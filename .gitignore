@@ -29,6 +29,10 @@
 
 # ::::::::::::::::::::::::::: #
 
+# Directories
+bin
+
+# Files
 *.suo
 *.sln
 *.vcxproj
