@@ -1,12 +1,23 @@
--- Premake5 script 
+----------------------------
+-- LORE2D Premake5 script --
+----------------------------
 
 targetdir "../bin/%{cfg.buildcfg}/Run"
 objdir "../bin/%{cfg.buildcfg}/Obj"
-
-includedirs { ".", "%{prj.location}", "%{prj.location}/_deps" }
-
 debugdir "../bin/%{cfg.buildcfg}/Run"
 
+includedirs { ".", "%{prj.location}", "%{prj.location}/_deps" }
+libdirs { "../lib/x64/%{cfg.buildcfg}" }
+architecture "x86_64"
+
+    
+-- Solution
+
+solution "LORE2D"
+    configurations { "Debug", "Release" }
+    startproject "Driver"
+    
+    
 -- Configurations
 
 filter "configurations:Debug"
@@ -17,29 +28,19 @@ filter "configurations:Release"
     defines { "NDEBUG" }
     optimize "On"
     
-filter "configurations:*32"
-    libdirs { "../lib/x86/%{cfg.buildcfg}" }
-    
-filter "configurations:*64"
-    libdirs { "../lib/x64/%{cfg.buildcfg}" }
-    
--- Solution
-
-solution "LORE2D"
-    configurations { "Debug", "Release" }
-    startproject "Driver"
     
 -- Project(s)
+
 project "LORE2D"
     location "LORE2D"
     kind "SharedLib"
     language "C++"
+    defines { "__Lore_Exports__" }
     files {
         "LORE2D/**.h", "LORE2D/**.cpp"
     }
 	links { "glfw3dll.lib" }	
-	postbuildcommands { "xcopy ..\\lib\\SDL\\x86\\*.dll ..\\bin\\%{cfg.buildcfg}\\Run\\ /Y",
-                        "if not exist ..\\bin\\%{cfg.buildcfg}\\Run\\res\\nul (xcopy ..\\res\\* ..\\bin\\%{cfg.buildcfg}\\Run\\res\\ /e)" }
+	postbuildcommands { "xcopy ..\\..\\lib\\x64\\%{cfg.buildcfg}\\*.dll ..\\..\\bin\\%{cfg.buildcfg}\\Run\\ /Y" }
 
 project "Driver"
     location "Driver"
