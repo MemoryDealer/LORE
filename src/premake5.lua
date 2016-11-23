@@ -36,11 +36,26 @@ project "LORE2D"
     kind "SharedLib"
     language "C++"
     defines { "__Lore_Exports__" }
+    pchheader "_pch.h"
+    pchsource "_pch.cpp"
+    buildoptions { "/FI_pch.h" }
     files {
         "LORE2D/**.h", "LORE2D/**.cpp"
     }
-	links { "glfw3dll.lib" }	
-	postbuildcommands { "xcopy ..\\..\\lib\\x64\\%{cfg.buildcfg}\\*.dll ..\\..\\bin\\%{cfg.buildcfg}\\Run\\ /Y" }
+    
+project "Plugin_OpenGL"
+    location "Plugins/OpenGL"
+    kind "SharedLib"
+    language "C++"
+    defines { "__LoreOpenGL_Exports__" }
+    pchheader "_pch.h"
+    pchsource "_pch.cpp"
+    buildoptions { "/FI_pch.h" }
+    files {
+        "Plugins/OpenGL/**.h", "Plugins/OpenGL/**.cpp"
+    }
+    links { "glfw3dll.lib" }
+    postbuildcommands { "xcopy ..\\..\\lib\\x64\\%{cfg.buildcfg}\\*.dll ..\\..\\bin\\%{cfg.buildcfg}\\Run\\ /Y" }
 
 project "Driver"
     location "Driver"

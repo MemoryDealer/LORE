@@ -27,7 +27,7 @@
 
 namespace Lore {
 
-    class IContext
+    class LORE_EXPORT IContext
     {
 
     public:
@@ -35,6 +35,12 @@ namespace Lore {
         virtual ~IContext() { }
 
     };
+
+    static std::unique_ptr<IContext> CreateContext()
+    {
+
+        return nullptr;
+    }
 
 }
 

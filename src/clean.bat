@@ -1,4 +1,5 @@
 @echo off
 
-del *.sln *.sdf *.vcxproj *.user /s
+del *.sln *.sdf *.vcxproj *.user *.filters /s
 rmdir .vs /s /q
+rmdir ipch /s /q

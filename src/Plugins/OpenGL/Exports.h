@@ -25,10 +25,10 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Include this file for all Lore2D functionality.
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-#include "IContext.h"
+#ifdef __LoreOpenGL_Exports__
+#define LORE_OPENGL_EXPORT __declspec( dllexport )
+#else
+#define LORE_OPENGL_EXPORT __declspec ( dllimport )
+#endif
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
