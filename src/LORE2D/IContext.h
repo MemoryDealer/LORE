@@ -25,6 +25,10 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include "Plugins.h"
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 namespace Lore {
 
     class LORE_EXPORT IContext
@@ -34,9 +38,14 @@ namespace Lore {
 
         virtual ~IContext() { }
 
+        //
+        // Rendering.
+
+        virtual void renderFrame( const real dt ) = 0;
+
     };
 
-    static std::unique_ptr<IContext> CreateContext()
+    inline LORE_EXPORT std::unique_ptr<IContext> CreateContext( const RendererPlugin& renderer )
     {
 
         return nullptr;

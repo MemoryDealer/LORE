@@ -25,9 +25,31 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/IContext.h>
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 namespace Lore { namespace OpenGL {
 
+    class Context : public IContext
+    {
 
+    public:
+
+        constexpr explicit Context();
+
+        virtual ~Context() override;
+
+        //
+        // Rendering.
+
+        virtual void renderFrame( const float dt ) override;
+    };
+
+    extern "C" __declspec( dllexport ) Context* CreateContext()
+    {
+        return new Context();
+    }
 
 }}
 
