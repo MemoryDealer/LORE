@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Lib.cpp" />
+    <ClCompile Include="PluginLoader\RenderPluginLoader.cpp">
+      <Filter>PluginLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="Context.cpp" />
+    <ClCompile Include="_pch.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Exports.h" />
+    <ClInclude Include="Lore.h" />
+    <ClInclude Include="Plugins.h" />
+    <ClInclude Include="Types.h" />
+    <ClInclude Include="_pch.h" />
+    <ClInclude Include="Context.h" />
+    <ClInclude Include="PluginLoader\RenderPluginLoader.h">
+      <Filter>PluginLoader</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="PluginLoader">
+      <UniqueIdentifier>{920f5f31-9fa4-4c74-8405-587a27ff27b4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

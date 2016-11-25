@@ -25,9 +25,13 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <string> // TODO: Figure out nicer way for clients to include dependencies.
+
 namespace Lore {
 
     using real = float;
+
+    using string = std::string;
 
 }
 

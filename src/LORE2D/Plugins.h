@@ -31,7 +31,7 @@
 
 namespace Lore {
 
-    enum class RendererPlugin {
+    enum class RenderPlugin {
 
         OpenGL
 

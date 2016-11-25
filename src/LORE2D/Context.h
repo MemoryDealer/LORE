@@ -25,17 +25,50 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// C++/STL.
-#include <memory>
-#include <string>
+#include "Plugins.h"
 
-// Windows.
-#if defined( _WIN32 ) || defined( _WIN64 )
-#include <Windows.h>
-#endif
+#include "PluginLoader/RenderPluginLoader.h"
 
-// Lore.
-#include "Exports.h"
-#include "Types.h"
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+namespace Lore {
+
+    class LORE_EXPORT Context
+    {
+
+    private:
+
+        // ...
+
+        
+
+    public:
+
+        explicit constexpr Context();
+
+        virtual ~Context();
+
+        //
+        // Rendering.
+
+        virtual void renderFrame( const real dt ) = 0;
+
+        static std::unique_ptr<Context> Create( const RenderPlugin& renderPlugin );
+
+        static void Destroy( std::unique_ptr<Context> context );
+
+    };
+
+    inline LORE_EXPORT std::unique_ptr<Context> CreateContext( const RenderPlugin& renderPlugin )
+    {
+        return Context::Create( renderPlugin );
+    }
+
+    inline LORE_EXPORT void DestroyContext( std::unique_ptr<Context> context )
+    {
+        Context::Destroy( std::move( context ) );
+    }
+
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

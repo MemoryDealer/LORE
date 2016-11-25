@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,32 +24,69 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Plugins.h"
+#include "RenderPluginLoader.h"
+
+#include "Context.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+using namespace Lore;
 
-    class LORE_EXPORT IContext
-    {
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    public:
+#if defined( _WIN32 ) || defined( _WIN64 )
 
-        virtual ~IContext() { }
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        //
-        // Rendering.
+constexpr
+RenderPluginLoader::RenderPluginLoader()
+: _hModule( nullptr )
+{
+}
 
-        virtual void renderFrame( const real dt ) = 0;
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    };
+RenderPluginLoader::~RenderPluginLoader()
+{
+    if ( _hModule ) {
+        FreeLibrary( _hModule );
+    }
+}
 
-    inline LORE_EXPORT std::unique_ptr<IContext> CreateContext( const RendererPlugin& renderer )
-    {
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+bool RenderPluginLoader::load( const string& file )
+{
+    _hModule = LoadLibrary( file.c_str() );
+    if ( nullptr == _hModule ) {
+        // log...
+        return false;
+    }
+
+    return true;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+std::unique_ptr<Context> RenderPluginLoader::createContext()
+{
+    using CreateContextPtr = Context*( *)( );
+
+    CreateContextPtr ccp = reinterpret_cast< CreateContextPtr >(
+        GetProcAddress( _hModule, "CreateContext" ) );
+    if ( nullptr == ccp ) {
 
         return nullptr;
     }
 
+    // Allocate the render plugin's context.
+    Context* context = ccp();
+    std::unique_ptr<Context> p( context );
+    return std::move( p );
 }
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+#endif
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

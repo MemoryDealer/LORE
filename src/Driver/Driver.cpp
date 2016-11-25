@@ -24,13 +24,18 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <memory>
 #include <LORE2D/Lore.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 int main( int argc, char** argv )
 {
-    auto context = Lore::CreateContext( Lore::RendererPlugin::OpenGL );
+    auto context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
+
+    context->renderFrame( 0 );
+
+    Lore::DestroyContext( std::move( context ) );
 
     return 0;
 }

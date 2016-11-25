@@ -25,13 +25,13 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/IContext.h>
+#include <LORE2D/Context.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore { namespace OpenGL {
 
-    class Context : public IContext
+    class Context : public Lore::Context
     {
 
     public:
@@ -46,9 +46,10 @@ namespace Lore { namespace OpenGL {
         virtual void renderFrame( const float dt ) override;
     };
 
-    extern "C" __declspec( dllexport ) Context* CreateContext()
+    extern "C" __declspec( dllexport ) Lore::Context* __stdcall CreateContext()
     {
-        return new Context();
+        Lore::Context* context = new Context();
+        return context;
     }
 
 }}

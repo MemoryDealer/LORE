@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,17 +24,67 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// C++/STL.
-#include <memory>
-#include <string>
+#include "Context.h"
 
-// Windows.
-#if defined( _WIN32 ) || defined( _WIN64 )
-#include <Windows.h>
-#endif
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Lore.
-#include "Exports.h"
-#include "Types.h"
+using namespace Lore;
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+namespace Local {
+
+    static std::unique_ptr<IRenderPluginLoader> __rpl;
+
+}
+using namespace Local;
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+constexpr
+Context::Context()
+{
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Context::~Context()
+{
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+std::unique_ptr<Context> Context::Create( const RenderPlugin& renderer )
+{
+    string file;
+    __rpl = CreateRenderPluginLoader();
+
+    switch ( renderer ) {
+    default:
+
+        return nullptr;
+
+    case RenderPlugin::OpenGL:
+        file = "Plugin_OpenGL";
+        break;
+    }
+
+    if ( !__rpl->load( file ) ) {
+
+        return nullptr;
+    }
+
+    // Load the context class from the plugin.
+    auto context = __rpl->createContext();
+    return std::move( context );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Context::Destroy( std::unique_ptr<Context> context )
+{
+    context.reset();
+    __rpl.reset();
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

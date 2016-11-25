@@ -25,17 +25,58 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// C++/STL.
-#include <memory>
-#include <string>
+namespace Lore {
 
-// Windows.
+    class Context;
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    class LORE_EXPORT IRenderPluginLoader
+    {
+
+    public:
+
+        virtual ~IRenderPluginLoader() { }
+
+        virtual bool load( const string& file ) = 0;
+
+        virtual std::unique_ptr<Context> createContext() = 0;
+
+    };
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 #if defined( _WIN32 ) || defined( _WIN64 )
 #include <Windows.h>
+
+    class LORE_EXPORT RenderPluginLoader : public IRenderPluginLoader
+    {
+
+    private:
+
+        HMODULE _hModule;
+
+    public:
+
+        explicit constexpr RenderPluginLoader();
+
+        virtual ~RenderPluginLoader() override;
+
+        virtual bool load( const string& file ) override;
+
+        virtual std::unique_ptr<Context> createContext() override;
+
+    };
 #endif
 
-// Lore.
-#include "Exports.h"
-#include "Types.h"
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    inline std::unique_ptr<IRenderPluginLoader> CreateRenderPluginLoader()
+    {
+        std::unique_ptr<IRenderPluginLoader> rpl = std::make_unique<RenderPluginLoader>();
+        return rpl;
+    }
+
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

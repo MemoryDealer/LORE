@@ -32,7 +32,9 @@ using namespace Lore::OpenGL;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-constexpr Context::Context()
+constexpr
+Context::Context()
+: Lore::Context()
 {
 }
 
@@ -46,7 +48,7 @@ Context::~Context()
 
 void Context::renderFrame( const float dt )
 {
-
+    ;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
