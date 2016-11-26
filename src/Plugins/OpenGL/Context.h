@@ -25,7 +25,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Context.h>
+#include <LORE2D/Core/Context.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -44,6 +44,12 @@ namespace Lore { namespace OpenGL {
         // Rendering.
 
         virtual void renderFrame( const float dt ) override;
+
+        //
+        // Information.
+
+        virtual string getRenderPluginName() const override;
+
     };
 
     extern "C" __declspec( dllexport ) Lore::Context* __stdcall CreateContext()

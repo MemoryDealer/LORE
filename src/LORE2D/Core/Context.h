@@ -1,3 +1,4 @@
+#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -24,10 +25,57 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// This is here to generate an import library (.lib file) on Windows.
+#include <LORE2D/Plugin/Plugins.h>
+#include <LORE2D/Plugin/RenderPluginLoader.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Lore.h"
+namespace Lore {
+
+    class LORE_EXPORT Context
+    {
+
+    private:
+
+        // ...
+
+        
+
+    public:
+
+        explicit constexpr Context();
+
+        virtual ~Context();
+
+        //
+        // Rendering.
+
+        virtual void renderFrame( const real dt ) = 0;
+
+        //
+        // Information.
+
+        virtual string getRenderPluginName() const = 0;
+
+        //
+        // Static helper functions.
+
+        static std::unique_ptr<Context> Create( const RenderPlugin& renderPlugin );
+
+        static void Destroy( std::unique_ptr<Context> context );
+
+    };
+
+    inline LORE_EXPORT std::unique_ptr<Context> CreateContext( const RenderPlugin& renderPlugin )
+    {
+        return Context::Create( renderPlugin );
+    }
+
+    inline LORE_EXPORT void DestroyContext( std::unique_ptr<Context> context )
+    {
+        Context::Destroy( std::move( context ) );
+    }
+
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

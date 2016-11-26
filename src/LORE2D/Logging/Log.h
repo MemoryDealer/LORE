@@ -1,3 +1,4 @@
+#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -24,23 +25,79 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <memory>
-#include <LORE2D/Lore.h>
+#include "Types.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-int main( int argc, char** argv )
-{
-    auto context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
+#pragma warning( disable: 4251 )
 
-    context->renderFrame( 0 );
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    Lore::Log::Write( "Test" );
-    Lore::Log::Write( "Test2" );
+namespace Lore {
 
-    Lore::DestroyContext( std::move( context ) );
+    enum class LogLevel {
+        Critical,       // Program must terminate.
+        Error,          // Something failed, which may or may not be fatal.
+        Warning,        // A possible concern.
+        Information,    // Similar to warning, however this reports general information.
+        Debug,          // Extended information.
+        Trace           // For tracing entry/exit of routines or blocks.
+    };
 
-    return 0;
+    class LORE_EXPORT Logger final
+    {
+
+    private:
+
+        LogLevel _level;
+
+        struct Message {
+            LogLevel lvl;
+            string text;
+        };
+
+        std::queue<Message> _messageQueue;
+        std::mutex _mutex;
+        std::condition_variable _cv;
+        std::atomic<bool> _active;
+
+    private:
+
+        void __logger();
+
+    public:
+
+        explicit Logger( const string& filename );
+
+        ~Logger();
+
+        void write( const string& text );
+
+        void write( const LogLevel& lvl, const string& text );
+
+        //
+        // Setters.
+
+        void setLevel( const LogLevel& lvl )
+        {
+            _level = lvl;
+        }
+
+    };
+
+    class LORE_EXPORT Log final
+    {
+
+    public:
+
+        static void Write( const string& text );
+
+        static void Write( const LogLevel& lvl, const string& text );
+
+        static void AllocateLogger();
+
+    };
+
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

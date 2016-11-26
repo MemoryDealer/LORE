@@ -24,7 +24,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Context.h"
+#include "Log.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -34,57 +34,91 @@ using namespace Lore;
 
 namespace Local {
 
-    static std::unique_ptr<IRenderPluginLoader> __rpl;
+    std::unique_ptr<Logger> __log;
 
 }
 using namespace Local;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-constexpr
-Context::Context()
+void Logger::__logger()
 {
-}
+    while ( _active ) {
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+        // Wait for incoming messages.
+        std::unique_lock<std::mutex> lock( _mutex );
+        _cv.wait( lock );
 
-Context::~Context()
-{
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-std::unique_ptr<Context> Context::Create( const RenderPlugin& renderer )
-{
-    string file;
-    __rpl = CreateRenderPluginLoader();
-
-    switch ( renderer ) {
-    default:
-
-        return nullptr;
-
-    case RenderPlugin::OpenGL:
-        file = "Plugin_OpenGL";
-        break;
+        while ( !_messageQueue.empty() ) {
+            Message msg = _messageQueue.front();
+            if ( msg.lvl <= _level ) {
+                printf( "msg: %s\n", msg.text.c_str() );
+            }
+            _messageQueue.pop();
+        }
     }
-
-    if ( !__rpl->load( file ) ) {
-
-        return nullptr;
-    }
-
-    // Load the context class from the plugin.
-    auto context = __rpl->createContext();
-    return std::move( context );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Context::Destroy( std::unique_ptr<Context> context )
+Logger::Logger( const string& filename )
+: _level( LogLevel::Information )
+, _messageQueue()
+, _mutex()
+, _cv()
+, _active( true )
 {
-    context.reset();
-    __rpl.reset();
+    std::thread loggerThread( &Logger::__logger, this );
+    loggerThread.detach();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Logger::~Logger()
+{
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Logger::write( const string& text )
+{
+    Message msg;
+    msg.lvl = LogLevel::Information;
+    msg.text = text;
+    
+    std::lock_guard<std::mutex> lock( _mutex );
+    _messageQueue.push( msg );
+    _cv.notify_one();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Logger::write( const LogLevel& lvl, const string& text )
+{
+
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Log::Write( const string& msg )
+{
+    __log->write( msg );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Log::Write( const LogLevel& lvl, const string& msg )
+{
+    __log->write( lvl, msg );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Log::AllocateLogger()
+{
+    if ( !__log.get() ) {
+        __log = std::make_unique<Logger>( "Lore.log" );
+    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

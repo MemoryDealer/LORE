@@ -24,8 +24,6 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "RenderPluginLoader.h"
-
 #include "Context.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -34,59 +32,66 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#if defined( _WIN32 ) || defined( _WIN64 )
+namespace Local {
+
+    static std::unique_ptr<IRenderPluginLoader> __rpl;
+
+}
+using namespace Local;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 constexpr
-RenderPluginLoader::RenderPluginLoader()
-: _hModule( nullptr )
+Context::Context()
 {
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-RenderPluginLoader::~RenderPluginLoader()
+Context::~Context()
 {
-    if ( _hModule ) {
-        FreeLibrary( _hModule );
-    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-bool RenderPluginLoader::load( const string& file )
+std::unique_ptr<Context> Context::Create( const RenderPlugin& renderer )
 {
-    _hModule = LoadLibrary( file.c_str() );
-    if ( nullptr == _hModule ) {
-        // log...
-        return false;
+    string file;
+
+    Log::AllocateLogger();
+
+    if ( __rpl.get() ) {
+        __rpl.reset();
     }
 
-    return true;
-}
+    __rpl = CreateRenderPluginLoader();
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    switch ( renderer ) {
+    default:
 
-std::unique_ptr<Context> RenderPluginLoader::createContext()
-{
-    using CreateContextPtr = Context*( *)( );
+        return nullptr;
 
-    CreateContextPtr ccp = reinterpret_cast< CreateContextPtr >(
-        GetProcAddress( _hModule, "CreateContext" ) );
-    if ( nullptr == ccp ) {
+    case RenderPlugin::OpenGL:
+        file = "Plugin_OpenGL";
+        break;
+    }
+
+    if ( !__rpl->load( file ) ) {
 
         return nullptr;
     }
 
-    // Allocate the render plugin's context.
-    Context* context = ccp();
-    std::unique_ptr<Context> p( context );
-    return std::move( p );
+    // Load the context class from the plugin.
+    auto context = __rpl->createContext();
+    return std::move( context );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#endif
+void Context::Destroy( std::unique_ptr<Context> context )
+{
+    context.reset();
+    __rpl.reset(); // Free the plugin library.
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -52,3 +52,10 @@ void Context::renderFrame( const float dt )
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Lore::string Context::getRenderPluginName() const
+{
+    return Lore::string( "OpenGL" );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

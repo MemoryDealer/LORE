@@ -1,27 +1,45 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Lib.cpp" />
-    <ClCompile Include="PluginLoader\RenderPluginLoader.cpp">
-      <Filter>PluginLoader</Filter>
-    </ClCompile>
-    <ClCompile Include="Context.cpp" />
-    <ClCompile Include="_pch.cpp" />
+    <Filter Include="Core">
+      <UniqueIdentifier>{2EB4837C-1AEB-840D-C3D7-6A10AFED000F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Logging">
+      <UniqueIdentifier>{AC6878E8-1848-F783-2160-825A8DBE5DE5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugin">
+      <UniqueIdentifier>{F4F95FCA-E09B-8AA0-C956-9EF4B59711F1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Core\Context.h">
+      <Filter>Core</Filter>
+    </ClInclude>
     <ClInclude Include="Exports.h" />
+    <ClInclude Include="Logging\Log.h">
+      <Filter>Logging</Filter>
+    </ClInclude>
     <ClInclude Include="Lore.h" />
-    <ClInclude Include="Plugins.h" />
+    <ClInclude Include="LorePrerequisites.h" />
+    <ClInclude Include="Plugin\Plugins.h">
+      <Filter>Plugin</Filter>
+    </ClInclude>
+    <ClInclude Include="Plugin\RenderPluginLoader.h">
+      <Filter>Plugin</Filter>
+    </ClInclude>
     <ClInclude Include="Types.h" />
     <ClInclude Include="_pch.h" />
-    <ClInclude Include="Context.h" />
-    <ClInclude Include="PluginLoader\RenderPluginLoader.h">
-      <Filter>PluginLoader</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="PluginLoader">
-      <UniqueIdentifier>{920f5f31-9fa4-4c74-8405-587a27ff27b4}</UniqueIdentifier>
-    </Filter>
+    <ClCompile Include="Core\Context.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Logging\Log.cpp">
+      <Filter>Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="Plugin\RenderPluginLoader.cpp">
+      <Filter>Plugin</Filter>
+    </ClCompile>
+    <ClCompile Include="_pch.cpp" />
   </ItemGroup>
 </Project>

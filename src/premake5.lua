@@ -9,6 +9,7 @@ debugdir "../bin/%{cfg.buildcfg}/Run"
 includedirs { ".", "%{prj.location}", "%{prj.location}/_deps" }
 libdirs { "../lib/x64/%{cfg.buildcfg}" }
 architecture "x86_64"
+characterset ( "MBCS" )
 
     
 -- Solution
@@ -67,6 +68,7 @@ project "Driver"
     files {
         "Driver/**.cpp"
     }
+    links { "LORE2D" }
     
 project "UnitTests"
     location "UnitTests"
@@ -75,3 +77,4 @@ project "UnitTests"
     files {
         "UnitTests/**.h", "UnitTests/**.hpp", "UnitTests/**.cpp"
     }
+    links { "LORE2D" }
