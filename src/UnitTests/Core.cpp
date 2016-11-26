@@ -24,38 +24,26 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Context.h"
+#include "UnitTests.h"
+#include <LORE2D/Lore.h>
+
+#define CATCH_CONFIG_MAIN
+#include "catch.hpp"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-using namespace Lore::OpenGL;
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-Context::Context()
-: Lore::Context()
+TEST_CASE( "Context correctly created from render plugins", "[context]" )
 {
-    Log::Write( "OpenGL render plugin initialized" );
-}
+    std::unique_ptr<Lore::Context> context;
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    SECTION( "OpenGL render plugin" ) {
+        context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
 
-Context::~Context()
-{
-}
+        REQUIRE( context.get() != nullptr );
+        REQUIRE( context->getRenderPluginName() == "OpenGL" );
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Context::renderFrame( const float dt )
-{
-    ;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-Lore::string Context::getRenderPluginName() const
-{
-    return Lore::string( "OpenGL" );
+        DestroyLoreContext( context );
+    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

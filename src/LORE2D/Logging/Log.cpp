@@ -49,7 +49,7 @@ void Logger::__logger()
     logLevelStrings[LogLevel::Critical] = "Critical";
     logLevelStrings[LogLevel::Error] = "Error";
     logLevelStrings[LogLevel::Warning] = "Warning";
-    logLevelStrings[LogLevel::Information] = "Information";
+    logLevelStrings[LogLevel::Information] = "";
     logLevelStrings[LogLevel::Debug] = "Debug";
     logLevelStrings[LogLevel::Trace] = "Trace";
 

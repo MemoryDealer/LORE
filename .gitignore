@@ -37,6 +37,7 @@ src/ipch
 *.suo
 *.sln
 *.vcxproj
+*.filters
 *.user
 *.opendb
 *.sdf

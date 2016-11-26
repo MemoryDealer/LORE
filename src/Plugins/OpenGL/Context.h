@@ -25,7 +25,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Core/Context.h>
+#include <LORE2D/Lore.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -36,7 +36,7 @@ namespace Lore { namespace OpenGL {
 
     public:
 
-        constexpr explicit Context();
+        explicit Context();
 
         virtual ~Context() override;
 
