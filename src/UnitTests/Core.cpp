@@ -24,7 +24,6 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "UnitTests.h"
 #include <LORE2D/Lore.h>
 
 #define CATCH_CONFIG_MAIN

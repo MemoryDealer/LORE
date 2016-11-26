@@ -60,6 +60,7 @@ bool RenderPluginLoader::load( const string& file )
     _hModule = LoadLibrary( file.c_str() );
     if ( nullptr == _hModule ) {
         // log...
+        log!
         return false;
     }
 

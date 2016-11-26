@@ -138,6 +138,7 @@ void Logger::write( const LogLevel& lvl, const string& text )
 void Logger::join()
 {
     if ( _thread.joinable() ) {
+        _cv.notify_one();
         _thread.join();
     }
 }
