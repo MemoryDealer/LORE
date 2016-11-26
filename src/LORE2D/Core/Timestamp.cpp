@@ -24,9 +24,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Context.h"
-
-#include <LORE2D/Core/Timestamp.h>
+#include "Timestamp.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -36,66 +34,64 @@ using namespace Lore;
 
 namespace Local {
 
-    static std::unique_ptr<IRenderPluginLoader> __rpl;
+    std::unique_ptr<ITimestamper> __timestamper;
 
 }
 using namespace Local;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-constexpr
-Context::Context()
+void Lore::CreateTimestamper()
 {
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-Context::~Context()
-{
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-std::unique_ptr<Context> Context::Create( const RenderPlugin& renderer )
-{
-    string file;
-
-    // Setup required Lore objects.
-    Log::AllocateLogger();
-
-    if ( __rpl.get() ) {
-        __rpl.reset();
+    if ( __timestamper.get() ) {
+        __timestamper.reset();
     }
 
-    __rpl = CreateRenderPluginLoader();
-
-    switch ( renderer ) {
-    default:
-
-        return nullptr;
-
-    case RenderPlugin::OpenGL:
-        file = "Plugin_OpenGL";
-        break;
-    }
-
-    if ( !__rpl->load( file ) ) {
-
-        return nullptr;
-    }
-
-    // Load the context class from the plugin.
-    auto context = __rpl->createContext();
-    return std::move( context );
+    __timestamper = std::make_unique<Timestamper>();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Context::Destroy( std::unique_ptr<Context> context )
+string Lore::GenerateTimestamp()
 {
-    context.reset();
-    __rpl.reset(); // Free the plugin library.
-    Log::DeleteLogger();
+    return __timestamper->generate();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+#if defined( _WIN32 ) || defined( _WIN64 )
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+string Timestamper::generate() const 
+{
+    SYSTEMTIME st { 0 };
+
+    GetLocalTime( &st );
+    string timestamp;
+
+    // Trash "algorithm" to generate a timestamp string.
+    auto month = std::to_string( st.wMonth );
+    if ( st.wMonth < 10 ) month.insert( 0, "0" );
+    auto day = std::to_string( st.wDay );
+    if ( st.wDay < 10 ) day.insert( 0, "0" );
+    auto year = std::to_string( st.wYear );
+    auto hour = std::to_string( st.wHour );
+    if ( st.wHour < 10 ) hour.insert( 0, "0" );
+    auto minute = std::to_string( st.wMinute );
+    if ( st.wMinute < 10 ) minute.insert( 0, "0" );
+    auto second = std::to_string( st.wSecond );
+    if ( st.wSecond < 10 ) second.insert( 0, "0" );
+
+    timestamp.append( month + "/" + day + "/" + year + " " );
+    timestamp.append( hour + ":" + minute + ":" + second );
+    return timestamp;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+#endif
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+

@@ -1,3 +1,4 @@
+#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -24,26 +25,30 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <memory>
-#include <LORE2D/Lore.h>
+namespace Lore {
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    class Exception : public std::exception
+    {
 
-int main( int argc, char** argv )
-{
-    auto context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
+    private:
 
-    Lore::Log::Write( "Test1" );
-    Lore::Log::Write( "2" );
+        std::string _what;
+        
+    public:
 
-    context->renderFrame( 0 );
+        explicit Exception( const std::string& what )
+        : _what( what )
+        {
 
-    DestroyLoreContext( context );
+        }
 
-#ifdef _DEBUG
-    system( "pause" );
-#endif
-    return 0;
+        virtual char const* what() const override
+        {
+            return ( !_what.empty() ) ? _what.c_str() : "Unknown exception";
+        }
+
+    };
+
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

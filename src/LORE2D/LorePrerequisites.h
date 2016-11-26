@@ -27,12 +27,18 @@
 
 // C++/STL.
 #include <atomic>
+#include <chrono>
 #include <condition_variable>
+#include <ctime>
+#include <fstream>
+#include <map>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <thread>
 #include <queue>
+#include <unordered_map>
+#include <vector>
 
 // Windows.
 #if defined( _WIN32 ) || defined( _WIN64 )
@@ -40,6 +46,7 @@
 #endif
 
 // Lore.
+#include "Exception.h"
 #include "Exports.h"
 #include "Logging/Log.h"
 #include "Types.h"

@@ -1,3 +1,4 @@
+#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -24,26 +25,35 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <memory>
-#include <LORE2D/Lore.h>
+namespace Lore {
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    class ITimestamper
+    {
 
-int main( int argc, char** argv )
-{
-    auto context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
+    public:
 
-    Lore::Log::Write( "Test1" );
-    Lore::Log::Write( "2" );
+        virtual ~ITimestamper() { }
 
-    context->renderFrame( 0 );
+        virtual string generate() const = 0;
 
-    DestroyLoreContext( context );
+    };
 
-#ifdef _DEBUG
-    system( "pause" );
+#if defined( _WIN32 ) || defined( _WIN64 )
+
+    class Timestamper : public ITimestamper
+    {
+
+    public:
+
+        virtual string generate() const override;
+
+    };
+
 #endif
-    return 0;
+
+    extern void CreateTimestamper();
+    extern string GenerateTimestamp();
+
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

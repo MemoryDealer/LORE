@@ -76,6 +76,8 @@ namespace Lore {
         Context::Destroy( std::move( context ) );
     }
 
+#define DestroyLoreContext( c ) Lore::DestroyContext( std::move( c ) )
+
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

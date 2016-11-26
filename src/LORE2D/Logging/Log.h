@@ -56,7 +56,10 @@ namespace Lore {
             string text;
         };
 
+        std::ofstream _stream;
         std::queue<Message> _messageQueue;
+
+        std::thread _thread;
         std::mutex _mutex;
         std::condition_variable _cv;
         std::atomic<bool> _active;
@@ -71,9 +74,14 @@ namespace Lore {
 
         ~Logger();
 
+        //
+        // Logging functions.
+
         void write( const string& text );
 
         void write( const LogLevel& lvl, const string& text );
+
+        void join();
 
         //
         // Setters.
@@ -81,6 +89,11 @@ namespace Lore {
         void setLevel( const LogLevel& lvl )
         {
             _level = lvl;
+        }
+
+        void setActive( const bool active )
+        {
+            _active = active;
         }
 
     };
@@ -95,6 +108,8 @@ namespace Lore {
         static void Write( const LogLevel& lvl, const string& text );
 
         static void AllocateLogger();
+
+        static void DeleteLogger();
 
     };
 

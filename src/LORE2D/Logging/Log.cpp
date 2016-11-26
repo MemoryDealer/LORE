@@ -26,6 +26,8 @@
 
 #include "Log.h"
 
+#include <LORE2D/Core/Timestamp.h>
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 using namespace Lore;
@@ -34,7 +36,7 @@ using namespace Lore;
 
 namespace Local {
 
-    std::unique_ptr<Logger> __log;
+    static std::unique_ptr<Logger> __log;
 
 }
 using namespace Local;
@@ -43,19 +45,41 @@ using namespace Local;
 
 void Logger::__logger()
 {
+    std::unordered_map<LogLevel, string> logLevelStrings;
+    logLevelStrings[LogLevel::Critical] = "Critical";
+    logLevelStrings[LogLevel::Error] = "Error";
+    logLevelStrings[LogLevel::Warning] = "Warning";
+    logLevelStrings[LogLevel::Information] = "Information";
+    logLevelStrings[LogLevel::Debug] = "Debug";
+    logLevelStrings[LogLevel::Trace] = "Trace";
+
     while ( _active ) {
 
         // Wait for incoming messages.
         std::unique_lock<std::mutex> lock( _mutex );
         _cv.wait( lock );
 
+        auto timestamp = GenerateTimestamp();
+
         while ( !_messageQueue.empty() ) {
             Message msg = _messageQueue.front();
             if ( msg.lvl <= _level ) {
-                printf( "msg: %s\n", msg.text.c_str() );
+                string out = "[" + timestamp + "] ";
+                out.append( logLevelStrings[msg.lvl] + ": " );
+                out.append( msg.text );
+
+                printf( "%s\n", out.c_str() );
+                _stream << out << std::endl;
             }
             _messageQueue.pop();
         }
+
+        _stream.flush();
+
+    }
+
+    if ( _stream.is_open() ) {
+        _stream.close();
     }
 }
 
@@ -63,39 +87,59 @@ void Logger::__logger()
 
 Logger::Logger( const string& filename )
 : _level( LogLevel::Information )
+, _stream()
 , _messageQueue()
+, _thread()
 , _mutex()
 , _cv()
 , _active( true )
 {
-    std::thread loggerThread( &Logger::__logger, this );
-    loggerThread.detach();
+    // Open log file.
+    _stream.open( filename.c_str(), std::ofstream::out );
+    if ( !_stream.is_open() ) {
+        throw Lore::Exception( "Unable to create log file" );
+    }
+
+    _stream << "..::| LORE2D Log Started |::.." << std::endl;
+
+    _thread = std::thread( &Logger::__logger, this );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Logger::~Logger()
 {
+    
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Logger::write( const string& text )
 {
-    Message msg;
-    msg.lvl = LogLevel::Information;
-    msg.text = text;
-    
-    std::lock_guard<std::mutex> lock( _mutex );
-    _messageQueue.push( msg );
-    _cv.notify_one();
+    write( LogLevel::Information, text );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Logger::write( const LogLevel& lvl, const string& text )
 {
+    Message msg;
+    msg.lvl = lvl;
+    msg.text = text;
 
+    // Enqueue message and wake up logger thread.
+    std::unique_lock<std::mutex> lock( _mutex );
+    _messageQueue.push( msg );
+    _cv.notify_one();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Logger::join()
+{
+    if ( _thread.joinable() ) {
+        _thread.join();
+    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -118,6 +162,18 @@ void Log::AllocateLogger()
 {
     if ( !__log.get() ) {
         __log = std::make_unique<Logger>( "Lore.log" );
+    }
+    CreateTimestamper();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Log::DeleteLogger()
+{
+    if ( __log.get() ) {
+        __log->setActive( false );
+        __log->join();
+        __log.reset();
     }
 }
 
