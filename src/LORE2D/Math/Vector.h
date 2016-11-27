@@ -49,7 +49,7 @@ namespace Lore {
     T& operator [] ( int idx ) { return data[idx]; }\
     const T& operator [] ( int idx ) const { return data[idx]; }\
     /* Vector operations */ \
-    T dot( const Vector<T, N>& rhs )\
+    T dot( const Vector<T, N>& rhs ) const\
     {\
         T re(0);\
         for( int i=0; i<N; ++i ){\
@@ -57,23 +57,31 @@ namespace Lore {
         }\
         return re;\
     }\
-    T lengthSquared()\
+    T squaredLength() const\
     {\
         return dot( *this );\
     }\
-    T length()\
+    T length() const\
     {\
-        return sqrt( lengthSquared() );\
+        return sqrt( squaredLength() );\
     }\
     void normalize()\
     {\
         *this = *this / length();\
     }\
-    Vector<T, N> normalizedCopy()\
+    Vector<T, N> normalizedCopy() const\
     {\
         auto copy = *this;\
         copy.normalize();\
         return copy;\
+    }\
+    T distance( const Vector<T, N>& rhs ) const\
+    {\
+        return ( *this - rhs ).length();\
+    }\
+    T squaredDistance( const Vector<T, N>& rhs ) const\
+    {\
+        return ( *this - rhs ).squaredLength();\
     }\
     Vector<T, N> pow( const float p )\
     {\
