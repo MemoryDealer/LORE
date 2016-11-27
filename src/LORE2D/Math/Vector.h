@@ -141,11 +141,13 @@ namespace Lore {
 
         DEFAULT_MEMBERS( 3 );
 
-        void cross( const Vector<T, 3>& rhs )
+        Vector<T, 3> cross( const Vector<T, 3>& rhs )
         {
-            x = x * rhs.z - z * rhs.y;
-            y = z * rhs.x - x * rhs.z;
-            z = x * rhs.y - y * rhs.x;
+            Vector<T, 3> re;
+            re.x = y * rhs.z - z * rhs.y;
+            re.y = z * rhs.x - x * rhs.z;
+            re.z = x * rhs.y - y * rhs.x;
+            return re;
         }
     };
 

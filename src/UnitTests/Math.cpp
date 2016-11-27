@@ -33,6 +33,11 @@
     REQUIRE( v.x == Approx( f ) );\
     REQUIRE( v.y == Approx( f ) )
 
+#define REQUIRE_V3( v, f )\
+    REQUIRE( v.x == Approx( f ) );\
+    REQUIRE( v.y == Approx( f ) );\
+    REQUIRE( v.z == Approx( f ) )
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 TEST_CASE( "Basic vector-scalar operators", "[math]" )
@@ -211,6 +216,16 @@ TEST_CASE( "Vector operations", "[math]" )
         v += 2.f;
         v.pow( 3.f );
         REQUIRE_V2( v, 8.f );
+    }
+
+    SECTION( "Cross product" )
+    {
+        Lore::Vec3 a( 71.f, 33.f, 21.f ), b( 83.2f, 44.f, 3.2f );
+
+        auto re = a.cross( b );
+        REQUIRE( re.x == Approx( -818.4f ) );
+        REQUIRE( re.y == Approx( 1520.f ) );
+        REQUIRE( re.z == Approx( 378.4f ) );
     }
 }
 
