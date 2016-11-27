@@ -98,3 +98,15 @@ TEST_CASE( "Basic vector-scalar operators", "[math]" )
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+TEST_CASE( "Basic vector-vector operators", "[math]" )
+{
+    Lore::Vec2 v;
+
+    SECTION( "Addition" )
+    {
+
+    }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

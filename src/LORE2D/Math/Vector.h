@@ -40,8 +40,47 @@ namespace Lore {
             data[i] = t;\
         }\
     }\
+    Vector( const Vector<T, N>& rhs )\
+    {\
+        for( int i=0; i<N; ++i ){\
+            data[i] = rhs[i];\
+        }\
+    }\
     T& operator [] ( int idx ) { return data[idx]; }\
-    const T& operator [] ( int idx ) const { return data[idx]; }
+    const T& operator [] ( int idx ) const { return data[idx]; }\
+    /* Vector operations */ \
+    T dot( const Vector<T, N>& rhs )\
+    {\
+        T re(0);\
+        for( int i=0; i<N; ++i ){\
+            re += data[i] * rhs[i];\
+        }\
+        return re;\
+    }\
+    T lengthSquared()\
+    {\
+        return dot( *this );\
+    }\
+    T length()\
+    {\
+        return sqrt( lengthSquared() );\
+    }\
+    void normalize()\
+    {\
+        *this = *this / length();\
+    }\
+    Vector<T, N> normalizedCopy()\
+    {\
+        auto copy = *this;\
+        copy.normalize();\
+        return copy;\
+    }\
+    Vector<T, N> pow( const float p )\
+    {\
+        for ( int i = 0; i < N; ++i ){\
+            data[i] = ::pow( data[i], p );\
+        }\
+    }
 
     ///
     /// \class Vector
@@ -56,6 +95,9 @@ namespace Lore {
     using Vec2 = Vector<float, 2>;
     using Vec3 = Vector<float, 3>;
     using Vec4 = Vector<float, 4>;
+
+    using Colori = Vector<int, 4>;
+    using Colorf = Vector<float, 4>;
 
     //
     // Specialize component access for all vector sizes.
@@ -90,6 +132,13 @@ namespace Lore {
         { }
 
         DEFAULT_MEMBERS( 3 );
+
+        void cross( const Vector<T, 3>& rhs )
+        {
+            x = x * rhs.z - z * rhs.y;
+            y = z * rhs.x - x * rhs.z;
+            z = x * rhs.y - y * rhs.x;
+        }
     };
 
     template<typename T>
@@ -110,6 +159,8 @@ namespace Lore {
 
         DEFAULT_MEMBERS( 4 );
     };
+
+#undef DEFAULT_MEMBERS
 
     //
     // Operator overloads.
@@ -195,53 +246,6 @@ namespace Lore {
 #undef VEC_UNARY_OP
 #undef VEC_BINARY_OP
 #undef VEC_INPLACE_OP
-
-    //
-    // Vector operations.
-
-    template<typename T, int N>
-    T dot( const Vector<T, N>& a, const Vector<T, N>& b )
-    {
-        T re( 0 );
-        for ( int i = 0; i < N; ++i ) {
-            re += a[i] * b[i];
-        }
-        return re;
-    }
-
-    template<typename T, int N>
-    T lengthSquared( const Vector<T, N> v )
-    {
-        return dot( v, v );
-    }
-
-    template<typename T, int N>
-    T length( const Vector<T, N> v )
-    {
-        return sqrt( lengthSquared( v ) );
-    }
-
-    template<typename T, int N>
-    Vector<T, N> normalize( Vector<T, N>& v )
-    {
-        v = v / length( v );
-    }
-
-    template<typename T, int N>
-    Vector<T, N> normalizedCopy( const Vector<T, N>& v )
-    {
-        return v / length( v );
-    }
-
-    template<typename T>
-    Vector<T, 3> cross( const Vector<T, 3>& a, const Vector<T, 3>& b )
-    {
-        return Vector<T, 3>(
-            a.y * b.z - a.z * b.y,
-            a.z * b.x - a.x * b.z,
-            a.x * b.y - a.y * b.x
-        );
-    }
 
 }
 
