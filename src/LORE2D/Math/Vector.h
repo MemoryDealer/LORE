@@ -83,7 +83,7 @@ namespace Lore {
     {\
         return ( *this - rhs ).squaredLength();\
     }\
-    Vector<T, N> pow( const float p )\
+    void pow( const float p )\
     {\
         for ( int i = 0; i < N; ++i ){\
             data[i] = ::pow( data[i], p );\

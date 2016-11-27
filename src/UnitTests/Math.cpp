@@ -105,7 +105,112 @@ TEST_CASE( "Basic vector-vector operators", "[math]" )
 
     SECTION( "Addition" )
     {
+        Lore::Vec2 r( 5.f, 5.f );
 
+        v += r;
+        REQUIRE_V2( v, 5.f );
+
+        v += Lore::Vec2( 123.54f, 123.54f );
+        REQUIRE_V2( v, 128.54f );
+
+        v = v / r;
+        REQUIRE_V2( v, 128.54f / 5.f );
+    }
+
+    SECTION( "Subtraction" )
+    {
+        Lore::Vec2 r( 17.08f, 17.08f );
+
+        v -= r;
+        REQUIRE_V2( v, -17.08f );
+
+        v -= Lore::Vec2( 0.071f, 0.071f );
+        REQUIRE_V2( v, -17.151f );
+
+        v = v - r;
+        REQUIRE_V2( v, -17.151f - 17.08f );
+    }
+
+    SECTION( "Multiplication" )
+    {
+        Lore::Vec2 r( 5.f, 5.f );
+
+        v += 1.f;
+        v *= r;
+        REQUIRE_V2( v, 5.f );
+
+        v *= Lore::Vec2( -3.f, -3.f );
+        REQUIRE_V2( v, -15.f );
+
+        v = v * r;
+        REQUIRE_V2( v, -15.f * 5.f );
+    }
+
+    SECTION( "Division" )
+    {
+        Lore::Vec2 r( 21.f, 21.f );
+
+        v /= r;
+        REQUIRE_V2( v, 0.f );
+        
+        v += 1.f;
+        v /= r;
+        REQUIRE_V2( v, 0.04762f );
+
+        v /= Lore::Vec2( -.03f, -.03f );
+        REQUIRE_V2( v, -1.5873f );
+
+        v = v / r;
+        REQUIRE_V2( v, -1.5873f / 21.f );
+    }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+TEST_CASE( "Vector operations", "[math]" )
+{
+    Lore::Vec2 v;
+
+    SECTION( "Dot product" )
+    {
+        Lore::Vec2 r( 2.5f, 7.5f );
+        v += 5.f;
+        REQUIRE( v.dot( r ) == Approx( 50.f ) );
+        REQUIRE( v.dot( Lore::Vec2( -20.f, -78.3f ) ) == Approx( -983.f / 2.f ) );
+    }
+
+    SECTION( "Length" )
+    {
+        v += Lore::Vec2( 2.5f, 7.5f );
+        REQUIRE( v.squaredLength() == Approx( 62.5f ) );
+        REQUIRE( v.length() == Approx( 7.9057f ) );
+    }
+
+    SECTION( "Normalization" )
+    {
+        v += 15.f;
+        v.normalize();
+        REQUIRE_V2( v, 0.7071f );
+
+        Lore::Vec2 r( 121.f, 33.f );
+        auto copy = r.normalizedCopy();
+        REQUIRE( copy.x == Approx( 0.96476f ) );
+        REQUIRE( copy.y == Approx( 0.26312f ) );
+    }
+
+    SECTION( "Distance" )
+    {
+        v += 5.f;
+        Lore::Vec2 r( 120.f, 5.f );
+        REQUIRE( v.squaredDistance( r ) == Approx( 13225.f ) );
+        REQUIRE( v.distance( r ) == Approx( 115.f ) );
+    }
+
+    SECTION( "Pow" )
+    {
+        v += 2.f;
+        v.pow( 3.f );
+        REQUIRE_V2( v, 8.f );
     }
 }
 
