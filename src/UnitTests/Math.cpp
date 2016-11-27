@@ -24,72 +24,77 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "RenderPluginLoader.h"
-
-#include <LORE2D/Core/Context.h>
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-using namespace Lore;
+#include "catch.hpp"
+#include <LORE2D/Lore.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#if defined( _WIN32 ) || defined( _WIN64 )
+#define REQUIRE_V2( v, f )\
+    REQUIRE( v.x == Approx( f ) );\
+    REQUIRE( v.y == Approx( f ) )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-constexpr
-RenderPluginLoader::RenderPluginLoader()
-: _hModule( nullptr )
+TEST_CASE( "Basic vector-scalar operators", "[math]" )
 {
-}
+    Lore::Vec2 v;
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    REQUIRE( v.x == 0.f );
+    REQUIRE( v.y == 0.f );
 
-RenderPluginLoader::~RenderPluginLoader()
-{
-    if ( _hModule ) {
-        FreeLibrary( _hModule );
-    }
-}
+    SECTION( "Addition" )
+    {
+        v += 5.f;
+        REQUIRE_V2( v, 5.f );
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+        v = v + 7.f;
+        REQUIRE_V2( v, 12.f );
 
-bool RenderPluginLoader::load( const string& file )
-{
-    _hModule = LoadLibrary( file.c_str() );
-    if ( nullptr == _hModule ) {
-        log_critical( "Unable to load render plugin " + file );
-        return false;
+        v += 37.845f;
+        REQUIRE_V2( v, 49.845f );
     }
 
-    log_debug( "Render plugin " + file + " successfully loaded" );
+    SECTION( "Subtraction" )
+    {
+        v -= 20.f;
+        REQUIRE_V2( v, -20.f );
 
-    return true;
-}
+        v = v - 7.4f;
+        REQUIRE_V2( v, -27.4f );
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-std::unique_ptr<Context> RenderPluginLoader::createContext()
-{
-    using CreateContextPtr = Context*( *)( );
-
-    CreateContextPtr ccp = reinterpret_cast< CreateContextPtr >(
-        GetProcAddress( _hModule, "CreateContext" ) );
-    if ( nullptr == ccp ) {
-        log_critical( "Unable to get CreateContext function pointer from render plugin" );
-        return nullptr;
+        v -= 127.64f;
+        REQUIRE_V2( v, -155.04f );
     }
 
-    // Allocate the render plugin's context.
-    Context* context = ccp();
+    SECTION( "Multiplication" )
+    {
+        v *= 5.f;
+        REQUIRE_V2( v, 0.f );
 
-    std::unique_ptr<Context> p( context );
-    return std::move( p );
+        v += 1.f;
+        REQUIRE_V2( v, 1.f );
+
+        v *= 50.f;
+        REQUIRE_V2( v, 50.f );
+
+        v = v * 7.55f;
+        REQUIRE_V2( v, 377.5f );
+    }
+
+    SECTION( "Division" )
+    {
+        v /= 5.f;
+        REQUIRE_V2( v, 0.f );
+
+        v += 5.56f;
+        REQUIRE_V2( v, 5.56f );
+
+        v /= 2.42f;
+        REQUIRE_V2( v, 2.2975f );
+
+        v = v / -77.84f;
+        REQUIRE_V2( v, -0.02952f );
+    }
 }
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-#endif
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

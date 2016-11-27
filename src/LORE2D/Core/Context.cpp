@@ -71,7 +71,7 @@ std::unique_ptr<Context> Context::Create( const RenderPlugin& renderer )
 
     switch ( renderer ) {
     default:
-
+        log_critical( "Unknown render plugin specified" );
         return nullptr;
 
     case RenderPlugin::OpenGL:
@@ -80,7 +80,6 @@ std::unique_ptr<Context> Context::Create( const RenderPlugin& renderer )
     }
 
     if ( !__rpl->load( file ) ) {
-
         return nullptr;
     }
 

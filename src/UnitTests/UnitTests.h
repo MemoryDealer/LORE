@@ -1,3 +1,4 @@
+#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -24,24 +25,8 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "catch.hpp"
-#include <LORE2D/Lore.h>
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-TEST_CASE( "Context correctly created from render plugins", "[context]" )
-{
-    std::unique_ptr<Lore::Context> context;
-
-    SECTION( "OpenGL render plugin" )
-    {
-        context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
-
-        REQUIRE( context.get() != nullptr );
-        REQUIRE( context->getRenderPluginName() == "OpenGL" );
-
-        DestroyLoreContext( context );
-    }
-}
+// Remove encapsulation for unit testing.
+#define protected public
+#define private public
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

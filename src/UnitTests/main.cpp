@@ -24,24 +24,20 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#define CATCH_CONFIG_RUNNER
 #include "catch.hpp"
-#include <LORE2D/Lore.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-TEST_CASE( "Context correctly created from render plugins", "[context]" )
+int main( int argc, char** const argv )
 {
-    std::unique_ptr<Lore::Context> context;
+    int result = Catch::Session().run( argc, argv );
 
-    SECTION( "OpenGL render plugin" )
-    {
-        context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
-
-        REQUIRE( context.get() != nullptr );
-        REQUIRE( context->getRenderPluginName() == "OpenGL" );
-
-        DestroyLoreContext( context );
+    if ( IsDebuggerPresent() ) {
+        getchar(); // Allow user to see results when running in debugger.
     }
+
+    return result;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

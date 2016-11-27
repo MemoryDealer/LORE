@@ -46,12 +46,12 @@ using namespace Local;
 void Logger::__logger()
 {
     std::unordered_map<LogLevel, string> logLevelStrings;
-    logLevelStrings[LogLevel::Critical] = "Critical";
-    logLevelStrings[LogLevel::Error] = "Error";
-    logLevelStrings[LogLevel::Warning] = "Warning";
+    logLevelStrings[LogLevel::Critical] = " Critical";
+    logLevelStrings[LogLevel::Error] = " Error";
+    logLevelStrings[LogLevel::Warning] = " Warning";
     logLevelStrings[LogLevel::Information] = "";
-    logLevelStrings[LogLevel::Debug] = "Debug";
-    logLevelStrings[LogLevel::Trace] = "Trace";
+    logLevelStrings[LogLevel::Debug] = " Debug";
+    logLevelStrings[LogLevel::Trace] = " Trace";
 
     while ( _active ) {
 
@@ -64,7 +64,7 @@ void Logger::__logger()
         while ( !_messageQueue.empty() ) {
             Message msg = _messageQueue.front();
             if ( msg.lvl <= _level ) {
-                string out = "[" + timestamp + "] ";
+                string out = "[" + timestamp + "]";
                 out.append( logLevelStrings[msg.lvl] + ": " );
                 out.append( msg.text );
 
@@ -76,10 +76,6 @@ void Logger::__logger()
 
         _stream.flush();
 
-    }
-
-    if ( _stream.is_open() ) {
-        _stream.close();
     }
 }
 
@@ -97,7 +93,7 @@ Logger::Logger( const string& filename )
     // Open log file.
     _stream.open( filename.c_str(), std::ofstream::out );
     if ( !_stream.is_open() ) {
-        throw Lore::Exception( "Unable to create log file" );
+        throw Lore::Exception( "Unable to create log file " + filename );
     }
 
     _stream << "..::| LORE2D Log Started |::.." << std::endl;
@@ -109,7 +105,9 @@ Logger::Logger( const string& filename )
 
 Logger::~Logger()
 {
-    
+    if ( _stream.is_open() ) {
+        _stream.close();
+    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

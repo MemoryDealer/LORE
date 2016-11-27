@@ -74,6 +74,7 @@ project "UnitTests"
     location "UnitTests"
     kind "ConsoleApp"
     language "C++"
+    forceincludes { "UnitTests.h" }
     files {
         "UnitTests/**.h", "UnitTests/**.hpp", "UnitTests/**.cpp"
     }
