@@ -36,7 +36,7 @@ using namespace Lore;
 
 namespace Local {
 
-    static std::unique_ptr<Logger> __log;
+    std::unique_ptr<Logger> __log;
 
 }
 using namespace Local;
@@ -105,6 +105,7 @@ Logger::Logger( const string& filename )
 
 Logger::~Logger()
 {
+    flush();
     if ( _stream.is_open() ) {
         _stream.close();
     }

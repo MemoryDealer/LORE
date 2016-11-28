@@ -46,14 +46,6 @@ namespace Lore { namespace OpenGL {
         virtual void renderFrame( const float dt ) override;
 
         //
-        // Window functions.
-
-        virtual WindowPtr createWindow( const string& title,
-                                        const uint width,
-                                        const uint height,
-                                        const Window::Mode& mode = Window::Mode::Windowed ) override;
-
-        //
         // Information.
 
         virtual string getRenderPluginName() const override;

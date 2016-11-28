@@ -38,8 +38,13 @@ int main( int argc, char** argv )
 
     DestroyLoreContext( context );
 
+    context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
+    window =
+        context->createWindow( "Test", 640, 480 );
+    DestroyLoreContext( context );
+
 #ifdef _DEBUG
-    //system( "pause" );
+    system( "pause" );
 #endif
     return 0;
 }

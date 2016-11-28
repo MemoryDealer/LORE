@@ -54,10 +54,10 @@ namespace Lore {
         //
         // Window functions.
 
-        virtual WindowPtr createWindow( const string& title,
-                                        const uint width,
-                                        const uint height,
-                                        const Window::Mode& mode = Window::Mode::Windowed ) = 0;
+        WindowPtr createWindow( const string& title,
+                                const uint width,
+                                const uint height,
+                                const Window::Mode& mode = Window::Mode::Windowed );
 
         //
         // Information.

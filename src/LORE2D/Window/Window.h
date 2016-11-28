@@ -52,6 +52,8 @@ namespace Lore {
 
         virtual ~Window();
 
+        virtual void destroy() = 0;
+
         virtual void setTitle( const string& title );
 
         virtual void setDimensions( const uint width, const uint height );

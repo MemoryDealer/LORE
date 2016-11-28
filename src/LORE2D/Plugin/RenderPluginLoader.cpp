@@ -48,15 +48,15 @@ RenderPluginLoader::RenderPluginLoader()
 
 RenderPluginLoader::~RenderPluginLoader()
 {
-    if ( _hModule ) {
-        FreeLibrary( _hModule );
-    }
+    free();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 bool RenderPluginLoader::load( const string& file )
 {
+    free(); 
+
     _hModule = LoadLibrary( file.c_str() );
     if ( nullptr == _hModule ) {
         log_critical( "Unable to load render plugin " + file );
@@ -86,6 +86,35 @@ std::unique_ptr<Context> RenderPluginLoader::createContext()
 
     std::unique_ptr<Context> p( context );
     return std::move( p );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+WindowPtr RenderPluginLoader::createWindow( const string& title,
+                                            const uint width,
+                                            const uint height )
+{
+    using CreateWindowPtr = Window*( *)( const string&, const uint, const uint );
+
+    CreateWindowPtr cwp = reinterpret_cast< CreateWindowPtr >(
+        GetProcAddress( _hModule, "CreateLoreWindow" ) );
+    if ( nullptr == cwp ) {
+        return nullptr;
+    }
+
+    Window* window = cwp( title, width, height );
+
+    std::shared_ptr<Window> p( window );
+    return p;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void RenderPluginLoader::free()
+{
+    if ( _hModule ) {
+        FreeLibrary( _hModule );
+    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
