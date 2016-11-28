@@ -25,16 +25,43 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Include this file for all Lore2D functionality.
+namespace Lore {
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    class LORE_EXPORT Window
+    {
 
-#include "LorePrerequisites.h"
+    public:
 
-// Core.
-#include "Core/Context.h"
+        enum class Mode {
+            Windowed,
+            Fullscreen,
+            FullscreenBorderless
+        };
 
-// Math.
-#include "Math/Vector.h"
+    protected:
+
+        string _title;
+        uint _width, _height;
+        Mode _mode;
+
+    public:
+
+        explicit Window( const string& title,
+                         const uint width,
+                         const uint height );
+
+        virtual ~Window();
+
+        virtual void setTitle( const string& title );
+
+        virtual void setDimensions( const uint width, const uint height );
+
+        virtual void setMode( const Mode& mode );
+
+    };
+
+    using WindowPtr = std::shared_ptr<Window>;
+
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -24,7 +24,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Context.h"
+#include "Window.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -32,30 +32,31 @@ using namespace Lore::OpenGL;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Context::Context()
-: Lore::Context()
+Window::Window( const string& title,
+                const uint width,
+                const uint height )
+: Lore::Window( title, width, height )
+, _window( nullptr )
 {
-    Log::Write( "OpenGL render plugin initialized" );
+    _window = glfwCreateWindow( _width,
+                                _height,
+                                _title.c_str(),
+                                nullptr,
+                                nullptr );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Context::~Context()
+Window::~Window()
 {
+    glfwDestroyWindow( _window );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Context::renderFrame( const float dt )
+void Window::setTitle( const string& title )
 {
-    ;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-Lore::string Context::getRenderPluginName() const
-{
-    return Lore::string( "OpenGL" );
+    
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

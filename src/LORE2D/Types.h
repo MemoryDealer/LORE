@@ -30,7 +30,7 @@
 namespace Lore {
 
     using real = float;
-
+    using uint = unsigned int;
     using string = std::string;
 
 }

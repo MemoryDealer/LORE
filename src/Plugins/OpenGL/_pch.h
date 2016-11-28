@@ -25,14 +25,18 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Project
+// Project.
 #include "Exports.h"
+#include "Types.h"
 
-// LORE2D
+// LORE2D.
 #include <LORE2D/Exports.h>
 #include <LORE2D/Types.h>
 
-// C++/STL
+// C++/STL.
 #include <memory>
+
+// GLFW.
+#include <GLFW/glfw3.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

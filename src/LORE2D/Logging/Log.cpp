@@ -133,7 +133,7 @@ void Logger::write( const LogLevel& lvl, const string& text )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Logger::join()
+void Logger::flush()
 {
     if ( _thread.joinable() ) {
         _cv.notify_one();
@@ -171,7 +171,7 @@ void Log::DeleteLogger()
 {
     if ( __log.get() ) {
         __log->setActive( false );
-        __log->join();
+        __log->flush();
         __log.reset();
     }
 }

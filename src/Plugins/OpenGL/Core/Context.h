@@ -25,16 +25,47 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Include this file for all Lore2D functionality.
+#include <LORE2D/Lore.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "LorePrerequisites.h"
+namespace Lore { namespace OpenGL {
 
-// Core.
-#include "Core/Context.h"
+    class Context : public Lore::Context
+    {
 
-// Math.
-#include "Math/Vector.h"
+    public:
+
+        explicit Context() noexcept;
+
+        virtual ~Context() override;
+
+        //
+        // Rendering.
+
+        virtual void renderFrame( const float dt ) override;
+
+        //
+        // Window functions.
+
+        virtual WindowPtr createWindow( const string& title,
+                                        const uint width,
+                                        const uint height,
+                                        const Window::Mode& mode = Window::Mode::Windowed ) override;
+
+        //
+        // Information.
+
+        virtual string getRenderPluginName() const override;
+
+    };
+
+    extern "C" __declspec( dllexport ) Lore::Context* __stdcall CreateContext()
+    {
+        Lore::Context* context = new Context();
+        return context;
+    }
+
+}}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

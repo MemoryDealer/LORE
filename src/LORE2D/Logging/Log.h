@@ -81,7 +81,7 @@ namespace Lore {
 
         void write( const LogLevel& lvl, const string& text );
 
-        void join();
+        void flush();
 
         //
         // Setters.

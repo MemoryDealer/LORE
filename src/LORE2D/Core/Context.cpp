@@ -37,6 +37,7 @@ using namespace Lore;
 namespace Local {
 
     static std::unique_ptr<IRenderPluginLoader> __rpl;
+    static std::vector<Context::ErrorListener> __errorListeners;
 
 }
 using namespace Local;
@@ -44,7 +45,8 @@ using namespace Local;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 constexpr
-Context::Context()
+Context::Context() noexcept
+: _windows()
 {
 }
 
@@ -52,6 +54,28 @@ Context::Context()
 
 Context::~Context()
 {
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Context::addErrorListener( ErrorListener listener )
+{
+    __errorListeners.push_back( listener );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Context::removeErrorListener( ErrorListener listener )
+{
+    for ( auto it = __errorListeners.begin(); it != __errorListeners.end(); )
+    {
+        if ( ( *it ) == listener ) {
+            it = __errorListeners.erase( it );
+        }
+        else {
+            ++it;
+        }
+    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -95,6 +119,18 @@ void Context::Destroy( std::unique_ptr<Context> context )
     context.reset();
     __rpl.reset(); // Free the plugin library.
     Log::DeleteLogger();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Context::ErrorCallback( int error, const char* desc )
+{
+    log_error( desc );
+
+    // Call all error listeners.
+    for ( const auto& listener : __errorListeners ) {
+        listener( error, desc );
+    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,16 +24,61 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Include this file for all Lore2D functionality.
+#include "Context.h"
+
+#include <Plugins/OpenGL/Window/Window.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "LorePrerequisites.h"
+using namespace Lore::OpenGL;
 
-// Core.
-#include "Core/Context.h"
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Math.
-#include "Math/Vector.h"
+Context::Context() noexcept
+: Lore::Context()
+{
+    log( "OpenGL render plugin initialized" );
+
+    glfwInit();
+    glfwSetErrorCallback( ErrorCallback );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Context::~Context()
+{
+    // Free all windows.
+    for ( auto it = _windows.begin(); it != _windows.end(); ++it ) {
+        WindowPtr window = it->second;
+        window.reset();
+    }
+
+    glfwTerminate();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Context::renderFrame( const float dt )
+{
+
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Lore::WindowPtr Context::createWindow( const string& title,
+                                       const uint width,
+                                       const uint height,
+                                       const Lore::Window::Mode& mode )
+{
+    Lore::WindowPtr window = std::make_shared<Window>( title, width, height );
+    return window;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Lore::string Context::getRenderPluginName() const
+{
+    return Lore::string( "OpenGL" );
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

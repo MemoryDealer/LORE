@@ -27,6 +27,7 @@
 
 #include <LORE2D/Plugin/Plugins.h>
 #include <LORE2D/Plugin/RenderPluginLoader.h>
+#include <LORE2D/Window/Window.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -35,15 +36,13 @@ namespace Lore {
     class LORE_EXPORT Context
     {
 
-    private:
+    public:
 
-        // ...
-
-        
+        using ErrorListener = void (*)( int, const char* );
 
     public:
 
-        explicit constexpr Context();
+        explicit constexpr Context() noexcept;
 
         virtual ~Context();
 
@@ -53,9 +52,24 @@ namespace Lore {
         virtual void renderFrame( const real dt ) = 0;
 
         //
+        // Window functions.
+
+        virtual WindowPtr createWindow( const string& title,
+                                        const uint width,
+                                        const uint height,
+                                        const Window::Mode& mode = Window::Mode::Windowed ) = 0;
+
+        //
         // Information.
 
         virtual string getRenderPluginName() const = 0;
+
+        //
+        // Callbacks.
+
+        void addErrorListener( ErrorListener listener );
+
+        void removeErrorListener( ErrorListener listener );
 
         //
         // Static helper functions.
@@ -63,6 +77,14 @@ namespace Lore {
         static std::unique_ptr<Context> Create( const RenderPlugin& renderPlugin );
 
         static void Destroy( std::unique_ptr<Context> context );
+
+    protected:
+
+        static void ErrorCallback( int error, const char* desc );
+
+    protected:
+
+        std::map<string, WindowPtr> _windows;
 
     };
 

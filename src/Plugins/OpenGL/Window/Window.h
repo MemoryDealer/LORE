@@ -31,32 +31,24 @@
 
 namespace Lore { namespace OpenGL {
 
-    class Context : public Lore::Context
+    class Window final : public Lore::Window
     {
+
+    private:
+
+        GLFWwindow* _window;
 
     public:
 
-        explicit Context();
+        explicit Window( const string& title,
+                         const uint width,
+                         const uint height );
 
-        virtual ~Context() override;
+        virtual ~Window() override;
 
-        //
-        // Rendering.
-
-        virtual void renderFrame( const float dt ) override;
-
-        //
-        // Information.
-
-        virtual string getRenderPluginName() const override;
+        virtual void setTitle( const string& title ) override;
 
     };
-
-    extern "C" __declspec( dllexport ) Lore::Context* __stdcall CreateContext()
-    {
-        Lore::Context* context = new Context();
-        return context;
-    }
 
 }}
 

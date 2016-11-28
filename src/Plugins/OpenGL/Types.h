@@ -25,16 +25,16 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Include this file for all Lore2D functionality.
+#include <LORE2D/Types.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "LorePrerequisites.h"
+namespace Lore { namespace OpenGL {
 
-// Core.
-#include "Core/Context.h"
+    using real = Lore::real;
+    using uint = Lore::uint;
+    using string = Lore::string;
 
-// Math.
-#include "Math/Vector.h"
+}}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

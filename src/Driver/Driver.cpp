@@ -33,15 +33,13 @@ int main( int argc, char** argv )
 {
     auto context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
 
-    Lore::Log::Write( "Test1" );
-    Lore::Log::Write( "2" );
-
-    context->renderFrame( 0 );
+    std::shared_ptr<Lore::Window> window =
+    context->createWindow( "Test", 640, 480 );
 
     DestroyLoreContext( context );
 
 #ifdef _DEBUG
-    system( "pause" );
+    //system( "pause" );
 #endif
     return 0;
 }

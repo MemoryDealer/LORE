@@ -6,7 +6,7 @@ targetdir "../bin/%{cfg.buildcfg}/Run"
 objdir "../bin/%{cfg.buildcfg}/Obj"
 debugdir "../bin/%{cfg.buildcfg}/Run"
 
-includedirs { ".", "%{prj.location}", "%{prj.location}/_deps" }
+includedirs { ".", "%{prj.location}", "%{sln.location}/_deps" }
 libdirs { "../lib/x64/%{cfg.buildcfg}" }
 architecture "x86_64"
 characterset ( "MBCS" )
