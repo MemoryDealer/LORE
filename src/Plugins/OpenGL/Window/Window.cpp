@@ -49,7 +49,15 @@ Window::Window( const string& title,
 
 Window::~Window()
 {
-    glfwDestroyWindow( _window );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Window::destroy()
+{
+    if ( _window ) {
+        glfwDestroyWindow( _window );
+    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

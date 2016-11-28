@@ -36,8 +36,8 @@ using namespace Lore;
 
 namespace Local {
 
-    static std::unique_ptr<IRenderPluginLoader> __rpl;
-    static std::vector<Context::ErrorListener> __errorListeners;
+    std::shared_ptr<IRenderPluginLoader> __rpl;
+    std::vector<Context::ErrorListener> __errorListeners;
 
 }
 using namespace Local;
@@ -54,6 +54,18 @@ Context::Context() noexcept
 
 Context::~Context()
 {
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+WindowPtr Context::createWindow( const string& title,
+                                 const uint width,
+                                 const uint height,
+                                 const Window::Mode& mode )
+{
+    WindowPtr window = __rpl->createWindow( title, width, height );
+    _windows[title] = window;
+    return window;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -117,7 +129,6 @@ std::unique_ptr<Context> Context::Create( const RenderPlugin& renderer )
 void Context::Destroy( std::unique_ptr<Context> context )
 {
     context.reset();
-    __rpl.reset(); // Free the plugin library.
     Log::DeleteLogger();
 }
 

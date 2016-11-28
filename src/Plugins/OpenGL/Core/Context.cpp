@@ -47,10 +47,8 @@ Context::Context() noexcept
 
 Context::~Context()
 {
-    // Free all windows.
-    for ( auto it = _windows.begin(); it != _windows.end(); ++it ) {
-        WindowPtr window = it->second;
-        window.reset();
+    for ( const auto& pair : _windows ) {
+        pair.second->destroy();
     }
 
     glfwTerminate();
@@ -61,17 +59,6 @@ Context::~Context()
 void Context::renderFrame( const float dt )
 {
 
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-Lore::WindowPtr Context::createWindow( const string& title,
-                                       const uint width,
-                                       const uint height,
-                                       const Lore::Window::Mode& mode )
-{
-    Lore::WindowPtr window = std::make_shared<Window>( title, width, height );
-    return window;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

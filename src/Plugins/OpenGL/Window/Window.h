@@ -46,9 +46,19 @@ namespace Lore { namespace OpenGL {
 
         virtual ~Window() override;
 
+        virtual void destroy() override;
+
         virtual void setTitle( const string& title ) override;
 
     };
+
+    extern "C" __declspec( dllexport ) Lore::Window* __stdcall CreateLoreWindow( const string& name,
+                                                                                 const uint width,
+                                                                                 const uint height )
+    {
+        Lore::Window* window = new Window( name, width, height );
+        return window;
+    }
 
 }}
 
