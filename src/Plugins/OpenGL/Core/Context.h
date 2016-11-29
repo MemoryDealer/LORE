@@ -31,7 +31,7 @@
 
 namespace Lore { namespace OpenGL {
 
-    class Context : public Lore::Context
+    class Context final : public Lore::Context
     {
 
     public:
@@ -49,6 +49,10 @@ namespace Lore { namespace OpenGL {
         // Information.
 
         virtual string getRenderPluginName() const override;
+
+    private:
+
+        GLFWwindow* _offscreenContextWindow;
 
     };
 

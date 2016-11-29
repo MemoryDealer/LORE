@@ -36,29 +36,43 @@ using namespace Lore::OpenGL;
 
 Context::Context() noexcept
 : Lore::Context()
+, _offscreenContextWindow( nullptr )
 {
-    log( "OpenGL render plugin initialized" );
-
+    log( "Initializing OpenGL render plugin context..." );
     glfwInit();
     glfwSetErrorCallback( ErrorCallback );
+    log( "OpenGL render plugin context initialized!" );
+
+    glfwWindowHint( GLFW_VISIBLE, GLFW_FALSE );
+    _offscreenContextWindow = glfwCreateWindow( 1, 1, "", nullptr, nullptr );
+    glfwWindowHint( GLFW_VISIBLE, GLFW_TRUE );
+    glfwMakeContextCurrent( _offscreenContextWindow );
+
+    gladLoadGLLoader( reinterpret_cast< GLADloadproc >( glfwGetProcAddress ) );
+    glfwSwapInterval( 1 );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Context::~Context()
 {
-    for ( const auto& pair : _windows ) {
-        pair.second->destroy();
-    }
+    glfwDestroyWindow( _offscreenContextWindow );
 
+    log( "Terminating OpenGL render plugin context..." );
+    glfwSetErrorCallback( nullptr );
     glfwTerminate();
+    log( "OpenGL render plugin context terminated!" );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Context::renderFrame( const float dt )
 {
+    glfwPollEvents();
 
+    for ( const auto& pair : _windows ) {
+        pair.second->renderFrame();
+    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

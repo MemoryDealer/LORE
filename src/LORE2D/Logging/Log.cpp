@@ -63,14 +63,16 @@ void Logger::__logger()
 
         while ( !_messageQueue.empty() ) {
             Message msg = _messageQueue.front();
-            if ( msg.lvl <= _level ) {
-                string out = "[" + timestamp + "]";
-                out.append( logLevelStrings[msg.lvl] + ": " );
-                out.append( msg.text );
 
-                printf( "%s\n", out.c_str() );
-                _stream << out << std::endl;
-            }
+            // Build the log string.
+            string out = "[" + timestamp + "]";
+            out.append( logLevelStrings[msg.lvl] + ": " );
+            out.append( msg.text );
+
+            // Output the string to both the console and log file.
+            printf( "%s\n", out.c_str() );
+            _stream << out << std::endl;
+
             _messageQueue.pop();
         }
 
@@ -146,14 +148,18 @@ void Logger::flush()
 
 void Log::Write( const string& msg )
 {
-    __log->write( msg );
+    if ( LogLevel::Information <= __log->getLevel() ) {
+        __log->write( msg );
+    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Log::Write( const LogLevel& lvl, const string& msg )
 {
-    __log->write( lvl, msg );
+    if ( lvl <= __log->getLevel() ) {
+        __log->write( lvl, msg );
+    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -36,11 +36,10 @@ int main( int argc, char** argv )
     std::shared_ptr<Lore::Window> window =
     context->createWindow( "Test", 640, 480 );
 
-    DestroyLoreContext( context );
+    //while ( context->active() ) {
+        context->renderFrame( 0 );
+    //}
 
-    context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
-    window =
-        context->createWindow( "Test", 640, 480 );
     DestroyLoreContext( context );
 
 #ifdef _DEBUG

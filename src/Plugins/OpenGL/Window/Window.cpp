@@ -49,15 +49,28 @@ Window::Window( const string& title,
 
 Window::~Window()
 {
+    destroy();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Window::destroy()
 {
-    if ( _window ) {
-        glfwDestroyWindow( _window );
-    }
+    glfwDestroyWindow( _window );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Window::renderFrame()
+{
+    glfwMakeContextCurrent( _window );
+
+    // Scenes...
+
+    glClearColor( 0.2f, 0.2f, 0.2f, 1.f );
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+    glfwSwapBuffers( _window );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

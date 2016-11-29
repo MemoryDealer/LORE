@@ -54,11 +54,27 @@ namespace Lore {
 
         virtual void destroy() = 0;
 
+        //
+        // Rendering.
+
+        virtual void renderFrame() = 0;
+
+        //
+        // Modifiers.
+
         virtual void setTitle( const string& title );
 
         virtual void setDimensions( const uint width, const uint height );
 
         virtual void setMode( const Mode& mode );
+
+        //
+        // Getters.
+
+        string getTitle() const
+        {
+            return _title;
+        }
 
     };
 

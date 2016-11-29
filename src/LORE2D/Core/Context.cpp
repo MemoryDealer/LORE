@@ -47,6 +47,7 @@ using namespace Local;
 constexpr
 Context::Context() noexcept
 : _windows()
+, _active( false )
 {
 }
 
@@ -65,7 +66,22 @@ WindowPtr Context::createWindow( const string& title,
 {
     WindowPtr window = __rpl->createWindow( title, width, height );
     _windows[title] = window;
+    _active = true;
     return window;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Context::destroyWindow( WindowPtr window )
+{
+    const auto& lookup = _windows.find( window->getTitle() );
+    if ( lookup == _windows.end() ) {
+        throw Lore::Exception( "Attempted to destroy window which was not created by context" );
+    }
+    unit tests!;
+    _windows.erase( window->getTitle() );
+    window->destroy();
+    window.reset();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

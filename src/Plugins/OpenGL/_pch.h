@@ -37,6 +37,7 @@
 #include <memory>
 
 // GLFW.
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -48,6 +48,11 @@ namespace Lore { namespace OpenGL {
 
         virtual void destroy() override;
 
+        //
+        // Rendering.
+
+        virtual void renderFrame() override;
+
         virtual void setTitle( const string& title ) override;
 
     };

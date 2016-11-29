@@ -59,6 +59,8 @@ namespace Lore {
                                 const uint height,
                                 const Window::Mode& mode = Window::Mode::Windowed );
 
+        void destroyWindow( WindowPtr window );
+
         //
         // Information.
 
@@ -70,6 +72,14 @@ namespace Lore {
         void addErrorListener( ErrorListener listener );
 
         void removeErrorListener( ErrorListener listener );
+
+        //
+        // Getters.
+
+        bool active() const
+        {
+            return _active;
+        }
 
         //
         // Static helper functions.
@@ -85,6 +95,8 @@ namespace Lore {
     protected:
 
         std::map<string, WindowPtr> _windows;
+
+        bool _active;
 
     };
 

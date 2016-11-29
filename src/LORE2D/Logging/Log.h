@@ -86,14 +86,22 @@ namespace Lore {
         //
         // Setters.
 
-        void setLevel( const LogLevel& lvl )
+        inline void setLevel( const LogLevel& lvl )
         {
             _level = lvl;
         }
 
-        void setActive( const bool active )
+        inline void setActive( const bool active )
         {
             _active = active;
+        }
+
+        //
+        // Getters.
+
+        inline LogLevel getLevel() const
+        {
+            return _level;
         }
 
     };
