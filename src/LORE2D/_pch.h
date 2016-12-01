@@ -46,9 +46,9 @@
 #endif
 
 // Lore.
-#include "Exception.h"
 #include "Exports.h"
-#include "Logging/Log.h"
 #include "Types.h"
+#include "Logging/Log.h"
+#include "Exception.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

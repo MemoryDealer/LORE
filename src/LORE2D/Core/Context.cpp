@@ -46,7 +46,7 @@ using namespace Local;
 
 constexpr
 Context::Context() noexcept
-: _windows()
+: _windowRegistry()
 , _active( false )
 {
 }
@@ -64,24 +64,31 @@ WindowPtr Context::createWindow( const string& title,
                                  const uint height,
                                  const Window::Mode& mode )
 {
-    WindowPtr window = __rpl->createWindow( title, width, height );
-    _windows[title] = window;
+    std::unique_ptr<Window> window = __rpl->createWindow( title, width, height );
+    window->setMode( mode );
+
+    log( "Window " + title + " created successfully" );
+
+    _windowRegistry.insert( title, std::move( window ) );
+    
+    // At least one window means the context is active.
     _active = true;
-    return window;
+
+    // Return a handle.
+    return _windowRegistry.get( title );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Context::destroyWindow( WindowPtr window )
 {
-    const auto& lookup = _windows.find( window->getTitle() );
-    if ( lookup == _windows.end() ) {
-        throw Lore::Exception( "Attempted to destroy window which was not created by context" );
-    }
-    unit tests!;
-    _windows.erase( window->getTitle() );
-    window->destroy();
-    window.reset();
+    const string title = window->getTitle();
+
+    _windowRegistry.remove( title );
+    log( "Window " + title + " destroyed successfully" );
+
+    // Context is no longer considered active if all windows have been destroyed.
+    _active = !_windowRegistry.empty();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

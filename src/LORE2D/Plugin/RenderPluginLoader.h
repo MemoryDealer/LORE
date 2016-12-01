@@ -44,9 +44,9 @@ namespace Lore {
 
         virtual std::unique_ptr<Context> createContext() = 0;
 
-        virtual WindowPtr createWindow( const string& title,
-                                        const uint width,
-                                        const uint height ) = 0;
+        virtual std::unique_ptr<Window> createWindow( const string& title,
+                                                      const uint width,
+                                                      const uint height ) = 0;
 
     protected:
 
@@ -76,9 +76,9 @@ namespace Lore {
 
         virtual std::unique_ptr<Context> createContext() override;
 
-        virtual WindowPtr createWindow( const string& title,
-                                        const uint width,
-                                        const uint height ) override;
+        virtual std::unique_ptr<Window> createWindow( const string& title,
+                                                      const uint width,
+                                                      const uint height ) override;
 
     protected:
 

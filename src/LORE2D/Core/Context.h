@@ -27,6 +27,7 @@
 
 #include <LORE2D/Plugin/Plugins.h>
 #include <LORE2D/Plugin/RenderPluginLoader.h>
+#include <LORE2D/Resource/Registry.h>
 #include <LORE2D/Window/Window.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -76,7 +77,7 @@ namespace Lore {
         //
         // Getters.
 
-        bool active() const
+        inline bool active() const
         {
             return _active;
         }
@@ -88,13 +89,19 @@ namespace Lore {
 
         static void Destroy( std::unique_ptr<Context> context );
 
+        //
+        // Deleted functions/operators.
+
+        Context& operator = ( const Context& rhs ) = delete;
+        Context( const Context& rhs ) = delete;
+
     protected:
 
         static void ErrorCallback( int error, const char* desc );
 
     protected:
 
-        std::map<string, WindowPtr> _windows;
+        Registry<Window> _windowRegistry;
 
         bool _active;
 

@@ -70,22 +70,20 @@ TEST_CASE( "Context creation/destruction multiple times in a single run", "[cont
         context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
 
         Lore::WindowPtr window = context->createWindow( "UnitTest", 50, 50 );
-        REQUIRE( window.get() != nullptr );
+        REQUIRE( nullptr != window );
 
         DestroyLoreContext( context );
         // The window object it points to should still be valid (though the render implementation resources should now be free).
-        REQUIRE( window.get() != nullptr );
-        REQUIRE( window.use_count() == 1 );
+        REQUIRE( nullptr != window );
 
         context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
-        REQUIRE( context.get() != nullptr );
+        REQUIRE( nullptr != context );
 
-        window tries to destruct here and crashes;
         window = context->createWindow( "UnitTest2", 50, 50 );
-        REQUIRE( window.get() != nullptr );
+        REQUIRE( nullptr != window );
 
         DestroyLoreContext( context );
-        REQUIRE( window.get() != nullptr );
+        REQUIRE( nullptr != window );
     }
 }
 

@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,44 +24,6 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Lore.h>
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-namespace Lore { namespace OpenGL {
-
-    class Window final : public Lore::Window
-    {
-
-    private:
-
-        GLFWwindow* _window;
-
-    public:
-
-        explicit Window( const string& title,
-                         const uint width,
-                         const uint height );
-
-        virtual ~Window() override;
-
-        //
-        // Rendering.
-
-        virtual void renderFrame() override;
-
-        virtual void setTitle( const string& title ) override;
-
-    };
-
-    extern "C" __declspec( dllexport ) Lore::Window* __stdcall CreateLoreWindow( const string& name,
-                                                                                 const uint width,
-                                                                                 const uint height )
-    {
-        Lore::Window* window = new Window( name, width, height );
-        return window;
-    }
-
-}}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

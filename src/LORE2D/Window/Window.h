@@ -38,12 +38,6 @@ namespace Lore {
             FullscreenBorderless
         };
 
-    protected:
-
-        string _title;
-        uint _width, _height;
-        Mode _mode;
-
     public:
 
         explicit Window( const string& title,
@@ -52,12 +46,10 @@ namespace Lore {
 
         virtual ~Window();
 
-        virtual void destroy() = 0;
-
         //
         // Rendering.
 
-        virtual void renderFrame() = 0;
+        virtual void renderFrame() { }
 
         //
         // Modifiers.
@@ -76,9 +68,15 @@ namespace Lore {
             return _title;
         }
 
+    protected:
+
+        string _title;
+        uint _width, _height;
+        Mode _mode;
+
     };
 
-    using WindowPtr = std::shared_ptr<Window>;
+    using WindowPtr = Window*;
 
 }
 

@@ -90,9 +90,9 @@ std::unique_ptr<Context> RenderPluginLoader::createContext()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-WindowPtr RenderPluginLoader::createWindow( const string& title,
-                                            const uint width,
-                                            const uint height )
+std::unique_ptr<Window> RenderPluginLoader::createWindow( const string& title,
+                                                          const uint width,
+                                                          const uint height )
 {
     using CreateWindowPtr = Window*( *)( const string&, const uint, const uint );
 
@@ -104,8 +104,8 @@ WindowPtr RenderPluginLoader::createWindow( const string& title,
 
     Window* window = cwp( title, width, height );
 
-    std::shared_ptr<Window> p( window );
-    return p;
+    std::unique_ptr<Window> p( window );
+    return std::move( p );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

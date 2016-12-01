@@ -33,12 +33,11 @@ int main( int argc, char** argv )
 {
     auto context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
 
-    std::shared_ptr<Lore::Window> window =
-    context->createWindow( "Test", 640, 480 );
+    Lore::WindowPtr window = context->createWindow( "Test", 640, 480 );
 
-    //while ( context->active() ) {
+    while ( context->active() ) {
         context->renderFrame( 0 );
-    //}
+    }
 
     DestroyLoreContext( context );
 

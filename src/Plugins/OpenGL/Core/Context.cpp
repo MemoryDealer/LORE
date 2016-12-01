@@ -70,9 +70,10 @@ void Context::renderFrame( const float dt )
 {
     glfwPollEvents();
 
-    for ( const auto& pair : _windows ) {
+    /*auto windows = _windowRegistry.getContainer();
+    for ( const auto& pair : windows ) {
         pair.second->renderFrame();
-    }
+    }*/
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

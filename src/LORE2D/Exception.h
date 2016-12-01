@@ -39,7 +39,7 @@ namespace Lore {
         explicit Exception( const std::string& what )
         : _what( what )
         {
-
+            //log_error( "(EXCEPTION) " + what );
         }
 
         virtual char const* what() const override
