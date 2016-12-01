@@ -27,16 +27,35 @@
 
 namespace Lore {
 
+    template<typename T>
+    class Registry;
+
+    template<typename T>
     class RegistryIterator
     {
 
     public:
 
+        explicit RegistryIterator( Registry<T>& reg )
+        : _registry( reg )
+        {
+            
+        }
 
+        T* getNext()
+        {
+            auto it = _registry._container.begin();
+            return it->second.get();
+        }
+
+    private:
+
+        Registry<T>& _registry;
 
     };
 
     // TODO: Create macro to allow both map and unordered_map as containers.
+    // TODO: Make thread-safe and non-thread-safe version.
 
     template<typename T>
     class Registry
@@ -102,6 +121,12 @@ namespace Lore {
             return _container.empty();
         }
 
+        RegistryIterator<T> getIterator()
+        {
+            RegistryIterator<T> r( *this );
+            return r;
+        }
+
         //
         // Deleted functions/operators.
 
@@ -113,6 +138,8 @@ namespace Lore {
         Container _container;
 
         mutable std::mutex _mutex;
+
+        friend class RegistryIterator<T>;
 
     };
 
