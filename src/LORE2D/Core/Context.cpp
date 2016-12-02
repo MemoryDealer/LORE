@@ -26,6 +26,7 @@
 
 #include "Context.h"
 
+#include <LORE2D/Core/NotificationCenter.h>
 #include <LORE2D/Core/Timestamp.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -121,6 +122,7 @@ std::unique_ptr<Context> Context::Create( const RenderPlugin& renderer )
 
     // Setup required Lore objects.
     Log::AllocateLogger();
+    NotificationCenter::Initialize();
 
     if ( __rpl.get() ) {
         __rpl.reset();

@@ -71,8 +71,10 @@ void Context::renderFrame( const float dt )
     glfwPollEvents();
 
     RegistryIterator<Lore::Window> it = _windowRegistry.getIterator();
-    auto w = it.getNext();
-    w->renderFrame();
+    while ( it.hasMore() ) {
+        WindowPtr window = it.getNext();
+        window->renderFrame();
+    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

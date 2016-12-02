@@ -56,6 +56,11 @@ Window::~Window()
 
 void Window::renderFrame()
 {
+    if ( glfwWindowShouldClose( _window ) ) {
+
+        return;
+    }
+
     glfwMakeContextCurrent( _window );
 
     // Scenes...

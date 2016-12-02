@@ -29,6 +29,19 @@
 
 namespace Lore {
 
+    //
+    // Forward declarations.
+
+    class Window;
+
+    //
+    // Pointer types.
+
+    using WindowPtr = Window*;
+
+    //
+    // Types.
+
     using real = float;
     using uint = unsigned int;
     using string = std::string;

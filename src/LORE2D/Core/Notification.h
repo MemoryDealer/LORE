@@ -27,53 +27,23 @@
 
 namespace Lore {
 
-    class LORE_EXPORT Window
+    struct Notification
     {
 
-    public:
+        virtual ~Notification() { }
 
-        enum class Mode {
-            Windowed,
-            Fullscreen,
-            FullscreenBorderless
+    };
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    struct WindowEventNotification : public Notification
+    {
+        enum class Event {
+            Closed
         };
 
-    public:
-
-        explicit Window( const string& title,
-                         const uint width,
-                         const uint height );
-
-        virtual ~Window();
-
-        //
-        // Rendering.
-
-        virtual void renderFrame() { }
-
-        //
-        // Modifiers.
-
-        virtual void setTitle( const string& title );
-
-        virtual void setDimensions( const uint width, const uint height );
-
-        virtual void setMode( const Mode& mode );
-
-        //
-        // Getters.
-
-        string getTitle() const
-        {
-            return _title;
-        }
-
-    protected:
-
-        string _title;
-        uint _width, _height;
-        Mode _mode;
-
+        WindowPtr window;
+        Event event;
     };
 
 }

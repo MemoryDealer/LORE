@@ -38,23 +38,59 @@ namespace Lore {
 
         explicit RegistryIterator( Registry<T>& reg )
         : _registry( reg )
+        , _hasMore( true )
+        , _itOffset( 0 )
+        //, _lock( _registry._mutex )
         {
             
         }
 
+        ~RegistryIterator()
+        {
+            
+        }
+
+        // A hack for now.
+        // TODO: Implement a proper iterator wrapper.
         T* getNext()
         {
+            std::lock_guard<std::mutex> lock( _registry._mutex );
+
             auto it = _registry._container.begin();
-            return it->second.get();
+
+            for ( int i = 0; i < _itOffset; ++i ) {
+                ++it;
+            }
+            ++_itOffset;
+            
+            _hasMore = ( it != _registry._container.end() );
+            if ( _hasMore ) {
+                T* next = it->second.get();
+
+                ++it;
+                _hasMore = ( it != _registry._container.end() );
+
+                return next;
+            }
+
+            return nullptr;
+        }
+
+        bool hasMore() const
+        {
+            return _hasMore;
         }
 
     private:
 
         Registry<T>& _registry;
+        bool _hasMore;
+        int _itOffset;
+        //std::unique_lock<std::mutex> _lock;
 
     };
 
-    // TODO: Create macro to allow both map and unordered_map as containers.
+    // TODO: Create macro to allow both map and unordered_map as containers (or variadic templates: template<class ...> class C ?).
     // TODO: Make thread-safe and non-thread-safe version.
 
     template<typename T>
@@ -113,11 +149,13 @@ namespace Lore {
 
         size_t size() const
         {
+            std::lock_guard<std::mutex> lock( _mutex );
             return _container.size();
         }
 
         bool empty() const
         {
+            std::lock_guard<std::mutex> lock( _mutex );
             return _container.empty();
         }
 
@@ -135,6 +173,7 @@ namespace Lore {
 
     private:
 
+        //Container _container;
         Container _container;
 
         mutable std::mutex _mutex;

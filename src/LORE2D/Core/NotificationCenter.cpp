@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,57 +24,41 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include "NotificationCenter.h"
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+using namespace Lore;
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 namespace Lore {
 
-    class LORE_EXPORT Window
-    {
+    //std::unordered_map<const std::type_info*, NotificationCenter::OnNotify> __subscriptions;
+    //std::unique_ptr<SubscriptionMap> _subscriptions;
+}
 
-    public:
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        enum class Mode {
-            Windowed,
-            Fullscreen,
-            FullscreenBorderless
-        };
-
-    public:
-
-        explicit Window( const string& title,
-                         const uint width,
-                         const uint height );
-
-        virtual ~Window();
-
-        //
-        // Rendering.
-
-        virtual void renderFrame() { }
-
-        //
-        // Modifiers.
-
-        virtual void setTitle( const string& title );
-
-        virtual void setDimensions( const uint width, const uint height );
-
-        virtual void setMode( const Mode& mode );
-
-        //
-        // Getters.
-
-        string getTitle() const
-        {
-            return _title;
-        }
-
-    protected:
-
-        string _title;
-        uint _width, _height;
-        Mode _mode;
-
-    };
+constexpr
+NotificationCenter::NotificationCenter()
+{
 
 }
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+NotificationCenter::~NotificationCenter()
+{
+
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+//template<typename T>
+//void NotificationCenter::Subscribe( OnNotify handler )
+//{
+//    __subscriptions[&typeid( T )] = handler;
+//}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

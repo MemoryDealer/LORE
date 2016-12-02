@@ -25,54 +25,73 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Core/Notification.h>
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 namespace Lore {
 
-    class LORE_EXPORT Window
+    class LORE_EXPORT NotificationCenter final
     {
 
     public:
 
-        enum class Mode {
-            Windowed,
-            Fullscreen,
-            FullscreenBorderless
-        };
+        // Notification handler function pointer.
+        using OnNotify = void (*)( const Notification& n );
+
+        using HandlerList = std::vector<OnNotify>;
+        using SubscriptionMap = std::unordered_map<const std::type_info*, HandlerList>;
 
     public:
 
-        explicit Window( const string& title,
-                         const uint width,
-                         const uint height );
+        constexpr explicit NotificationCenter();
 
-        virtual ~Window();
+        ~NotificationCenter();
 
-        //
-        // Rendering.
-
-        virtual void renderFrame() { }
-
-        //
-        // Modifiers.
-
-        virtual void setTitle( const string& title );
-
-        virtual void setDimensions( const uint width, const uint height );
-
-        virtual void setMode( const Mode& mode );
-
-        //
-        // Getters.
-
-        string getTitle() const
+        // Instance.
+        static NotificationCenter& get()
         {
-            return _title;
+            static NotificationCenter nc;
+            return nc;
         }
 
-    protected:
+        template<typename T>
+        void subscribe( OnNotify handler )
+        {
+            _subscriptions[&typeid( T )].push_back( handler );
+        }
 
-        string _title;
-        uint _width, _height;
-        Mode _mode;
+        template<typename T>
+        void notify( const Notification& n )
+        {
+            for ( const auto& handler : _subscriptions[&typeid( T )] ) {
+                handler( n );
+            }
+        }
+
+        //
+        // Static functions.
+
+        static void Initialize()
+        {
+            NotificationCenter::get();
+        }
+
+        template<typename T>
+        static void Subscribe( OnNotify handler )
+        {
+            NotificationCenter::get().subscribe<T>( handler );
+        }
+
+        template<typename T>
+        static void Notify( const Notification& n )
+        {
+            NotificationCenter::get().notify<T>( n );
+        }
+
+    private:
+
+        SubscriptionMap _subscriptions;
 
     };
 

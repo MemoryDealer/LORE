@@ -26,14 +26,23 @@
 
 #include <memory>
 #include <LORE2D/Lore.h>
+#include <LORE2D/Core/NotificationCenter.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void onNotify( const Lore::Notification& n )
+{
+    int a = 0;
+}
 
 int main( int argc, char** argv )
 {
     auto context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
+    Lore::NotificationCenter::Subscribe<Lore::WindowEventNotification>( onNotify );
+    Lore::NotificationCenter::Notify<Lore::WindowEventNotification>( Lore::WindowEventNotification() );
 
     Lore::WindowPtr window = context->createWindow( "Test", 640, 480 );
+    context->createWindow( "Test2", 720, 640 );
 
     while ( context->active() ) {
         context->renderFrame( 0 );
