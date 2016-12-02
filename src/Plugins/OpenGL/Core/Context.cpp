@@ -70,6 +70,8 @@ void Context::renderFrame( const float dt )
 {
     glfwPollEvents();
 
+    NotificationCenter::FireAllNotifications();
+
     RegistryIterator<Lore::Window> it = _windowRegistry.getIterator();
     while ( it.hasMore() ) {
         WindowPtr window = it.getNext();

@@ -42,6 +42,12 @@ namespace Lore {
         using HandlerList = std::vector<OnNotify>;
         using SubscriptionMap = std::unordered_map<const std::type_info*, HandlerList>;
 
+        struct QueuedNotification{
+            Notification n;
+            std::type_info* t;
+        };
+        using NotificationQueue = std::queue<QueuedNotification>;
+
     public:
 
         constexpr explicit NotificationCenter();
@@ -51,7 +57,7 @@ namespace Lore {
         // Instance.
         static NotificationCenter& get()
         {
-            static NotificationCenter nc;
+            NotificationCenter& nc = *_instance.get();
             return nc;
         }
 
@@ -64,17 +70,38 @@ namespace Lore {
         template<typename T>
         void notify( const Notification& n )
         {
-            for ( const auto& handler : _subscriptions[&typeid( T )] ) {
-                handler( n );
+            QueuedNotification qn;
+            qn.n = n;
+            qn.t = const_cast< std::type_info* >( &typeid( T ) );
+
+            _queue.push( qn );
+        }
+
+        void fireAllNotifications()
+        {
+            while ( !_queue.empty() ) {
+                QueuedNotification qn = _queue.front();
+
+                // Call all subscribed handler functions.
+                for ( const auto& handler : _subscriptions[qn.t] ) {
+                    handler( qn.n );
+                }
+
+                _queue.pop();
             }
         }
 
         //
-        // Static functions.
+        // Static helper functions.
 
         static void Initialize()
         {
-            NotificationCenter::get();
+            _instance = std::make_unique<NotificationCenter>();
+        }
+
+        static void Destroy()
+        {
+            _instance.reset();
         }
 
         template<typename T>
@@ -83,15 +110,24 @@ namespace Lore {
             NotificationCenter::get().subscribe<T>( handler );
         }
 
+        // TODO: Can the template parameter be removed and get the type_info from Notification?
         template<typename T>
         static void Notify( const Notification& n )
         {
             NotificationCenter::get().notify<T>( n );
         }
 
+        static void FireAllNotifications()
+        {
+            NotificationCenter::get().fireAllNotifications();
+        }
+
     private:
 
+        static std::unique_ptr<NotificationCenter> _instance;
+
         SubscriptionMap _subscriptions;
+        NotificationQueue _queue;
 
     };
 

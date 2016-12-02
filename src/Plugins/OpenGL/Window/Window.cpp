@@ -26,6 +26,8 @@
 
 #include "Window.h"
 
+#include <LORE2D/Core/NotificationCenter.h>
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 using namespace Lore::OpenGL;
@@ -57,7 +59,10 @@ Window::~Window()
 void Window::renderFrame()
 {
     if ( glfwWindowShouldClose( _window ) ) {
-
+        // Post window closed event.
+        WindowEventNotification n;
+        n.event = WindowEventNotification::Event::Closed;
+        NotificationCenter::Notify<WindowEventNotification>( n );
         return;
     }
 

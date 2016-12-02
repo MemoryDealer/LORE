@@ -50,6 +50,7 @@ Context::Context() noexcept
 : _windowRegistry()
 , _active( false )
 {
+    NotificationCenter::Subscribe<WindowEventNotification>( onWindowEvent );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -155,6 +156,15 @@ void Context::Destroy( std::unique_ptr<Context> context )
 {
     context.reset();
     Log::DeleteLogger();
+    NotificationCenter::Destroy();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Context::onWindowEvent( const Notification& n )
+{
+    const WindowEventNotification& wen = static_cast< const WindowEventNotification& >( n );
+    destroyWindow( wen.window );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

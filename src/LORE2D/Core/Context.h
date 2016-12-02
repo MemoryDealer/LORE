@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Core/NotificationCenter.h>
 #include <LORE2D/Plugin/Plugins.h>
 #include <LORE2D/Plugin/RenderPluginLoader.h>
 #include <LORE2D/Resource/Registry.h>
@@ -94,6 +95,13 @@ namespace Lore {
 
         Context& operator = ( const Context& rhs ) = delete;
         Context( const Context& rhs ) = delete;
+
+    protected:
+
+        //
+        // Notification handlers.
+
+        void onWindowEvent( const Notification& n );
 
     protected:
 
