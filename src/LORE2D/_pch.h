@@ -37,6 +37,8 @@
 #include <mutex>
 #include <string>
 #include <thread>
+#include <typeindex>
+#include <typeinfo>
 #include <queue>
 #include <unordered_map>
 #include <vector>

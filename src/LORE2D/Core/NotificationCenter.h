@@ -39,12 +39,24 @@ namespace Lore {
         // Notification handler function pointer.
         using OnNotify = void (*)( const Notification& n );
 
-        using HandlerList = std::vector<OnNotify>;
-        using SubscriptionMap = std::unordered_map<const std::type_info*, HandlerList>;
+        using NotificationHandler = std::function<void ( const Notification& n )>;
+
+        using HandlerList = std::vector<NotificationHandler>;
+        using SubscriptionMap = std::unordered_map<std::type_index, HandlerList>;
 
         struct QueuedNotification{
-            Notification n;
-            std::type_info* t;
+            const Notification& n;
+            std::type_index t;
+
+            explicit QueuedNotification( const Notification& n_ )
+            : n( n_ ), t( typeid( int ) ) { }
+
+            QueuedNotification operator = ( const QueuedNotification& rhs )
+            {
+                QueuedNotification qn( rhs.n );
+                qn.t = rhs.t;
+                return qn;
+            }
         };
         using NotificationQueue = std::queue<QueuedNotification>;
 
@@ -62,19 +74,28 @@ namespace Lore {
         }
 
         template<typename T>
-        void subscribe( OnNotify handler )
+        void subscribe( NotificationHandler handler )
         {
-            _subscriptions[&typeid( T )].push_back( handler );
+            auto t = std::type_index( typeid( T ) );
+            _subscriptions[t].push_back( handler );
         }
 
         template<typename T>
         void notify( const Notification& n )
         {
-            QueuedNotification qn;
-            qn.n = n;
-            qn.t = const_cast< std::type_info* >( &typeid( T ) );
+           /* QueuedNotification qn( n );
+            qn.t = std::type_index( typeid( T ) );
 
-            _queue.push( qn );
+            _queue.push( qn );*/
+
+            // TODO: Design a queue system that can handle storing the notification.
+            auto t = std::type_index( typeid( T ) );
+            auto lookup = _subscriptions.find( t );
+            if ( _subscriptions.end() != lookup ) {
+                for ( const auto& handler : lookup->second ) {
+                    handler( n );
+                }
+            }
         }
 
         void fireAllNotifications()
@@ -83,8 +104,11 @@ namespace Lore {
                 QueuedNotification qn = _queue.front();
 
                 // Call all subscribed handler functions.
-                for ( const auto& handler : _subscriptions[qn.t] ) {
-                    handler( qn.n );
+                auto lookup = _subscriptions.find( qn.t );
+                if ( _subscriptions.end() != lookup ) {
+                    for ( const auto& handler : lookup->second ) {
+                        handler( qn.n );
+                    }
                 }
 
                 _queue.pop();
@@ -105,7 +129,7 @@ namespace Lore {
         }
 
         template<typename T>
-        static void Subscribe( OnNotify handler )
+        static void Subscribe( NotificationHandler handler )
         {
             NotificationCenter::get().subscribe<T>( handler );
         }

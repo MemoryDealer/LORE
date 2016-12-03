@@ -45,12 +45,11 @@ using namespace Local;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-constexpr
 Context::Context() noexcept
 : _windowRegistry()
 , _active( false )
 {
-    NotificationCenter::Subscribe<WindowEventNotification>( onWindowEvent );
+    NotificationCenter::Subscribe<WindowEventNotification>( std::bind( &Context::onWindowEvent, this, std::placeholders::_1 ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

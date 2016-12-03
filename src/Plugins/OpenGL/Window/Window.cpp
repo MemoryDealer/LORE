@@ -62,6 +62,7 @@ void Window::renderFrame()
         // Post window closed event.
         WindowEventNotification n;
         n.event = WindowEventNotification::Event::Closed;
+        n.window = this;
         NotificationCenter::Notify<WindowEventNotification>( n );
         return;
     }

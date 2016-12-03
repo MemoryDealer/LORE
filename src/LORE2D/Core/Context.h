@@ -44,7 +44,7 @@ namespace Lore {
 
     public:
 
-        explicit constexpr Context() noexcept;
+        explicit Context() noexcept;
 
         virtual ~Context();
 
