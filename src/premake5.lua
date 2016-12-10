@@ -57,7 +57,6 @@ project "Plugin_OpenGL"
     forceincludes { "_pch.h" }
     files {
         "Plugins/OpenGL/**.h", "Plugins/OpenGL/**.cpp",
-        --"Plugins/_Dependencies/glad.h", "Plugins/_Dependencies/glad.c", "Plugins/_Dependencies/khrplatform.h"
     }
     links { "LORE2D", "glfw3dll", "glad" }
     postbuildcommands { "xcopy ..\\..\\..\\lib\\x64\\%{cfg.buildcfg}\\*.dll ..\\..\\..\\bin\\%{cfg.buildcfg}\\Run\\ /Y" }

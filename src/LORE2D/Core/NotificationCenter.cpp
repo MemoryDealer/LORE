@@ -32,33 +32,20 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
-
-    //std::unordered_map<const std::type_info*, NotificationCenter::OnNotify> __subscriptions;
-    //std::unique_ptr<SubscriptionMap> _subscriptions;
-}
+template<> std::unique_ptr<NotificationCenter> Singleton<NotificationCenter>::_instance = nullptr;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 constexpr
 NotificationCenter::NotificationCenter()
+: _subscriptions()
 {
-
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 NotificationCenter::~NotificationCenter()
 {
-
 }
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-//template<typename T>
-//void NotificationCenter::Subscribe( OnNotify handler )
-//{
-//    __subscriptions[&typeid( T )] = handler;
-//}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -26,21 +26,26 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 #include <LORE2D/Core/Notification.h>
+#include <LORE2D/Core/Singleton.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-    class LORE_EXPORT NotificationCenter final
+    ///
+    /// \class NotificationCenter
+    /// \brief Single point through which global notifications are handled.
+    /// \details Anyone may subscribe to a notification through the NotificationCenter.
+    ///     Notifications of any type may also be sent through the NotificationCenter.
+    class LORE_EXPORT NotificationCenter final : public Singleton<NotificationCenter>
     {
 
     public:
 
-        // Notification handler function pointer.
-        using OnNotify = void (*)( const Notification& n );
-
-        using HandlerList = std::vector<OnNotify>;
-        using SubscriptionMap = std::unordered_map<const std::type_info*, HandlerList>;
+        ///
+        /// \typedef NotificationHandler
+        /// \brief Function pointer to register a notification handler.
+        using NotificationHandler = std::function<void ( const Notification& n )>;
 
     public:
 
@@ -48,48 +53,70 @@ namespace Lore {
 
         ~NotificationCenter();
 
-        // Instance.
-        static NotificationCenter& get()
+        ///
+        /// \brief Registers a notification handler function to be called when a
+        ///     notification is fired through the NotificationCenter.
+        template<typename T>
+        void subscribe( NotificationHandler handler )
         {
-            static NotificationCenter nc;
-            return nc;
+            auto t = std::type_index( typeid( T ) );
+            _subscriptions[t].push_back( handler );
         }
 
         template<typename T>
-        void subscribe( OnNotify handler )
+        void unsubscribe( NotificationHandler handler )
         {
-            _subscriptions[&typeid( T )].push_back( handler );
+            auto t = std::type_index( typeid( T ) );
+            auto lookup = _subscriptions.find( t );
+            if ( lookup != _subscriptions.end() ) {
+                _subscriptions.erase( t );
+            }
         }
 
+        ///
+        /// \brief Immediately notifies all subscribed handlers for the specified
+        ///     notification type.
         template<typename T>
-        void notify( const Notification& n )
+        void post( const Notification& n )
         {
-            for ( const auto& handler : _subscriptions[&typeid( T )] ) {
-                handler( n );
+            // Call all subscribed handlers for this notification type.
+            auto t = std::type_index( typeid( T ) );
+            auto lookup = _subscriptions.find( t );
+            if ( _subscriptions.end() != lookup ) {
+                for ( const auto& handler : lookup->second ) {
+                    handler( n );
+                }
             }
         }
 
         //
-        // Static functions.
+        // Static helper functions.
 
-        static void Initialize()
+        ///
+        /// \copydoc NotificationCenter::subscribe()
+        template<typename T>
+        static void Subscribe( NotificationHandler handler )
         {
-            NotificationCenter::get();
+            NotificationCenter::Get().subscribe<T>( handler );
         }
 
+        // TODO: Can the template parameter be removed and get the type_info from Notification?
+        ///
+        /// \copydoc NotificationCenter::notify()
         template<typename T>
-        static void Subscribe( OnNotify handler )
+        static void Post( const Notification& n )
         {
-            NotificationCenter::get().subscribe<T>( handler );
-        }
-
-        template<typename T>
-        static void Notify( const Notification& n )
-        {
-            NotificationCenter::get().notify<T>( n );
+            NotificationCenter::Get().post<T>( n );
         }
 
     private:
+
+        using HandlerList = std::vector<NotificationHandler>;
+        using SubscriptionMap = std::unordered_map<std::type_index, HandlerList>;
+
+    private:
+
+        static std::unique_ptr<NotificationCenter> _instance;
 
         SubscriptionMap _subscriptions;
 

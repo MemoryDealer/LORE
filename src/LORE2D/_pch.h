@@ -25,30 +25,6 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// C++/STL.
-#include <atomic>
-#include <chrono>
-#include <condition_variable>
-#include <ctime>
-#include <fstream>
-#include <map>
-#include <memory>
-#include <mutex>
-#include <string>
-#include <thread>
-#include <queue>
-#include <unordered_map>
-#include <vector>
-
-// Windows.
-#if defined( _WIN32 ) || defined( _WIN64 )
-#include <Windows.h>
-#endif
-
-// Lore.
-#include "Exports.h"
-#include "Types.h"
-#include "Logging/Log.h"
-#include "Exception.h"
+#include "LorePrerequisites.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

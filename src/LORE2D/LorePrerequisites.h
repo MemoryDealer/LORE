@@ -25,17 +25,21 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// C++/STL.
+// C/C++/STL.
 #include <atomic>
+#include <cassert>
 #include <chrono>
 #include <condition_variable>
 #include <ctime>
 #include <fstream>
+#include <functional>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <thread>
+#include <typeindex>
+#include <typeinfo>
 #include <queue>
 #include <unordered_map>
 #include <vector>
@@ -43,12 +47,15 @@
 // Windows.
 #if defined( _WIN32 ) || defined( _WIN64 )
 #include <Windows.h>
+#ifdef _USE_VLD
+
+#endif
 #endif
 
 // Lore.
-#include "Exception.h"
 #include "Exports.h"
-#include "Logging/Log.h"
 #include "Types.h"
+#include "Logging/Log.h"
+#include "Exception.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

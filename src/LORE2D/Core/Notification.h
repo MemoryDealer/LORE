@@ -27,6 +27,9 @@
 
 namespace Lore {
 
+    ///
+    /// \struct Notification
+    /// \brief Base class for notifications sent through the NotificationCenter.
     struct Notification
     {
 
@@ -36,14 +39,21 @@ namespace Lore {
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+    ///
+    /// \struct WindowEventNotification
+    /// \brief Contains window pointer and event type for a window event.
     struct WindowEventNotification : public Notification
     {
+
+        virtual ~WindowEventNotification() override { }
+
         enum class Event {
             Closed
         };
 
         WindowPtr window;
         Event event;
+
     };
 
 }

@@ -24,7 +24,9 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Window.h"
+#include "GLWindow.h"
+
+#include <LORE2D/Core/NotificationCenter.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -57,7 +59,11 @@ Window::~Window()
 void Window::renderFrame()
 {
     if ( glfwWindowShouldClose( _window ) ) {
-
+        // Post window closed event.
+        WindowEventNotification n;
+        n.event = WindowEventNotification::Event::Closed;
+        n.window = this;
+        NotificationCenter::Post<WindowEventNotification>( n );
         return;
     }
 

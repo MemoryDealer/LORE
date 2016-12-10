@@ -44,6 +44,9 @@ namespace Lore {
         Trace           // For tracing entry/exit of routines or blocks.
     };
 
+    ///
+    /// \class Logger
+    /// \brief Writes log messages to Lore.log file in same directory as executable.
     class LORE_EXPORT Logger final
     {
 
@@ -77,10 +80,16 @@ namespace Lore {
         //
         // Logging functions.
 
+        ///
+        /// \brief Writes log message with timestamp at information level.
         void write( const string& text );
 
+        ///
+        /// \brief Writes log message with timestamp at specified level.
         void write( const LogLevel& lvl, const string& text );
 
+        ///
+        /// \brief Wakes up the logger thread and joins.
         void flush();
 
         //

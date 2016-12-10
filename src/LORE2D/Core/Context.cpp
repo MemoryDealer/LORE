@@ -45,11 +45,11 @@ using namespace Local;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-constexpr
 Context::Context() noexcept
 : _windowRegistry()
 , _active( false )
 {
+    NotificationCenter::Subscribe<WindowEventNotification>( std::bind( &Context::onWindowEvent, this, std::placeholders::_1 ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -155,6 +155,25 @@ void Context::Destroy( std::unique_ptr<Context> context )
 {
     context.reset();
     Log::DeleteLogger();
+    NotificationCenter::Destroy();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Context::onWindowEvent( const Notification& n )
+{
+    const WindowEventNotification& wen = static_cast< const WindowEventNotification& >( n );
+
+    switch ( wen.event ) {
+
+    default:
+        break;
+
+    case WindowEventNotification::Event::Closed:
+        destroyWindow( wen.window );
+        break;
+
+    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

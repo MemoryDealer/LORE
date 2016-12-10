@@ -24,9 +24,9 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Context.h"
+#include "GLContext.h"
 
-#include <Plugins/OpenGL/Window/Window.h>
+#include <Plugins/OpenGL/Window/GLWindow.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
