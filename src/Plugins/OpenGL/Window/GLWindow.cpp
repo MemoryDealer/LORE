@@ -24,7 +24,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Window.h"
+#include "GLWindow.h"
 
 #include <LORE2D/Core/NotificationCenter.h>
 
@@ -63,7 +63,7 @@ void Window::renderFrame()
         WindowEventNotification n;
         n.event = WindowEventNotification::Event::Closed;
         n.window = this;
-        NotificationCenter::Notify<WindowEventNotification>( n );
+        NotificationCenter::Post<WindowEventNotification>( n );
         return;
     }
 

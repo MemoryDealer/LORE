@@ -173,7 +173,6 @@ namespace Lore {
 
     private:
 
-        //Container _container;
         Container _container;
 
         mutable std::mutex _mutex;

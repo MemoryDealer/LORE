@@ -163,7 +163,17 @@ void Context::Destroy( std::unique_ptr<Context> context )
 void Context::onWindowEvent( const Notification& n )
 {
     const WindowEventNotification& wen = static_cast< const WindowEventNotification& >( n );
-    destroyWindow( wen.window );
+
+    switch ( wen.event ) {
+
+    default:
+        break;
+
+    case WindowEventNotification::Event::Closed:
+        destroyWindow( wen.window );
+        break;
+
+    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

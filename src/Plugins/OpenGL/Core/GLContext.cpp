@@ -24,9 +24,9 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Context.h"
+#include "GLContext.h"
 
-#include <Plugins/OpenGL/Window/Window.h>
+#include <Plugins/OpenGL/Window/GLWindow.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -69,8 +69,6 @@ Context::~Context()
 void Context::renderFrame( const float dt )
 {
     glfwPollEvents();
-
-    NotificationCenter::FireAllNotifications();
 
     RegistryIterator<Lore::Window> it = _windowRegistry.getIterator();
     while ( it.hasMore() ) {

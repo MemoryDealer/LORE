@@ -35,11 +35,17 @@
 
 namespace Lore {
 
+    ///
+    /// \class Context
+    /// \brief The owner of all Lore functionality. 
     class LORE_EXPORT Context
     {
 
     public:
 
+        ///
+        /// \typedef ErrorListener
+        /// \brief Function pointer to an error listener callback.
         using ErrorListener = void (*)( int, const char* );
 
     public:
@@ -51,33 +57,48 @@ namespace Lore {
         //
         // Rendering.
 
+        ///
+        /// \brief Renders a single frame using configured Windows and Scenes.
         virtual void renderFrame( const real dt ) = 0;
 
         //
         // Window functions.
 
+        ///
+        /// \brief Creates a window and returns a handle to it.
         WindowPtr createWindow( const string& title,
                                 const uint width,
                                 const uint height,
                                 const Window::Mode& mode = Window::Mode::Windowed );
 
+        ///
+        /// \brief Destroys specified window. If this is the last remaining window,
+        ///     the context will no longer be active.
         void destroyWindow( WindowPtr window );
 
         //
         // Information.
 
+        ///
+        /// \brief Returns name of the loaded render plugin.
         virtual string getRenderPluginName() const = 0;
 
         //
         // Callbacks.
 
+        ///
+        /// \brief Registers ErrorListener function pointer to be called when an error occurs.
         void addErrorListener( ErrorListener listener );
 
+        ///
+        /// \brief Removes ErrorListener function pointer from registered listeners.
         void removeErrorListener( ErrorListener listener );
 
         //
         // Getters.
 
+        ///
+        /// \brief Returns true if the context is active.
         inline bool active() const
         {
             return _active;
@@ -86,8 +107,14 @@ namespace Lore {
         //
         // Static helper functions.
 
+        ///
+        /// \brief Creates a new Context instance and loads the specified render plugin.
+        /// \return A std::unique_ptr containing the Context. The caller should maintain
+        ///     the pointer until it is no longer needed and pass it to Context::Destroy().
         static std::unique_ptr<Context> Create( const RenderPlugin& renderPlugin );
 
+        ///
+        /// \brief Frees all associated memory of Context.
         static void Destroy( std::unique_ptr<Context> context );
 
         //
@@ -101,10 +128,14 @@ namespace Lore {
         //
         // Notification handlers.
 
+        ///
+        /// \brief Handler for window event notifications.
         void onWindowEvent( const Notification& n );
 
     protected:
 
+        ///
+        /// \brief Called on a render plugin error. Notifies all registered listeners.
         static void ErrorCallback( int error, const char* desc );
 
     protected:
@@ -115,11 +146,15 @@ namespace Lore {
 
     };
 
+    ///
+    /// \copydoc Context::Create()
     inline LORE_EXPORT std::unique_ptr<Context> CreateContext( const RenderPlugin& renderPlugin )
     {
         return Context::Create( renderPlugin );
     }
 
+    ///
+    /// \copydoc Context::Destroy()
     inline LORE_EXPORT void DestroyContext( std::unique_ptr<Context> context )
     {
         Context::Destroy( std::move( context ) );

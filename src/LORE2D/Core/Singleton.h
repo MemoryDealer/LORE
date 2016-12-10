@@ -25,44 +25,55 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#pragma warning( disable: 4311 )
+#pragma warning( disable: 4312 )
+#pragma warning( disable: 4661 )
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 namespace Lore {
 
     ///
-    /// \class ITimestamper
-    /// \brief Interface for Timestamper class per-platform. 
-    class ITimestamper
+    /// \class Singleton
+    /// \brief Generic singleton class for any singletons to inherit from.
+    template<typename T>
+    class Singleton
     {
 
     public:
 
-        virtual ~ITimestamper() { }
+        Singleton()
+        {
+        }
+
+        ~Singleton()
+        {
+        }
 
         ///
-        /// \brief Generates a timestamp string in the format of "mm/dd/yyyy hh:mm::ss".
-        virtual string generate() const = 0;
-
-    };
-
-#if defined( _WIN32 ) || defined( _WIN64 )
-
-    ///
-    /// \class Timestamper
-    /// \brief Win32 implementation for ITimestamper.
-    class Timestamper : public ITimestamper
-    {
-
-    public:
+        /// \brief Allocates the singleton.
+        static void Initialize()
+        {
+            _instance = std::make_unique<T>();
+        }
 
         ///
-        /// \copydoc ITimestamper::generate()
-        virtual string generate() const override;
+        /// \brief Frees the singleton from memory.
+        static void Destroy()
+        {
+            _instance.reset();
+        }
+
+        static T& Get()
+        {
+            return *_instance;
+        }
+
+    private:
+
+        static std::unique_ptr<T> _instance;
 
     };
-
-#endif
-
-    extern void CreateTimestamper();
-    extern string GenerateTimestamp();
 
 }
 

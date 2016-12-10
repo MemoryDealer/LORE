@@ -25,8 +25,9 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// C++/STL.
+// C/C++/STL.
 #include <atomic>
+#include <cassert>
 #include <chrono>
 #include <condition_variable>
 #include <ctime>
@@ -46,6 +47,9 @@
 // Windows.
 #if defined( _WIN32 ) || defined( _WIN64 )
 #include <Windows.h>
+#ifdef _USE_VLD
+
+#endif
 #endif
 
 // Lore.

@@ -32,14 +32,13 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-std::unique_ptr<NotificationCenter> NotificationCenter::_instance = nullptr;
+template<> std::unique_ptr<NotificationCenter> Singleton<NotificationCenter>::_instance = nullptr;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 constexpr
 NotificationCenter::NotificationCenter()
 : _subscriptions()
-, _queue()
 {
 }
 

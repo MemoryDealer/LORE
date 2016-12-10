@@ -26,39 +26,26 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 #include <LORE2D/Core/Notification.h>
+#include <LORE2D/Core/Singleton.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-    class LORE_EXPORT NotificationCenter final
+    ///
+    /// \class NotificationCenter
+    /// \brief Single point through which global notifications are handled.
+    /// \details Anyone may subscribe to a notification through the NotificationCenter.
+    ///     Notifications of any type may also be sent through the NotificationCenter.
+    class LORE_EXPORT NotificationCenter final : public Singleton<NotificationCenter>
     {
 
     public:
 
-        // Notification handler function pointer.
-        using OnNotify = void (*)( const Notification& n );
-
+        ///
+        /// \typedef NotificationHandler
+        /// \brief Function pointer to register a notification handler.
         using NotificationHandler = std::function<void ( const Notification& n )>;
-
-        using HandlerList = std::vector<NotificationHandler>;
-        using SubscriptionMap = std::unordered_map<std::type_index, HandlerList>;
-
-        struct QueuedNotification{
-            const Notification& n;
-            std::type_index t;
-
-            explicit QueuedNotification( const Notification& n_ )
-            : n( n_ ), t( typeid( int ) ) { }
-
-            QueuedNotification operator = ( const QueuedNotification& rhs )
-            {
-                QueuedNotification qn( rhs.n );
-                qn.t = rhs.t;
-                return qn;
-            }
-        };
-        using NotificationQueue = std::queue<QueuedNotification>;
 
     public:
 
@@ -66,13 +53,9 @@ namespace Lore {
 
         ~NotificationCenter();
 
-        // Instance.
-        static NotificationCenter& get()
-        {
-            NotificationCenter& nc = *_instance.get();
-            return nc;
-        }
-
+        ///
+        /// \brief Registers a notification handler function to be called when a
+        ///     notification is fired through the NotificationCenter.
         template<typename T>
         void subscribe( NotificationHandler handler )
         {
@@ -81,14 +64,22 @@ namespace Lore {
         }
 
         template<typename T>
-        void notify( const Notification& n )
+        void unsubscribe( NotificationHandler handler )
         {
-           /* QueuedNotification qn( n );
-            qn.t = std::type_index( typeid( T ) );
+            auto t = std::type_index( typeid( T ) );
+            auto lookup = _subscriptions.find( t );
+            if ( lookup != _subscriptions.end() ) {
+                _subscriptions.erase( t );
+            }
+        }
 
-            _queue.push( qn );*/
-
-            // TODO: Design a queue system that can handle storing the notification.
+        ///
+        /// \brief Immediately notifies all subscribed handlers for the specified
+        ///     notification type.
+        template<typename T>
+        void post( const Notification& n )
+        {
+            // Call all subscribed handlers for this notification type.
             auto t = std::type_index( typeid( T ) );
             auto lookup = _subscriptions.find( t );
             if ( _subscriptions.end() != lookup ) {
@@ -98,60 +89,36 @@ namespace Lore {
             }
         }
 
-        void fireAllNotifications()
-        {
-            while ( !_queue.empty() ) {
-                QueuedNotification qn = _queue.front();
-
-                // Call all subscribed handler functions.
-                auto lookup = _subscriptions.find( qn.t );
-                if ( _subscriptions.end() != lookup ) {
-                    for ( const auto& handler : lookup->second ) {
-                        handler( qn.n );
-                    }
-                }
-
-                _queue.pop();
-            }
-        }
-
         //
         // Static helper functions.
 
-        static void Initialize()
-        {
-            _instance = std::make_unique<NotificationCenter>();
-        }
-
-        static void Destroy()
-        {
-            _instance.reset();
-        }
-
+        ///
+        /// \copydoc NotificationCenter::subscribe()
         template<typename T>
         static void Subscribe( NotificationHandler handler )
         {
-            NotificationCenter::get().subscribe<T>( handler );
+            NotificationCenter::Get().subscribe<T>( handler );
         }
 
         // TODO: Can the template parameter be removed and get the type_info from Notification?
+        ///
+        /// \copydoc NotificationCenter::notify()
         template<typename T>
-        static void Notify( const Notification& n )
+        static void Post( const Notification& n )
         {
-            NotificationCenter::get().notify<T>( n );
+            NotificationCenter::Get().post<T>( n );
         }
 
-        static void FireAllNotifications()
-        {
-            NotificationCenter::get().fireAllNotifications();
-        }
+    private:
+
+        using HandlerList = std::vector<NotificationHandler>;
+        using SubscriptionMap = std::unordered_map<std::type_index, HandlerList>;
 
     private:
 
         static std::unique_ptr<NotificationCenter> _instance;
 
         SubscriptionMap _subscriptions;
-        NotificationQueue _queue;
 
     };
 
