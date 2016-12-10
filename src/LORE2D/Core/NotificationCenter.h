@@ -63,13 +63,28 @@ namespace Lore {
             _subscriptions[t].push_back( handler );
         }
 
+        ///
+        /// \brief Removes handler from list of registered handlers for specified notification.
         template<typename T>
         void unsubscribe( NotificationHandler handler )
         {
             auto t = std::type_index( typeid( T ) );
+
+            // Find list of handlers for this notification type.
             auto lookup = _subscriptions.find( t );
             if ( lookup != _subscriptions.end() ) {
-                _subscriptions.erase( t );
+                HandlerList& handlers = lookup->second;
+
+                // Iterate over handlers for this notification type.
+                for ( auto it = handlers.begin(); it != handlers.end(); ) {
+                    NotificationHandler nh = *it;
+                    if ( GetFPAddress( nh ) == GetFPAddress( handler ) ) {
+                        it = handlers.erase( it );
+                    }
+                    else {
+                        ++it;
+                    }
+                }
             }
         }
 
@@ -100,6 +115,14 @@ namespace Lore {
             NotificationCenter::Get().subscribe<T>( handler );
         }
 
+        ///
+        /// \copydoc NotificationHandler::unsubscribe()
+        template<typename T>
+        static void Unsubscribe( NotificationHandler handler )
+        {
+            NotificationCenter::Get().unsubscribe<T>( handler );
+        }
+
         // TODO: Can the template parameter be removed and get the type_info from Notification?
         ///
         /// \copydoc NotificationCenter::notify()
@@ -108,6 +131,22 @@ namespace Lore {
         {
             NotificationCenter::Get().post<T>( n );
         }
+
+        ///
+        /// \brief Returns the address of the function encapsulated in a std::function object.
+        template<typename T>
+        size_t GetFPAddress( std::function<void ( T& )> function )
+        {
+            using fType = void( T& );
+            fType** fp = function.template target<fType*>();
+            return reinterpret_cast< size_t >( fp );
+        }
+
+        //
+        // Helper macros.
+
+#define NotificationSubscribe( Type, Handler ) NotificationCenter::Subscribe<Type>( std::bind( Handler, this, std::placeholders::_1 ) )
+#define NotificationUnsubscribe( Type, Handler ) NotificationCenter::Unsubscribe<Type>( std::bind( Handler, this, std::placeholders::_1 ) )
 
     private:
 

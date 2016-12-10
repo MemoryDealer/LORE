@@ -55,14 +55,6 @@ namespace Lore { namespace OpenGL {
 
     };
 
-    extern "C" __declspec( dllexport ) Lore::Window* __stdcall CreateLoreWindow( const string& name,
-                                                                                 const uint width,
-                                                                                 const uint height )
-    {
-        Lore::Window* window = new Window( name, width, height );
-        return window;
-    }
-
 }}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

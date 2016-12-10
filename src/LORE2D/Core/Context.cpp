@@ -37,7 +37,7 @@ using namespace Lore;
 
 namespace Local {
 
-    std::shared_ptr<IRenderPluginLoader> __rpl;
+    std::unique_ptr<IRenderPluginLoader> __rpl;
     std::vector<Context::ErrorListener> __errorListeners;
 
 }
@@ -49,47 +49,14 @@ Context::Context() noexcept
 : _windowRegistry()
 , _active( false )
 {
-    NotificationCenter::Subscribe<WindowEventNotification>( std::bind( &Context::onWindowEvent, this, std::placeholders::_1 ) );
+    NotificationSubscribe( WindowEventNotification, &Context::onWindowEvent );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Context::~Context()
 {
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-WindowPtr Context::createWindow( const string& title,
-                                 const uint width,
-                                 const uint height,
-                                 const Window::Mode& mode )
-{
-    std::unique_ptr<Window> window = __rpl->createWindow( title, width, height );
-    window->setMode( mode );
-
-    log( "Window " + title + " created successfully" );
-
-    _windowRegistry.insert( title, std::move( window ) );
-    
-    // At least one window means the context is active.
-    _active = true;
-
-    // Return a handle.
-    return _windowRegistry.get( title );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Context::destroyWindow( WindowPtr window )
-{
-    const string title = window->getTitle();
-
-    _windowRegistry.remove( title );
-    log( "Window " + title + " destroyed successfully" );
-
-    // Context is no longer considered active if all windows have been destroyed.
-    _active = !_windowRegistry.empty();
+    NotificationUnsubscribe( WindowEventNotification, &Context::onWindowEvent );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -66,15 +66,15 @@ namespace Lore {
 
         ///
         /// \brief Creates a window and returns a handle to it.
-        WindowPtr createWindow( const string& title,
-                                const uint width,
-                                const uint height,
-                                const Window::Mode& mode = Window::Mode::Windowed );
+        virtual WindowPtr createWindow( const string& title,
+                                        const uint width,
+                                        const uint height,
+                                        const Window::Mode& mode = Window::Mode::Windowed ) = 0;
 
         ///
         /// \brief Destroys specified window. If this is the last remaining window,
         ///     the context will no longer be active.
-        void destroyWindow( WindowPtr window );
+        virtual void destroyWindow( WindowPtr window ) = 0;
 
         //
         // Information.

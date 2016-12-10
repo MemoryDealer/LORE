@@ -79,6 +79,40 @@ void Context::renderFrame( const float dt )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+Lore::WindowPtr Context::createWindow( const string& title,
+                                       const uint width,
+                                       const uint height,
+                                       const Window::Mode& mode )
+{
+    std::unique_ptr<Window> window = std::make_unique<Window>( title, width, height );
+    window->setMode( mode );
+
+    log( "Window " + title + " created successfully" );
+
+    _windowRegistry.insert( title, std::move( window ) );
+
+    // At least one window means the context is active.
+    _active = true;
+
+    // Return a handle.
+    return _windowRegistry.get( title );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Context::destroyWindow( Lore::WindowPtr window )
+{
+    const string title = window->getTitle();
+
+    _windowRegistry.remove( title );
+    log( "Window " + title + " destroyed successfully" );
+
+    // Context is no longer considered active if all windows have been destroyed.
+    _active = !_windowRegistry.empty();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 Lore::string Context::getRenderPluginName() const
 {
     return Lore::string( "OpenGL" );

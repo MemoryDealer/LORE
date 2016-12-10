@@ -90,26 +90,6 @@ std::unique_ptr<Context> RenderPluginLoader::createContext()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-std::unique_ptr<Window> RenderPluginLoader::createWindow( const string& title,
-                                                          const uint width,
-                                                          const uint height )
-{
-    using CreateWindowPtr = Window*( *)( const string&, const uint, const uint );
-
-    CreateWindowPtr cwp = reinterpret_cast< CreateWindowPtr >(
-        GetProcAddress( _hModule, "CreateLoreWindow" ) );
-    if ( nullptr == cwp ) {
-        return nullptr;
-    }
-
-    Window* window = cwp( title, width, height );
-
-    std::unique_ptr<Window> p( window );
-    return std::move( p );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 void RenderPluginLoader::free()
 {
     if ( _hModule ) {

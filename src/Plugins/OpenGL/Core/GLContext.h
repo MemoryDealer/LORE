@@ -46,6 +46,21 @@ namespace Lore { namespace OpenGL {
         virtual void renderFrame( const float dt ) override;
 
         //
+        // Window functions.
+
+        ///
+        /// \brief Creates a window and returns a handle to it.
+        virtual WindowPtr createWindow( const string& title,
+                                        const uint width,
+                                        const uint height,
+                                        const Window::Mode& mode = Window::Mode::Windowed ) override;
+
+        ///
+        /// \brief Destroys specified window. If this is the last remaining window,
+        ///     the context will no longer be active.
+        virtual void destroyWindow( WindowPtr window ) override;
+
+        //
         // Information.
 
         virtual string getRenderPluginName() const override;

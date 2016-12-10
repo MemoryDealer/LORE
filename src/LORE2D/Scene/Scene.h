@@ -24,3 +24,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+namespace Lore {
+
+    ///
+    /// \class Scene
+    /// \brief Contains all information to render a scene to an area in a window,
+    ///     or to a texture.
+    class Scene
+    {
+
+    public:
+
+        explicit Scene( const string& name );
+
+        virtual ~Scene() { }
+
+    private:
+
+
+
+    };
+
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

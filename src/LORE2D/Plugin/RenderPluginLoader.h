@@ -44,10 +44,6 @@ namespace Lore {
 
         virtual std::unique_ptr<Context> createContext() = 0;
 
-        virtual std::unique_ptr<Window> createWindow( const string& title,
-                                                      const uint width,
-                                                      const uint height ) = 0;
-
     protected:
 
         virtual void free() = 0;
@@ -75,10 +71,6 @@ namespace Lore {
         virtual bool load( const string& file ) override;
 
         virtual std::unique_ptr<Context> createContext() override;
-
-        virtual std::unique_ptr<Window> createWindow( const string& title,
-                                                      const uint width,
-                                                      const uint height ) override;
 
     protected:
 
