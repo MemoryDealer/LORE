@@ -43,7 +43,7 @@ namespace Lore { namespace OpenGL {
 
         virtual ~GenericRenderer() override;
 
-        virtual void render( const Lore::RenderView& rv ) override;
+        virtual void present( const Lore::RenderView& rv ) override;
 
     };
 

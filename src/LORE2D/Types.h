@@ -34,6 +34,7 @@ namespace Lore {
 
     class Camera;
     class IRenderer;
+    class Node;
     class PostProcessor;
     class Scene;
     class Window;
@@ -42,6 +43,7 @@ namespace Lore {
     // Pointer types.
 
     using CameraPtr = Camera*;
+    using NodePtr = Node*;
     using RendererPtr = IRenderer*;
     using PostProcessorPtr = PostProcessor*;
     using ScenePtr = Scene*;

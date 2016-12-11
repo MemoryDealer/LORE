@@ -1,3 +1,4 @@
+#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -24,57 +25,41 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Scene.h"
+namespace Lore {
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    ///
+    /// \class Timer
+    /// \brief Tracks elapsed time in seconds, once started.
+    class Timer final
+    {
 
-using namespace Lore;
+    public:
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+        Timer();
 
-Scene::Scene( const string& name )
-: _name( name )
-, _bgColor( StockColor::Black )
-, _renderer( nullptr )
-, _root( "root", this, nullptr )
-, _nodes()
-{
-}
+        float totalTime() const;
+        float deltaTime() const;
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+        void reset();
+        void start();
+        void stop();
+        void tick();
 
-Scene::~Scene()
-{
-}
+    private:
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+        double mSecondsPerCount;
+        double mDeltaTime;
 
-NodePtr Scene::createNode( const string& name )
-{
-    std::unique_ptr<Node> node( new Node( name, this, nullptr ) );
+        __int64 mBaseTime;
+        __int64 mPausedTime;
+        __int64 mStopTime;
+        __int64 mPrevTime;
+        __int64 mCurrTime;
 
-    auto result = _nodes.insert( { name, std::move( node ) } );
-    if ( !result.second ) {
-        throw Lore::Exception( "Failed to insert node " + name + " into Scene " + _name );
-    }
+        bool mStopped;
 
-    NodePtr p = result.first->second.get();
+    };
 
-    _root.attachNode( p );
-
-    return p;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-NodePtr Scene::getNode( const string& name )
-{
-    auto lookup = _nodes.find( name );
-    if ( _nodes.end() == lookup ) {
-        throw Lore::Exception( "Node " + name + " does not exist in Scene " + _name );
-    }
-
-    return lookup->second.get();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

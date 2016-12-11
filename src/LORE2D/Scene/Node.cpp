@@ -24,7 +24,9 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Scene.h"
+#include "Node.h"
+
+#include <LORE2D/Scene/Scene.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -32,49 +34,67 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Scene::Scene( const string& name )
+Node::Node( const string& name, ScenePtr scene, NodePtr parent )
 : _name( name )
-, _bgColor( StockColor::Black )
-, _renderer( nullptr )
-, _root( "root", this, nullptr )
-, _nodes()
+, _scene( scene )
+, _parent( parent )
+, _childNodes()
 {
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Scene::~Scene()
+Node::~Node()
 {
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-NodePtr Scene::createNode( const string& name )
+NodePtr Node::createChildNode( const string& name )
 {
-    std::unique_ptr<Node> node( new Node( name, this, nullptr ) );
+    NodePtr node = _scene->createNode( name );
+    node->_parent = this;
 
-    auto result = _nodes.insert( { name, std::move( node ) } );
+    auto result = _childNodes.insert( { name, node } );
     if ( !result.second ) {
-        throw Lore::Exception( "Failed to insert node " + name + " into Scene " + _name );
+        throw Lore::Exception( "Failed to add child node " + name + " to " + _name );
     }
 
-    NodePtr p = result.first->second.get();
-
-    _root.attachNode( p );
-
-    return p;
+    return node;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-NodePtr Scene::getNode( const string& name )
+void Node::attachNode( NodePtr node )
 {
-    auto lookup = _nodes.find( name );
-    if ( _nodes.end() == lookup ) {
-        throw Lore::Exception( "Node " + name + " does not exist in Scene " + _name );
+    if ( node->_parent ) {
+        throw Lore::Exception( "Node " + node->getName() +
+                               " is already a child of " + node->getParent()->getName() );
     }
 
-    return lookup->second.get();
+    auto result = _childNodes.insert( { node->getName(), node } );
+    if ( !result.second ) {
+        throw Lore::Exception( "Failed to attach node to node " + _name );
+    }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+NodePtr Node::getChild( const string& name )
+{
+    auto lookup = _childNodes.find( name );
+    if ( _childNodes.end() == lookup ) {
+        throw Lore::Exception( "Child node " + name + " does not exist in node " + _name );
+    }
+
+    return lookup->second;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Node::ChildNodeIterator Node::getChildIterator()
+{
+    return ChildNodeIterator( _childNodes.begin(), _childNodes.end() );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -31,6 +31,9 @@
 
 namespace Lore { namespace OpenGL {
 
+    ///
+    /// \class RendererFactory
+    /// \brief Allocates an IRenderer object of the specified type.
     class RendererFactory final
     {
 

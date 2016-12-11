@@ -75,7 +75,7 @@ void Window::renderFrame()
     // Render each Scene with the corresponding RenderView data.
     for ( const RenderView& rv : _renderViews ) {
         RendererPtr renderer = rv.scene->getRenderer();
-        renderer->render( rv );
+        renderer->present( rv );
     }
 
     glfwSwapBuffers( _window );
@@ -87,10 +87,11 @@ void Window::addRenderView( const Lore::RenderView& renderView )
 {
     // Convert Viewport to gl_viewport.
     RenderView rv = renderView;
-    rv.gl_viewport.x = static_cast< int >( rv.viewport.x * static_cast<float>( _frameBufferWidth ) );
-    rv.gl_viewport.y = static_cast< int >( rv.viewport.y * static_cast<float>( _frameBufferHeight ) );
-    rv.gl_viewport.width = static_cast< int >( rv.viewport.width * static_cast<float>( _frameBufferWidth ) );
-    rv.gl_viewport.height = static_cast< int >( rv.viewport.height * static_cast<float>( _frameBufferHeight ) );
+    Viewport vp = rv.viewport;
+    rv.gl_viewport.x = static_cast< int >( vp.x * static_cast<float>( _frameBufferWidth ) );
+    rv.gl_viewport.y = static_cast< int >( vp.y * static_cast<float>( _frameBufferHeight ) );
+    rv.gl_viewport.width = static_cast< int >( vp.width * static_cast<float>( _frameBufferWidth ) );
+    rv.gl_viewport.height = static_cast< int >( vp.height * static_cast<float>( _frameBufferHeight ) );
 
     Lore::Window::addRenderView( rv );
 }

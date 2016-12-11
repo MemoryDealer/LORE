@@ -35,7 +35,7 @@ namespace Lore {
         /// \class IRenderer
         /// \brief Interface for Renderers - the object that knows how to interpret
         ///     a RenderView and a Scene's scene graph and present an image to the 
-        ///     window.
+        ///     window. Render plugins shall define these implementations.
         class IRenderer
         {
 
@@ -43,7 +43,7 @@ namespace Lore {
 
             virtual ~IRenderer() { }
 
-            virtual void render( const RenderView& rv ) = 0;
+            virtual void present( const RenderView& rv ) = 0;
 
         };
         using RendererPtr = IRenderer*;

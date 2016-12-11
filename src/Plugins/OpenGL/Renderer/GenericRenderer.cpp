@@ -44,7 +44,7 @@ GenericRenderer::~GenericRenderer()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GenericRenderer::render( const Lore::RenderView& rv )
+void GenericRenderer::present( const Lore::RenderView& rv )
 {
     glViewport( rv.gl_viewport.x,
                 rv.gl_viewport.y,

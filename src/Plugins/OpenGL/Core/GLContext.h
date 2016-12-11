@@ -71,6 +71,10 @@ namespace Lore { namespace OpenGL {
 
     private:
 
+        void _destroyWindow( WindowPtr window );
+
+    private:
+
         using RendererMap = std::unordered_map <Lore::RendererType, std::unique_ptr<Lore::IRenderer>>;
 
     private:
@@ -78,6 +82,7 @@ namespace Lore { namespace OpenGL {
         GLFWwindow* _offscreenContextWindow;
         RendererMap _renderers;
 
+        std::queue<WindowPtr> _queuedClosingWindows;
     };
 
     // This is the only exported function from the render plugin, which allows the LORE2D 

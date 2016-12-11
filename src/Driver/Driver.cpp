@@ -43,6 +43,18 @@ int main( int argc, char** argv )
     Lore::RenderView rv( "main", scene, vp );
     window->addRenderView( rv );
 
+    Lore::NodePtr node = scene->createNode( "A" );
+    node = node->createChildNode( "AChild" );
+    node = scene->createNode( "B " );
+    node = node->createChildNode( "BChild" );
+    node = node->createChildNode( "BChildChild" );
+
+    auto it = scene->getNode( "A" )->getChildIterator();
+    while ( it.hasMore() ) {
+        node = it.getNext();
+        ;
+    }
+
     while ( context->active() ) {
         context->renderFrame( 0 );
     }

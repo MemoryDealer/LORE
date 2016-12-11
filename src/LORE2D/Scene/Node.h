@@ -1,3 +1,4 @@
+#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -24,57 +25,74 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Scene.h"
+#include <LORE2D/Core/Iterator.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-using namespace Lore;
+namespace Lore {
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    ///
+    /// \class Node
+    /// \brief A scene node in its scene graph. May contain any renderable or
+    ///     attachable objects.
+    class LORE_EXPORT Node
+    {
 
-Scene::Scene( const string& name )
-: _name( name )
-, _bgColor( StockColor::Black )
-, _renderer( nullptr )
-, _root( "root", this, nullptr )
-, _nodes()
-{
-}
+    public:
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+        using NodeMap = std::map<string, NodePtr>;
+        using ChildNodeIterator = MapIterator<NodeMap>;
 
-Scene::~Scene()
-{
-}
+    public:
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+        ~Node();
 
-NodePtr Scene::createNode( const string& name )
-{
-    std::unique_ptr<Node> node( new Node( name, this, nullptr ) );
+        NodePtr createChildNode( const string& name );
 
-    auto result = _nodes.insert( { name, std::move( node ) } );
-    if ( !result.second ) {
-        throw Lore::Exception( "Failed to insert node " + name + " into Scene " + _name );
-    }
+        void attachNode( NodePtr child );
 
-    NodePtr p = result.first->second.get();
+        NodePtr getChild( const string& name );
 
-    _root.attachNode( p );
+        ChildNodeIterator getChildIterator();
 
-    return p;
-}
+        //
+        // Getters.
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+        string getName() const
+        {
+            return _name;
+        }
 
-NodePtr Scene::getNode( const string& name )
-{
-    auto lookup = _nodes.find( name );
-    if ( _nodes.end() == lookup ) {
-        throw Lore::Exception( "Node " + name + " does not exist in Scene " + _name );
-    }
+        NodePtr getParent() const
+        {
+            return _parent;
+        }
 
-    return lookup->second.get();
+        //
+        // Deleted functions/operators.
+
+        Node( const Node& rhs ) = delete;
+        Node& operator = ( const Node& rhs ) = delete;
+
+    private:
+
+        // Only scenes can construct nodes.
+        friend class Scene;
+
+        Node( const string& name, ScenePtr scene, NodePtr parent );
+
+    private:
+
+        string _name;
+
+        // The creator of this node.
+        ScenePtr _scene;
+
+        NodePtr _parent;
+        NodeMap _childNodes;
+
+    };
+
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

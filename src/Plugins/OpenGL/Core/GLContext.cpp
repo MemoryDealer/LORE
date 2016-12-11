@@ -39,6 +39,7 @@ Context::Context() noexcept
 : Lore::Context()
 , _offscreenContextWindow( nullptr )
 , _renderers()
+, _queuedClosingWindows()
 {
     log( "Initializing OpenGL render plugin context..." );
     glfwInit();
@@ -72,6 +73,15 @@ void Context::renderFrame( const float dt )
 {
     glfwPollEvents();
 
+    // Destroy any windows that were closed.
+    /*while ( !_queuedClosingWindows.empty() ) {
+        WindowPtr window = _queuedClosingWindows.front();
+
+        _destroyWindow( window );
+        _queuedClosingWindows.pop();
+    }*/
+
+    // Render all RenderViews for each window.
     RegistryIterator<Lore::Window> it = _windowRegistry.getIterator();
     while ( it.hasMore() ) {
         WindowPtr window = it.getNext();
@@ -104,13 +114,8 @@ Lore::WindowPtr Context::createWindow( const string& title,
 
 void Context::destroyWindow( Lore::WindowPtr window )
 {
-    const string title = window->getTitle();
-
-    _windowRegistry.remove( title );
-    log( "Window " + title + " destroyed successfully" );
-
-    // Context is no longer considered active if all windows have been destroyed.
-    _active = !_windowRegistry.empty();
+    //_queuedClosingWindows.push( window );
+    _destroyWindow( window );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -139,6 +144,20 @@ Lore::ScenePtr Context::createScene( const string& name, const Lore::RendererTyp
 Lore::string Context::getRenderPluginName() const
 {
     return Lore::string( "OpenGL" );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Context::_destroyWindow( Lore::WindowPtr window )
+{
+    const string title = window->getTitle();
+
+    _windowRegistry.remove( title );
+    log( "Window " + title + " destroyed successfully" );
+
+    // Context is no longer considered active if all windows have been destroyed.
+    _active = !_windowRegistry.empty();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

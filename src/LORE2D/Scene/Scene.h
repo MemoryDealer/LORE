@@ -26,6 +26,7 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 #include <LORE2D/Resource/Color.h>
+#include <LORE2D/Scene/Node.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -35,7 +36,7 @@ namespace Lore {
     /// \class Scene
     /// \brief Contains all information to render a scene to an area in a window,
     ///     or to a texture.
-    class Scene final
+    class LORE_EXPORT Scene final
     {
 
     public:
@@ -43,6 +44,13 @@ namespace Lore {
         explicit Scene( const string& name );
 
         ~Scene();
+
+        NodePtr createNode( const string& name );
+
+        void destroyNode( NodePtr node );
+        void destroyNode( const string& name );
+
+        NodePtr getNode( const string& name );
 
         //
         // Setters.
@@ -77,11 +85,22 @@ namespace Lore {
 
     private:
 
+        using NodeHashMap = std::unordered_map<string, std::unique_ptr<Node>>;
+
+    private:
+
         string _name;
         Color _bgColor;
 
         // The type of renderer this scene uses.
         RendererPtr _renderer;
+
+        // The scene's root node.
+        Node _root;
+
+        // Convenient hash map of all nodes for quick lookup.
+        // This is the owner of all nodes; they are stored as unique_ptrs.
+        NodeHashMap _nodes;
 
     };
 
