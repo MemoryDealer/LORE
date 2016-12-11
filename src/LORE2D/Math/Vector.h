@@ -104,9 +104,6 @@ namespace Lore {
     using Vec3 = Vector<float, 3>;
     using Vec4 = Vector<float, 4>;
 
-    using Colori = Vector<int, 4>;
-    using Colorf = Vector<float, 4>;
-
     //
     // Specialize component access for all vector sizes.
 

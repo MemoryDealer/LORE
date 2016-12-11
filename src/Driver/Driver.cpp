@@ -36,6 +36,12 @@ int main( int argc, char** argv )
     Lore::WindowPtr window = context->createWindow( "Test", 640, 480 );
     context->createWindow( "Test2", 720, 640 );
 
+    Lore::ScenePtr scene = context->createScene( "Default" );
+    scene->setBackgroundColor( Lore::StockColor::White );
+
+    Lore::RenderView rv( "main", scene );
+    window->addRenderView( rv );
+
     while ( context->active() ) {
         context->renderFrame( 0 );
     }

@@ -25,50 +25,81 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Resource/Color.h>
+#include <LORE2D/Scene/Scene.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
     ///
-    /// \class Scene
-    /// \brief Contains all information to render a scene to an area in a window,
-    ///     or to a texture.
-    class Scene final
+    /// \class Viewport
+    /// \brief Viewport dimensions in float coordinates (0.0f to 1.0f).
+    struct Viewport final
     {
 
-    public:
+        float x;
+        float y;
+        float width;
+        float height;
 
-        explicit Scene( const string& name );
+        Viewport()
+        : x( 0.f )
+        , y( 0.f )
+        , width( 1.f )
+        , height( 1.f )
+        { }
 
-        ~Scene();
+        Viewport( const float x_,
+                  const float y_,
+                  const float width_,
+                  const float height_ )
+        : x (x_)
+        , y( y_)
+        , width( width_ )
+        , height( height_ )
+        { }
 
-        //
-        // Setters.
+    };
 
-        void setBackgroundColor( const Color& color )
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    ///
+    /// \class RenderView
+    /// \brief Contains the information needed to render a scene to a window.
+    /// \details ...
+    struct RenderView final
+    {
+
+        string name;
+        Scene* scene;
+        Viewport viewport;
+        //Cam
+        //PostProcesser
+
+        RenderView( const string& name_ )
+        : name ( name_ )
+        , scene( nullptr )
+        , viewport()
+        { }
+
+        RenderView( const string& name_, Scene* scene_ )
+        : name( name_ )
+        , scene( scene_ )
+        , viewport( )
         {
-            _bgColor = color;
         }
 
-        //
-        // Getters.
+        RenderView( const string& name_, Scene* scene_, const Viewport& viewport_ )
+        : name( name_ )
+        , scene( scene_ )
+        , viewport( viewport_ )
+        { }
 
-        string getName() const
+        bool operator == ( const RenderView& rhs ) const
         {
-            return _name;
+            // RenderView names are unique.
+            return ( name == rhs.name );
         }
-
-        Color getBackgroundColor() const
-        {
-            return _bgColor;
-        }
-
-    private:
-
-        string _name;
-        Color _bgColor;
 
     };
 

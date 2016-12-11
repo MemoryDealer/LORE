@@ -35,8 +35,8 @@ using namespace Lore::OpenGL;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Window::Window( const string& title,
-                const uint width,
-                const uint height )
+                const int width,
+                const int height )
 : Lore::Window( title, width, height )
 , _window( nullptr )
 {
@@ -45,6 +45,9 @@ Window::Window( const string& title,
                                 _title.c_str(),
                                 nullptr,
                                 nullptr );
+
+    // Store frame buffer size.
+    glfwGetFramebufferSize( _window, &_frameBufferWidth, &_frameBufferHeight );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -69,10 +72,13 @@ void Window::renderFrame()
 
     glfwMakeContextCurrent( _window );
 
-    // Scenes...
+    // Render each RenderView.
+    for ( const RenderView& rv : _renderViews ) {
+        Color bg = rv.scene->getBackgroundColor();
 
-    glClearColor( 0.2f, 0.2f, 0.2f, 1.f );
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+        glClearColor( bg.r, bg.g, bg.b, bg.a );
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    }
 
     glfwSwapBuffers( _window );
 }
@@ -81,7 +87,19 @@ void Window::renderFrame()
 
 void Window::setTitle( const string& title )
 {
-    
+    Lore::Window::setTitle( title );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Window::setDimensions( const int width, const int height )
+{
+    Lore::Window::setDimensions( width, height );
+
+    glfwSetWindowSize( _window, width, height );
+
+    // Store frame buffer size.
+    glfwGetFramebufferSize( _window, &_frameBufferWidth, &_frameBufferHeight );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

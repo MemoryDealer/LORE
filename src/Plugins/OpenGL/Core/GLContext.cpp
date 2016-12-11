@@ -84,7 +84,7 @@ Lore::WindowPtr Context::createWindow( const string& title,
                                        const uint height,
                                        const Window::Mode& mode )
 {
-    std::unique_ptr<Window> window = std::make_unique<Window>( title, width, height );
+    auto window = std::make_unique<Window>( title, width, height );
     window->setMode( mode );
 
     log( "Window " + title + " created successfully" );

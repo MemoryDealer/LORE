@@ -62,7 +62,7 @@ namespace Lore {
         virtual void renderFrame( const real dt ) = 0;
 
         //
-        // Window functions.
+        // Factory/Destruction functions.
 
         ///
         /// \brief Creates a window and returns a handle to it.
@@ -75,6 +75,15 @@ namespace Lore {
         /// \brief Destroys specified window. If this is the last remaining window,
         ///     the context will no longer be active.
         virtual void destroyWindow( WindowPtr window ) = 0;
+
+        ///
+        /// \brief Creates a scene and returns a handle to it.
+        virtual ScenePtr createScene( const string& name );
+
+        ///
+        /// \brief Destroys specified scene and all of its nodes.
+        virtual void destroyScene( const string& name );
+        virtual void destroyScene( ScenePtr scene );
 
         //
         // Information.
@@ -102,6 +111,16 @@ namespace Lore {
         inline bool active() const
         {
             return _active;
+        }
+
+        WindowPtr getWindow( const string& title )
+        {
+            return _windowRegistry.get( title );
+        }
+
+        ScenePtr getScene( const string& name )
+        {
+            return _sceneRegistry.get( name );
         }
 
         //
@@ -141,6 +160,7 @@ namespace Lore {
     protected:
 
         Registry<Window> _windowRegistry;
+        Registry<Scene> _sceneRegistry;
 
         bool _active;
 

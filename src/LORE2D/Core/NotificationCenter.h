@@ -92,7 +92,7 @@ namespace Lore {
         /// \brief Immediately notifies all subscribed handlers for the specified
         ///     notification type.
         template<typename T>
-        void post( const Notification& n )
+        void post( const Notification& n ) const
         {
             // Call all subscribed handlers for this notification type.
             auto t = std::type_index( typeid( T ) );

@@ -1,3 +1,4 @@
+#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -24,24 +25,23 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Scene.h"
+#include <LORE2D/Math/Vector.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-using namespace Lore;
+namespace Lore {
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    using Colori = Vector<int, 4>;
+    using Colorf = Vector<float, 4>;
+    using Color = Colorf; // Default colors to floats.
 
-Scene::Scene( const string& name )
-: _name( name )
-, _bgColor( StockColor::Black )
-{
-}
+    namespace StockColor {
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+        static const Color Black = Color( 0.f, 0.f, 0.f, 0.f );
+        static const Color White = Color( 1.f, 1.f, 1.f, 1.f );
 
-Scene::~Scene()
-{
+    }
+
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

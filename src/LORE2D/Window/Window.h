@@ -25,6 +25,10 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Window/RenderView.h>
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 namespace Lore {
 
     class LORE_EXPORT Window
@@ -41,8 +45,8 @@ namespace Lore {
     public:
 
         explicit Window( const string& title,
-                         const uint width,
-                         const uint height );
+                         const int width,
+                         const int height );
 
         virtual ~Window();
 
@@ -51,12 +55,21 @@ namespace Lore {
 
         virtual void renderFrame() { }
 
+        virtual void addRenderView( const RenderView& renderView );
+
+        virtual void removeRenderView( const RenderView& renderView );
+        virtual void removeRenderView( const string& name );
+
+        virtual RenderView& getRenderView( const string& name );
+
+        virtual void resetRenderViews();
+
         //
         // Modifiers.
 
         virtual void setTitle( const string& title );
 
-        virtual void setDimensions( const uint width, const uint height );
+        virtual void setDimensions( const int width, const int height );
 
         virtual void setMode( const Mode& mode );
 
@@ -68,11 +81,48 @@ namespace Lore {
             return _title;
         }
 
+        int getWidth() const
+        {
+            return _frameBufferWidth;
+        }
+
+        int getHeight() const
+        {
+            return _frameBufferHeight;
+        }
+
+        void getDimensions( int& width, int& height )
+        {
+            width = _frameBufferWidth;
+            height = _frameBufferHeight;
+        }
+
+        ///
+        /// \brief Returns full width of window, including borders.
+        int getFullWidth() const
+        {
+            return _width;
+        }
+
+        ///
+        /// \brief Returns full height of window, including borders.
+        int getFullHeight() const
+        {
+            return _height;
+        }
+
+    protected:
+
+        using RenderViewList = std::vector<RenderView>;
+
     protected:
 
         string _title;
-        uint _width, _height;
+        int _width, _height;
+        int _frameBufferWidth, _frameBufferHeight;
         Mode _mode;
+
+        RenderViewList _renderViews;
 
     };
 

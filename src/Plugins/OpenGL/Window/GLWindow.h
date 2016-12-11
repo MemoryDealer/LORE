@@ -41,8 +41,8 @@ namespace Lore { namespace OpenGL {
     public:
 
         explicit Window( const string& title,
-                         const uint width,
-                         const uint height );
+                         const int width,
+                         const int height );
 
         virtual ~Window() override;
 
@@ -52,6 +52,8 @@ namespace Lore { namespace OpenGL {
         virtual void renderFrame() override;
 
         virtual void setTitle( const string& title ) override;
+
+        virtual void setDimensions( const int width, const int height ) override;
 
     };
 

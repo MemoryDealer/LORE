@@ -33,11 +33,13 @@ using namespace Lore;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Window::Window( const string& title,
-                const uint width,
-                const uint height )
+                const int width,
+                const int height )
 : _title( title )
 , _width( width )
 , _height( height )
+, _frameBufferWidth( 0 )
+, _frameBufferHeight( 0 )
 , _mode( Mode::Windowed )
 {
 }
@@ -50,6 +52,66 @@ Window::~Window()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void Window::addRenderView( const RenderView& renderView )
+{
+    // Verify this render view does not already exist.
+    for ( const auto& rv : _renderViews ) {
+        if ( rv == renderView ) {
+            throw Lore::Exception( "RenderView " + renderView.name +
+                                   " already exists in Window " + _title );
+        }
+    }
+
+    log( "Adding RenderView " + renderView.name + " to Window " + _title );
+    _renderViews.push_back( renderView );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Window::removeRenderView( const RenderView& renderView )
+{
+    removeRenderView( renderView.name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Window::removeRenderView( const string& name )
+{
+    for ( auto it = _renderViews.begin(); it != _renderViews.end(); ) {
+        const RenderView& rv = ( *it );
+        if ( rv.name == name ) {
+            log( "Removing RenderView " + name + " from Window " + _title );
+            it = _renderViews.erase( it );
+            break;
+        }
+        else {
+            ++it;
+        }
+    }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+RenderView& Window::getRenderView( const string& name )
+{
+    for ( auto& rv : _renderViews ) {
+        if ( name == rv.name ) {
+            return rv;
+        }
+    }
+
+    throw Lore::Exception( "RenderView " + name + " does not exist in Window " + _title );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Window::resetRenderViews()
+{
+    _renderViews.clear();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void Window::setTitle( const string& title )
 {
     _title = title;
@@ -57,7 +119,7 @@ void Window::setTitle( const string& title )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Window::setDimensions( const uint width, const uint height )
+void Window::setDimensions( const int width, const int height )
 {
     _width = width;
     _height = height;

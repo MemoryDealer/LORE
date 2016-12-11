@@ -47,6 +47,7 @@ using namespace Local;
 
 Context::Context() noexcept
 : _windowRegistry()
+, _sceneRegistry()
 , _active( false )
 {
     NotificationSubscribe( WindowEventNotification, &Context::onWindowEvent );
@@ -57,6 +58,33 @@ Context::Context() noexcept
 Context::~Context()
 {
     NotificationUnsubscribe( WindowEventNotification, &Context::onWindowEvent );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+ScenePtr Context::createScene( const string& name )
+{
+    auto scene = std::make_unique<Scene>( name );
+
+    log( "Scene " + name + " created successfully" );
+
+    _sceneRegistry.insert( name, std::move( scene ) );
+    return _sceneRegistry.get( name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Context::destroyScene( const string& name )
+{
+    _sceneRegistry.remove( name );
+    log( "Scene " + name + " destroyed successfully" );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Context::destroyScene( ScenePtr scene )
+{
+    destroyScene( scene->getName() );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
