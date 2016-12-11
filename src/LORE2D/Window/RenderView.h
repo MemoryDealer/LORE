@@ -72,9 +72,23 @@ namespace Lore {
 
         string name;
         Scene* scene;
-        Viewport viewport;
         //Cam
         //PostProcesser
+
+        // Viewports are stored in a union, so each render plugin can do the 
+        // conversion once, when the RenderView is added to a window.
+        union
+        {
+
+            Viewport viewport;
+
+            struct
+            {
+                int x, y;
+                uint width, height;
+            }  gl_viewport;
+
+        };
 
         RenderView( const string& name_ )
         : name ( name_ )

@@ -25,43 +25,35 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Lore.h>
+#include <LORE2D/Window/RenderView.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore { namespace OpenGL {
+namespace Lore {
 
-    class Window final : public Lore::Window
-    {
+        ///
+        /// \class IRenderer
+        /// \brief Interface for Renderers - the object that knows how to interpret
+        ///     a RenderView and a Scene's scene graph and present an image to the 
+        ///     window.
+        class IRenderer
+        {
 
-    private:
+        public:
 
-        GLFWwindow* _window;
+            virtual ~IRenderer() { }
 
-    public:
+            virtual void render( const RenderView& rv ) = 0;
 
-        explicit Window( const string& title,
-                         const int width,
-                         const int height );
+        };
+        using RendererPtr = IRenderer*;
 
-        virtual ~Window() override;
+        // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        //
-        // Rendering.
+        enum class RendererType {
+            Generic
+        };
 
-        virtual void renderFrame() override;
-
-        virtual void addRenderView( const RenderView& renderView ) override;
-
-        //
-        // Modifiers.
-
-        virtual void setTitle( const string& title ) override;
-
-        virtual void setDimensions( const int width, const int height ) override;
-
-    };
-
-}}
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

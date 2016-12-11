@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,43 +24,29 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Lore.h>
+#include "RendererFactory.h"
+
+#include "GenericRenderer.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore { namespace OpenGL {
+using namespace Lore::OpenGL;
 
-    class Window final : public Lore::Window
-    {
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    private:
+std::unique_ptr<Lore::IRenderer> RendererFactory::Create( const Lore::RendererType& rt )
+{
+    switch ( rt ) {
 
-        GLFWwindow* _window;
+    default:
+        throw Lore::Exception( "Unknown renderer type in RendererFactory::createRenderer" );
+        break;
 
-    public:
+    case Lore::RendererType::Generic:
+        return std::make_unique<GenericRenderer>();
+        break;
 
-        explicit Window( const string& title,
-                         const int width,
-                         const int height );
-
-        virtual ~Window() override;
-
-        //
-        // Rendering.
-
-        virtual void renderFrame() override;
-
-        virtual void addRenderView( const RenderView& renderView ) override;
-
-        //
-        // Modifiers.
-
-        virtual void setTitle( const string& title ) override;
-
-        virtual void setDimensions( const int width, const int height ) override;
-
-    };
-
-}}
+    }
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

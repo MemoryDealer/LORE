@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,43 +24,36 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Lore.h>
+#include "GenericRenderer.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore { namespace OpenGL {
+using namespace Lore::OpenGL;
 
-    class Window final : public Lore::Window
-    {
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    private:
+GenericRenderer::GenericRenderer()
+{
+}
 
-        GLFWwindow* _window;
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    public:
+GenericRenderer::~GenericRenderer()
+{
+}
 
-        explicit Window( const string& title,
-                         const int width,
-                         const int height );
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        virtual ~Window() override;
+void GenericRenderer::render( const Lore::RenderView& rv )
+{
+    glViewport( rv.gl_viewport.x,
+                rv.gl_viewport.y,
+                rv.gl_viewport.width,
+                rv.gl_viewport.height );
 
-        //
-        // Rendering.
-
-        virtual void renderFrame() override;
-
-        virtual void addRenderView( const RenderView& renderView ) override;
-
-        //
-        // Modifiers.
-
-        virtual void setTitle( const string& title ) override;
-
-        virtual void setDimensions( const int width, const int height ) override;
-
-    };
-
-}}
+    Color bg = rv.scene->getBackgroundColor();
+    glClearColor( bg.r, bg.g, bg.b, bg.a );
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

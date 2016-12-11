@@ -47,6 +47,11 @@ namespace Lore {
         //
         // Setters.
 
+        void setRenderer( RendererPtr renderer )
+        {
+            _renderer = renderer;
+        }
+
         void setBackgroundColor( const Color& color )
         {
             _bgColor = color;
@@ -54,6 +59,11 @@ namespace Lore {
 
         //
         // Getters.
+
+        RendererPtr getRenderer() const
+        {
+            return _renderer;
+        }
 
         string getName() const
         {
@@ -69,6 +79,9 @@ namespace Lore {
 
         string _name;
         Color _bgColor;
+
+        // The type of renderer this scene uses.
+        RendererPtr _renderer;
 
     };
 

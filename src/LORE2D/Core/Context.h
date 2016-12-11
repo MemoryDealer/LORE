@@ -28,6 +28,7 @@
 #include <LORE2D/Core/NotificationCenter.h>
 #include <LORE2D/Plugin/Plugins.h>
 #include <LORE2D/Plugin/RenderPluginLoader.h>
+#include <LORE2D/Renderer/IRenderer.h>
 #include <LORE2D/Resource/Registry.h>
 #include <LORE2D/Window/Window.h>
 
@@ -77,8 +78,8 @@ namespace Lore {
         virtual void destroyWindow( WindowPtr window ) = 0;
 
         ///
-        /// \brief Creates a scene and returns a handle to it.
-        virtual ScenePtr createScene( const string& name );
+        /// \brief Creates a scene, assigns, the specified renderer, and returns a handle to it.
+        virtual ScenePtr createScene( const string& name, const RendererType& rt = RendererType::Generic );
 
         ///
         /// \brief Destroys specified scene and all of its nodes.

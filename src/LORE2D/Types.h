@@ -33,6 +33,7 @@ namespace Lore {
     // Forward declarations.
 
     class Camera;
+    class IRenderer;
     class PostProcessor;
     class Scene;
     class Window;
@@ -41,6 +42,7 @@ namespace Lore {
     // Pointer types.
 
     using CameraPtr = Camera*;
+    using RendererPtr = IRenderer*;
     using PostProcessorPtr = PostProcessor*;
     using ScenePtr = Scene*;
     using WindowPtr = Window*;

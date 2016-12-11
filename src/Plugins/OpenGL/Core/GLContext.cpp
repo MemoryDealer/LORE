@@ -27,6 +27,7 @@
 #include "GLContext.h"
 
 #include <Plugins/OpenGL/Window/GLWindow.h>
+#include <Plugins/OpenGL/Renderer/RendererFactory.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -37,6 +38,7 @@ using namespace Lore::OpenGL;
 Context::Context() noexcept
 : Lore::Context()
 , _offscreenContextWindow( nullptr )
+, _renderers()
 {
     log( "Initializing OpenGL render plugin context..." );
     glfwInit();
@@ -109,6 +111,27 @@ void Context::destroyWindow( Lore::WindowPtr window )
 
     // Context is no longer considered active if all windows have been destroyed.
     _active = !_windowRegistry.empty();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Lore::ScenePtr Context::createScene( const string& name, const Lore::RendererType& rt )
+{
+    Lore::ScenePtr scene = Lore::Context::createScene( name, rt );
+    RendererPtr rp = nullptr;
+
+    auto lookup = _renderers.find( rt );
+    if ( _renderers.end() == lookup ) {
+        // This renderer type hasn't been created yet, allocate one and assign it.
+        _renderers[rt] = RendererFactory::Create( rt );
+        rp = _renderers[rt].get(); // Second lookup :(
+    }
+    else {
+        rp = lookup->second.get();
+    }
+
+    scene->setRenderer( rp );
+    return scene;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

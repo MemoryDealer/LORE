@@ -72,15 +72,27 @@ void Window::renderFrame()
 
     glfwMakeContextCurrent( _window );
 
-    // Render each RenderView.
+    // Render each Scene with the corresponding RenderView data.
     for ( const RenderView& rv : _renderViews ) {
-        Color bg = rv.scene->getBackgroundColor();
-
-        glClearColor( bg.r, bg.g, bg.b, bg.a );
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+        RendererPtr renderer = rv.scene->getRenderer();
+        renderer->render( rv );
     }
 
     glfwSwapBuffers( _window );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Window::addRenderView( const Lore::RenderView& renderView )
+{
+    // Convert Viewport to gl_viewport.
+    RenderView rv = renderView;
+    rv.gl_viewport.x = static_cast< int >( rv.viewport.x * static_cast<float>( _frameBufferWidth ) );
+    rv.gl_viewport.y = static_cast< int >( rv.viewport.y * static_cast<float>( _frameBufferHeight ) );
+    rv.gl_viewport.width = static_cast< int >( rv.viewport.width * static_cast<float>( _frameBufferWidth ) );
+    rv.gl_viewport.height = static_cast< int >( rv.viewport.height * static_cast<float>( _frameBufferHeight ) );
+
+    Lore::Window::addRenderView( rv );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

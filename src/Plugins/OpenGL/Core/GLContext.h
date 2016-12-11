@@ -46,7 +46,7 @@ namespace Lore { namespace OpenGL {
         virtual void renderFrame( const float dt ) override;
 
         //
-        // Window functions.
+        // Factory/Destruction functions.
 
         ///
         /// \brief Creates a window and returns a handle to it.
@@ -60,6 +60,10 @@ namespace Lore { namespace OpenGL {
         ///     the context will no longer be active.
         virtual void destroyWindow( WindowPtr window ) override;
 
+        ///
+        /// \brief Creates a scene, assigns, the specified renderer, and returns a handle to it.
+        virtual Lore::ScenePtr createScene( const string& name, const RendererType& rt ) override;
+
         //
         // Information.
 
@@ -67,10 +71,17 @@ namespace Lore { namespace OpenGL {
 
     private:
 
+        using RendererMap = std::unordered_map <Lore::RendererType, std::unique_ptr<Lore::IRenderer>>;
+
+    private:
+
         GLFWwindow* _offscreenContextWindow;
+        RendererMap _renderers;
 
     };
 
+    // This is the only exported function from the render plugin, which allows the LORE2D 
+    // library to load its version of Context.
     extern "C" __declspec( dllexport ) Lore::Context* __stdcall CreateContext()
     {
         Lore::Context* context = new Context();

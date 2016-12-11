@@ -62,7 +62,7 @@ Context::~Context()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-ScenePtr Context::createScene( const string& name )
+ScenePtr Context::createScene( const string& name, const RendererType& rt )
 {
     auto scene = std::make_unique<Scene>( name );
 

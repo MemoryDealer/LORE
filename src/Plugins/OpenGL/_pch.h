@@ -30,8 +30,7 @@
 #include "Types.h"
 
 // LORE2D.
-#include <LORE2D/Exports.h>
-#include <LORE2D/Types.h>
+#include <LORE2D/LorePrerequisites.h>
 
 // C++/STL.
 #include <memory>

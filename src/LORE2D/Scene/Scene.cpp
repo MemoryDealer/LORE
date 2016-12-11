@@ -35,6 +35,7 @@ using namespace Lore;
 Scene::Scene( const string& name )
 : _name( name )
 , _bgColor( StockColor::Black )
+, _renderer( nullptr )
 {
 }
 

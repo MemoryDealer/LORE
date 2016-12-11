@@ -25,40 +25,25 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Lore.h>
+#include <LORE2D/Renderer/IRenderer.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore { namespace OpenGL {
 
-    class Window final : public Lore::Window
+    ///
+    /// \class GenericRenderer
+    /// \brief Renders a scene normally, without any special behavior.
+    class GenericRenderer : public Lore::IRenderer
     {
-
-    private:
-
-        GLFWwindow* _window;
 
     public:
 
-        explicit Window( const string& title,
-                         const int width,
-                         const int height );
+        GenericRenderer();
 
-        virtual ~Window() override;
+        virtual ~GenericRenderer() override;
 
-        //
-        // Rendering.
-
-        virtual void renderFrame() override;
-
-        virtual void addRenderView( const RenderView& renderView ) override;
-
-        //
-        // Modifiers.
-
-        virtual void setTitle( const string& title ) override;
-
-        virtual void setDimensions( const int width, const int height ) override;
+        virtual void render( const Lore::RenderView& rv ) override;
 
     };
 
