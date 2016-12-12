@@ -25,87 +25,105 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Core/Iterator.h>
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 namespace Lore {
 
-    template<typename T>
-    class Registry;
+    using id = string;
 
-    template<typename T>
-    class RegistryIterator
-    {
-
-    public:
-
-        explicit RegistryIterator( Registry<T>& reg )
-        : _registry( reg )
-        , _hasMore( true )
-        , _itOffset( 0 )
-        //, _lock( _registry._mutex )
-        {
-            
-        }
-
-        ~RegistryIterator()
-        {
-            
-        }
-
-        // A hack for now.
-        // TODO: Implement a proper iterator wrapper.
-        T* getNext()
-        {
-            std::lock_guard<std::mutex> lock( _registry._mutex );
-
-            auto it = _registry._container.begin();
-
-            for ( int i = 0; i < _itOffset; ++i ) {
-                ++it;
-            }
-            ++_itOffset;
-            
-            _hasMore = ( it != _registry._container.end() );
-            if ( _hasMore ) {
-                T* next = it->second.get();
-
-                ++it;
-                _hasMore = ( it != _registry._container.end() );
-
-                return next;
-            }
-
-            return nullptr;
-        }
-
-        bool hasMore() const
-        {
-            return _hasMore;
-        }
-
-    private:
-
-        Registry<T>& _registry;
-        bool _hasMore;
-        int _itOffset;
-        //std::unique_lock<std::mutex> _lock;
-
-    };
-
-    // TODO: Create macro to allow both map and unordered_map as containers (or variadic templates: template<class ...> class C ?).
-    // TODO: Make thread-safe and non-thread-safe version.
-
-    template<typename T>
+    ///
+    /// \class Registry
+    /// \brief Generic container class supporting multiple map types.
+    template<template <typename ...> typename MapType, typename T, typename ... MapParams>
     class Registry
     {
 
     public:
 
-        using id = string;
-        using Container = std::map<id, std::unique_ptr<T>>;
+        using Iterator = UniqueMapIterator<MapType<string, std::unique_ptr<T>, MapParams ...>>;
 
     public:
 
         constexpr
         explicit Registry()
+        : _container()
+        {
+        }
+
+        void insert( const id& id_, std::unique_ptr<T> resource )
+        {
+            if ( _container.find( id_ ) != _container.end() ) {
+                throw Lore::Exception( "Resource with id " + id_ + " already exists" );
+            }
+
+            auto it = _container.begin();
+            _container.insert( it, std::pair<id, std::unique_ptr<T>>( id_, std::move( resource ) ) );
+        }
+
+        void remove( const id& id_ )
+        {
+            auto lookup = _container.find( id_ );
+            if ( _container.end() == lookup ) {
+                log_warning( "Tried to remove resource with id " + id_ + " which does not exist" );
+            }
+
+            _container.erase( id_ );
+        }
+
+        T* get( const id& id_ ) const
+        {
+            auto lookup = _container.find( id_ );
+            if ( _container.end() == lookup ) {
+                throw Lore::Exception( "Resource with id " + id_ + " does not exist" );
+            }
+
+            return lookup->second.get();
+        }
+
+        size_t size() const
+        {
+            return _container.size();
+        }
+
+        bool empty() const
+        {
+            return _container.empty();
+        }
+
+        Iterator getIterator()
+        {
+            return Iterator( _container.begin(), _container.end() );
+        }
+
+        //
+        // Deleted functions/operators.
+
+        Registry& operator = ( const Registry& rhs ) = delete;
+        Registry( const Registry& rhs ) = delete;
+
+    private:
+
+        MapType<string, std::unique_ptr<T>, MapParams ...> _container;
+
+    };
+
+    ///
+    /// \class SafeRegistry
+    /// \brief Thread-safe version of Registry.
+    template<template <typename ...> typename MapType, typename T, typename ... MapParams>
+    class SafeRegistry
+    {
+
+    public:
+
+        using Iterator = UniqueMapIterator<MapType<string, std::unique_ptr<T>, MapParams ...>>;
+
+    public:
+
+        constexpr
+        explicit SafeRegistry()
         : _container()
         , _mutex()
         {
@@ -159,25 +177,23 @@ namespace Lore {
             return _container.empty();
         }
 
-        RegistryIterator<T> getIterator()
+        Iterator getIterator()
         {
-            RegistryIterator<T> r( *this );
-            return r;
+            std::lock_guard<std::mutex> lock( _mutex );
+            return Iterator( _container.begin(), _container.end() );
         }
 
         //
         // Deleted functions/operators.
 
-        Registry& operator = ( const Registry& rhs ) = delete;
-        Registry( const Registry& rhs ) = delete;
+        SafeRegistry& operator = ( const SafeRegistry& rhs ) = delete;
+        SafeRegistry( const SafeRegistry& rhs ) = delete;
 
     private:
 
-        Container _container;
+        MapType<string, std::unique_ptr<T>, MapParams ...> _container;
 
         mutable std::mutex _mutex;
-
-        friend class RegistryIterator<T>;
 
     };
 

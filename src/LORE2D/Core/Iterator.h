@@ -144,7 +144,33 @@ namespace Lore {
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+    // For iterating a map with value of unique_ptr<T>.
+    template<typename T>
+    class UniqueMapIterator : public MapIteratorWrapper<T, typename T::iterator>
+    {
 
+    public:
+
+        using UniqueType = typename ValueType::element_type*;
+
+    public:
+
+        UniqueMapIterator( typename T::iterator begin, typename T::iterator end )
+        : MapIteratorWrapper<T, typename T::iterator>( begin, end )
+        {
+        }
+
+        explicit UniqueMapIterator( T& c )
+        : MapIteratorWrapper<T, typename T::iterator>( c.begin(), c.end() )
+        {
+        }
+
+        UniqueType getNext()
+        {
+            return ( _current++ )->second.get();
+        }
+
+    };
 
 }
 

@@ -160,8 +160,13 @@ namespace Lore {
 
     protected:
 
-        Registry<Window> _windowRegistry;
-        Registry<Scene> _sceneRegistry;
+        using WindowRegistry = Registry<std::map, Window>;
+        using SceneRegistry = Registry<std::unordered_map, Scene>;
+
+    protected:
+
+        WindowRegistry _windowRegistry;
+        SceneRegistry _sceneRegistry;
 
         bool _active;
 
