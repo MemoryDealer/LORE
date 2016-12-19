@@ -116,7 +116,7 @@ namespace Lore {
             struct { T u, v; };
         };
 
-        Vector( const T x_, const T y_ )
+        constexpr Vector( const T x_, const T y_ )
         : x( x_ ), y( y_ )
         { }
 
@@ -132,7 +132,7 @@ namespace Lore {
             struct { T r, g, b; };
         };
 
-        Vector( const T x_, const T y_, const T z_ )
+        constexpr Vector( const T x_, const T y_, const T z_ )
         : x( x_ ), y( y_ ), z( z_ )
         { }
 
@@ -160,7 +160,7 @@ namespace Lore {
             Vector<T, 3> rgb;
         };
 
-        Vector( const T x_, const T y_, const T z_, const T w_ )
+        constexpr Vector( const T x_, const T y_, const T z_, const T w_ )
         : x( x_ ), y( y_ ), z( z_ ), w( w_ )
         { }
 

@@ -26,6 +26,7 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 #include <LORE2D/Core/Iterator.h>
+#include <LORE2D/Math/Math.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -42,6 +43,27 @@ namespace Lore {
 
         using NodeMap = std::map<string, NodePtr>;
         using ChildNodeIterator = MapIterator<NodeMap>;
+        using ConstChildNodeIterator = ConstMapIterator<NodeMap>;
+
+        struct Transform
+        {
+
+            Vec3 position;
+            Quaternion orientation;
+            Vec3 scale;
+
+            Mat4 matrix;
+            bool matrixDirty;
+
+            Transform()
+            : position()
+            , orientation()
+            , scale()
+            , matrix()
+            , matrixDirty( true )
+            { }
+
+        };
 
     public:
 
@@ -51,9 +73,38 @@ namespace Lore {
 
         void attachNode( NodePtr child );
 
+        void removeChildNode( NodePtr child );
+
         NodePtr getChild( const string& name );
 
         ChildNodeIterator getChildIterator();
+
+        ConstChildNodeIterator getConstChildNodeIterator() const;
+
+        void detachFromParent();
+
+        //
+        // Modifiers.
+
+        void setPosition( const Vec3& position )
+        {
+            _transform.position = position;
+        }
+
+        void translate( const Vec3& offset )
+        {
+            _transform.position += offset;
+        }
+
+        void setScale( const Vec3& scale )
+        {
+            _transform.scale = scale;
+        }
+
+        void scale( const Vec3& scale )
+        {
+            _transform.scale += scale;
+        }
 
         //
         // Getters.
@@ -66,6 +117,16 @@ namespace Lore {
         NodePtr getParent() const
         {
             return _parent;
+        }
+
+        Vec3 getPosition() const
+        {
+            return _transform.position;
+        }
+
+        Vec3 getScale() const
+        {
+            return _transform.scale;
         }
 
         //
@@ -84,6 +145,8 @@ namespace Lore {
     private:
 
         string _name;
+
+        Transform _transform;
 
         // The creator of this node.
         ScenePtr _scene;

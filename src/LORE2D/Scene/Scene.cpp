@@ -67,6 +67,29 @@ NodePtr Scene::createNode( const string& name )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void Scene::destroyNode( NodePtr node )
+{
+    destroyNode( node->getName() );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Scene::destroyNode( const string& name )
+{
+    auto lookup = _nodes.find( name );
+    if ( _nodes.end() == lookup ) {
+        throw Lore::Exception( "Tried to destroy node " + name + " that does not exist in scene + " + name );
+    }
+
+    // Detach node from parent before destroying.
+    NodePtr node = lookup->second.get();
+    node->detachFromParent();
+
+    _nodes.erase( lookup );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 NodePtr Scene::getNode( const string& name )
 {
     auto lookup = _nodes.find( name );

@@ -73,7 +73,7 @@ void Context::renderFrame( const float dt )
     glfwPollEvents();
 
     // Render all RenderViews for each window.
-    WindowRegistry::Iterator it = _windowRegistry.getIterator();
+    WindowRegistry::ConstIterator it = _windowRegistry.getConstIterator();
     while ( it.hasMore() ) {
         WindowPtr window = it.getNext();
         window->renderFrame();
@@ -124,8 +124,8 @@ Lore::ScenePtr Context::createScene( const string& name, const Lore::RendererTyp
     auto lookup = _renderers.find( rt );
     if ( _renderers.end() == lookup ) {
         // This renderer type hasn't been created yet, allocate one and assign it.
-        _renderers[rt] = RendererFactory::Create( rt );
-        rp = _renderers[rt].get(); // Second lookup :(
+        auto result = _renderers.insert( { rt, RendererFactory::Create( rt ) } );
+        rp = result.first->second.get();
     }
     else {
         rp = lookup->second.get();

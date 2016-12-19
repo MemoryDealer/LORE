@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,17 +24,41 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Include this file for all Lore2D functionality.
+#include "Quaternion.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "LorePrerequisites.h"
+using namespace Lore;
 
-// Core.
-#include <LORE2D/Core/Context.h>
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Math.
-#include <LORE2D/Math/Matrix.h>
-#include <LORE2D/Math/Vector.h>
+Matrix3 Quaternion::createRotationMatrix() const
+{
+    real tx = x + x;
+    real ty = y + y;
+    real tz = z + z;
+    real twx = tx * w;
+    real twy = ty * w;
+    real twz = tz * w;
+    real txx = tx * x;
+    real txy = ty * x;
+    real txz = tz * x;
+    real tyy = ty * y;
+    real tyz = tz * y;
+    real tzz = tz * z;
+
+    Matrix3 rot;
+    rot[0][0] = 1.f - ( tyy + tzz );
+    rot[0][1] = txy - twz;
+    rot[0][2] = txz + twy;
+    rot[1][0] = txy + twz;
+    rot[1][1] = 1.f - ( txx + tzz );
+    rot[1][2] = tyz - twx;
+    rot[2][0] = txz - twy;
+    rot[2][1] = tyz + twx;
+    rot[2][2] = 1.f - ( txx + tyy );
+
+    return rot;
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

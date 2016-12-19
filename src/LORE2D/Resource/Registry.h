@@ -43,6 +43,7 @@ namespace Lore {
     public:
 
         using Iterator = UniqueMapIterator<MapType<string, std::unique_ptr<T>, MapParams ...>>;
+        using ConstIterator = ConstUniqueMapIterator<MapType<string, std::unique_ptr<T>, MapParams ...>>;
 
     public:
 
@@ -94,7 +95,12 @@ namespace Lore {
 
         Iterator getIterator()
         {
-            return Iterator( _container.begin(), _container.end() );
+            return Iterator( std::begin( _container ), std::end( _container ) );
+        }
+
+        ConstIterator getConstIterator()
+        {
+            return ConstIterator( std::begin( _container ), std::end( _container ) );
         }
 
         //
@@ -119,6 +125,7 @@ namespace Lore {
     public:
 
         using Iterator = UniqueMapIterator<MapType<string, std::unique_ptr<T>, MapParams ...>>;
+        using ConstIterator = ConstUniqueMapIterator<MapType<string, std::unique_ptr<T>, MapParams ...>>;
 
     public:
 
@@ -177,10 +184,17 @@ namespace Lore {
             return _container.empty();
         }
 
+        // Not really thread-safe since returning an iterator...
         Iterator getIterator()
         {
             std::lock_guard<std::mutex> lock( _mutex );
-            return Iterator( _container.begin(), _container.end() );
+            return Iterator( std::begin( _container ), std::end( _container ) );
+        }
+
+        ConstIterator getConstIterator()
+        {
+            std::lock_guard<std::mutex> lock( _mutex );
+            return ConstIterator( std::begin( _container ), std::end( _container ) );
         }
 
         //

@@ -36,6 +36,7 @@ using namespace Lore;
 
 Node::Node( const string& name, ScenePtr scene, NodePtr parent )
 : _name( name )
+, _transform()
 , _scene( scene )
 , _parent( parent )
 , _childNodes()
@@ -80,6 +81,19 @@ void Node::attachNode( NodePtr node )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void Node::removeChildNode( NodePtr node )
+{
+    auto lookup = _childNodes.find( node->getName() );
+    if ( _childNodes.end() == lookup ) {
+        throw Lore::Exception( "Tried to remove child node " + node->getName() + " from node " + _name +
+                               ", which is not a child" );
+    }
+
+    _childNodes.erase( lookup );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 NodePtr Node::getChild( const string& name )
 {
     auto lookup = _childNodes.find( name );
@@ -94,7 +108,23 @@ NodePtr Node::getChild( const string& name )
 
 Node::ChildNodeIterator Node::getChildIterator()
 {
-    return ChildNodeIterator( _childNodes.begin(), _childNodes.end() );
+    return ChildNodeIterator( std::begin( _childNodes ), std::end( _childNodes ) );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Node::ConstChildNodeIterator Node::getConstChildNodeIterator() const
+{
+    return ConstChildNodeIterator( std::cbegin( _childNodes ), std::cend( _childNodes ) );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Node::detachFromParent()
+{
+    if ( _parent ) {
+        _parent->removeChildNode( this );
+    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

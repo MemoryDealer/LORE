@@ -25,17 +25,32 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Include this file for all Lore2D functionality.
+#include "Matrix.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "LorePrerequisites.h"
+namespace Lore {
 
-// Core.
-#include <LORE2D/Core/Context.h>
+    struct LORE_EXPORT Quaternion
+    {
 
-// Math.
-#include <LORE2D/Math/Matrix.h>
-#include <LORE2D/Math/Vector.h>
+    public:
+
+        constexpr Quaternion()
+        : x( 0.f )
+        , y( 0.f )
+        , z( 0.f )
+        , w( 1.f )
+        { }
+
+        Matrix3 createRotationMatrix() const;
+
+    public:
+
+        real x, y, z, w;
+
+    };
+
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

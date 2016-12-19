@@ -137,14 +137,34 @@ namespace Lore {
         { }
 
         explicit MapIterator( T& c )
-        : MapIteratorWrapper<T, typename T::iterator>( c.begin(), c.end() )
+        : MapIteratorWrapper<T, typename T::iterator>( std::begin( c ), std::end( c ) )
         { }
 
     };
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    // For iterating a map with value of unique_ptr<T>.
+    template<typename T>
+    class ConstMapIterator : public MapIteratorWrapper<T, typename T::const_iterator>
+    {
+
+    public:
+
+        ConstMapIterator( typename T::const_iterator start, typename T::const_iterator last )
+        : MapIteratorWrapper<T, typename T::const_iterator>( start, last )
+        { }
+
+        explicit ConstMapIterator( const T& c )
+        : MapIteratorWrapper<T, typename T::const_iterator> ( std::begin( c ), std::end( c ) )
+        { }
+
+    };
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    ///
+    /// \class UniqueMapIterator
+    /// \brief For iterating a map with value of unique_ptr<T>.
     template<typename T>
     class UniqueMapIterator : public MapIteratorWrapper<T, typename T::iterator>
     {
@@ -161,7 +181,36 @@ namespace Lore {
         }
 
         explicit UniqueMapIterator( T& c )
-        : MapIteratorWrapper<T, typename T::iterator>( c.begin(), c.end() )
+        : MapIteratorWrapper<T, typename T::iterator>( std::begin( c ), std::end( c ) )
+        {
+        }
+
+        UniqueType getNext()
+        {
+            return ( _current++ )->second.get();
+        }
+
+    };
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    template<typename T>
+    class ConstUniqueMapIterator : public MapIteratorWrapper<T, typename T::const_iterator>
+    {
+
+    public:
+
+        using UniqueType = typename ValueType::element_type*;
+
+    public:
+
+        ConstUniqueMapIterator( typename T::const_iterator begin, typename T::const_iterator end )
+        : MapIteratorWrapper<T, typename T::const_iterator>( begin, end )
+        {
+        }
+
+        explicit ConstUniqueMapIterator( T& c )
+        : MapIteratorWrapper<T, typename T::const_iterator>( std::begin( c ), std::end( c ) )
         {
         }
 
