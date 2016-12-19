@@ -128,3 +128,56 @@ void Node::detachFromParent()
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Node::setPosition( const Vec3& position )
+{
+    _transform.position = position;
+    dirty();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Node::translate( const Vec3& offset )
+{
+    _transform.position += offset;
+    dirty();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Node::setScale( const Vec3& scale )
+{
+    _transform.scale = scale;
+    dirty();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Node::scale( const Vec3& scale )
+{
+    _transform.scale += scale;
+    dirty();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Matrix4 Node::getTransformationMatrix()
+{
+    if ( _transform.dirty ) {
+        _transform.matrix = CreateTransformationMatrix( _transform.position,
+                                                        _transform.orientation,
+                                                        _transform.scale );
+    }
+
+    return _transform.matrix;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Node::dirty()
+{
+    _transform.dirty = true;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

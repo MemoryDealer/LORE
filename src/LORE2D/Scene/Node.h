@@ -53,15 +53,21 @@ namespace Lore {
             Vec3 scale;
 
             Mat4 matrix;
-            bool matrixDirty;
+            bool dirty; // True if matrix needs update.
 
             Transform()
             : position()
             , orientation()
             , scale()
             , matrix()
-            , matrixDirty( true )
+            , dirty( true )
             { }
+
+            enum Space {
+                Local,
+                Parent,
+                World
+            };
 
         };
 
@@ -86,25 +92,18 @@ namespace Lore {
         //
         // Modifiers.
 
-        void setPosition( const Vec3& position )
-        {
-            _transform.position = position;
-        }
+        void setPosition( const Vec3& position );
 
-        void translate( const Vec3& offset )
-        {
-            _transform.position += offset;
-        }
+        void translate( const Vec3& offset );
 
-        void setScale( const Vec3& scale )
-        {
-            _transform.scale = scale;
-        }
+        void setScale( const Vec3& scale );
 
-        void scale( const Vec3& scale )
-        {
-            _transform.scale += scale;
-        }
+        void scale( const Vec3& scale );
+
+        ///
+        /// \brief Sets node's transformation matrix to dirty - it will be updated before
+        ///     next frame is rendered.
+        void dirty();
 
         //
         // Getters.
@@ -128,6 +127,8 @@ namespace Lore {
         {
             return _transform.scale;
         }
+
+        Matrix4 getTransformationMatrix();
 
         //
         // Deleted functions/operators.
