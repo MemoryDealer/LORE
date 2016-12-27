@@ -1,3 +1,4 @@
+#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -24,18 +25,31 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Texture.h"
+#include <LORE2D/Math/Math.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-using namespace Lore;
+namespace Lore {
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    class LORE_EXPORT SceneGraphVisitor
+    {
 
-Texture::Texture( const string& name )
-: Renderable( name )
-{
-    _type = Renderable::Type::Texture;
+    public:
+
+        SceneGraphVisitor();
+
+        ~SceneGraphVisitor();
+
+        void pushMatrix( const Matrix4 m );
+
+        void visit( NodePtr node, bool worldDirty = false );
+
+    private:
+
+        std::stack<Matrix4> _stack;
+
+    };
+
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

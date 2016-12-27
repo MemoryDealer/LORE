@@ -49,7 +49,7 @@ ResourceLoader::~ResourceLoader()
 
 Lore::TexturePtr ResourceLoader::loadTexture( const string& name, const string& file )
 {
-    auto texture = std::make_unique<Texture>( file );
+    auto texture = std::make_unique<Texture>( name, file );
 
     auto handle = _textureRegistry.insert( name, std::move( texture ) );
     return handle;

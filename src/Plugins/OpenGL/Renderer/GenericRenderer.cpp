@@ -26,6 +26,7 @@
 
 #include "GenericRenderer.h"
 
+#include <LORE2D/Renderer/SceneGraphVisitor.h>
 #include <LORE2D/Resource/Renderable.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -61,7 +62,8 @@ void GenericRenderer::addRenderable( RenderablePtr r, Lore::Matrix4& model )
     RenderQueue& queue = _queues.at( queueId );
 
     // Insert render queue object into list for associated material.
-    queue.solids[r->getMaterial()].push_back( obj );
+    // TODO: Deal with transparents
+    queue.solids[r->getMaterial()].insert( { r, obj } );
 
     // Add this queue to the active queue list if not already there.
     activateQueue( queueId, _queues[queueId] );
@@ -71,6 +73,21 @@ void GenericRenderer::addRenderable( RenderablePtr r, Lore::Matrix4& model )
 
 void GenericRenderer::present( const Lore::RenderView& rv )
 {
+    NodePtr root = rv.scene->getRootNode();
+    if ( root->isTransformDirty() ) {
+        root->setWorldTransformationMatrix( root->getTransformationMatrix() );
+    }
+    
+    // Traverse the scene graph and update object transforms.
+    Node::ChildNodeIterator it = root->getChildNodeIterator();
+    while ( it.hasMore() ) {
+        NodePtr node = it.getNext();
+
+        Lore::SceneGraphVisitor sgv;
+        sgv.pushMatrix( root->getWorldTransformationMatrix() );
+        sgv.visit( node );
+    }
+
     glViewport( rv.gl_viewport.x,
                 rv.gl_viewport.y,
                 rv.gl_viewport.width,
@@ -80,11 +97,31 @@ void GenericRenderer::present( const Lore::RenderView& rv )
     glClearColor( bg.r, bg.g, bg.b, bg.a );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-    NodePtr root = rv.scene->getRootNode();
-    Node::ConstChildNodeIterator it = root->getConstChildNodeIterator();
-    while ( it.hasMore() ) {
-        NodePtr node = it.getNext();
+    // Iterate through all active render queues and render each object.
+    for ( const auto& rqPair : _activeQueues ) {
+        RenderQueue& rq = rqPair.second;
 
+        RenderQueue::RenderableList& renderables = rq.solids;
+        for ( auto& rlPair : renderables ) {
+            Lore::MaterialPtr mat = rlPair.first;
+
+            // Bind material settings to pipeline.
+            // ...
+
+            RenderQueue::ObjectList& objects = rlPair.second;
+            for ( auto& objPair : objects ) {
+                RenderQueue::Object& obj = objPair.second;
+
+                // Set program matrix...
+                // ...
+
+                obj.renderable->bind();
+
+                // Draw based on material...
+                // ...
+            }
+        }
+        
         
     }
 }

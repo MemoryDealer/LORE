@@ -35,7 +35,7 @@ namespace Lore {
     Matrix()\
     : m()\
     {}\
-    inline Vec& operator [] ( size_t idx )\
+    inline Vec operator [] ( size_t idx ) const\
     {\
         assert( idx < C );\
         return m[idx];\
@@ -123,18 +123,6 @@ namespace Lore {
                 const Vec3& scale )
         : m()
         {
-            makeTransform( position, scale );
-        }
-
-        ///
-        /// \brief Creates 4x4 transformation matrix based on translation, rotation, and scale.
-        Matrix<T, 4, 4> makeTransform( const Vec3& position,
-                                       const Vec3& scale )
-        {
-            Matrix3 rot3x3;
-            
-
-            m[0][0] = scale.x * rot3x3[0][0];
         }
 
     private:

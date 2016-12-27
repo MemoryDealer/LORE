@@ -46,9 +46,11 @@ namespace Lore {
 
     public:
 
-        constexpr Renderable();
+        explicit Renderable( const string& name );
 
         virtual ~Renderable() { }
+
+        virtual void bind() { }
 
         //
         // Getters.

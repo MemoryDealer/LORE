@@ -24,7 +24,9 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Texture.h"
+#include "SceneGraphVisitor.h"
+
+#include <LORE2D/Scene/Node.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -32,10 +34,51 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Texture::Texture( const string& name )
-: Renderable( name )
+SceneGraphVisitor::SceneGraphVisitor()
+: _stack()
 {
-    _type = Renderable::Type::Texture;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+SceneGraphVisitor::~SceneGraphVisitor()
+{
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void SceneGraphVisitor::pushMatrix( const Matrix4 m )
+{
+    _stack.push( m );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void SceneGraphVisitor::visit( NodePtr node, bool worldDirty )
+{
+    Vec4 v = _stack.top()[0];
+    v = v * v;
+    if ( worldDirty ) {
+        Matrix4 world = _stack.top() * node->getTransformationMatrix();
+        node->setWorldTransformationMatrix( world );
+    }
+    else if ( node->isTransformDirty() ) {
+        Matrix4 world = _stack.top() * node->getTransformationMatrix();
+        node->setWorldTransformationMatrix( world );
+        worldDirty = true;
+    }
+
+    if ( node->hasChildNodes() ) {
+        _stack.push( node->getWorldTransformationMatrix() );
+
+        Node::ChildNodeIterator it = node->getChildNodeIterator();
+        while ( it.hasMore() ) {
+            NodePtr child = it.getNext();
+            visit( child, worldDirty );
+        }
+    }
+    
+    _stack.pop();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

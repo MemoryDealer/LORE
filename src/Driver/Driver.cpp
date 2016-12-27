@@ -53,7 +53,7 @@ int main( int argc, char** argv )
     Lore::TexturePtr tex = context->getResourceLoader().loadTexture( "tex1", "C:\\Texture.png" );
     node->attachObject( (Lore::RenderablePtr)tex );
 
-    auto it = scene->getNode( "A" )->getChildIterator();
+    auto it = scene->getNode( "A" )->getChildNodeIterator();
     while ( it.hasMore() ) {
         node = it.getNext();
         ;

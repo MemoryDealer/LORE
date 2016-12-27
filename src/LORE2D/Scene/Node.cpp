@@ -109,7 +109,7 @@ NodePtr Node::getChild( const string& name )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Node::ChildNodeIterator Node::getChildIterator()
+Node::ChildNodeIterator Node::getChildNodeIterator()
 {
     return ChildNodeIterator( std::begin( _childNodes ), std::end( _childNodes ) );
 }

@@ -87,7 +87,7 @@ namespace Lore {
 
         NodePtr getChild( const string& name );
 
-        ChildNodeIterator getChildIterator();
+        ChildNodeIterator getChildNodeIterator();
 
         ConstChildNodeIterator getConstChildNodeIterator() const;
 
@@ -140,6 +140,11 @@ namespace Lore {
         inline bool isTransformDirty() const
         {
             return _transform.dirty;
+        }
+
+        inline bool hasChildNodes() const
+        {
+            return !( _childNodes.empty() );
         }
 
         Matrix4 getTransformationMatrix();

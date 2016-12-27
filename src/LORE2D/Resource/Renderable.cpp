@@ -35,9 +35,8 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-constexpr
-Renderable::Renderable()
-: _name()
+Renderable::Renderable( const string& name )
+: _name( name )
 , _material( nullptr )
 , _renderQueue( RenderQueue::General )
 , _attached( false )

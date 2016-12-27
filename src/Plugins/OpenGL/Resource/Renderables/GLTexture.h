@@ -36,9 +36,11 @@ namespace Lore { namespace OpenGL {
 
     public:
 
-        explicit Texture( const string& file );
+        explicit Texture( const string& name, const string& file );
 
         virtual ~Texture() override;
+
+        virtual void bind() override;
 
         //
         // Getters.

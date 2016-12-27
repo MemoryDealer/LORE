@@ -31,12 +31,15 @@
 
 namespace Lore {
 
+    // TODO: How to handle multi-texturing? With current rendering pipeline, 
+    // it may be best to have a link to the next texture for each texture object.
+    // Then let the material inform the renderer to iterate the linked list.
     class LORE_EXPORT Texture : public Renderable
     {
 
     public:
 
-        Texture();
+        Texture( const string& name );
 
         virtual ~Texture() override { }
 

@@ -35,8 +35,9 @@ using namespace Lore::OpenGL;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Texture::Texture( const string& file )
-: _id( 0 )
+Texture::Texture( const string& name, const string& file )
+: Lore::Texture( name )
+, _id( 0 )
 {
     int width, height, n;
     unsigned char* pixels = stbi_load( file.c_str(), &width, &height, &n, 0 );
@@ -65,6 +66,13 @@ Texture::Texture( const string& file )
 Texture::~Texture()
 {
     glDeleteTextures( 1, &_id );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Texture::bind()
+{
+    glBindTexture( GL_TEXTURE_2D, _id );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
