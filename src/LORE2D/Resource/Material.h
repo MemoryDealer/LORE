@@ -25,72 +25,61 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Window/RenderView.h>
+#include <LORE2D/Resource/Color.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-        ///
-        /// \class IRenderer
-        /// \brief Interface for Renderers - the object that knows how to interpret
-        ///     a RenderView and a Scene's scene graph and present an image to the 
-        ///     window. Render plugins shall define these implementations.
-        class IRenderer
+    class LORE_EXPORT Material final
+    {
+
+    public:
+
+        enum class DisplayMode
         {
-
-        public:
-
-            virtual ~IRenderer() { }
-
-            virtual void addRenderable( RenderablePtr r, Matrix4& model ) = 0;
-
-            virtual void present( const RenderView& rv ) = 0;
-
-        };
-        using RendererPtr = IRenderer*;
-
-        // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-        enum class RendererType {
-            Generic
+            Quad,
+            Triangle,
+            Circle //?
         };
 
-        // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-        struct RenderQueue
+        struct Pass final
         {
+            bool lighting;
+            Color color;
+            DisplayMode displayMode;
 
-            static const uint Background = 0;
-            static const uint General = 50;
-            static const uint Foreground = 99;
-
-            // :::::: //
-
-            struct Object
-            {
-
-                RenderablePtr renderable;
-                Matrix4& model;
-
-                Object( RenderablePtr r, Matrix4& m )
-                : renderable( r )
-                , model( m )
-                { }
-
-            };
-
-            // :::::: //
-
-            using ObjectList = std::vector<Object>;
-            using RenderableList = std::map<MaterialPtr, ObjectList>;
-
-            // :::::: //
-
-            RenderableList solids;
-            RenderableList sortedTransparents;
-
+            Pass()
+            : lighting( true )
+            , color( StockColor::White )
+            , displayMode( DisplayMode::Quad )
+            { }
         };
+
+    public:
+
+        Material();
+
+        ~Material();
+
+        //
+        // Getters.
+
+        Pass& getPass( const size_t idx )
+        {
+            assert( idx <= _passes.size() );
+            return _passes[idx];
+        }
+
+    private:
+
+        using PassList = std::vector<Pass>;
+
+    private:
+
+        PassList _passes;
+
+    };
 
 }
 

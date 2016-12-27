@@ -25,48 +25,83 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Renderer/IRenderer.h>
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-namespace Lore { namespace OpenGL {
+namespace Lore {
 
     ///
-    /// \class GenericRenderer
-    /// \brief Renders a scene normally, without any special behavior.
-    class GenericRenderer : public Lore::IRenderer
+    /// \class Renderable
+    /// \brief The base class of anything that can be attached to a node.
+    class LORE_EXPORT Renderable
     {
 
     public:
 
-        const size_t DefaultRenderQueueCount = 100;
+        enum class Type
+        {
+            Unknown,
+            Camera,
+            Light,
+            Texture,
+            Sprite
+        };
 
     public:
 
-        GenericRenderer();
+        constexpr Renderable();
 
-        virtual ~GenericRenderer() override;
+        virtual ~Renderable() { }
 
-        virtual void addRenderable( Lore::RenderablePtr r, Lore::Matrix4& model ) override;
+        //
+        // Getters.
 
-        virtual void present( const Lore::RenderView& rv ) override;
+        inline string getName() const
+        {
+            return _name;
+        }
+
+        inline Type getType() const
+        {
+            return _type;
+        }
+
+        inline MaterialPtr getMaterial() const
+        {
+            return _material;
+        }
+
+        inline uint getRenderQueue() const
+        {
+            return _renderQueue;
+        }
+
+        inline bool isAttached() const
+        {
+            return _attached;
+        }
+
+        //
+        // Setters.
+
+        inline void setRenderQueue( const uint id )
+        {
+            _renderQueue = id;
+        }
+
+    protected:
+
+        string _name;
+        MaterialPtr _material;
+        uint _renderQueue;
+        bool _attached;
+        Type _type;
 
     private:
 
-        void activateQueue( const uint id, Lore::RenderQueue& rq );
+        void _notifyAttached();
 
-    private:
-
-        using RenderQueueList = std::vector<RenderQueue>;
-        using ActiveRenderQueueList = std::map<uint, RenderQueue&>;
-
-    private:
-
-        RenderQueueList _queues;
-        ActiveRenderQueueList _activeQueues;
+        friend class Node;
 
     };
 
-}}
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -30,6 +30,7 @@
 #include <LORE2D/Plugin/RenderPluginLoader.h>
 #include <LORE2D/Renderer/IRenderer.h>
 #include <LORE2D/Resource/Registry.h>
+#include <LORE2D/Resource/ResourceLoader.h>
 #include <LORE2D/Window/Window.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -106,6 +107,8 @@ namespace Lore {
 
         //
         // Getters.
+
+        virtual ResourceLoader& getResourceLoader() = 0;
 
         ///
         /// \brief Returns true if the context is active.

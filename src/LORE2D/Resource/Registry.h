@@ -53,14 +53,18 @@ namespace Lore {
         {
         }
 
-        void insert( const id& id_, std::unique_ptr<T> resource )
+        T* insert( const id& id_, std::unique_ptr<T> resource )
         {
             if ( _container.find( id_ ) != _container.end() ) {
                 throw Lore::Exception( "Resource with id " + id_ + " already exists" );
             }
 
+            T* p = resource.get();
+
             auto it = _container.begin();
-            _container.insert( it, std::pair<id, std::unique_ptr<T>>( id_, std::move( resource ) ) );
+            auto result = _container.insert( it, std::pair<id, std::unique_ptr<T>>( id_, std::move( resource ) ) );
+            
+            return p;
         }
 
         void remove( const id& id_ )

@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,48 +24,47 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Renderer/IRenderer.h>
+#include "GLTexture.h"
+
+#define STB_IMAGE_IMPLEMENTATION
+#include <Plugins/ThirdParty/stb_image.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore { namespace OpenGL {
+using namespace Lore::OpenGL;
 
-    ///
-    /// \class GenericRenderer
-    /// \brief Renders a scene normally, without any special behavior.
-    class GenericRenderer : public Lore::IRenderer
-    {
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    public:
+Texture::Texture( const string& file )
+: _id( 0 )
+{
+    int width, height, n;
+    unsigned char* pixels = stbi_load( file.c_str(), &width, &height, &n, 0 );
+    if ( pixels ) {
 
-        const size_t DefaultRenderQueueCount = 100;
+        glGenTextures( 1, &_id );
+        glBindTexture( GL_TEXTURE_2D, _id );
 
-    public:
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
 
-        GenericRenderer();
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
-        virtual ~GenericRenderer() override;
+        // Create the OpenGL texture.
+        glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels );
+        glGenerateMipmap( GL_TEXTURE_2D );
 
-        virtual void addRenderable( Lore::RenderablePtr r, Lore::Matrix4& model ) override;
+        stbi_image_free( pixels );
+        glBindTexture( GL_TEXTURE_2D, 0 );
+    }
+}
 
-        virtual void present( const Lore::RenderView& rv ) override;
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    private:
-
-        void activateQueue( const uint id, Lore::RenderQueue& rq );
-
-    private:
-
-        using RenderQueueList = std::vector<RenderQueue>;
-        using ActiveRenderQueueList = std::map<uint, RenderQueue&>;
-
-    private:
-
-        RenderQueueList _queues;
-        ActiveRenderQueueList _activeQueues;
-
-    };
-
-}}
+Texture::~Texture()
+{
+    glDeleteTextures( 1, &_id );
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

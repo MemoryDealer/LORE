@@ -68,8 +68,8 @@ ScenePtr Context::createScene( const string& name, const RendererType& rt )
 
     log( "Scene " + name + " created successfully" );
 
-    _sceneRegistry.insert( name, std::move( scene ) );
-    return _sceneRegistry.get( name );
+    ScenePtr handle = _sceneRegistry.insert( name, std::move( scene ) );
+    return handle;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

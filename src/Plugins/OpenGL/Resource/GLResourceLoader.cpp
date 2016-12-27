@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,48 +24,35 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Renderer/IRenderer.h>
+#include "GLResourceLoader.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore { namespace OpenGL {
+using namespace Lore::OpenGL;
 
-    ///
-    /// \class GenericRenderer
-    /// \brief Renders a scene normally, without any special behavior.
-    class GenericRenderer : public Lore::IRenderer
-    {
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    public:
+ResourceLoader::ResourceLoader()
+: _textureRegistry()
+{
 
-        const size_t DefaultRenderQueueCount = 100;
+}
 
-    public:
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        GenericRenderer();
+ResourceLoader::~ResourceLoader()
+{
 
-        virtual ~GenericRenderer() override;
+}
 
-        virtual void addRenderable( Lore::RenderablePtr r, Lore::Matrix4& model ) override;
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        virtual void present( const Lore::RenderView& rv ) override;
+Lore::TexturePtr ResourceLoader::loadTexture( const string& name, const string& file )
+{
+    auto texture = std::make_unique<Texture>( file );
 
-    private:
-
-        void activateQueue( const uint id, Lore::RenderQueue& rq );
-
-    private:
-
-        using RenderQueueList = std::vector<RenderQueue>;
-        using ActiveRenderQueueList = std::map<uint, RenderQueue&>;
-
-    private:
-
-        RenderQueueList _queues;
-        ActiveRenderQueueList _activeQueues;
-
-    };
-
-}}
+    auto handle = _textureRegistry.insert( name, std::move( texture ) );
+    return handle;
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

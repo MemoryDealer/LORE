@@ -25,45 +25,30 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Renderer/IRenderer.h>
+#include <LORE2D/Resource/ResourceLoader.h>
+
+#include <LORE2D/Resource/Registry.h>
+
+#include <Plugins/OpenGL/Resource/Renderables/GLTexture.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore { namespace OpenGL {
 
-    ///
-    /// \class GenericRenderer
-    /// \brief Renders a scene normally, without any special behavior.
-    class GenericRenderer : public Lore::IRenderer
+    class ResourceLoader : public Lore::ResourceLoader
     {
 
     public:
 
-        const size_t DefaultRenderQueueCount = 100;
+        ResourceLoader();
 
-    public:
+        ~ResourceLoader();
 
-        GenericRenderer();
-
-        virtual ~GenericRenderer() override;
-
-        virtual void addRenderable( Lore::RenderablePtr r, Lore::Matrix4& model ) override;
-
-        virtual void present( const Lore::RenderView& rv ) override;
+        virtual TexturePtr loadTexture( const string& name, const string& file ) override;
 
     private:
 
-        void activateQueue( const uint id, Lore::RenderQueue& rq );
-
-    private:
-
-        using RenderQueueList = std::vector<RenderQueue>;
-        using ActiveRenderQueueList = std::map<uint, RenderQueue&>;
-
-    private:
-
-        RenderQueueList _queues;
-        ActiveRenderQueueList _activeQueues;
+        Registry<std::unordered_map, Texture> _textureRegistry;
 
     };
 

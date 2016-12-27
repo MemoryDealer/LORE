@@ -27,6 +27,8 @@
 
 #include <LORE2D/Lore.h>
 
+#include <Plugins/OpenGL/Resource/GLResourceLoader.h>
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore { namespace OpenGL {
@@ -69,6 +71,14 @@ namespace Lore { namespace OpenGL {
 
         virtual string getRenderPluginName() const override;
 
+        //
+        // Getters.
+
+        virtual Lore::ResourceLoader& getResourceLoader()
+        {
+            return _resourceLoader;
+        }
+
     private:
 
         using RendererMap = std::unordered_map <Lore::RendererType, std::unique_ptr<Lore::IRenderer>>;
@@ -77,6 +87,7 @@ namespace Lore { namespace OpenGL {
 
         GLFWwindow* _offscreenContextWindow;
         RendererMap _renderers;
+        ResourceLoader _resourceLoader;
 
     };
 

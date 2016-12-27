@@ -25,72 +25,22 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Window/RenderView.h>
+#include <LORE2D/Resource/Renderable.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-        ///
-        /// \class IRenderer
-        /// \brief Interface for Renderers - the object that knows how to interpret
-        ///     a RenderView and a Scene's scene graph and present an image to the 
-        ///     window. Render plugins shall define these implementations.
-        class IRenderer
-        {
+    class LORE_EXPORT Texture : public Renderable
+    {
 
-        public:
+    public:
 
-            virtual ~IRenderer() { }
+        Texture();
 
-            virtual void addRenderable( RenderablePtr r, Matrix4& model ) = 0;
+        virtual ~Texture() override { }
 
-            virtual void present( const RenderView& rv ) = 0;
-
-        };
-        using RendererPtr = IRenderer*;
-
-        // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-        enum class RendererType {
-            Generic
-        };
-
-        // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-        struct RenderQueue
-        {
-
-            static const uint Background = 0;
-            static const uint General = 50;
-            static const uint Foreground = 99;
-
-            // :::::: //
-
-            struct Object
-            {
-
-                RenderablePtr renderable;
-                Matrix4& model;
-
-                Object( RenderablePtr r, Matrix4& m )
-                : renderable( r )
-                , model( m )
-                { }
-
-            };
-
-            // :::::: //
-
-            using ObjectList = std::vector<Object>;
-            using RenderableList = std::map<MaterialPtr, ObjectList>;
-
-            // :::::: //
-
-            RenderableList solids;
-            RenderableList sortedTransparents;
-
-        };
+    };
 
 }
 

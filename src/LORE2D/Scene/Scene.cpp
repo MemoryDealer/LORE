@@ -51,6 +51,7 @@ Scene::~Scene()
 
 NodePtr Scene::createNode( const string& name )
 {
+    // Note: Not using make_unique here because Node's new operator is private.
     std::unique_ptr<Node> node( new Node( name, this, nullptr ) );
 
     auto result = _nodes.insert( { name, std::move( node ) } );
@@ -60,7 +61,7 @@ NodePtr Scene::createNode( const string& name )
 
     NodePtr p = result.first->second.get();
 
-    _root.attachNode( p );
+    _root.attachChildNode( p );
 
     return p;
 }

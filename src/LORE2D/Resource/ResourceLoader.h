@@ -25,48 +25,17 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Renderer/IRenderer.h>
+namespace Lore {
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-namespace Lore { namespace OpenGL {
-
-    ///
-    /// \class GenericRenderer
-    /// \brief Renders a scene normally, without any special behavior.
-    class GenericRenderer : public Lore::IRenderer
+    class ResourceLoader
     {
 
     public:
 
-        const size_t DefaultRenderQueueCount = 100;
-
-    public:
-
-        GenericRenderer();
-
-        virtual ~GenericRenderer() override;
-
-        virtual void addRenderable( Lore::RenderablePtr r, Lore::Matrix4& model ) override;
-
-        virtual void present( const Lore::RenderView& rv ) override;
-
-    private:
-
-        void activateQueue( const uint id, Lore::RenderQueue& rq );
-
-    private:
-
-        using RenderQueueList = std::vector<RenderQueue>;
-        using ActiveRenderQueueList = std::map<uint, RenderQueue&>;
-
-    private:
-
-        RenderQueueList _queues;
-        ActiveRenderQueueList _activeQueues;
+        virtual TexturePtr loadTexture( const string& name, const string& file ) = 0;
 
     };
 
-}}
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -26,6 +26,8 @@
 
 #include "GenericRenderer.h"
 
+#include <LORE2D/Resource/Renderable.h>
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 using namespace Lore::OpenGL;
@@ -33,13 +35,36 @@ using namespace Lore::OpenGL;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 GenericRenderer::GenericRenderer()
+: _queues()
+, _activeQueues()
 {
+    // Initialize all available queues.
+    _queues.resize( DefaultRenderQueueCount );
+
+    // Active default queues.
+    activateQueue( RenderQueue::General, _queues.at( RenderQueue::General ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 GenericRenderer::~GenericRenderer()
 {
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GenericRenderer::addRenderable( RenderablePtr r, Lore::Matrix4& model )
+{
+    const uint queueId = r->getRenderQueue();
+
+    RenderQueue::Object obj( r, model );
+    RenderQueue& queue = _queues.at( queueId );
+
+    // Insert render queue object into list for associated material.
+    queue.solids[r->getMaterial()].push_back( obj );
+
+    // Add this queue to the active queue list if not already there.
+    activateQueue( queueId, _queues[queueId] );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -54,6 +79,25 @@ void GenericRenderer::present( const Lore::RenderView& rv )
     Color bg = rv.scene->getBackgroundColor();
     glClearColor( bg.r, bg.g, bg.b, bg.a );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+    NodePtr root = rv.scene->getRootNode();
+    Node::ConstChildNodeIterator it = root->getConstChildNodeIterator();
+    while ( it.hasMore() ) {
+        NodePtr node = it.getNext();
+
+        
+    }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GenericRenderer::activateQueue( const uint id, Lore::RenderQueue& rq )
+{
+    auto lookup = _activeQueues.find( id );
+    if ( _activeQueues.end() == lookup ) {
+        _activeQueues.insert( { id, rq } );
+    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

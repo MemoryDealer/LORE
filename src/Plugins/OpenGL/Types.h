@@ -31,9 +31,18 @@
 
 namespace Lore { namespace OpenGL {
 
+    //
+    // Basic types.
+
     using real = Lore::real;
     using uint = Lore::uint;
     using string = Lore::string;
+
+    //
+    // LORE.
+
+    using NodePtr = Lore::NodePtr;
+    using RenderablePtr = Lore::RenderablePtr;
 
 }}
 

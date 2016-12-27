@@ -68,6 +68,11 @@ namespace Lore {
         //
         // Getters.
 
+        NodePtr getRootNode()
+        {
+            return &_root;
+        }
+
         RendererPtr getRenderer() const
         {
             return _renderer;

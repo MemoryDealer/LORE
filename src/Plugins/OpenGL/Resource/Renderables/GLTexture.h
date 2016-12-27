@@ -25,45 +25,32 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Renderer/IRenderer.h>
+#include <LORE2D/Resource/Renderables/Texture.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore { namespace OpenGL {
 
-    ///
-    /// \class GenericRenderer
-    /// \brief Renders a scene normally, without any special behavior.
-    class GenericRenderer : public Lore::IRenderer
+    class Texture : public Lore::Texture
     {
 
     public:
 
-        const size_t DefaultRenderQueueCount = 100;
+        explicit Texture( const string& file );
 
-    public:
+        virtual ~Texture() override;
 
-        GenericRenderer();
+        //
+        // Getters.
 
-        virtual ~GenericRenderer() override;
-
-        virtual void addRenderable( Lore::RenderablePtr r, Lore::Matrix4& model ) override;
-
-        virtual void present( const Lore::RenderView& rv ) override;
-
-    private:
-
-        void activateQueue( const uint id, Lore::RenderQueue& rq );
+        GLuint getID() const
+        {
+            return _id;
+        }
 
     private:
 
-        using RenderQueueList = std::vector<RenderQueue>;
-        using ActiveRenderQueueList = std::map<uint, RenderQueue&>;
-
-    private:
-
-        RenderQueueList _queues;
-        ActiveRenderQueueList _activeQueues;
+        GLuint _id;
 
     };
 

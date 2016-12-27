@@ -26,6 +26,8 @@
 
 #include "Node.h"
 
+#include <LORE2D/Renderer/IRenderer.h>
+#include <LORE2D/Resource/Renderable.h>
 #include <LORE2D/Scene/Scene.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -37,6 +39,7 @@ using namespace Lore;
 Node::Node( const string& name, ScenePtr scene, NodePtr parent )
 : _name( name )
 , _transform()
+, _renderables()
 , _scene( scene )
 , _parent( parent )
 , _childNodes()
@@ -66,7 +69,7 @@ NodePtr Node::createChildNode( const string& name )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Node::attachNode( NodePtr node )
+void Node::attachChildNode( NodePtr node )
 {
     if ( node->_parent ) {
         throw Lore::Exception( "Node " + node->getName() +
@@ -129,6 +132,23 @@ void Node::detachFromParent()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void Node::attachObject( RenderablePtr r )
+{
+    switch ( r->getType() ) {
+    default:
+    case Renderable::Type::Unknown:
+        log_error( "Attempted to attach unknown renderable " + r->getName() );
+        break;
+
+    case Renderable::Type::Texture:
+        _renderables.insert( { r->getName(), r } );
+        _scene->getRenderer()->addRenderable( r, _transform.matrix );
+        break;
+    }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void Node::setPosition( const Vec3& position )
 {
     _transform.position = position;
@@ -167,9 +187,24 @@ Matrix4 Node::getTransformationMatrix()
         _transform.matrix = CreateTransformationMatrix( _transform.position,
                                                         _transform.orientation,
                                                         _transform.scale );
+        _transform.dirty = false;
     }
 
     return _transform.matrix;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Matrix4 Node::getWorldTransformationMatrix()
+{
+    return _transform.worldMatrix;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Node::setWorldTransformationMatrix( const Matrix4& w )
+{
+    _transform.worldMatrix = w;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -49,6 +49,10 @@ int main( int argc, char** argv )
     node = node->createChildNode( "BChild" );
     node = node->createChildNode( "BChildChild" );
 
+    // Textures.
+    Lore::TexturePtr tex = context->getResourceLoader().loadTexture( "tex1", "C:\\Texture.png" );
+    node->attachObject( (Lore::RenderablePtr)tex );
+
     auto it = scene->getNode( "A" )->getChildIterator();
     while ( it.hasMore() ) {
         node = it.getNext();

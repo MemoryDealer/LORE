@@ -44,6 +44,7 @@ namespace Lore {
         using NodeMap = std::map<string, NodePtr>;
         using ChildNodeIterator = MapIterator<NodeMap>;
         using ConstChildNodeIterator = ConstMapIterator<NodeMap>;
+        using RenderableList = std::unordered_map<string, RenderablePtr>;
 
         struct Transform
         {
@@ -52,8 +53,10 @@ namespace Lore {
             Quaternion orientation;
             Vec3 scale;
 
-            Mat4 matrix;
+            Matrix4 matrix; // Local transformation matrix.
             bool dirty; // True if matrix needs update.
+
+            Matrix4 worldMatrix; // Derived transformation in scene graph.
 
             Transform()
             : position()
@@ -61,6 +64,7 @@ namespace Lore {
             , scale()
             , matrix()
             , dirty( true )
+            , worldMatrix()
             { }
 
             enum Space {
@@ -77,7 +81,7 @@ namespace Lore {
 
         NodePtr createChildNode( const string& name );
 
-        void attachNode( NodePtr child );
+        void attachChildNode( NodePtr child );
 
         void removeChildNode( NodePtr child );
 
@@ -88,6 +92,11 @@ namespace Lore {
         ConstChildNodeIterator getConstChildNodeIterator() const;
 
         void detachFromParent();
+
+        //
+        // Renderable attachments.
+
+        void attachObject( RenderablePtr r );
 
         //
         // Modifiers.
@@ -108,27 +117,38 @@ namespace Lore {
         //
         // Getters.
 
-        string getName() const
+        inline string getName() const
         {
             return _name;
         }
 
-        NodePtr getParent() const
+        inline NodePtr getParent() const
         {
             return _parent;
         }
 
-        Vec3 getPosition() const
+        inline Vec3 getPosition() const
         {
             return _transform.position;
         }
 
-        Vec3 getScale() const
+        inline Vec3 getScale() const
         {
             return _transform.scale;
         }
 
+        inline bool isTransformDirty() const
+        {
+            return _transform.dirty;
+        }
+
         Matrix4 getTransformationMatrix();
+        Matrix4 getWorldTransformationMatrix();
+
+        //
+        // Setters.
+
+        void setWorldTransformationMatrix( const Matrix4& w );
 
         //
         // Deleted functions/operators.
@@ -148,6 +168,8 @@ namespace Lore {
         string _name;
 
         Transform _transform;
+
+        RenderableList _renderables;
 
         // The creator of this node.
         ScenePtr _scene;

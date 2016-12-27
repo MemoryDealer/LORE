@@ -39,6 +39,7 @@ Context::Context() noexcept
 : Lore::Context()
 , _offscreenContextWindow( nullptr )
 , _renderers()
+, _resourceLoader()
 {
     log( "Initializing OpenGL render plugin context..." );
     glfwInit();
@@ -92,13 +93,13 @@ Lore::WindowPtr Context::createWindow( const string& title,
 
     log( "Window " + title + " created successfully" );
 
-    _windowRegistry.insert( title, std::move( window ) );
+    Lore::WindowPtr handle = _windowRegistry.insert( title, std::move( window ) );
 
     // At least one window means the context is active.
     _active = true;
 
     // Return a handle.
-    return _windowRegistry.get( title );
+    return handle;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

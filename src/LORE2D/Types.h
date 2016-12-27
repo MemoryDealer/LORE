@@ -34,19 +34,25 @@ namespace Lore {
 
     class Camera;
     class IRenderer;
+    class Material;
     class Node;
     class PostProcessor;
+    class Renderable;
     class Scene;
+    class Texture;
     class Window;
 
     //
     // Pointer types.
 
     using CameraPtr = Camera*;
+    using MaterialPtr = Material*;
     using NodePtr = Node*;
     using RendererPtr = IRenderer*;
     using PostProcessorPtr = PostProcessor*;
+    using RenderablePtr = Renderable*;
     using ScenePtr = Scene*;
+    using TexturePtr = Texture*;
     using WindowPtr = Window*;
 
     //

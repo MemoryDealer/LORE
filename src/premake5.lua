@@ -6,7 +6,7 @@ targetdir "../bin/%{cfg.buildcfg}/Run"
 objdir "../bin/%{cfg.buildcfg}/Obj"
 debugdir "../bin/%{cfg.buildcfg}/Run"
 
-includedirs { ".", "%{prj.location}", "%{sln.location}/Plugins/_Dependencies" }
+includedirs { ".", "%{prj.location}", "%{sln.location}/Plugins/ThirdParty" }
 libdirs { "../lib/x64/%{cfg.buildcfg}" }
 architecture "x86_64"
 characterset ( "MBCS" )
@@ -62,11 +62,11 @@ project "Plugin_OpenGL"
     postbuildcommands { "xcopy ..\\..\\..\\lib\\x64\\%{cfg.buildcfg}\\*.dll ..\\..\\..\\bin\\%{cfg.buildcfg}\\Run\\ /Y" }
     
 project "glad"
-    location "Plugins/_Dependencies/glad"
+    location "Plugins/ThirdParty/glad"
     kind "StaticLib"
     language "C"
     files { 
-        "Plugins/_Dependencies/glad/*.h", "Plugins/_Dependencies/glad/*.c"
+        "Plugins/ThirdParty/glad/*.h", "Plugins/ThirdParty/glad/*.c"
     }
 
 project "Driver"
