@@ -24,27 +24,80 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Material.h"
+#include "GLShader.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-using namespace Lore;
+using namespace Lore::OpenGL;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Material::Material( const string& name )
-: _name( name )
-, _passes()
+Shader::Shader( const string& name, const Shader::Type& type )
+: Lore::Shader( name, type )
+, _shader( 0 )
 {
-    // By default a material should have at least one pass.
-    _passes.push_back( Pass() );
+    GLenum shaderType = 0;
+    switch ( type ) {
+    default:
+        log_error( "Unknown shader type requested for Shader " + _name );
+        return;
+
+    case Shader::Type::Vertex:
+        shaderType = GL_VERTEX_SHADER;
+        break;
+
+    case Shader::Type::Fragment:
+        shaderType = GL_FRAGMENT_SHADER;
+        break;
+    }
+
+    _shader = glCreateShader( shaderType );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Material::~Material()
+Shader::~Shader()
+{
+    unload();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+bool Shader::loadFromFile( const string& file )
 {
 
+    return false;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+bool Shader::loadFromSource( const string& source )
+{
+    const char* psrc = source.c_str();
+
+    glShaderSource( _shader, 1, &psrc, nullptr );
+    glCompileShader( _shader );
+
+    GLint success;
+    GLchar buf[512];
+    glGetShaderiv( _shader, GL_COMPILE_STATUS, &success );
+    if ( !success ) {
+        glGetShaderInfoLog( _shader, sizeof( buf ), nullptr, buf );
+        log_error( "Failed to load and compile shader " + _name + ": " + buf );
+        return false;
+    }
+
+    _loaded = true;
+
+    return true;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Shader::unload()
+{
+    glDeleteShader( _shader );
+    _loaded = false;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

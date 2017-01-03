@@ -27,18 +27,36 @@
 
 namespace Lore {
 
-    class ResourceLoader
+    class LORE_EXPORT VertexLayout
     {
 
     public:
 
-        virtual TexturePtr loadTexture( const string& name, const string& file ) = 0;
+        enum class Type
+        {
+            Quad,
+            Triangle
+        };
 
-        virtual GPUProgramPtr createGPUProgram( const string& name ) = 0;
+        struct Attribute
+        {
+            uint size;
+        };
 
-        virtual ShaderPtr createVertexShader( const string& name ) = 0;
+    public:
 
-        virtual ShaderPtr createFragmentShader( const string& name ) = 0;
+        explicit VertexLayout( const Type& type );
+
+        virtual ~VertexLayout() { }
+
+        void addAttribute( const uint size );
+
+        virtual void build() = 0;
+
+    private:
+
+        Type _type;
+        std::vector<Attribute> _attributes;
 
     };
 

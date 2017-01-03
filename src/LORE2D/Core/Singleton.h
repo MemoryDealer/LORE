@@ -37,7 +37,7 @@ namespace Lore {
     /// \class Singleton
     /// \brief Generic singleton class for any singletons to inherit from.
     template<typename T>
-    class Singleton
+    class LORE_EXPORT Singleton
     {
 
     public:
@@ -46,7 +46,7 @@ namespace Lore {
         {
         }
 
-        ~Singleton()
+        virtual ~Singleton()
         {
         }
 

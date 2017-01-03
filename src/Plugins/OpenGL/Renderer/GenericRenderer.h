@@ -27,6 +27,8 @@
 
 #include <LORE2D/Renderer/IRenderer.h>
 
+#include <LORE2D/Resource/Material.h>
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore { namespace OpenGL {
@@ -54,6 +56,8 @@ namespace Lore { namespace OpenGL {
     private:
 
         void activateQueue( const uint id, Lore::RenderQueue& rq );
+
+        void drawObject( const RenderQueue::Object& obj );
 
     private:
 

@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,23 +24,64 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+#include "GLStockShaders.h"
 
-    class ResourceLoader
-    {
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    public:
+using namespace Lore::OpenGL;
 
-        virtual TexturePtr loadTexture( const string& name, const string& file ) = 0;
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        virtual GPUProgramPtr createGPUProgram( const string& name ) = 0;
-
-        virtual ShaderPtr createVertexShader( const string& name ) = 0;
-
-        virtual ShaderPtr createFragmentShader( const string& name ) = 0;
-
-    };
+StockVertexShaders::StockVertexShaders()
+: _shaders()
+{
 
 }
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+string& StockVertexShaders::get( const Type& t )
+{
+    auto lookup = _shaders.find( t );
+    if ( _shaders.end() != lookup ) {
+        return lookup->second;
+    }
+
+    throw Lore::Exception( "Stock shader not found" );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void StockVertexShaders::create( const Parameters& p )
+{
+    string s( "#version 430 core\n" );
+
+    uint location = 0;
+    if ( p.pos2D ) {
+        s += "layout (location = " + std::to_string( location++ ) + ") in vec2 in_Pos;";
+    }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+//
+//const string StockVertexShaders::Generic =
+//"#version 330 core\n"
+//""
+//"layout (location = 0) in vec2 in_Pos;"
+//"layout (location = 1) in vec2 in_TexCoord;"
+//""
+//"uniform mat4 mvp;"
+//"uniform mat4 model;"
+//""
+//"out vec2 FPos;"
+//"out vec2 FTexCoord;"
+//""
+//"void main()"
+//"{"
+//"gl_Position = mvp * vec4(in_Pos, 1.0f);"
+//"FPos = (model * vec4(in_Pos, 1.0f)).xy;"
+//"FTexCoord = vec2(in_TexCoord.x, 1.0 - in_TexCoord.y);"
+//"}"
+//;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

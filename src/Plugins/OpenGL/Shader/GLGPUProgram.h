@@ -25,23 +25,51 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+#include <LORE2D/Shader/GPUProgram.h>
 
-    class ResourceLoader
+#include <Plugins/OpenGL/Math/MathConverter.h>
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+namespace Lore { namespace OpenGL {
+
+    class GPUProgram : public Lore::GPUProgram
     {
 
     public:
 
-        virtual TexturePtr loadTexture( const string& name, const string& file ) = 0;
+        explicit GPUProgram( const string& name );
 
-        virtual GPUProgramPtr createGPUProgram( const string& name ) = 0;
+        virtual ~GPUProgram() override;
 
-        virtual ShaderPtr createVertexShader( const string& name ) = 0;
+        virtual void attachShader( ShaderPtr shader ) override;
 
-        virtual ShaderPtr createFragmentShader( const string& name ) = 0;
+        virtual bool link() override;
+
+        virtual void use() override;
+
+        //
+        // Uniform value updating.
+
+        virtual void setUniformMatrix4( const string& name, const Matrix4& mat ) override;
+
+        //
+        // OpenGL uniform value updaters.
+
+        /*void setUniformMatrix4fv( const string& name, glm::mat4x4& m );*/
+
+    private:
+
+        using UniformMap = std::unordered_map<string, GLuint>;
+
+    private:
+
+        GLuint _program;
+
+        UniformMap _uniforms;
 
     };
 
-}
+}}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

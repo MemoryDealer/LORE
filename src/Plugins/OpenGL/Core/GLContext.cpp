@@ -41,10 +41,10 @@ Context::Context() noexcept
 , _renderers()
 , _resourceLoader()
 {
-    log( "Initializing OpenGL render plugin context..." );
+    lore_log( "Initializing OpenGL render plugin context..." );
     glfwInit();
     glfwSetErrorCallback( ErrorCallback );
-    log( "OpenGL render plugin context initialized!" );
+    lore_log( "OpenGL render plugin context initialized!" );
 
     glfwWindowHint( GLFW_VISIBLE, GLFW_FALSE );
     _offscreenContextWindow = glfwCreateWindow( 1, 1, "", nullptr, nullptr );
@@ -61,10 +61,10 @@ Context::~Context()
 {
     glfwDestroyWindow( _offscreenContextWindow );
 
-    log( "Terminating OpenGL render plugin context..." );
+    lore_log( "Terminating OpenGL render plugin context..." );
     glfwSetErrorCallback( nullptr );
     glfwTerminate();
-    log( "OpenGL render plugin context terminated!" );
+    lore_log( "OpenGL render plugin context terminated!" );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -91,7 +91,7 @@ Lore::WindowPtr Context::createWindow( const string& title,
     auto window = std::make_unique<Window>( title, width, height );
     window->setMode( mode );
 
-    log( "Window " + title + " created successfully" );
+    lore_log( "Window " + title + " created successfully" );
 
     Lore::WindowPtr handle = _windowRegistry.insert( title, std::move( window ) );
 
@@ -109,7 +109,7 @@ void Context::destroyWindow( Lore::WindowPtr window )
     const string title = window->getTitle();
 
     _windowRegistry.remove( title );
-    log( "Window " + title + " destroyed successfully" );
+    lore_log( "Window " + title + " destroyed successfully" );
 
     // Context is no longer considered active if all windows have been destroyed.
     _active = !_windowRegistry.empty();

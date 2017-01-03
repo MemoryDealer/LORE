@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,22 +24,23 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+#include "GLStockResource.h"
 
-    class ResourceLoader
-    {
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    public:
+using namespace Lore::OpenGL;
 
-        virtual TexturePtr loadTexture( const string& name, const string& file ) = 0;
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        virtual GPUProgramPtr createGPUProgram( const string& name ) = 0;
+StockResource::~StockResource()
+{
 
-        virtual ShaderPtr createVertexShader( const string& name ) = 0;
+}
 
-        virtual ShaderPtr createFragmentShader( const string& name ) = 0;
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    };
+void StockResource::createStockResources()
+{
 
 }
 

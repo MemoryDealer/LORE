@@ -24,10 +24,9 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "GLResourceLoader.h"
+#include "GLGPUProgram.h"
 
-#include <Plugins/OpenGL/Shader/GLGPUProgram.h>
-#include <Plugins/OpenGL/Shader/GLShader.h>
+#include <LORE2D/Shader/Shader.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -35,60 +34,85 @@ using namespace Lore::OpenGL;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-ResourceLoader::ResourceLoader()
-: _textureRegistry()
-, _gpuProgramRegistry()
-, _vertexShaderRegistry()
-, _fragmentShaderRegistry()
+GPUProgram::GPUProgram( const string& name )
+: Lore::GPUProgram( name )
+, _program( 0 )
+, _uniforms()
 {
-
+    _program = glCreateProgram();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-ResourceLoader::~ResourceLoader()
+GPUProgram::~GPUProgram()
 {
-
+    glDeleteProgram( _program );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::TexturePtr ResourceLoader::loadTexture( const string& name, const string& file )
+void GPUProgram::attachShader( Lore::ShaderPtr shader )
 {
-    auto texture = std::make_unique<Texture>( name, file );
+    if ( !shader->isLoaded() ) {
+        log_error( "Shader " + shader->getName() +
+                   " is not loaded, not attaching to GPUProgram" + _name );
+        return;
+    }
 
-    auto handle = _textureRegistry.insert( name, std::move( texture ) );
-    return handle;
+    Lore::GPUProgram::attachShader( shader );
+
+    GLuint id = shader->getUintId();
+    glAttachShader( _program, id );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::GPUProgramPtr ResourceLoader::createGPUProgram( const string& name )
+bool GPUProgram::link()
 {
-    auto program = std::make_unique<GPUProgram>( name );
+    glLinkProgram( _program );
 
-    auto handle = _gpuProgramRegistry.insert( name, std::move( program ) );
-    return handle;
+    GLint success;
+    GLchar buf[512];
+    glGetProgramiv( _program, GL_LINK_STATUS, &success );
+    if ( !success ) {
+        glGetProgramInfoLog( _program, sizeof( buf ), nullptr, buf );
+        log_error( "Failed to link program + " + _name + ": " + string( buf ) );
+        return false;
+    }
+
+    // Can delete shader buffers (or flag them for delete in GL) now that the program is linked.
+    for ( auto pair : _shaders ) {
+        ShaderPtr shader = pair.second;
+        shader->unload();
+    }
+
+    return true;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::ShaderPtr ResourceLoader::createVertexShader( const string& name )
+void GPUProgram::use()
 {
-    auto shader = std::make_unique<Shader>( name, Shader::Type::Vertex );
-
-    auto handle = _vertexShaderRegistry.insert( name, std::move( shader ) );
-    return handle;
+    glUseProgram( _program );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::ShaderPtr ResourceLoader::createFragmentShader( const string& name )
+void GPUProgram::setUniformMatrix4( const string& name, const Lore::Matrix4& mat )
 {
-    auto shader = std::make_unique<Shader>( name, Shader::Type::Fragment );
+    glm::mat4x4 m = MathConverter::LoreToGLM( mat );
+    GLuint location = 0;
 
-    auto handle = _fragmentShaderRegistry.insert( name, std::move( shader ) );
-    return handle;
+    auto lookup = _uniforms.find( name );
+    if ( _uniforms.end() != lookup ) {
+        location = lookup->second;
+    }
+    else {
+        location = glGetUniformLocation( _program, name.c_str() );
+        _uniforms.insert( { name, location } );
+    }
+
+    glUniformMatrix4fv( location, 1, GL_FALSE, glm::value_ptr( m ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,23 +24,34 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+#include "Renderable.h"
 
-    class ResourceLoader
-    {
+#include <LORE2D/Renderer/IRenderer.h>
+#include <LORE2D/Resource/Material.h>
 
-    public:
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        virtual TexturePtr loadTexture( const string& name, const string& file ) = 0;
+using namespace Lore;
 
-        virtual GPUProgramPtr createGPUProgram( const string& name ) = 0;
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        virtual ShaderPtr createVertexShader( const string& name ) = 0;
+Renderable::Renderable( const string& name )
+: _name( name )
+, _material( nullptr )
+, _renderQueue( RenderQueue::General )
+, _attached( false )
+, _type( Type::Unknown )
+{
+    // TODO: Get default stock material.
+    
+}
 
-        virtual ShaderPtr createFragmentShader( const string& name ) = 0;
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    };
-
+void Renderable::_notifyAttached()
+{
+    _attached = true;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

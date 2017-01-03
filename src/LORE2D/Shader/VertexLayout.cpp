@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,23 +24,29 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+#include "VertexLayout.h"
 
-    class ResourceLoader
-    {
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    public:
+using namespace Lore;
 
-        virtual TexturePtr loadTexture( const string& name, const string& file ) = 0;
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        virtual GPUProgramPtr createGPUProgram( const string& name ) = 0;
+VertexLayout::VertexLayout( const Type& type )
+: _type( type )
+, _attributes()
+{
 
-        virtual ShaderPtr createVertexShader( const string& name ) = 0;
+}
 
-        virtual ShaderPtr createFragmentShader( const string& name ) = 0;
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    };
+void VertexLayout::addAttribute( const uint size )
+{
+    Attribute att;
+    att.size = size;
 
+    _attributes.push_back( att );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

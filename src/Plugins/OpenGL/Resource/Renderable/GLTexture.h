@@ -25,23 +25,37 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+#include <LORE2D/Resource/Renderable/Texture.h>
 
-    class ResourceLoader
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+namespace Lore { namespace OpenGL {
+
+    class Texture : public Lore::Texture
     {
 
     public:
 
-        virtual TexturePtr loadTexture( const string& name, const string& file ) = 0;
+        explicit Texture( const string& name, const string& file );
 
-        virtual GPUProgramPtr createGPUProgram( const string& name ) = 0;
+        virtual ~Texture() override;
 
-        virtual ShaderPtr createVertexShader( const string& name ) = 0;
+        virtual void bind() override;
 
-        virtual ShaderPtr createFragmentShader( const string& name ) = 0;
+        //
+        // Getters.
+
+        GLuint getID() const
+        {
+            return _id;
+        }
+
+    private:
+
+        GLuint _id;
 
     };
 
-}
+}}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

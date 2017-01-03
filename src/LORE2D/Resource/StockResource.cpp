@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,26 +24,41 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Resource/Renderable.h>
+#include "StockResource.h"
+
+#include <LORE2D/Resource/Material.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+using namespace Lore;
 
-    // TODO: How to handle multi-texturing? With current rendering pipeline, 
-    // it may be best to have a link to the next texture for each texture object.
-    // Then let the material inform the renderer to iterate the linked list.
-    class LORE_EXPORT Texture : public Renderable
-    {
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    public:
+StockResource::StockResource()
+: _materials()
+, _gpuPrograms()
+{
+}
 
-        Texture( const string& name );
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        virtual ~Texture() override { }
+void StockResource::createStockResources()
+{
+    //
+    // Load stock materials.
 
-    };
+    auto material = std::make_unique<Material>( "BaseWhiteNoLighting" );
+    Material::Pass& pass = material->getPass( 0 );
+    pass.ambient = pass.diffuse = StockColor::White;
+    pass.lighting = false;
+    pass.program = nullptr;
+}
 
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+MaterialPtr StockResource::getMaterial( const string& name )
+{
+    return _materials.get( name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

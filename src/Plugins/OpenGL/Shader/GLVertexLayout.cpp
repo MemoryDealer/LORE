@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,37 +24,24 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Resource/Renderables/Texture.h>
+#include "GLVertexLayout.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore { namespace OpenGL {
+using namespace Lore::OpenGL;
 
-    class Texture : public Lore::Texture
-    {
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    public:
+VertexLayout::~VertexLayout()
+{
 
-        explicit Texture( const string& name, const string& file );
+}
 
-        virtual ~Texture() override;
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        virtual void bind() override;
+void VertexLayout::build()
+{
 
-        //
-        // Getters.
-
-        GLuint getID() const
-        {
-            return _id;
-        }
-
-    private:
-
-        GLuint _id;
-
-    };
-
-}}
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

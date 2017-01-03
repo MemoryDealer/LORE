@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,23 +24,45 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+#include "GPUProgram.h"
 
-    class ResourceLoader
-    {
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    public:
+using namespace Lore;
 
-        virtual TexturePtr loadTexture( const string& name, const string& file ) = 0;
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        virtual GPUProgramPtr createGPUProgram( const string& name ) = 0;
+GPUProgram::GPUProgram( const string& name )
+: _name( name )
+, _shaders()
+{
+}
 
-        virtual ShaderPtr createVertexShader( const string& name ) = 0;
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        virtual ShaderPtr createFragmentShader( const string& name ) = 0;
+GPUProgram::~GPUProgram()
+{
+}
 
-    };
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void GPUProgram::attachShader( ShaderPtr shader )
+{
+    const Shader::Type type = shader->getType();
+
+    _shaders[type] = shader;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+ShaderPtr GPUProgram::getAttachedShader( const Shader::Type& type )
+{
+    auto lookup = _shaders.find( type );
+    if ( _shaders.end() != lookup ) {
+        return lookup->second;
+    }
+
+    throw Lore::Exception( "Attached shader type not in GPUProgram " + _name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

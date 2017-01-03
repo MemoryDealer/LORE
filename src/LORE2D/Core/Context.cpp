@@ -66,7 +66,7 @@ ScenePtr Context::createScene( const string& name, const RendererType& rt )
 {
     auto scene = std::make_unique<Scene>( name );
 
-    log( "Scene " + name + " created successfully" );
+    lore_log( "Scene " + name + " created successfully" );
 
     ScenePtr handle = _sceneRegistry.insert( name, std::move( scene ) );
     return handle;
@@ -77,7 +77,7 @@ ScenePtr Context::createScene( const string& name, const RendererType& rt )
 void Context::destroyScene( const string& name )
 {
     _sceneRegistry.remove( name );
-    log( "Scene " + name + " destroyed successfully" );
+    lore_log( "Scene " + name + " destroyed successfully" );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

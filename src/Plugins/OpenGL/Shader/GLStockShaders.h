@@ -25,23 +25,50 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+namespace Lore { namespace OpenGL {
 
-    class ResourceLoader
+    class StockVertexShaders final
     {
 
     public:
 
-        virtual TexturePtr loadTexture( const string& name, const string& file ) = 0;
+        enum class Type
+        {
+            Generic
+        };
 
-        virtual GPUProgramPtr createGPUProgram( const string& name ) = 0;
+        struct Parameters
+        {
+            bool pos2D;
+            bool texCoord;
+        };
 
-        virtual ShaderPtr createVertexShader( const string& name ) = 0;
+    public:
 
-        virtual ShaderPtr createFragmentShader( const string& name ) = 0;
+        StockVertexShaders();
+
+        //TODO: Return Shader object
+        string& get( const Type& t );
+
+    private:
+
+        void create( const Parameters& p );
+
+    private:
+
+        std::unordered_map<Type, string> _shaders;
 
     };
 
-}
+    class StockFragmentShaders final
+    {
+
+    public:
+
+        static const string Generic;
+
+    };
+
+}}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

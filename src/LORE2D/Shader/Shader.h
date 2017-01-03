@@ -27,18 +27,60 @@
 
 namespace Lore {
 
-    class ResourceLoader
+    class LORE_EXPORT Shader
     {
 
     public:
 
-        virtual TexturePtr loadTexture( const string& name, const string& file ) = 0;
+        enum class Type {
+            Vertex,
+            Fragment
+        };
 
-        virtual GPUProgramPtr createGPUProgram( const string& name ) = 0;
+    public:
 
-        virtual ShaderPtr createVertexShader( const string& name ) = 0;
+        Shader( const string& name, const Shader::Type& type )
+        : _name( name )
+        , _type( type )
+        , _loaded( false )
+        { }
 
-        virtual ShaderPtr createFragmentShader( const string& name ) = 0;
+        virtual ~Shader() { }
+
+        virtual bool loadFromFile( const string& file ) = 0;
+
+        virtual bool loadFromSource( const string& source ) = 0;
+
+        virtual void unload() = 0;
+
+        //
+        // Getters.
+
+        string getName() const
+        {
+            return _name;
+        }
+
+        virtual Type getType() const
+        {
+            return _type;
+        }
+
+        bool isLoaded() const
+        {
+            return _loaded;
+        }
+
+        virtual uint getUintId()
+        {
+            return 0;
+        }
+
+    protected:
+
+        string _name;
+        Type _type;
+        bool _loaded;
 
     };
 

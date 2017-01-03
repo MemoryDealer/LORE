@@ -29,6 +29,38 @@
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+const static Lore::string vshader_src =
+"#version 450 core\n"
+"layout (location = 0) in vec3 position;\n"
+"layout (location = 1) in vec3 color;\n"
+"layout (location = 2) in vec2 texCoord;\n"
+"out vec3 inColor;\n"
+"out vec2 TexCoord;\n"
+"uniform mat4 transform;\n"
+"void main()\n"
+"{\n"
+"gl_Position = transform * vec4(position, 1.0);\n"
+"inColor = color;\n"
+"TexCoord = texCoord;\n"
+"}\n";
+
+const static Lore::string pshader_src =
+"#version 450 core\n"
+"in vec3 inColor;\n"
+"in vec2 TexCoord;\n"
+"out vec4 color;\n"
+"uniform vec4 sColor;\n"
+"uniform sampler2D tex;\n"
+"uniform sampler2D tex2;\n"
+"uniform float mixValue;\n"
+"void main()\n"
+"{\n"
+"float a = texture(tex2, TexCoord).a;\n"
+"color = mix( texture(tex, TexCoord), texture(tex2, TexCoord), a * mixValue);\n"
+"}\n";
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 int main( int argc, char** argv )
 {
     auto context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
@@ -49,9 +81,22 @@ int main( int argc, char** argv )
     node = node->createChildNode( "BChild" );
     node = node->createChildNode( "BChildChild" );
 
+    Lore::ResourceLoader& loader = context->getResourceLoader();
+
     // Textures.
-    Lore::TexturePtr tex = context->getResourceLoader().loadTexture( "tex1", "C:\\Texture.png" );
+    Lore::TexturePtr tex = loader.loadTexture( "tex1", "C:\\Texture.png" );
     node->attachObject( (Lore::RenderablePtr)tex );
+
+    Lore::GPUProgramPtr program = loader.createGPUProgram( "GPU1" );
+    Lore::ShaderPtr vshader = loader.createVertexShader( "v1" );
+    vshader->loadFromSource( vshader_src.c_str() );
+
+    Lore::ShaderPtr fshader = loader.createFragmentShader( "f1" );
+    fshader->loadFromSource( pshader_src.c_str() );
+
+    program->attachShader( vshader );
+    program->attachShader( fshader );
+    program->link();
 
     auto it = scene->getNode( "A" )->getChildNodeIterator();
     while ( it.hasMore() ) {

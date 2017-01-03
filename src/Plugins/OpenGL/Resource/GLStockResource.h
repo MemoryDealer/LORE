@@ -25,23 +25,30 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+#include <LORE2D/Resource/StockResource.h>
 
-    class ResourceLoader
+#include <Plugins/OpenGL/Shader/GLStockShaders.h>
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+namespace Lore { namespace OpenGL {
+
+    class StockResource : public Lore::StockResource
     {
 
     public:
 
-        virtual TexturePtr loadTexture( const string& name, const string& file ) = 0;
+        virtual ~StockResource() override;
 
-        virtual GPUProgramPtr createGPUProgram( const string& name ) = 0;
+        virtual void createStockResources() override;
 
-        virtual ShaderPtr createVertexShader( const string& name ) = 0;
+    private:
 
-        virtual ShaderPtr createFragmentShader( const string& name ) = 0;
+        StockVertexShaders _stockVertexShaders;
+        StockFragmentShaders _stockFragmentShaders;
 
     };
 
-}
+}}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

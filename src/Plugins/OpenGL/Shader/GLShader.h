@@ -1,3 +1,4 @@
+#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -24,32 +25,38 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Renderable.h"
-
-#include <LORE2D/Renderer/IRenderer.h>
-#include <LORE2D/Resource/Material.h>
+#include <LORE2D/Shader/Shader.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-using namespace Lore;
+namespace Lore { namespace OpenGL {
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    class Shader : public Lore::Shader
+    {
 
-Renderable::Renderable( const string& name )
-: _name( name )
-, _material( nullptr )
-, _renderQueue( RenderQueue::General )
-, _attached( false )
-, _type( Type::Unknown )
-{
-}
+    public:
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+        Shader( const string& name, const Shader::Type& type );
 
-void Renderable::_notifyAttached()
-{
-    _attached = true;
-}
+        virtual ~Shader();
+
+        virtual bool loadFromFile( const string& file ) override;
+
+        virtual bool loadFromSource( const string& source ) override;
+
+        virtual void unload() override;
+
+        virtual uint getUintId() override
+        {
+            return _shader;
+        }
+
+    private:
+
+        GLuint _shader;
+
+    };
+
+}}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

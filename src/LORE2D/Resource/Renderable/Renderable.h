@@ -27,18 +27,85 @@
 
 namespace Lore {
 
-    class ResourceLoader
+    ///
+    /// \class Renderable
+    /// \brief The base class of anything that can be attached to a node.
+    class LORE_EXPORT Renderable
     {
 
     public:
 
-        virtual TexturePtr loadTexture( const string& name, const string& file ) = 0;
+        enum class Type
+        {
+            Unknown,
+            Camera,
+            Light,
+            Texture,
+            Sprite
+        };
 
-        virtual GPUProgramPtr createGPUProgram( const string& name ) = 0;
+    public:
 
-        virtual ShaderPtr createVertexShader( const string& name ) = 0;
+        explicit Renderable( const string& name );
 
-        virtual ShaderPtr createFragmentShader( const string& name ) = 0;
+        virtual ~Renderable() { }
+
+        virtual void bind() { }
+
+        //
+        // Getters.
+
+        inline string getName() const
+        {
+            return _name;
+        }
+
+        inline Type getType() const
+        {
+            return _type;
+        }
+
+        inline MaterialPtr getMaterial() const
+        {
+            return _material;
+        }
+
+        inline uint getRenderQueue() const
+        {
+            return _renderQueue;
+        }
+
+        inline bool isAttached() const
+        {
+            return _attached;
+        }
+
+        //
+        // Setters.
+
+        inline void setMaterial( MaterialPtr mat )
+        {
+            _material = mat;
+        }
+
+        inline void setRenderQueue( const uint id )
+        {
+            _renderQueue = id;
+        }
+
+    protected:
+
+        string _name;
+        MaterialPtr _material;
+        uint _renderQueue;
+        bool _attached;
+        Type _type;
+
+    private:
+
+        void _notifyAttached();
+
+        friend class Node;
 
     };
 

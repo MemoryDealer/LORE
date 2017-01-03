@@ -135,7 +135,7 @@ namespace Lore {
 #define log_error( text )       Log::Write( LogLevel::Error, text )
 #define log_warning( text )     Log::Write( LogLevel::Warning, text )
 #define log_information( text ) Log::Write( LogLevel::Information, text )
-#define log( text )             Log::Write( LogLevel::Information, text )
+#define lore_log( text )        Log::Write( LogLevel::Information, text )
 #define log_debug( text )       Log::Write( LogLevel::Debug, text )
 #define log_trace( text )       Log::Write( LogLevel::Trace, text )
 

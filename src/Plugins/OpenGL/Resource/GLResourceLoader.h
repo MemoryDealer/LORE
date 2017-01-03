@@ -28,8 +28,9 @@
 #include <LORE2D/Resource/ResourceLoader.h>
 
 #include <LORE2D/Resource/Registry.h>
+#include <LORE2D/Shader/Shader.h>
 
-#include <Plugins/OpenGL/Resource/Renderables/GLTexture.h>
+#include <Plugins/OpenGL/Resource/Renderable/GLTexture.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -46,9 +47,26 @@ namespace Lore { namespace OpenGL {
 
         virtual TexturePtr loadTexture( const string& name, const string& file ) override;
 
+        virtual GPUProgramPtr createGPUProgram( const string& name ) override;
+
+        virtual ShaderPtr createVertexShader( const string& name ) override;
+
+        virtual ShaderPtr createFragmentShader( const string& name ) override;
+
+    private:
+
+        using ShaderRegistry = Registry<std::unordered_map, Shader>;
+
     private:
 
         Registry<std::unordered_map, Texture> _textureRegistry;
+
+        // Shaders.
+
+        Registry<std::unordered_map, GPUProgram> _gpuProgramRegistry;
+
+        ShaderRegistry _vertexShaderRegistry;
+        ShaderRegistry _fragmentShaderRegistry;
 
     };
 

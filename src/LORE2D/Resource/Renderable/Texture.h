@@ -25,82 +25,29 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Resource/Renderable/Renderable.h>
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 namespace Lore {
 
-    ///
-    /// \class Renderable
-    /// \brief The base class of anything that can be attached to a node.
-    class LORE_EXPORT Renderable
+    // TODO: How to handle multi-texturing? With current rendering pipeline, 
+    // it may be best to have a link to the next texture for each texture object.
+    // Then let the material inform the renderer to iterate the linked list.
+    class LORE_EXPORT Texture : public Renderable
     {
 
     public:
 
-        enum class Type
-        {
-            Unknown,
-            Camera,
-            Light,
-            Texture,
-            Sprite
+        enum class Shape {
+            Quad
         };
 
     public:
 
-        explicit Renderable( const string& name );
+        Texture( const string& name );
 
-        virtual ~Renderable() { }
-
-        virtual void bind() { }
-
-        //
-        // Getters.
-
-        inline string getName() const
-        {
-            return _name;
-        }
-
-        inline Type getType() const
-        {
-            return _type;
-        }
-
-        inline MaterialPtr getMaterial() const
-        {
-            return _material;
-        }
-
-        inline uint getRenderQueue() const
-        {
-            return _renderQueue;
-        }
-
-        inline bool isAttached() const
-        {
-            return _attached;
-        }
-
-        //
-        // Setters.
-
-        inline void setRenderQueue( const uint id )
-        {
-            _renderQueue = id;
-        }
-
-    protected:
-
-        string _name;
-        MaterialPtr _material;
-        uint _renderQueue;
-        bool _attached;
-        Type _type;
-
-    private:
-
-        void _notifyAttached();
-
-        friend class Node;
+        virtual ~Texture() override { }
 
     };
 

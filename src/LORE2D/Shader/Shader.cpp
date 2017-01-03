@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,23 +24,10 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+#include "Shader.h"
 
-    class ResourceLoader
-    {
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    public:
 
-        virtual TexturePtr loadTexture( const string& name, const string& file ) = 0;
-
-        virtual GPUProgramPtr createGPUProgram( const string& name ) = 0;
-
-        virtual ShaderPtr createVertexShader( const string& name ) = 0;
-
-        virtual ShaderPtr createFragmentShader( const string& name ) = 0;
-
-    };
-
-}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

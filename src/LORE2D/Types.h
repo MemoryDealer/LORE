@@ -27,18 +27,22 @@
 
 #include <string> // TODO: Figure out nicer way for clients to include dependencies.
 
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 namespace Lore {
 
     //
     // Forward declarations.
 
     class Camera;
+    class GPUProgram;
     class IRenderer;
     class Material;
     class Node;
     class PostProcessor;
     class Renderable;
     class Scene;
+    class Shader;
     class Texture;
     class Window;
 
@@ -46,12 +50,14 @@ namespace Lore {
     // Pointer types.
 
     using CameraPtr = Camera*;
+    using GPUProgramPtr = GPUProgram*;
     using MaterialPtr = Material*;
     using NodePtr = Node*;
     using RendererPtr = IRenderer*;
     using PostProcessorPtr = PostProcessor*;
     using RenderablePtr = Renderable*;
     using ScenePtr = Scene*;
+    using ShaderPtr = Shader*;
     using TexturePtr = Texture*;
     using WindowPtr = Window*;
 

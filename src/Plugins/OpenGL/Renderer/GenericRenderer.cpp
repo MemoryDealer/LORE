@@ -27,7 +27,8 @@
 #include "GenericRenderer.h"
 
 #include <LORE2D/Renderer/SceneGraphVisitor.h>
-#include <LORE2D/Resource/Renderable.h>
+#include <LORE2D/Resource/Renderable/Renderable.h>
+#include <LORE2D/Shader/GPUProgram.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -77,6 +78,10 @@ void GenericRenderer::present( const Lore::RenderView& rv )
     if ( root->isTransformDirty() ) {
         root->setWorldTransformationMatrix( root->getTransformationMatrix() );
     }
+
+    // TODO: Cache which scenes have been visited and check before doing it again.
+    // [OR] move visitor to context?
+    // ...
     
     // Traverse the scene graph and update object transforms.
     Node::ChildNodeIterator it = root->getChildNodeIterator();
@@ -106,7 +111,8 @@ void GenericRenderer::present( const Lore::RenderView& rv )
             Lore::MaterialPtr mat = rlPair.first;
 
             // Bind material settings to pipeline.
-            // ...
+            Lore::Material::Pass& pass = mat->getPass( 0 );
+            pass.program->use();
 
             RenderQueue::ObjectList& objects = rlPair.second;
             for ( auto& objPair : objects ) {
@@ -114,10 +120,13 @@ void GenericRenderer::present( const Lore::RenderView& rv )
 
                 // Set program matrix...
                 // ...
+                //have setModelViewWorld( mat )
+                //    in GPUProgram, values are located in constructor and saved off
 
                 obj.renderable->bind();
 
                 // Draw based on material...
+                drawObject( obj );
                 // ...
             }
         }
@@ -135,6 +144,13 @@ void GenericRenderer::activateQueue( const uint id, Lore::RenderQueue& rq )
     if ( _activeQueues.end() == lookup ) {
         _activeQueues.insert( { id, rq } );
     }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GenericRenderer::drawObject( const Lore::RenderQueue::Object& obj )
+{
+
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

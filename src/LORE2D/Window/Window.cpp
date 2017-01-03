@@ -62,7 +62,7 @@ void Window::addRenderView( const RenderView& renderView )
         }
     }
 
-    log( "Adding RenderView " + renderView.name + " to Window " + _title );
+    lore_log( "Adding RenderView " + renderView.name + " to Window " + _title );
     _renderViews.push_back( renderView );
 }
 
@@ -80,7 +80,7 @@ void Window::removeRenderView( const string& name )
     for ( auto it = _renderViews.begin(); it != _renderViews.end(); ) {
         const RenderView& rv = ( *it );
         if ( rv.name == name ) {
-            log( "Removing RenderView " + name + " from Window " + _title );
+            lore_log( "Removing RenderView " + name + " from Window " + _title );
             it = _renderViews.erase( it );
             break;
         }

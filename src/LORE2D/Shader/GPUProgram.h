@@ -25,20 +25,49 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Math/Math.h>
+#include <LORE2D/Shader/Shader.h>
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 namespace Lore {
 
-    class ResourceLoader
+    class LORE_EXPORT GPUProgram
     {
 
     public:
 
-        virtual TexturePtr loadTexture( const string& name, const string& file ) = 0;
+        explicit GPUProgram( const string& name );
 
-        virtual GPUProgramPtr createGPUProgram( const string& name ) = 0;
+        virtual ~GPUProgram();
 
-        virtual ShaderPtr createVertexShader( const string& name ) = 0;
+        virtual void attachShader( ShaderPtr shader );
 
-        virtual ShaderPtr createFragmentShader( const string& name ) = 0;
+        virtual ShaderPtr getAttachedShader( const Shader::Type& type );
+
+        virtual bool link() = 0;
+
+        virtual void use() = 0;
+
+        inline bool hasAttachedShader( const Shader::Type& type )
+        {
+            return ( _shaders.find( type ) != _shaders.end() );
+        }
+
+        //
+        // Uniform value updating.
+
+        virtual void setUniformMatrix4( const string& name, const Matrix4& mat ) = 0;
+
+    protected:
+
+        using ShaderMap = std::unordered_map<Shader::Type, ShaderPtr>;
+
+    protected:
+
+        string _name;
+
+        ShaderMap _shaders;
 
     };
 

@@ -36,29 +36,24 @@ namespace Lore {
 
     public:
 
-        enum class DisplayMode
-        {
-            Quad,
-            Triangle,
-            Circle //?
-        };
-
         struct Pass final
         {
             bool lighting;
-            Color color;
-            DisplayMode displayMode;
+            Color ambient;
+            Color diffuse;
+            GPUProgramPtr program;
 
             Pass()
             : lighting( true )
-            , color( StockColor::White )
-            , displayMode( DisplayMode::Quad )
+            , ambient( StockColor::White )
+            , diffuse( StockColor::White )
+            , program( nullptr )
             { }
         };
 
     public:
 
-        Material();
+        explicit Material( const string& name );
 
         ~Material();
 
@@ -77,6 +72,7 @@ namespace Lore {
 
     private:
 
+        string _name;
         PassList _passes;
 
     };

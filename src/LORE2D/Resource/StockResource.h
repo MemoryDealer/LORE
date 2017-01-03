@@ -25,20 +25,50 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Core/Singleton.h>
+#include <LORE2D/Resource/Material.h>
+#include <LORE2D/Resource/Registry.h>
+#include <LORE2D/Shader/GPUProgram.h>
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 namespace Lore {
 
-    class ResourceLoader
+    class LORE_EXPORT StockResource : public Singleton<StockResource>
     {
 
     public:
 
-        virtual TexturePtr loadTexture( const string& name, const string& file ) = 0;
+        enum class MaterialType
+        {
+            BaseWhiteNoLighting
+        };
 
-        virtual GPUProgramPtr createGPUProgram( const string& name ) = 0;
+    public:
 
-        virtual ShaderPtr createVertexShader( const string& name ) = 0;
+        StockResource();
 
-        virtual ShaderPtr createFragmentShader( const string& name ) = 0;
+        virtual ~StockResource() { }
+
+        virtual void createStockResources();
+
+        //
+        // Retrieval functions for each type of stock resource.
+
+        MaterialPtr getMaterial( const string& name );
+
+        //
+        // Static helpers.
+
+        static MaterialPtr GetMaterial( const string& name )
+        {
+            return StockResource::Get().getMaterial( name );
+        }
+
+    protected:
+
+        Registry<std::unordered_map, Material> _materials;
+        Registry<std::unordered_map, GPUProgram> _gpuPrograms;
 
     };
 

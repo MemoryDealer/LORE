@@ -31,6 +31,7 @@
 #include <LORE2D/Renderer/IRenderer.h>
 #include <LORE2D/Resource/Registry.h>
 #include <LORE2D/Resource/ResourceLoader.h>
+#include <LORE2D/Shader/GPUProgram.h>
 #include <LORE2D/Window/Window.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

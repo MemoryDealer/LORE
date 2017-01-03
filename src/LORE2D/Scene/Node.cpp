@@ -27,7 +27,7 @@
 #include "Node.h"
 
 #include <LORE2D/Renderer/IRenderer.h>
-#include <LORE2D/Resource/Renderable.h>
+#include <LORE2D/Resource/Renderable/Renderable.h>
 #include <LORE2D/Scene/Scene.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
