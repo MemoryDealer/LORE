@@ -69,7 +69,7 @@ namespace Lore {
             return *_instance;
         }
 
-    private:
+    protected:
 
         static std::unique_ptr<T> _instance;
 

@@ -1,3 +1,4 @@
+#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -24,23 +25,52 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "GLVertexLayout.h"
+namespace Lore {
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    class LORE_EXPORT VertexBuffer
+    {
 
-using namespace Lore::OpenGL;
+    public:
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+        enum class Type
+        {
+            Custom,
+            Quad,
+            Triangle
+        };
 
-VertexLayout::~VertexLayout()
-{
+        enum class AttributeType
+        {
+            Int,
+            Float
+        };
 
-}
+    public:
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+        explicit VertexBuffer( const Type& type );
 
-void VertexLayout::build()
-{
+        virtual ~VertexBuffer() { }
+
+        void addAttribute( const AttributeType& type, const uint size );
+
+        virtual void build() = 0;
+
+        virtual void bind() = 0;
+
+    private:
+
+        struct Attribute
+        {
+            AttributeType type;
+            int size;
+        };
+
+    protected:
+
+        Type _type;
+        std::vector<Attribute> _attributes;
+
+    };
 
 }
 

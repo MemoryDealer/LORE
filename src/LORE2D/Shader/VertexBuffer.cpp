@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,23 +24,30 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Shader/VertexLayout.h>
+#include "VertexBuffer.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore { namespace OpenGL {
+using namespace Lore;
 
-    class VertexLayout : public Lore::VertexLayout
-    {
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    public:
+VertexBuffer::VertexBuffer( const Type& type )
+: _type( type )
+, _attributes()
+{
 
-        virtual ~VertexLayout() override;
+}
 
-        virtual void build() override;
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    };
+void VertexBuffer::addAttribute( const AttributeType& type, const uint size )
+{
+    Attribute att;
+    att.type = type;
+    att.size = size;
 
-}}
+    _attributes.push_back( att );
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

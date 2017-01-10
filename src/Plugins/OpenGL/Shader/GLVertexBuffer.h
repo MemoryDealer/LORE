@@ -25,41 +25,36 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+#include <LORE2D/Shader/VertexBuffer.h>
 
-    class LORE_EXPORT VertexLayout
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+namespace Lore { namespace OpenGL {
+
+    class VertexBuffer : public Lore::VertexBuffer
     {
 
     public:
 
-        enum class Type
-        {
-            Quad,
-            Triangle
-        };
+        explicit VertexBuffer( const Lore::VertexBuffer::Type& type );
 
-        struct Attribute
-        {
-            uint size;
-        };
+        virtual ~VertexBuffer() override;
 
-    public:
+        virtual void build() override;
 
-        explicit VertexLayout( const Type& type );
-
-        virtual ~VertexLayout() { }
-
-        void addAttribute( const uint size );
-
-        virtual void build() = 0;
+        virtual void bind() override;
 
     private:
 
-        Type _type;
-        std::vector<Attribute> _attributes;
+        GLuint _vbo; // Vertex buffer object.
+        GLuint _vao; // Vertex array object.
+        GLuint _ebo; // Element buffer object.
+
+        std::vector<GLfloat> _vertices;
+        std::vector<GLfloat> _indices;
 
     };
 
-}
+}}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

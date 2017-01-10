@@ -44,6 +44,7 @@ namespace Lore {
     class Scene;
     class Shader;
     class Texture;
+    class VertexBuffer;
     class Window;
 
     //
@@ -59,6 +60,7 @@ namespace Lore {
     using ScenePtr = Scene*;
     using ShaderPtr = Shader*;
     using TexturePtr = Texture*;
+    using VertexBufferPtr = VertexBuffer*;
     using WindowPtr = Window*;
 
     //

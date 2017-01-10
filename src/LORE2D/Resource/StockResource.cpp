@@ -34,6 +34,10 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+template<> std::unique_ptr<StockResource> StockResource::_instance = nullptr;
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 StockResource::StockResource()
 : _materials()
 , _gpuPrograms()

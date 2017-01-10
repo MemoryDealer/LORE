@@ -28,6 +28,7 @@
 
 #include <Plugins/OpenGL/Shader/GLGPUProgram.h>
 #include <Plugins/OpenGL/Shader/GLShader.h>
+#include <Plugins/OpenGL/Shader/GLVertexBuffer.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -40,6 +41,7 @@ ResourceLoader::ResourceLoader()
 , _gpuProgramRegistry()
 , _vertexShaderRegistry()
 , _fragmentShaderRegistry()
+, _vertexBufferRegistry()
 {
 
 }
@@ -88,6 +90,16 @@ Lore::ShaderPtr ResourceLoader::createFragmentShader( const string& name )
     auto shader = std::make_unique<Shader>( name, Shader::Type::Fragment );
 
     auto handle = _fragmentShaderRegistry.insert( name, std::move( shader ) );
+    return handle;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Lore::VertexBufferPtr ResourceLoader::createVertexBuffer( const string& name, const VertexBuffer::Type& type )
+{
+    auto vb = std::make_unique<VertexBuffer>( type );
+
+    auto handle = _vertexBufferRegistry.insert( name, std::move( vb ) );
     return handle;
 }
 

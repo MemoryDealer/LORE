@@ -25,6 +25,10 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Shader/VertexBuffer.h>
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 namespace Lore {
 
     class ResourceLoader
@@ -39,6 +43,8 @@ namespace Lore {
         virtual ShaderPtr createVertexShader( const string& name ) = 0;
 
         virtual ShaderPtr createFragmentShader( const string& name ) = 0;
+
+        virtual VertexBufferPtr createVertexBuffer( const string& name, const VertexBuffer::Type& type ) = 0;
 
     };
 

@@ -94,6 +94,12 @@ int main( int argc, char** argv )
     Lore::ShaderPtr fshader = loader.createFragmentShader( "f1" );
     fshader->loadFromSource( pshader_src.c_str() );
 
+    Lore::VertexBufferPtr vb = loader.createVertexBuffer( "vb1", Lore::VertexBuffer::Type::Quad );
+    vb->addAttribute( Lore::VertexBuffer::AttributeType::Float, 3 );
+    vb->addAttribute( Lore::VertexBuffer::AttributeType::Float, 3 );
+    vb->build();
+
+    program->setVertexBuffer( vb );
     program->attachShader( vshader );
     program->attachShader( fshader );
     program->link();

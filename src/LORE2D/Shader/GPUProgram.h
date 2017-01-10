@@ -27,6 +27,7 @@
 
 #include <LORE2D/Math/Math.h>
 #include <LORE2D/Shader/Shader.h>
+#include <LORE2D/Shader/VertexBuffer.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -44,6 +45,8 @@ namespace Lore {
         virtual void attachShader( ShaderPtr shader );
 
         virtual ShaderPtr getAttachedShader( const Shader::Type& type );
+
+        void setVertexBuffer( VertexBufferPtr vb );
 
         virtual bool link() = 0;
 
@@ -68,6 +71,8 @@ namespace Lore {
         string _name;
 
         ShaderMap _shaders;
+        
+        VertexBufferPtr _vertexBuffer;
 
     };
 
