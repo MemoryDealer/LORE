@@ -58,9 +58,19 @@ namespace Lore {
         }
 
         //
+        // Getters.
+
+        inline VertexBufferPtr getVertexBuffer() const
+        {
+            return _vertexBuffer;
+        }
+
+        //
         // Uniform value updating.
 
-        virtual void setUniformMatrix4( const string& name, const Matrix4& mat ) = 0;
+        virtual void addUniformVar( const string& id ) = 0;
+
+        virtual void setUniformVar( const string& id, const Matrix4& m ) = 0;
 
     protected:
 

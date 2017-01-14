@@ -51,7 +51,7 @@ namespace Lore { namespace OpenGL {
 
         virtual void addRenderable( Lore::RenderablePtr r, Lore::Matrix4& model ) override;
 
-        virtual void present( const Lore::RenderView& rv ) override;
+        virtual void present( const Lore::RenderView& rv, const WindowPtr window ) override;
 
     private:
 

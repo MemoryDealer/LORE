@@ -26,6 +26,8 @@
 
 #include "GLResourceLoader.h"
 
+#include <LORE2D/Resource/Material.h>
+
 #include <Plugins/OpenGL/Shader/GLGPUProgram.h>
 #include <Plugins/OpenGL/Shader/GLShader.h>
 #include <Plugins/OpenGL/Shader/GLVertexBuffer.h>
@@ -42,6 +44,7 @@ ResourceLoader::ResourceLoader()
 , _vertexShaderRegistry()
 , _fragmentShaderRegistry()
 , _vertexBufferRegistry()
+, _materialRegistry()
 {
 
 }
@@ -100,6 +103,16 @@ Lore::VertexBufferPtr ResourceLoader::createVertexBuffer( const string& name, co
     auto vb = std::make_unique<VertexBuffer>( type );
 
     auto handle = _vertexBufferRegistry.insert( name, std::move( vb ) );
+    return handle;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Lore::MaterialPtr ResourceLoader::createMaterial( const string& name )
+{
+    auto mat = std::make_unique<Material>( name );
+
+    auto handle = _materialRegistry.insert( name, std::move( mat ) );
     return handle;
 }
 

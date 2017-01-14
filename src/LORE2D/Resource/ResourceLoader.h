@@ -46,6 +46,8 @@ namespace Lore {
 
         virtual VertexBufferPtr createVertexBuffer( const string& name, const VertexBuffer::Type& type ) = 0;
 
+        virtual MaterialPtr createMaterial( const string& name ) = 0;
+
     };
 
 }

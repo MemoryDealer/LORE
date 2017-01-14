@@ -46,6 +46,8 @@ Window::Window( const string& title,
                                 nullptr,
                                 nullptr );
 
+
+
     // Store frame buffer size.
     glfwGetFramebufferSize( _window, &_frameBufferWidth, &_frameBufferHeight );
 }
@@ -75,7 +77,7 @@ void Window::renderFrame()
     // Render each Scene with the corresponding RenderView data.
     for ( const RenderView& rv : _renderViews ) {
         RendererPtr renderer = rv.scene->getRenderer();
-        renderer->present( rv );
+        renderer->present( rv, this );
     }
 
     glfwSwapBuffers( _window );
@@ -113,6 +115,13 @@ void Window::setDimensions( const int width, const int height )
 
     // Store frame buffer size.
     glfwGetFramebufferSize( _window, &_frameBufferWidth, &_frameBufferHeight );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Window::setActive()
+{
+    glfwMakeContextCurrent( _window );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

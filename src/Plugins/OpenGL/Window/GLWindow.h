@@ -60,6 +60,8 @@ namespace Lore { namespace OpenGL {
 
         virtual void setDimensions( const int width, const int height ) override;
 
+        virtual void setActive() override;
+
     };
 
 }}

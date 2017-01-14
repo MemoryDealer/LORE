@@ -57,6 +57,10 @@ namespace Lore {
 
         virtual void bind() = 0;
 
+        virtual void unbind() = 0;
+
+        virtual void draw() = 0;
+
     private:
 
         struct Attribute

@@ -30,6 +30,12 @@
 #include <LORE2D/Resource/Renderable/Renderable.h>
 #include <LORE2D/Shader/GPUProgram.h>
 
+#include <Plugins/OpenGL/Math/MathConverter.h>
+#include <Plugins/OpenGL/Shader/GLGPUProgram.h>
+#include <Plugins/OpenGL/Window/GLWindow.h>
+#include <Plugins/ThirdParty/glm/glm.hpp>
+#include <Plugins/ThirdParty/glm/gtc/matrix_transform.hpp>
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 using namespace Lore::OpenGL;
@@ -72,7 +78,7 @@ void GenericRenderer::addRenderable( RenderablePtr r, Lore::Matrix4& model )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GenericRenderer::present( const Lore::RenderView& rv )
+void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr window )
 {
     NodePtr root = rv.scene->getRootNode();
     if ( root->isTransformDirty() ) {
@@ -102,6 +108,10 @@ void GenericRenderer::present( const Lore::RenderView& rv )
     glClearColor( bg.r, bg.g, bg.b, bg.a );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
+    // Setup projection matrix.
+    const float aspectRatio = static_cast< float >( window->getWidth() ) / static_cast< float >( window->getHeight() );
+    glm::mat4x4 proj = glm::ortho( -aspectRatio, aspectRatio, -1.f, 1.f, 100.f, -100.f );
+    
     // Iterate through all active render queues and render each object.
     for ( const auto& rqPair : _activeQueues ) {
         RenderQueue& rq = rqPair.second;
@@ -114,6 +124,8 @@ void GenericRenderer::present( const Lore::RenderView& rv )
             Lore::Material::Pass& pass = mat->getPass( 0 );
             pass.program->use();
 
+            pass.program->getVertexBuffer()->bind();
+
             RenderQueue::ObjectList& objects = rlPair.second;
             for ( auto& objPair : objects ) {
                 RenderQueue::Object& obj = objPair.second;
@@ -122,13 +134,23 @@ void GenericRenderer::present( const Lore::RenderView& rv )
                 // ...
                 //have setModelViewWorld( mat )
                 //    in GPUProgram, values are located in constructor and saved off
+                glm::mat4x4 model;
+                model = glm::translate( model, glm::vec3( std::sin( GetTickCount() ), 0.f, 0.f ) );
+                dynamic_cast< Lore::OpenGL::GPUProgram* >( pass.program )->setUniformVar( "model", model );
+                glm::mat4x4 view;
+                view = glm::scale( view, glm::vec3( 1.f, 1.f, 0.f ) );
+                dynamic_cast< Lore::OpenGL::GPUProgram* >( pass.program )->setUniformVar( "view", view );
+                dynamic_cast<Lore::OpenGL::GPUProgram*>(pass.program)->setUniformVar( "projection", proj );
 
-                obj.renderable->bind();
+                //obj.renderable->bind(); // ?Texture
 
                 // Draw based on material...
-                drawObject( obj );
+                //drawObject( obj );
+                pass.program->getVertexBuffer()->draw();
                 // ...
             }
+
+            pass.program->getVertexBuffer()->unbind();
         }
         
         

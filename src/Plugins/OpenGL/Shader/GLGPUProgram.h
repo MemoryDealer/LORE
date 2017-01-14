@@ -51,12 +51,11 @@ namespace Lore { namespace OpenGL {
         //
         // Uniform value updating.
 
-        virtual void setUniformMatrix4( const string& name, const Matrix4& mat ) override;
+        virtual void addUniformVar( const string& id ) override;
 
-        //
-        // OpenGL uniform value updaters.
+        virtual void setUniformVar( const string& id, const Matrix4& m ) override;
 
-        /*void setUniformMatrix4fv( const string& name, glm::mat4x4& m );*/
+        void setUniformVar( const string& id, const glm::mat4x4& m );
 
     private:
 

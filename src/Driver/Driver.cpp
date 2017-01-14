@@ -26,37 +26,28 @@
 
 #include <memory>
 #include <LORE2D/Lore.h>
+#include <LORE2D/Resource/Material.h>
+#include <LORE2D/Resource/Renderable/Texture.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 const static Lore::string vshader_src =
 "#version 450 core\n"
-"layout (location = 0) in vec3 position;\n"
-"layout (location = 1) in vec3 color;\n"
-"layout (location = 2) in vec2 texCoord;\n"
-"out vec3 inColor;\n"
-"out vec2 TexCoord;\n"
-"uniform mat4 transform;\n"
+"layout (location = 0) in vec2 vertex;\n"
+"uniform mat4 model;\n"
+"uniform mat4 view;\n"
+"uniform mat4 projection;\n"
 "void main()\n"
 "{\n"
-"gl_Position = transform * vec4(position, 1.0);\n"
-"inColor = color;\n"
-"TexCoord = texCoord;\n"
+"gl_Position = projection * view * model * vec4(vertex, 1.0f, 1.0f);\n"
 "}\n";
 
 const static Lore::string pshader_src =
 "#version 450 core\n"
-"in vec3 inColor;\n"
-"in vec2 TexCoord;\n"
 "out vec4 color;\n"
-"uniform vec4 sColor;\n"
-"uniform sampler2D tex;\n"
-"uniform sampler2D tex2;\n"
-"uniform float mixValue;\n"
 "void main()\n"
 "{\n"
-"float a = texture(tex2, TexCoord).a;\n"
-"color = mix( texture(tex, TexCoord), texture(tex2, TexCoord), a * mixValue);\n"
+"color = vec4( 0.0f, 1.0f, 0.0f, 1.0f );\n"
 "}\n";
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -66,12 +57,13 @@ int main( int argc, char** argv )
     auto context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
 
     Lore::WindowPtr window = context->createWindow( "Test", 640, 480 );
-    context->createWindow( "Test2", 720, 640 );
+    window->setActive();
+    //context->createWindow( "Test2", 720, 640 );
 
     Lore::ScenePtr scene = context->createScene( "Default" );
-    scene->setBackgroundColor( Lore::StockColor::White );
+    scene->setBackgroundColor( Lore::StockColor::Black );
 
-    Lore::Viewport vp( 0.f, 0.f, 0.5f, 1.f );
+    Lore::Viewport vp( 0.f, 0.f, 1.f, 1.f );
     Lore::RenderView rv( "main", scene, vp );
     window->addRenderView( rv );
 
@@ -85,7 +77,6 @@ int main( int argc, char** argv )
 
     // Textures.
     Lore::TexturePtr tex = loader.loadTexture( "tex1", "C:\\Texture.png" );
-    node->attachObject( (Lore::RenderablePtr)tex );
 
     Lore::GPUProgramPtr program = loader.createGPUProgram( "GPU1" );
     Lore::ShaderPtr vshader = loader.createVertexShader( "v1" );
@@ -95,14 +86,26 @@ int main( int argc, char** argv )
     fshader->loadFromSource( pshader_src.c_str() );
 
     Lore::VertexBufferPtr vb = loader.createVertexBuffer( "vb1", Lore::VertexBuffer::Type::Quad );
-    vb->addAttribute( Lore::VertexBuffer::AttributeType::Float, 3 );
-    vb->addAttribute( Lore::VertexBuffer::AttributeType::Float, 3 );
+    vb->addAttribute( Lore::VertexBuffer::AttributeType::Float, 2 );
+    //vb->addAttribute( Lore::VertexBuffer::AttributeType::Float, 2 );
     vb->build();
+
+   // ; How will changing material on renderable propagate to render queues? Should do so with pointers?
 
     program->setVertexBuffer( vb );
     program->attachShader( vshader );
     program->attachShader( fshader );
     program->link();
+
+    program->addUniformVar( "model" );
+    program->addUniformVar( "view" );
+    program->addUniformVar( "projection" );
+
+    Lore::MaterialPtr mat = loader.createMaterial( "mat1" );
+    mat->getPass( 0 ).program = program;
+    tex->setMaterial( mat );
+
+    node->attachObject( ( Lore::RenderablePtr )tex );
 
     auto it = scene->getNode( "A" )->getChildNodeIterator();
     while ( it.hasMore() ) {

@@ -55,6 +55,8 @@ namespace Lore { namespace OpenGL {
 
         virtual VertexBufferPtr createVertexBuffer( const string& name, const VertexBuffer::Type& type ) override;
 
+        virtual MaterialPtr createMaterial( const string& name ) override;
+
     private:
 
         using ShaderRegistry = Registry<std::unordered_map, Shader>;
@@ -71,6 +73,10 @@ namespace Lore { namespace OpenGL {
         ShaderRegistry _fragmentShaderRegistry;
 
         Registry<std::unordered_map, VertexBuffer> _vertexBufferRegistry;
+
+        // Materials.
+
+        Registry<std::unordered_map, Material> _materialRegistry;
 
     };
 

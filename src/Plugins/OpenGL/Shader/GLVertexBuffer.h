@@ -44,6 +44,10 @@ namespace Lore { namespace OpenGL {
 
         virtual void bind() override;
 
+        virtual void unbind() override;
+
+        virtual void draw() override;
+
     private:
 
         GLuint _vbo; // Vertex buffer object.
@@ -52,6 +56,9 @@ namespace Lore { namespace OpenGL {
 
         std::vector<GLfloat> _vertices;
         std::vector<GLfloat> _indices;
+
+        GLenum _mode;
+        GLenum _glType;
 
     };
 

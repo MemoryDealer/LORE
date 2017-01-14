@@ -61,7 +61,7 @@ void GPUProgram::attachShader( Lore::ShaderPtr shader )
 
     Lore::GPUProgram::attachShader( shader );
 
-    GLuint id = shader->getUintId();
+    GLuint id = shader->getUintId(); // TODO: Use getData("", &vptr);
     glAttachShader( _program, id );
 }
 
@@ -98,21 +98,38 @@ void GPUProgram::use()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GPUProgram::setUniformMatrix4( const string& name, const Lore::Matrix4& mat )
+void GPUProgram::addUniformVar( const string& id )
 {
-    glm::mat4x4 m = MathConverter::LoreToGLM( mat );
-    GLuint location = 0;
+    GLuint uniform = glGetUniformLocation( _program, id.c_str() );
+    _uniforms.insert( { id, uniform } );
+}
 
-    auto lookup = _uniforms.find( name );
-    if ( _uniforms.end() != lookup ) {
-        location = lookup->second;
-    }
-    else {
-        location = glGetUniformLocation( _program, name.c_str() );
-        _uniforms.insert( { name, location } );
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GPUProgram::setUniformVar( const string& id, const Lore::Matrix4& m )
+{
+    auto lookup = _uniforms.find( id );
+    if ( _uniforms.end() == lookup ) {
+        throw Lore::Exception( "Uniform variable " + id + " does not exist" );
     }
 
-    glUniformMatrix4fv( location, 1, GL_FALSE, glm::value_ptr( m ) );
+    GLuint uniform = lookup->second;
+    glm::mat4x4 mm = MathConverter::LoreToGLM( m );
+    glUniformMatrix4fv( uniform, 1, GL_FALSE, glm::value_ptr( mm ) );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GPUProgram::setUniformVar( const string& id, const glm::mat4x4& m )
+{
+    auto lookup = _uniforms.find( id );
+    if ( _uniforms.end() == lookup ) {
+        throw Lore::Exception( "Uniform variable " + id + " does not exist" );
+    }
+
+    GLuint uniform = lookup->second;
+
+    glUniformMatrix4fv( uniform, 1, GL_FALSE, glm::value_ptr( m ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -73,6 +73,8 @@ namespace Lore {
 
         virtual void setMode( const Mode& mode );
 
+        virtual void setActive() = 0;
+
         //
         // Getters.
 

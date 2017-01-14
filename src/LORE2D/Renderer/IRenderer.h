@@ -45,7 +45,7 @@ namespace Lore {
 
             virtual void addRenderable( RenderablePtr r, Matrix4& model ) = 0;
 
-            virtual void present( const RenderView& rv ) = 0;
+            virtual void present( const RenderView& rv, const WindowPtr window ) = 0;
 
         };
         using RendererPtr = IRenderer*;
