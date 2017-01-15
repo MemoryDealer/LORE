@@ -34,7 +34,18 @@ namespace Lore {
 #define DEFAULT_MEMBERS( C, R )\
     Matrix()\
     : m()\
-    {}\
+    {\
+        for( int i=0; i<C; ++i ){\
+            for( int j=0; j<R; ++j){\
+                if( i == j ){\
+                    m[i][j] = static_cast<T>( 1 );\
+                }\
+                else{\
+                    m[i][j] = static_cast<T>( 0 );\
+                }\
+            }\
+        }\
+    }\
     explicit Matrix( const T t )\
     {\
         for( int i=0; i<C; ++i){\
@@ -92,7 +103,19 @@ namespace Lore {
         // Operators.
 
         
-
+        void makeIdentity()
+        {
+            for ( int i = 0; i<C; ++i ) {
+                for ( int j = 0; j<R; ++j ) {
+                    if ( i == j ) {
+                        m[i][j] = static_cast< T >( 1 );
+                    }
+                    else {
+                        m[i][j] = static_cast< T >( 0 );
+                    }
+                }
+            }
+        }
         
 
     private:

@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Scene/Camera.h>
 #include <LORE2D/Scene/Scene.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -71,8 +72,8 @@ namespace Lore {
     {
 
         string name;
-        Scene* scene;
-        //Cam
+        ScenePtr scene;
+        CameraPtr camera;
         //PostProcesser
 
         Viewport viewport;
@@ -86,6 +87,7 @@ namespace Lore {
             {
                 int x, y;
                 uint width, height;
+                real aspectRatio;
             }  gl_viewport;
 
         };
@@ -93,12 +95,14 @@ namespace Lore {
         RenderView( const string& name_ )
         : name ( name_ )
         , scene( nullptr )
+        , camera( nullptr )
         , viewport()
         { }
 
         RenderView( const string& name_, Scene* scene_ )
         : name( name_ )
         , scene( scene_ )
+        , camera( nullptr )
         , viewport( )
         {
         }
@@ -106,6 +110,7 @@ namespace Lore {
         RenderView( const string& name_, Scene* scene_, const Viewport& viewport_ )
         : name( name_ )
         , scene( scene_ )
+        , camera( nullptr )
         , viewport( viewport_ )
         { }
 

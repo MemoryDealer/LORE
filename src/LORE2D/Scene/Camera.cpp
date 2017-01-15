@@ -24,106 +24,115 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "GLResourceLoader.h"
-
-#include <LORE2D/Resource/Material.h>
-#include <LORE2D/Scene/Camera.h>
-
-#include <Plugins/OpenGL/Shader/GLGPUProgram.h>
-#include <Plugins/OpenGL/Shader/GLShader.h>
-#include <Plugins/OpenGL/Shader/GLVertexBuffer.h>
+#include "Camera.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-using namespace Lore::OpenGL;
+using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-ResourceLoader::ResourceLoader()
-: _textureRegistry()
-, _gpuProgramRegistry()
-, _vertexShaderRegistry()
-, _fragmentShaderRegistry()
-, _vertexBufferRegistry()
-, _materialRegistry()
-, _cameraRegistry()
+Camera::Camera( const string& name )
+: _name( name )
+, _position()
+, _scale( 1.f, 1.f )
+, _view()
+, _dirty( true )
 {
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-ResourceLoader::~ResourceLoader()
+Camera::~Camera()
 {
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::TexturePtr ResourceLoader::loadTexture( const string& name, const string& file )
+void Camera::setPosition( const Vec2& pos )
 {
-    auto texture = std::make_unique<Texture>( name, file );
-
-    auto handle = _textureRegistry.insert( name, std::move( texture ) );
-    return handle;
+    _position = pos;
+    dirty();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::GPUProgramPtr ResourceLoader::createGPUProgram( const string& name )
+void Camera::setPosition( const real x, const real y )
 {
-    auto program = std::make_unique<GPUProgram>( name );
-
-    auto handle = _gpuProgramRegistry.insert( name, std::move( program ) );
-    return handle;
+    _position.x = x;
+    _position.y = y;
+    dirty();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::ShaderPtr ResourceLoader::createVertexShader( const string& name )
+void Camera::translate( const Vec2& offset )
 {
-    auto shader = std::make_unique<Shader>( name, Shader::Type::Vertex );
-
-    auto handle = _vertexShaderRegistry.insert( name, std::move( shader ) );
-    return handle;
+    _position += offset;
+    dirty();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::ShaderPtr ResourceLoader::createFragmentShader( const string& name )
+void Camera::translate( const real xOffset, const real yOffset )
 {
-    auto shader = std::make_unique<Shader>( name, Shader::Type::Fragment );
-
-    auto handle = _fragmentShaderRegistry.insert( name, std::move( shader ) );
-    return handle;
+    _position.x += xOffset;
+    _position.y += yOffset;
+    dirty();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::VertexBufferPtr ResourceLoader::createVertexBuffer( const string& name, const VertexBuffer::Type& type )
+void Camera::zoom( const real amount )
 {
-    auto vb = std::make_unique<VertexBuffer>( type );
-
-    auto handle = _vertexBufferRegistry.insert( name, std::move( vb ) );
-    return handle;
+    _scale.x += amount;
+    _scale.y += amount;
+    dirty();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::MaterialPtr ResourceLoader::createMaterial( const string& name )
+void Camera::setZoom( const real amount )
 {
-    auto mat = std::make_unique<Material>( name );
-
-    auto handle = _materialRegistry.insert( name, std::move( mat ) );
-    return handle;
+    _scale.x = _scale.y = amount;
+    dirty();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::CameraPtr ResourceLoader::createCamera( const string& name )
+void Camera::dirty()
 {
-    auto cam = std::make_unique<Camera>( name );
+    _dirty = true;
+}
 
-    auto handle = _cameraRegistry.insert( name, std::move( cam ) );
-    return handle;
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Matrix4 Camera::getViewMatrix()
+{
+    if ( _dirty ) {
+        _updateViewMatrix();
+    }
+
+    return _view;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Camera::_updateViewMatrix()
+{
+    /*_view[3] = _view[0] * _position.x + _view[1] * _position.y + _view[3];
+    _position.x = 0.f;
+    _position.y = 0.f;*/
+    _view[3].x = _position.x;
+    _view[3].y = _position.y;
+
+    Vec4 zoom( _scale.x, _scale.y, 1.f, 1.f );
+    _view[0] *= zoom;
+    _view[1] *= zoom;
+    _view[2] *= zoom;
+    _scale.x = _scale.y = 1.f;
+
+    _dirty = false;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

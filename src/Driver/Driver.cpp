@@ -57,12 +57,15 @@ int main( int argc, char** argv )
     Lore::WindowPtr window = context->createWindow( "Test", 640, 480 );
     window->setActive();
     //context->createWindow( "Test2", 720, 640 );
+    Lore::ResourceLoader& loader = context->getResourceLoader();
 
     Lore::ScenePtr scene = context->createScene( "Default" );
     scene->setBackgroundColor( Lore::StockColor::Black );
 
     Lore::Viewport vp( 0.f, 0.f, 1.f, 1.f );
+    Lore::CameraPtr camera = loader.createCamera( "cam1" );
     Lore::RenderView rv( "main", scene, vp );
+    rv.camera = camera;
     window->addRenderView( rv );
 
     Lore::NodePtr node = scene->createNode( "A" );
@@ -70,8 +73,6 @@ int main( int argc, char** argv )
     node = scene->createNode( "B " );
     node = node->createChildNode( "BChild" );
     node = node->createChildNode( "BChildChild" );
-
-    Lore::ResourceLoader& loader = context->getResourceLoader();
 
     // Textures.
     Lore::TexturePtr tex = loader.loadTexture( "tex1", "C:\\Texture.png" );
@@ -89,7 +90,8 @@ int main( int argc, char** argv )
     vb->build();
 
    // ; How will changing material on renderable propagate to render queues? Should do so with pointers?
-
+    // Remove createVertexBuffer and have GPUProgram own one, so there's not another variable to deal with
+    // Consider doing the same for vertex and fragment shader
     program->setVertexBuffer( vb );
     program->attachShader( vshader );
     program->attachShader( fshader );
@@ -105,16 +107,31 @@ int main( int argc, char** argv )
     node->attachObject( ( Lore::RenderablePtr )tex );
 
     node->getChild( "AChild" )->attachObject( ( Lore::RenderablePtr )tex );
-    node->getChild( "AChild" )->setPosition( Lore::Vec3( 0.25f, 0.25f, 0.f ) );
+    node->getChild( "AChild" )->setPosition( Lore::Vec2( -0.25f, 0.25f ) );
 
     float f = 0.f;
     while ( context->active() ) { 
-
-        auto pos = node->getPosition();
-        pos.x += 0.05f * std::sinf( f );
-        pos.y += 0.05f * std::cosf( f );
+        //node->translate( 0.05f * std::sinf( f ), 0.05f * std::cosf( f ) );
         f += 0.05f;
-        node->setPosition( pos );
+
+        if ( GetAsyncKeyState( VK_F1 ) ) {
+            camera->translate( -0.01f, 0.f );
+        }
+        else if ( GetAsyncKeyState( VK_F2 ) ) {
+            camera->translate( 0.01f, 0.f );
+        }
+        else if ( GetAsyncKeyState( VK_F3 ) ) {
+            camera->translate( 0.f, -0.01f );
+        }
+        else if ( GetAsyncKeyState( VK_F4 ) ) {
+            camera->translate( 0.f, 0.01f );
+        }
+        else if ( GetAsyncKeyState( VK_F5 ) ) {
+            camera->zoom( 0.01f );
+        }
+        else if ( GetAsyncKeyState( VK_F6 ) ) {
+            camera->zoom( -0.01f );
+        }
 
         context->renderFrame( 0 );
     }

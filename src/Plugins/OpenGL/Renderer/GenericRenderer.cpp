@@ -28,13 +28,12 @@
 
 #include <LORE2D/Renderer/SceneGraphVisitor.h>
 #include <LORE2D/Resource/Renderable/Renderable.h>
+#include <LORE2D/Scene/Camera.h>
 #include <LORE2D/Shader/GPUProgram.h>
 
 #include <Plugins/OpenGL/Math/MathConverter.h>
 #include <Plugins/OpenGL/Shader/GLGPUProgram.h>
 #include <Plugins/OpenGL/Window/GLWindow.h>
-#include <Plugins/ThirdParty/glm/glm.hpp>
-#include <Plugins/ThirdParty/glm/gtc/matrix_transform.hpp>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -117,11 +116,12 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
 
     // Setup projection matrix.
     // TODO: Take viewport dimensions into account. Cache more things inside window.
-    const float aspectRatio = static_cast< float >( window->getWidth() ) / (float)window->getHeight();
-    const Matrix4 projection = MathConverter::GLMToLore(
-        glm::ortho( -aspectRatio, aspectRatio, -1.f, 1.f, 100.f, -100.f ) );
-
-    Matrix4 viewProjection;//...
+    const float aspectRatio = window->getAspectRatio();
+    const Matrix4 projection = Math::OrthoRH( -aspectRatio, aspectRatio,
+                                              -1.f, 1.f,
+                                              100.f, -100.f );
+    const Matrix4 view = rv.camera->getViewMatrix();
+    const Matrix4 viewProjection = projection * view;
     
     // Iterate through all active render queues and render each object.
     for ( const auto& rqPair : _activeQueues ) {
@@ -141,13 +141,9 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
             for ( auto& objPair : objects ) {
                 for ( auto& obj : objPair.second ) {
                     // TODO:
-                    // Add camera class, use vectors for vertex buffers
+                    // Use vectors for vertex buffers, add window callback handler class
 
-                    glm::mat4x4 glmView;
-                    glmView = glm::scale( glmView, glm::vec3( 1.f, 1.f, 0.f ) );
-                    glmView = glmView * glmView;
-                    Matrix4 view = MathConverter::GLMToLore( glmView );
-                    Matrix4 mvp = projection * view * obj.model;
+                    Matrix4 mvp = viewProjection * obj.model;
 
                     pass.program->setUniformVar( "transform", mvp );
 

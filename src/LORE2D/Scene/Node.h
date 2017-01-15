@@ -49,9 +49,9 @@ namespace Lore {
         struct Transform
         {
 
-            Vec3 position;
+            Vec2 position;
             Quaternion orientation;
-            Vec3 scale;
+            Vec2 scale;
 
             Matrix4 matrix; // Local transformation matrix.
             bool dirty; // True if matrix needs update.
@@ -61,7 +61,7 @@ namespace Lore {
             Transform()
             : position()
             , orientation()
-            , scale( 1.f, 1.f, 1.f )
+            , scale( 1.f, 1.f )
             , matrix()
             , dirty( true )
             , worldMatrix()
@@ -101,13 +101,15 @@ namespace Lore {
         //
         // Modifiers.
 
-        void setPosition( const Vec3& position );
+        void setPosition( const Vec2& position );
 
-        void translate( const Vec3& offset );
+        void translate( const Vec2& offset );
 
-        void setScale( const Vec3& scale );
+        void translate( const real xOffset, const real yOffset );
 
-        void scale( const Vec3& scale );
+        void setScale( const Vec2& scale );
+
+        void scale( const Vec2& scale );
 
         ///
         /// \brief Sets node's transformation matrix to dirty - it will be updated before
@@ -127,12 +129,12 @@ namespace Lore {
             return _parent;
         }
 
-        inline Vec3 getPosition() const
+        inline Vec2 getPosition() const
         {
             return _transform.position;
         }
 
-        inline Vec3 getScale() const
+        inline Vec2 getScale() const
         {
             return _transform.scale;
         }

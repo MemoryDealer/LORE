@@ -25,22 +25,59 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Project.
-#include "Exports.h"
-#include "Types.h"
+#include <LORE2D/Math/Math.h>
 
-// LORE2D.
-#include <LORE2D/LorePrerequisites.h>
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// C++/STL.
-#include <memory>
+namespace Lore {
 
-// GLFW.
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+    class LORE_EXPORT Camera final
+    {
 
-// GLM.
-#include <Plugins/ThirdParty/glm/glm.hpp>
-#include <Plugins/ThirdParty/glm/gtc/matrix_transform.hpp>
+    public:
+
+        explicit Camera( const string& name );
+
+        ~Camera();
+
+        //
+        // Modifiers.
+
+        void setPosition( const Vec2& pos );
+
+        void setPosition( const real x, const real y );
+
+        void translate( const Vec2& offset );
+
+        void translate( const real xOffset, const real yOffset );
+
+        void zoom( const real amount );
+
+        void setZoom( const real amount );
+
+        //
+        // Getters.
+
+        Matrix4 getViewMatrix();
+
+        void dirty();
+
+    private:
+
+        void _updateViewMatrix();
+
+    private:
+
+        string _name;
+
+        Vec2 _position;
+        Vec2 _scale;
+        Matrix4 _view;
+
+        bool _dirty;
+
+    };
+
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

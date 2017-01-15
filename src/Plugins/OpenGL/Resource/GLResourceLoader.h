@@ -57,6 +57,8 @@ namespace Lore { namespace OpenGL {
 
         virtual MaterialPtr createMaterial( const string& name ) override;
 
+        virtual CameraPtr createCamera( const string& name ) override;
+
     private:
 
         using ShaderRegistry = Registry<std::unordered_map, Shader>;
@@ -77,6 +79,10 @@ namespace Lore { namespace OpenGL {
         // Materials.
 
         Registry<std::unordered_map, Material> _materialRegistry;
+
+        // Scene.
+
+        Registry<std::unordered_map, Camera> _cameraRegistry;
 
     };
 

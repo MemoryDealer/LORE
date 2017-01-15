@@ -78,22 +78,27 @@ namespace Lore {
         //
         // Getters.
 
-        string getTitle() const
+        inline string getTitle() const
         {
             return _title;
         }
 
-        int getWidth() const
+        inline int getWidth() const
         {
             return _frameBufferWidth;
         }
 
-        int getHeight() const
+        inline int getHeight() const
         {
             return _frameBufferHeight;
         }
 
-        void getDimensions( int& width, int& height )
+        inline real getAspectRatio() const
+        {
+            return _aspectRatio;
+        }
+
+        inline void getDimensions( int& width, int& height )
         {
             width = _frameBufferWidth;
             height = _frameBufferHeight;
@@ -101,14 +106,14 @@ namespace Lore {
 
         ///
         /// \brief Returns full width of window, including borders.
-        int getFullWidth() const
+        inline int getFullWidth() const
         {
             return _width;
         }
 
         ///
         /// \brief Returns full height of window, including borders.
-        int getFullHeight() const
+        inline int getFullHeight() const
         {
             return _height;
         }
@@ -122,6 +127,7 @@ namespace Lore {
         string _title;
         int _width, _height;
         int _frameBufferWidth, _frameBufferHeight;
+        real _aspectRatio;
         Mode _mode;
 
         RenderViewList _renderViews;

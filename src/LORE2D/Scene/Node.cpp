@@ -149,7 +149,7 @@ void Node::attachObject( RenderablePtr r )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Node::setPosition( const Vec3& position )
+void Node::setPosition( const Vec2& position )
 {
     _transform.position = position;
     dirty();
@@ -157,7 +157,7 @@ void Node::setPosition( const Vec3& position )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Node::translate( const Vec3& offset )
+void Node::translate( const Vec2& offset )
 {
     _transform.position += offset;
     dirty();
@@ -165,7 +165,16 @@ void Node::translate( const Vec3& offset )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Node::setScale( const Vec3& scale )
+void Node::translate( const real xOffset, const real yOffset )
+{
+    _transform.position.x += xOffset;
+    _transform.position.y += yOffset;
+    dirty();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Node::setScale( const Vec2& scale )
 {
     _transform.scale = scale;
     dirty();
@@ -173,7 +182,7 @@ void Node::setScale( const Vec3& scale )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Node::scale( const Vec3& scale )
+void Node::scale( const Vec2& scale )
 {
     _transform.scale += scale;
     dirty();
@@ -184,9 +193,9 @@ void Node::scale( const Vec3& scale )
 Matrix4 Node::getTransformationMatrix()
 {
     if ( _transform.dirty ) {
-        _transform.matrix = CreateTransformationMatrix( _transform.position,
-                                                        _transform.orientation,
-                                                        _transform.scale );
+        _transform.matrix = Math::CreateTransformationMatrix( _transform.position,
+                                                              _transform.orientation,
+                                                              _transform.scale );
         _transform.dirty = false;
     }
 

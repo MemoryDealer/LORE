@@ -31,38 +31,106 @@
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+namespace Lore { namespace Math {
 
-    static Matrix4 CreateTransformationMatrix( const Vec3& position,
-                                               const Quaternion& orientation,
-                                               const Vec3& scale )
-    {
-        Matrix4 m;
-        Matrix3 rot3x3 = orientation.createRotationMatrix();
-        
-        // Setup scale, rotation, and translation.
-        m[0][0] = scale.x * rot3x3[0][0];
-        m[1][0] = scale.y * rot3x3[0][1];
-        m[2][0] = scale.z * rot3x3[0][2];
-        m[3][0] = position.x;
+        static Matrix4 CreateTransformationMatrix( const Vec3& position,
+                                                   const Quaternion& orientation,
+                                                   const Vec3& scale )
+        {
+            Matrix4 m;
+            Matrix3 rot3x3 = orientation.createRotationMatrix();
 
-        m[0][1] = scale.x * rot3x3[1][0];
-        m[1][1] = scale.y * rot3x3[1][1];
-        m[2][1] = scale.z * rot3x3[1][2];
-        m[3][1] = position.y;
+            // Setup scale, rotation, and translation.
+            m[0][0] = scale.x * rot3x3[0][0];
+            m[1][0] = scale.y * rot3x3[0][1];
+            m[2][0] = scale.z * rot3x3[0][2];
+            m[3][0] = position.x;
 
-        m[0][2] = scale.x * rot3x3[2][0];
-        m[1][2] = scale.y * rot3x3[2][1];
-        m[2][2] = scale.z * rot3x3[2][2];
-        m[3][2] = position.z;
+            m[0][1] = scale.x * rot3x3[1][0];
+            m[1][1] = scale.y * rot3x3[1][1];
+            m[2][1] = scale.z * rot3x3[1][2];
+            m[3][1] = position.y;
 
-        // Transformation matrices don't need projection column, set it to [0, 0, 0, 1].
-        m[0][3] = m[1][3] = m[2][3] = 0.f;
-        m[3][3] = 1.f;
+            m[0][2] = scale.x * rot3x3[2][0];
+            m[1][2] = scale.y * rot3x3[2][1];
+            m[2][2] = scale.z * rot3x3[2][2];
+            m[3][2] = position.z;
 
-        return m;
-    }
+            m[0][3] = m[1][3] = m[2][3] = 0.f;
+            m[3][3] = 1.f;
 
-}
+            return m;
+        }
+
+        // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+        static Matrix4 CreateTransformationMatrix( const Vec2& position,
+                                                   const Quaternion& orientation,
+                                                   const Vec2& scale )
+        {
+            Matrix4 m;
+            Matrix3 rot3x3 = orientation.createRotationMatrix();
+
+            // Setup scale, rotation, and translation.
+            m[0][0] = scale.x * rot3x3[0][0];
+            m[1][0] = scale.y * rot3x3[0][1];
+            m[2][0] = 1.f * rot3x3[0][2];
+            m[3][0] = position.x;
+
+            m[0][1] = scale.x * rot3x3[1][0];
+            m[1][1] = scale.y * rot3x3[1][1];
+            m[2][1] = 1.f * rot3x3[1][2];
+            m[3][1] = position.y;
+
+            m[0][2] = scale.x * rot3x3[2][0];
+            m[1][2] = scale.y * rot3x3[2][1];
+            m[2][2] = 1.f * rot3x3[2][2];
+            m[3][2] = 0.f;
+
+            m[0][3] = m[1][3] = m[2][3] = 0.f;
+            m[3][3] = 1.f;
+
+            return m;
+        }
+
+        // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+        static Matrix4 OrthoLH( const float left, const float right,
+                                const float bottom, const float top,
+                                const float zNear, const float zFar )
+        {
+            Matrix4 ortho;
+
+            ortho[0][0] = 2.f / ( right - left );
+            ortho[1][1] = 2.f / ( top - bottom );
+            ortho[3][0] = -( right + left ) / ( right - left );
+            ortho[3][1] = -( top + bottom ) / ( top - bottom );
+
+            ortho[2][2] = 2.f / ( zFar - zNear );
+            ortho[3][2] = -( zFar + zNear ) / ( zFar - zNear );
+            
+            return ortho;
+        }
+
+        // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+        static Matrix4 OrthoRH( const float left, const float right,
+                                const float bottom, const float top,
+                                const float zNear, const float zFar )
+        {
+            Matrix4 ortho;
+
+            ortho[0][0] = 2.f / ( right - left );
+            ortho[1][1] = 2.f / ( top - bottom );
+            ortho[3][0] = -( right + left ) / ( right - left );
+            ortho[3][1] = -( top + bottom ) / ( top - bottom );
+
+            ortho[2][2] = -2.f / ( zFar - zNear );
+            ortho[3][2] = -( zFar + zNear ) / ( zFar - zNear );
+
+            return ortho;
+        }
+
+}}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

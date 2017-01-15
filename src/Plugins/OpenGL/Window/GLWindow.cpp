@@ -51,6 +51,7 @@ Window::Window( const string& title,
 
     // Store frame buffer size.
     glfwGetFramebufferSize( _window, &_frameBufferWidth, &_frameBufferHeight );
+    _aspectRatio = static_cast< float >( _frameBufferWidth ) / _frameBufferHeight;
 
     // Setup callbacks.
     glfwSetFramebufferSizeCallback( _window, _frameBufferSizeCallback );
@@ -99,6 +100,8 @@ void Window::addRenderView( const Lore::RenderView& renderView )
     rv.gl_viewport.width = static_cast< int >( vp.width * static_cast<float>( _frameBufferWidth ) );
     rv.gl_viewport.height = static_cast< int >( vp.height * static_cast<float>( _frameBufferHeight ) );
 
+    rv.gl_viewport.aspectRatio = static_cast< real >( rv.gl_viewport.width ) / rv.gl_viewport.height;
+
     Lore::Window::addRenderView( rv );
 }
 
@@ -119,6 +122,8 @@ void Window::setDimensions( const int width, const int height )
 
     // Store frame buffer size.
     glfwGetFramebufferSize( _window, &_frameBufferWidth, &_frameBufferHeight );
+
+    _aspectRatio = static_cast< float >( _frameBufferWidth ) / _frameBufferHeight;
 
     updateRenderViews();
 }

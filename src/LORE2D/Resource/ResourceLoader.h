@@ -48,6 +48,8 @@ namespace Lore {
 
         virtual MaterialPtr createMaterial( const string& name ) = 0;
 
+        virtual CameraPtr createCamera( const string& name ) = 0;
+
     };
 
 }

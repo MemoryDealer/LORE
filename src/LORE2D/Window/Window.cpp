@@ -40,6 +40,7 @@ Window::Window( const string& title,
 , _height( height )
 , _frameBufferWidth( 0 )
 , _frameBufferHeight( 0 )
+, _aspectRatio( 0.f )
 , _mode( Mode::Windowed )
 {
 }
