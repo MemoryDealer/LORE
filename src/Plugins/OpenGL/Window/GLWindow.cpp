@@ -46,10 +46,14 @@ Window::Window( const string& title,
                                 nullptr,
                                 nullptr );
 
-
+    // Store user pointer to Lore Window class for callbacks.
+    glfwSetWindowUserPointer( _window, reinterpret_cast< void* >( this ) );
 
     // Store frame buffer size.
     glfwGetFramebufferSize( _window, &_frameBufferWidth, &_frameBufferHeight );
+
+    // Setup callbacks.
+    glfwSetFramebufferSizeCallback( _window, _frameBufferSizeCallback );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -115,6 +119,8 @@ void Window::setDimensions( const int width, const int height )
 
     // Store frame buffer size.
     glfwGetFramebufferSize( _window, &_frameBufferWidth, &_frameBufferHeight );
+
+    updateRenderViews();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -122,6 +128,26 @@ void Window::setDimensions( const int width, const int height )
 void Window::setActive()
 {
     glfwMakeContextCurrent( _window );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Window::updateRenderViews()
+{
+    for ( auto& rv : _renderViews ) {
+        rv.gl_viewport.x = static_cast< int >( rv.viewport.x * static_cast<float>( _frameBufferWidth ) );
+        rv.gl_viewport.y = static_cast< int >( rv.viewport.y * static_cast<float>( _frameBufferHeight ) );
+        rv.gl_viewport.width = static_cast< int >( rv.viewport.width * static_cast<float>( _frameBufferWidth ) );
+        rv.gl_viewport.height = static_cast< int >( rv.viewport.height * static_cast<float>( _frameBufferHeight ) );
+    }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Window::_frameBufferSizeCallback( GLFWwindow* window, int width, int height )
+{
+    WindowPtr lw = reinterpret_cast< WindowPtr >( glfwGetWindowUserPointer( window ) );
+    lw->setDimensions( width, height );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

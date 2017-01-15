@@ -75,12 +75,12 @@ namespace Lore {
         //Cam
         //PostProcesser
 
+        Viewport viewport;
+
         // Viewports are stored in a union, so each render plugin can do the 
         // conversion once, when the RenderView is added to a window.
         union
         {
-
-            Viewport viewport;
 
             struct
             {

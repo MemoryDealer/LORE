@@ -82,7 +82,9 @@ namespace Lore {
 
             // :::::: //
 
-            using ObjectList = std::map<RenderablePtr, Object>;
+            // TODO: Cleanup naming of this stuff
+            using Objects = std::vector<Object>;
+            using ObjectList = std::map<RenderablePtr, Objects>;
             using RenderableList = std::map<MaterialPtr, ObjectList>;
 
             // :::::: //

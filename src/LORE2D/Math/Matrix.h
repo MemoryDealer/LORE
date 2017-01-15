@@ -35,7 +35,20 @@ namespace Lore {
     Matrix()\
     : m()\
     {}\
-    inline Vec operator [] ( size_t idx ) const\
+    explicit Matrix( const T t )\
+    {\
+        for( int i=0; i<C; ++i){\
+            for( int j=0; j<R; ++j){\
+                m[i][j] = t;\
+            }\
+        }\
+    }\
+    inline Vec& operator [] ( size_t idx )\
+    {\
+        assert( idx < C );\
+        return m[idx];\
+    }\
+    inline Vec operator [] ( size_t idx) const\
     {\
         assert( idx < C );\
         return m[idx];\
@@ -125,6 +138,18 @@ namespace Lore {
         {
         }
 
+        Matrix( const T m00, const T m01, const T m02, const T m03,
+                const T m10, const T m11, const T m12, const T m13,
+                const T m20, const T m21, const T m22, const T m23,
+                const T m30, const T m31, const T m32, const T m33 )
+        : m()
+        {
+            m[0][0] = m00; m[0][1] = m10; m[0][2] = m20; m[0][3] = m30;
+            m[1][0] = m01; m[1][1] = m11; m[1][2] = m21; m[1][3] = m31;
+            m[2][0] = m02; m[2][1] = m12; m[2][2] = m22; m[2][3] = m32;
+            m[3][0] = m03; m[3][1] = m13; m[3][2] = m23; m[3][3] = m33;
+        }
+
     private:
 
         Vec m[4];
@@ -142,17 +167,8 @@ namespace Lore {
         return re;\
     }
 
-#define DEFINE_BINARY_OP( op )\
-    template<typename T, int C, int R>\
-    Matrix<T, C, R> operator op ( const Matrix<T, C, R>& a, const Matrix<T, C, R>& b )\
-    {\
-        Matrix<T, C, R> re;\
-        for( int i=0; i<C; ++i ){\
-            re[i] = a[i] op b[i];\
-        }\
-        return re;\
-    }\
-    template<typename T, int C, int R>\
+#define DEFINE_BINARY_SCALAR_OP( op )\
+template<typename T, int C, int R>\
     Matrix<T, C, R> operator op ( const Matrix<T, C, R>& a, const T b )\
     {\
         Matrix<T, C, R> re;\
@@ -171,6 +187,27 @@ namespace Lore {
         return re;\
     }
 
+#define DEFINE_BINARY_OP( op )\
+    template<typename T, int C, int R>\
+    Matrix<T, C, R> operator op ( const Matrix<T, C, R>& a, const Matrix<T, C, R>& b )\
+    {\
+        Matrix<T, C, R> re;\
+        for( int i=0; i<C; ++i ){\
+            re[i] = a[i] op b[i];\
+        }\
+        return re;\
+    }\
+    DEFINE_BINARY_SCALAR_OP( op );
+
+#define DEFINE_INPLACE_SCALAR_OP( op )\
+template<typename T, int C, int R>\
+    Matrix<T, C, R>& operator op ( Matrix<T, C, R>& a, const T b )\
+    {\
+        for( int i=0; i<C; ++i ){\
+            a[i] = a[i] op b;\
+        }\
+    }
+
 #define DEFINE_INPLACE_OP( op )\
     template<typename T, int C, int R>\
     Matrix<T, C, R>& operator op ( Matrix<T, C, R>& a, const Matrix<T, C, R>& b )\
@@ -180,13 +217,7 @@ namespace Lore {
         }\
         return a;\
     }\
-    template<typename T, int C, int R>\
-    Matrix<T, C, R>& operator op ( Matrix<T, C, R>& a, const T b )\
-    {\
-        for( int i=0; i<C; ++i ){\
-            a[i] = a[i] op b;\
-        }\
-    }
+    DEFINE_INPLACE_SCALAR_OP( op );
 
     DEFINE_UNARY_OP( ! );
     DEFINE_UNARY_OP( ~ );
@@ -194,23 +225,50 @@ namespace Lore {
 
     DEFINE_BINARY_OP( + );
     DEFINE_BINARY_OP( - );
-    DEFINE_BINARY_OP( * );
-    DEFINE_BINARY_OP( / );
     DEFINE_BINARY_OP( & );
     DEFINE_BINARY_OP( | );
     DEFINE_BINARY_OP( ^ );
+    DEFINE_BINARY_SCALAR_OP( * );
+    DEFINE_BINARY_SCALAR_OP( / );
 
     DEFINE_INPLACE_OP( += );
     DEFINE_INPLACE_OP( -= );
-    DEFINE_INPLACE_OP( *= );
-    DEFINE_INPLACE_OP( /= );
     DEFINE_INPLACE_OP( &= );
     DEFINE_INPLACE_OP( |= );
     DEFINE_INPLACE_OP( ^= );
+    DEFINE_INPLACE_SCALAR_OP( *= );
+    DEFINE_INPLACE_SCALAR_OP( /= );
 
 #undef DEFINE_UNARY_OP
 #undef DEFINE_BINARY_OP
+#undef DEFINE_BINARY_SCALAR_OP
 #undef DEFINE_INPLACE_OP
+#undef DEFINE_INPLACE_SCALAR_OP
+
+    //
+    // Multiplication.
+
+    template<typename T, int C, int R>
+    Matrix<T, C, R> operator * ( Matrix<T, C, R> const& a, Matrix<T, R, C> const& b )
+    {
+        // See https://en.wikipedia.org/wiki/Matrix_multiplication_algorithm for optimization.
+        Matrix<T, C, R> re( T( 0 ) );
+        // For each column.
+        for ( int i = 0; i < C; ++i ) {
+
+            // For each element in column.
+            for ( int j = 0; j < R; ++j ) {
+
+                for ( int k = 0; k < C; ++k ) {
+                    re[j][i] += ( a[k][i] * b[j][k] );
+                    //re[j * C + i] += a[k * C + i] * b[]
+                    //column[k] += a[i][k] * b[k][j];
+                }
+            }
+        }
+
+        return re;
+    }
 
 }
 

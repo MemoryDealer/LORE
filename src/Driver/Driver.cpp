@@ -34,12 +34,10 @@
 const static Lore::string vshader_src =
 "#version 450 core\n"
 "layout (location = 0) in vec2 vertex;\n"
-"uniform mat4 model;\n"
-"uniform mat4 view;\n"
-"uniform mat4 projection;\n"
+"uniform mat4 transform;\n"
 "void main()\n"
 "{\n"
-"gl_Position = projection * view * model * vec4(vertex, 1.0f, 1.0f);\n"
+"gl_Position = transform * vec4(vertex, 0.0f, 1.0f);\n"
 "}\n";
 
 const static Lore::string pshader_src =
@@ -47,7 +45,7 @@ const static Lore::string pshader_src =
 "out vec4 color;\n"
 "void main()\n"
 "{\n"
-"color = vec4( 0.0f, 1.0f, 0.0f, 1.0f );\n"
+"color = vec4( 0.0f, 0.0f, 1.0f, 1.0f );\n"
 "}\n";
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -97,23 +95,27 @@ int main( int argc, char** argv )
     program->attachShader( fshader );
     program->link();
 
-    program->addUniformVar( "model" );
-    program->addUniformVar( "view" );
-    program->addUniformVar( "projection" );
+    program->addUniformVar( "transform" );
 
     Lore::MaterialPtr mat = loader.createMaterial( "mat1" );
     mat->getPass( 0 ).program = program;
     tex->setMaterial( mat );
 
+    node = scene->getNode( "A" );
     node->attachObject( ( Lore::RenderablePtr )tex );
 
-    auto it = scene->getNode( "A" )->getChildNodeIterator();
-    while ( it.hasMore() ) {
-        node = it.getNext();
-        ;
-    }
+    node->getChild( "AChild" )->attachObject( ( Lore::RenderablePtr )tex );
+    node->getChild( "AChild" )->setPosition( Lore::Vec3( 0.25f, 0.25f, 0.f ) );
 
-    while ( context->active() ) {
+    float f = 0.f;
+    while ( context->active() ) { 
+
+        auto pos = node->getPosition();
+        pos.x += 0.05f * std::sinf( f );
+        pos.y += 0.05f * std::cosf( f );
+        f += 0.05f;
+        node->setPosition( pos );
+
         context->renderFrame( 0 );
     }
 

@@ -40,7 +40,7 @@ namespace Lore {
 
         ~SceneGraphVisitor();
 
-        void pushMatrix( const Matrix4 m );
+        void pushMatrix( const Matrix4& m );
 
         void visit( NodePtr node, bool worldDirty = false );
 

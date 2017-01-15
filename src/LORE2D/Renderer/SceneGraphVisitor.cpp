@@ -47,7 +47,7 @@ SceneGraphVisitor::~SceneGraphVisitor()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void SceneGraphVisitor::pushMatrix( const Matrix4 m )
+void SceneGraphVisitor::pushMatrix( const Matrix4& m )
 {
     _stack.push( m );
 }
@@ -56,8 +56,6 @@ void SceneGraphVisitor::pushMatrix( const Matrix4 m )
 
 void SceneGraphVisitor::visit( NodePtr node, bool worldDirty )
 {
-    Vec4 v = _stack.top()[0];
-    v = v * v;
     if ( worldDirty ) {
         Matrix4 world = _stack.top() * node->getTransformationMatrix();
         node->setWorldTransformationMatrix( world );

@@ -61,7 +61,7 @@ namespace Lore {
             Transform()
             : position()
             , orientation()
-            , scale()
+            , scale( 1.f, 1.f, 1.f )
             , matrix()
             , dirty( true )
             , worldMatrix()

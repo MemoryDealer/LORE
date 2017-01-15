@@ -32,10 +32,10 @@ using namespace Lore::OpenGL;
 
 GLfloat quad_vertices [] = {
     // Positions          // Colors           // Texture Coords
-    0.5f,  0.5f,
-    0.5f, -0.5f,
-    -0.5f, -0.5f,
-    -0.5f,  0.5f
+    0.1f,  0.1f,
+    0.1f, -0.1f,
+    -0.1f, -0.1f,
+    -0.1f,  0.1f
 };
 
 GLuint quad_indices [] = {

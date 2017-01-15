@@ -142,7 +142,7 @@ void Node::attachObject( RenderablePtr r )
 
     case Renderable::Type::Texture:
         _renderables.insert( { r->getName(), r } );
-        _scene->getRenderer()->addRenderable( r, _transform.matrix );
+        _scene->getRenderer()->addRenderable( r, _transform.worldMatrix );
         break;
     }
 }

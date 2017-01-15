@@ -230,3 +230,82 @@ TEST_CASE( "Vector operations", "[math]" )
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+TEST_CASE( "Matrix-matrix operations", "[math]" )
+{
+
+    SECTION( "Multiplication" )
+    {
+        Lore::Matrix4 m1;
+        m1[0][0] = 1.f;
+        m1[1][0] = 2.f;
+        m1[3][3] = 1.f;
+
+        Lore::Matrix4 m2;
+        m2[0][0] = 1.5f;
+        m2[1][0] = 3.f;
+        m2[3][0] = 0.5f;
+        m2[3][3] = 0.1f;
+
+        Lore::Matrix4 r = m1 * m2;
+        REQUIRE( r[0][0] == Approx( 1.5f ) );
+        REQUIRE( r[1][0] == Approx( 3.f ) );
+        REQUIRE( r[3][0] == Approx( 0.5f ) );
+        REQUIRE( r[3][3] == Approx( 0.1f ) );
+
+        Lore::Matrix4 m3, m4;
+        m3[0][0] = 1.f;
+        m3[0][1] = 4.f;
+        m3[0][2] = 3.f;
+        m3[0][3] = 33.f;
+        m3[1][0] = 2.f;
+        m3[1][1] = 5.f;
+        m3[1][2] = 2.f;
+        m3[1][3] = 2.f;
+        m3[2][0] = 3.f;
+        m3[2][1] = 6.f;
+        m3[2][2] = 1.f;
+        m3[2][3] = 4.f;
+        m3[3][0] = 2.f;
+        m3[3][1] = 1.f;
+        m3[3][2] = 3.f;
+        m3[3][3] = 1.f;
+
+        m4[0][0] = 1.5f;
+        m4[0][1] = 3.f;
+        m4[0][2] = 3.f;
+        m4[0][3] = 2.f;
+        m4[1][0] = 3.f;
+        m4[1][1] = 7.f;
+        m4[1][2] = 1.f;
+        m4[1][3] = 3.f;
+        m4[2][0] = 2.f;
+        m4[2][1] = 5.f;
+        m4[2][2] = 0.f;
+        m4[2][3] = 21.f;
+        m4[3][0] = 0.5f;
+        m4[3][1] = 33.f;
+        m4[3][2] = 3.f;
+        m4[3][3] = 0.1f;
+
+        Lore::Matrix4 r2 = m3 * m4;
+        REQUIRE( r2[0][0] == Approx( m3[0][0] * m4[0][0] + m3[1][0] * m4[0][1] + m3[2][0] * m4[0][2] + m3[3][0] * m4[0][3] ) );
+        REQUIRE( r2[0][1] == Approx( 41.f ) );
+        REQUIRE( r2[0][2] == Approx( 19.5f ) );
+        REQUIRE( r2[0][3] == Approx( 69.5f ) );
+        REQUIRE( r2[1][0] == Approx( 26.f ) );
+        REQUIRE( r2[1][1] == Approx( 56.f ) );
+        REQUIRE( r2[1][2] == Approx( 33.f ) );
+        REQUIRE( r2[1][3] == Approx( 120.f ) );
+        REQUIRE( r2[2][0] == Approx( 54.f ) );
+        REQUIRE( r2[2][1] == Approx( 54.f ) );
+        REQUIRE( r2[2][2] == Approx( 79.f ) );
+        REQUIRE( r2[2][3] == Approx( 97.f ) );
+        REQUIRE( r2[3][0] == Approx( 75.7f ) );
+        REQUIRE( r2[3][1] == Approx( 185.1f ) );
+        REQUIRE( r2[3][2] == Approx( 70.8f ) );
+        REQUIRE( r2[3][3] == Approx( 94.6f ) );
+    }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

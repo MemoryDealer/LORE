@@ -70,7 +70,14 @@ void GenericRenderer::addRenderable( RenderablePtr r, Lore::Matrix4& model )
 
     // Insert render queue object into list for associated material.
     // TODO: Deal with transparents
-    queue.solids[r->getMaterial()].insert( { r, obj } );
+    //queue.solids[r->getMaterial()].insert( { r, obj } );
+    auto& rl = queue.solids[r->getMaterial()];
+    auto lookup = rl.find( r );
+    if ( rl.end() == lookup ) {
+        rl.insert( { r, RenderQueue::Objects() } );
+    }
+
+    rl.at( r ).push_back( obj );
 
     // Add this queue to the active queue list if not already there.
     activateQueue( queueId, _queues[queueId] );
@@ -109,8 +116,12 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     // Setup projection matrix.
-    const float aspectRatio = static_cast< float >( window->getWidth() ) / static_cast< float >( window->getHeight() );
-    glm::mat4x4 proj = glm::ortho( -aspectRatio, aspectRatio, -1.f, 1.f, 100.f, -100.f );
+    // TODO: Take viewport dimensions into account. Cache more things inside window.
+    const float aspectRatio = static_cast< float >( window->getWidth() ) / (float)window->getHeight();
+    const Matrix4 projection = MathConverter::GLMToLore(
+        glm::ortho( -aspectRatio, aspectRatio, -1.f, 1.f, 100.f, -100.f ) );
+
+    Matrix4 viewProjection;//...
     
     // Iterate through all active render queues and render each object.
     for ( const auto& rqPair : _activeQueues ) {
@@ -128,26 +139,25 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
 
             RenderQueue::ObjectList& objects = rlPair.second;
             for ( auto& objPair : objects ) {
-                RenderQueue::Object& obj = objPair.second;
+                for ( auto& obj : objPair.second ) {
+                    // TODO:
+                    // Add camera class, use vectors for vertex buffers
 
-                // Set program matrix...
-                // ...
-                //have setModelViewWorld( mat )
-                //    in GPUProgram, values are located in constructor and saved off
-                glm::mat4x4 model;
-                model = glm::translate( model, glm::vec3( std::sin( GetTickCount() ), 0.f, 0.f ) );
-                dynamic_cast< Lore::OpenGL::GPUProgram* >( pass.program )->setUniformVar( "model", model );
-                glm::mat4x4 view;
-                view = glm::scale( view, glm::vec3( 1.f, 1.f, 0.f ) );
-                dynamic_cast< Lore::OpenGL::GPUProgram* >( pass.program )->setUniformVar( "view", view );
-                dynamic_cast<Lore::OpenGL::GPUProgram*>(pass.program)->setUniformVar( "projection", proj );
+                    glm::mat4x4 glmView;
+                    glmView = glm::scale( glmView, glm::vec3( 1.f, 1.f, 0.f ) );
+                    glmView = glmView * glmView;
+                    Matrix4 view = MathConverter::GLMToLore( glmView );
+                    Matrix4 mvp = projection * view * obj.model;
 
-                //obj.renderable->bind(); // ?Texture
+                    pass.program->setUniformVar( "transform", mvp );
 
-                // Draw based on material...
-                //drawObject( obj );
-                pass.program->getVertexBuffer()->draw();
-                // ...
+                    //obj.renderable->bind(); // ?Texture
+
+                    // Draw based on material...
+                    //drawObject( obj );
+                    pass.program->getVertexBuffer()->draw();
+                    // ...
+                }
             }
 
             pass.program->getVertexBuffer()->unbind();
