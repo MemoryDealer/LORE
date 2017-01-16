@@ -88,31 +88,38 @@ void VertexBuffer::build()
         throw Lore::Exception( "Unknown vertex buffer type" );
 
     case VertexBuffer::Type::Quad:
-        _vertices = { 0.5f, 0.5f, 0.f,      1.f, 1.f,
-                      0.5f, -0.5f, 0.f,     1.f, 0.f,
-                      -0.5f, -0.5f, 0.f,    0.f, 0.f,
-                      -0.5f, -0.5f, 0.f,    0.f, 1.f };
-        _indices = { 0.f, 1.f, 2.f, 3.f }; // FLOAT???
+        _vertices = { 0.1f, 0.1f,
+                      0.1f, -0.1f,
+                     -0.1f, -0.1f,
+                     -0.1f, 0.1f };
+        _indices = { 1, 0, 2, 3 };
+
+        addAttribute( AttributeType::Float, 2 );
+        break;
+
+    case VertexBuffer::Type::TexturedQuad:
+        _vertices = { 0.1f, 0.1f,      1.f, 1.f,
+                      0.1f, -0.1f,     1.f, 0.f,
+                     -0.1f, -0.1f,     0.f, 0.f,
+                     -0.1f, 0.1f,      0.f, 1.f };
+        _indices = { 1, 0, 2, 3 };
+
+        addAttribute( AttributeType::Float, 2 );
+        addAttribute( AttributeType::Float, 2 );
         break;
     }
 
     glGenVertexArrays( 1, &_vao );
-    printf( "glError: %d\n", glGetError() );
     glGenBuffers( 1, &_vbo );
     glGenBuffers( 1, &_ebo );
 
     glBindVertexArray( _vao );
-    printf( "glError: %d\n", glGetError() );
 
     glBindBuffer( GL_ARRAY_BUFFER, _vbo );
-    glBufferData( GL_ARRAY_BUFFER, sizeof( quad_vertices ), quad_vertices, GL_STATIC_DRAW );
-
-    printf( "glError: %d\n", glGetError() );
+    glBufferData( GL_ARRAY_BUFFER, sizeof( GLfloat ) * _vertices.size(), _vertices.data(), GL_STATIC_DRAW );
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, _ebo );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( quad_indices ), quad_indices, GL_STATIC_DRAW );
-
-    printf( "glError: %d\n", glGetError() );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( GLuint ) * _indices.size(), _indices.data(), GL_STATIC_DRAW );
 
     // Attributes.
     GLsizei idx = 0;
@@ -142,10 +149,13 @@ void VertexBuffer::build()
 
         }
 
-        glVertexAttribPointer( idx, attr.size, type, GL_FALSE, stride * typeSize, reinterpret_cast< GLvoid* >( offset * typeSize ) );
-        printf( "glError: %d\n", glGetError() );
+        glVertexAttribPointer( idx,
+                               attr.size,
+                               type,
+                               GL_FALSE,
+                               stride * static_cast<GLsizei>( typeSize ),
+                               reinterpret_cast< GLvoid* >( offset * typeSize ) );
         glEnableVertexAttribArray( idx++ );
-        printf( "glError: %d\n", glGetError() );
 
         offset += attr.size;
     }
@@ -161,9 +171,7 @@ void VertexBuffer::build()
 
 void VertexBuffer::bind()
 {
-    //printf( "{{glError: %d\n", glGetError() );
     glBindVertexArray( _vao );
-    //printf( "}}glError: %d\n", glGetError() );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -177,7 +185,7 @@ void VertexBuffer::unbind()
 
 void VertexBuffer::draw()
 {
-    glDrawElements( GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, 0 );
+    glDrawElements( GL_TRIANGLE_STRIP, static_cast<GLsizei>( _indices.size() ), GL_UNSIGNED_INT, 0 );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -26,6 +26,8 @@
 
 #include "Camera.h"
 
+#include <LORE2D/Math/Math.h>
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 using namespace Lore;
@@ -123,14 +125,20 @@ void Camera::_updateViewMatrix()
     /*_view[3] = _view[0] * _position.x + _view[1] * _position.y + _view[3];
     _position.x = 0.f;
     _position.y = 0.f;*/
-    _view[3].x = _position.x;
-    _view[3].y = _position.y;
 
-    Vec4 zoom( _scale.x, _scale.y, 1.f, 1.f );
+    /*Vec4 zoom( _scale.x, _scale.y, 1.f, 1.f );
     _view[0] *= zoom;
     _view[1] *= zoom;
     _view[2] *= zoom;
     _scale.x = _scale.y = 1.f;
+
+    _view[3].x = _position.x;
+    _view[3].y = _position.y;*/
+
+    // TODO: Handle zooming properly.
+    _view = Math::CreateTransformationMatrix( _position,
+                                              Quaternion(),
+                                              _scale );
 
     _dirty = false;
 }

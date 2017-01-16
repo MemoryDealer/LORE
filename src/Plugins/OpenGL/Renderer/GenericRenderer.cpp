@@ -114,14 +114,13 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
     glClearColor( bg.r, bg.g, bg.b, bg.a );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-    // Setup projection matrix.
+    // Setup view-projection matrix.
     // TODO: Take viewport dimensions into account. Cache more things inside window.
     const float aspectRatio = window->getAspectRatio();
     const Matrix4 projection = Math::OrthoRH( -aspectRatio, aspectRatio,
                                               -1.f, 1.f,
                                               100.f, -100.f );
-    const Matrix4 view = rv.camera->getViewMatrix();
-    const Matrix4 viewProjection = projection * view;
+    const Matrix4 viewProjection = projection * rv.camera->getViewMatrix();
     
     // Iterate through all active render queues and render each object.
     for ( const auto& rqPair : _activeQueues ) {
@@ -141,18 +140,15 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
             for ( auto& objPair : objects ) {
                 for ( auto& obj : objPair.second ) {
                     // TODO:
-                    // Use vectors for vertex buffers, add window callback handler class
+                    // Add window callback handler class
 
                     Matrix4 mvp = viewProjection * obj.model;
 
                     pass.program->setUniformVar( "transform", mvp );
 
-                    //obj.renderable->bind(); // ?Texture
+                    obj.renderable->bind();
 
-                    // Draw based on material...
-                    //drawObject( obj );
                     pass.program->getVertexBuffer()->draw();
-                    // ...
                 }
             }
 

@@ -31,11 +31,18 @@
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore { namespace Math {
+namespace Lore {
+    
+    class Math final
+    {
 
-        static Matrix4 CreateTransformationMatrix( const Vec3& position,
-                                                   const Quaternion& orientation,
-                                                   const Vec3& scale )
+    public:
+
+        // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+        static inline Matrix4 CreateTransformationMatrix( const Vec3& position,
+                                                          const Quaternion& orientation,
+                                                          const Vec3& scale )
         {
             Matrix4 m;
             Matrix3 rot3x3 = orientation.createRotationMatrix();
@@ -64,9 +71,9 @@ namespace Lore { namespace Math {
 
         // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        static Matrix4 CreateTransformationMatrix( const Vec2& position,
-                                                   const Quaternion& orientation,
-                                                   const Vec2& scale )
+        static inline Matrix4 CreateTransformationMatrix( const Vec2& position,
+                                                          const Quaternion& orientation,
+                                                          const Vec2& scale )
         {
             Matrix4 m;
             Matrix3 rot3x3 = orientation.createRotationMatrix();
@@ -95,9 +102,9 @@ namespace Lore { namespace Math {
 
         // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        static Matrix4 OrthoLH( const float left, const float right,
-                                const float bottom, const float top,
-                                const float zNear, const float zFar )
+        static inline Matrix4 OrthoLH( const float left, const float right,
+                                       const float bottom, const float top,
+                                       const float zNear, const float zFar )
         {
             Matrix4 ortho;
 
@@ -108,15 +115,15 @@ namespace Lore { namespace Math {
 
             ortho[2][2] = 2.f / ( zFar - zNear );
             ortho[3][2] = -( zFar + zNear ) / ( zFar - zNear );
-            
+
             return ortho;
         }
 
         // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        static Matrix4 OrthoRH( const float left, const float right,
-                                const float bottom, const float top,
-                                const float zNear, const float zFar )
+        static inline Matrix4 OrthoRH( const float left, const float right,
+                                       const float bottom, const float top,
+                                       const float zNear, const float zFar )
         {
             Matrix4 ortho;
 
@@ -131,6 +138,23 @@ namespace Lore { namespace Math {
             return ortho;
         }
 
-}}
+        // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    };
+
+    class Radian final
+    {
+
+    public:
+
+
+
+    private:
+
+        real _value;
+
+    };
+
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

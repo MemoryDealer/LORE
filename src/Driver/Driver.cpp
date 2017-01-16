@@ -34,18 +34,25 @@
 const static Lore::string vshader_src =
 "#version 450 core\n"
 "layout (location = 0) in vec2 vertex;\n"
+"layout (location = 1) in vec2 texCoord;"
 "uniform mat4 transform;\n"
+""
+"out vec2 TexCoord;"
 "void main()\n"
 "{\n"
 "gl_Position = transform * vec4(vertex, 0.0f, 1.0f);\n"
+"TexCoord = vec2(texCoord.x, 1.0 - texCoord.y);"
 "}\n";
 
 const static Lore::string pshader_src =
 "#version 450 core\n"
+"uniform sampler2D tex1;"
+"in vec2 TexCoord;"
 "out vec4 color;\n"
 "void main()\n"
 "{\n"
-"color = vec4( 0.0f, 0.0f, 1.0f, 1.0f );\n"
+//"color = vec4( 0.0f, 0.0f, 1.0f, 1.0f );\n"
+"color = texture( tex1, TexCoord);"
 "}\n";
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -84,9 +91,7 @@ int main( int argc, char** argv )
     Lore::ShaderPtr fshader = loader.createFragmentShader( "f1" );
     fshader->loadFromSource( pshader_src.c_str() );
 
-    Lore::VertexBufferPtr vb = loader.createVertexBuffer( "vb1", Lore::VertexBuffer::Type::Quad );
-    vb->addAttribute( Lore::VertexBuffer::AttributeType::Float, 2 );
-    //vb->addAttribute( Lore::VertexBuffer::AttributeType::Float, 2 );
+    Lore::VertexBufferPtr vb = loader.createVertexBuffer( "vb1", Lore::VertexBuffer::Type::TexturedQuad );
     vb->build();
 
    // ; How will changing material on renderable propagate to render queues? Should do so with pointers?
@@ -113,6 +118,7 @@ int main( int argc, char** argv )
     while ( context->active() ) { 
         //node->translate( 0.05f * std::sinf( f ), 0.05f * std::cosf( f ) );
         f += 0.05f;
+        node->scale( 0.025f * std::sinf( f ) );
 
         if ( GetAsyncKeyState( VK_F1 ) ) {
             camera->translate( -0.01f, 0.f );

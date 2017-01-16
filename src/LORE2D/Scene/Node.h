@@ -109,7 +109,9 @@ namespace Lore {
 
         void setScale( const Vec2& scale );
 
-        void scale( const Vec2& scale );
+        void scale( const Vec2& s );
+
+        void scale( const real s );
 
         ///
         /// \brief Sets node's transformation matrix to dirty - it will be updated before

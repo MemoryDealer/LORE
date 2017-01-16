@@ -182,10 +182,18 @@ void Node::setScale( const Vec2& scale )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Node::scale( const Vec2& scale )
+void Node::scale( const Vec2& s )
 {
-    _transform.scale += scale;
+    _transform.scale += s;
     dirty();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Node::scale( const real s )
+{
+    Vec2 ss( s, s );
+    scale( ss );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

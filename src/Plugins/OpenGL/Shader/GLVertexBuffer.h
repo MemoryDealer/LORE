@@ -55,7 +55,7 @@ namespace Lore { namespace OpenGL {
         GLuint _ebo; // Element buffer object.
 
         std::vector<GLfloat> _vertices;
-        std::vector<GLfloat> _indices;
+        std::vector<GLuint> _indices;
 
         GLenum _mode;
         GLenum _glType;
