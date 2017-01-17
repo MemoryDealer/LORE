@@ -25,16 +25,32 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Include this file for all Lore2D functionality.
+#include <LORE2D/Window/Window.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "LorePrerequisites.h"
+namespace Lore { namespace OpenGL {
 
-// Core.
-#include <LORE2D/Core/Context.h>
+    class WindowCallbackHandler final
+    {
 
-// Math.
-#include <LORE2D/Math/Math.h>
+    public:
+
+        inline static WindowPtr GetWindowPtr( GLFWwindow* window )
+        {
+            return static_cast< WindowPtr >( glfwGetWindowUserPointer( window ) );
+        }
+
+        // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+        inline static void Size( GLFWwindow* window, int width, int height )
+        {
+            auto p = GetWindowPtr( window );
+            p->setDimensions( width, height );
+        }
+
+    };
+
+}}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

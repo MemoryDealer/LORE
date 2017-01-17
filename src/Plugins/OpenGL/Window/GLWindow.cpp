@@ -26,6 +26,8 @@
 
 #include "GLWindow.h"
 
+#include "CallbackHandler.h"
+
 #include <LORE2D/Core/NotificationCenter.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -54,7 +56,7 @@ Window::Window( const string& title,
     _aspectRatio = static_cast< float >( _frameBufferWidth ) / _frameBufferHeight;
 
     // Setup callbacks.
-    glfwSetFramebufferSizeCallback( _window, _frameBufferSizeCallback );
+    glfwSetWindowSizeCallback( _window, WindowCallbackHandler::Size );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -145,14 +147,6 @@ void Window::updateRenderViews()
         rv.gl_viewport.width = static_cast< int >( rv.viewport.width * static_cast<float>( _frameBufferWidth ) );
         rv.gl_viewport.height = static_cast< int >( rv.viewport.height * static_cast<float>( _frameBufferHeight ) );
     }
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Window::_frameBufferSizeCallback( GLFWwindow* window, int width, int height )
-{
-    WindowPtr lw = reinterpret_cast< WindowPtr >( glfwGetWindowUserPointer( window ) );
-    lw->setDimensions( width, height );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

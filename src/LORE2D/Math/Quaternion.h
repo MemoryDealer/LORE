@@ -37,17 +37,38 @@ namespace Lore {
     public:
 
         constexpr Quaternion()
-        : x( 0.f )
+        : w( 1.f )
+        , x( 0.f )
         , y( 0.f )
         , z( 0.f )
-        , w( 1.f )
         { }
+
+        Quaternion( const real w_,
+                    const real x_,
+                    const real y_,
+                    const real z_ )
+        : w( w_ )
+        , x( x_ )
+        , y( y_ )
+        , z( z_ )
+        { }
+
+        real getNormalLength() const;
+
+        real normalize();
 
         Matrix3 createRotationMatrix() const;
 
+        //
+        // Operator overloading.
+
+        Quaternion operator * ( const Quaternion& rhs ) const;
+
+        Quaternion operator * ( const real r ) const;
+
     public:
 
-        real x, y, z, w;
+        real w, x, y, z;
 
     };
 

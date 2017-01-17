@@ -174,6 +174,60 @@ void Node::translate( const real xOffset, const real yOffset )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void Node::rotate( const Radian& angle, const TransformSpace& ts )
+{
+    rotate( Math::POSITIVE_Z_AXIS, angle, ts );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Node::rotate( const Degree& angle, const TransformSpace& ts )
+{
+    rotate( Math::POSITIVE_Z_AXIS, angle, ts );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Node::rotate( const Vec3& axis, const Radian& angle, const TransformSpace& ts )
+{
+    Quaternion q = Math::CreateQuaternion( axis, angle );
+    rotate( q, ts );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Node::rotate( const Vec3& axis, const Degree& angle, const TransformSpace& ts )
+{
+    Quaternion q = Math::CreateQuaternion( axis, angle );
+    rotate( q, ts );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Node::rotate( const Quaternion& q, const TransformSpace& ts )
+{
+    Quaternion qnorm = q;
+    qnorm.normalize();
+
+    switch ( ts ) {
+    case TransformSpace::Local:
+        _transform.orientation = _transform.orientation * qnorm;
+        break;
+
+    case TransformSpace::Parent:
+        _transform.orientation = qnorm * _transform.orientation;
+        break;
+
+    case TransformSpace::World:
+        // ...
+        break;
+    }
+
+    dirty();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void Node::setScale( const Vec2& scale )
 {
     _transform.scale = scale;

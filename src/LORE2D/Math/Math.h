@@ -32,9 +32,39 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
-    
-    class Math final
+
+    enum class TransformSpace
     {
+        Local,
+        Parent,
+        World
+    };
+
+    class Degree;
+    class Radian;
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    
+    class LORE_EXPORT Math final
+    {
+
+        static const real _FDegToRad;
+        static const real _FRadToDeg;
+
+    public:
+
+        static const real PI;
+        static const real TWO_PI;
+        static const real HALF_PI;
+
+        // Axis vectors.
+        
+        static const Vec3 POSITIVE_X_AXIS;
+        static const Vec3 NEGATIVE_X_AXIS;
+        static const Vec3 POSITIVE_Y_AXIS;
+        static const Vec3 NEGATIVE_Y_AXIS;
+        static const Vec3 POSITIVE_Z_AXIS;
+        static const Vec3 NEGATIVE_Z_AXIS;
 
     public:
 
@@ -140,20 +170,188 @@ namespace Lore {
 
         // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+        static inline real DegreesToRadians( const real degrees )
+        {
+            return degrees * _FDegToRad;
+        }
+
+        static inline real RadiansToDegrees( const real radians )
+        {
+            return radians * _FRadToDeg;
+        }
+
+        // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+        // Quaternion factory functions.
+        // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+        static inline Quaternion CreateQuaternion( const Vec3& axis,
+                                                   const Radian& angle );
+
+        static inline Quaternion CreateQuaternion( const Vec3& axis,
+                                                   const Degree& angle );
+
     };
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     class Radian final
     {
 
     public:
 
+        explicit Radian( const real r = 0.f )
+        : _value( r )
+        { }
 
+        explicit Radian( const Degree& d );
+
+        //
+        // Conversion.
+
+        real valueDegrees() const;
+
+        real valueRadians() const
+        {
+            return _value;
+        }
+
+        real valueAngleUnits() const;
+
+        //
+        // Operator overloading.
+
+        Radian& operator = ( const real r )
+        {
+            _value = r;
+            return *this;
+        }
+
+        Radian& operator = ( const Radian& r )
+        {
+            _value = r._value;
+            return *this;
+        }
+
+        Radian operator * ( const real r ) const
+        {
+            return Radian( _value * r );
+        }
+
+        Radian operator * ( const Radian& r ) const
+        {
+            return Radian( _value * r._value );
+        }
+
+        Radian& operator *= ( const real r )
+        {
+            _value *= r;
+            return *this;
+        }
+
+        Radian& operator = ( const Degree& d );
 
     private:
 
         real _value;
 
     };
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    class Degree final
+    {
+
+    public:
+
+        explicit Degree( const real r = 0.f )
+        : _value( r )
+        { }
+
+        explicit Degree( const Radian& r )
+        : _value( r.valueDegrees() )
+        { }
+
+        //
+        // Conversion.
+
+        real valueDegrees() const
+        {
+            return _value;
+        }
+
+        real valueRadians() const;
+
+        real valueAngleUnits() const;
+
+        //
+        // Operator overloading.
+
+        Degree& operator = ( const real r )
+        {
+            _value = r;
+            return *this;
+        }
+
+        Degree& operator = ( const Degree& d )
+        {
+            _value = d._value;
+            return *this;
+        }
+
+        Degree& operator = ( const Radian& r )
+        {
+            _value = r.valueDegrees();
+        }
+
+    private:
+
+        real _value;
+
+    };
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    inline Radian::Radian( const Degree& d )
+    : _value( d.valueRadians() )
+    { }
+
+    inline Radian& Radian::operator = ( const Degree& d )
+    {
+        _value = d.valueRadians();
+        return *this;
+    }
+
+    inline real Radian::valueDegrees() const
+    {
+        return Math::RadiansToDegrees( _value );
+    }
+
+    inline real Degree::valueRadians() const
+    {
+        return Math::DegreesToRadians( _value );
+    }
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    inline Quaternion Math::CreateQuaternion( const Vec3& axis,
+                                              const Radian& angle )
+    {
+        Quaternion q;
+        Radian halfAngle( angle * 0.5f );
+        real rsin = std::sinf( halfAngle.valueRadians() );
+
+        q.w = std::cosf( halfAngle.valueRadians() );
+        q.x = rsin * axis.x;
+        q.y = rsin * axis.y;
+        q.z = rsin * axis.z;
+        return q;
+    }
+
+    inline Quaternion Math::CreateQuaternion( const Vec3& axis,
+                                              const Degree& angle )
+    {
+        return CreateQuaternion( axis, Radian( angle.valueRadians() ) );
+    }
 
 }
 

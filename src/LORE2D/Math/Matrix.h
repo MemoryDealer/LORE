@@ -284,8 +284,6 @@ template<typename T, int C, int R>\
 
                 for ( int k = 0; k < C; ++k ) {
                     re[j][i] += ( a[k][i] * b[j][k] );
-                    //re[j * C + i] += a[k * C + i] * b[]
-                    //column[k] += a[i][k] * b[k][j];
                 }
             }
         }

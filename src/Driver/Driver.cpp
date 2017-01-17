@@ -118,7 +118,12 @@ int main( int argc, char** argv )
     while ( context->active() ) { 
         //node->translate( 0.05f * std::sinf( f ), 0.05f * std::cosf( f ) );
         f += 0.05f;
-        node->scale( 0.025f * std::sinf( f ) );
+        //node->scale( 0.025f * std::sinf( f ) );
+
+        //node->rotate( Lore::Math::POSITIVE_Y_AXIS, Lore::Radian( Lore::Math::DegreesToRadians( 0.05f ) ) );
+        //node->rotate( Lore::Math::POSITIVE_Z_AXIS, Lore::Radian( Lore::Math::PI / 120.f ) );
+        node->rotate( Lore::Degree( 0.5f ) );
+        node->getChild( "AChild" )->rotate( Lore::Degree( -1.f ) );
 
         if ( GetAsyncKeyState( VK_F1 ) ) {
             camera->translate( -0.01f, 0.f );

@@ -57,8 +57,6 @@ namespace Lore { namespace OpenGL {
 
         void activateQueue( const uint id, Lore::RenderQueue& rq );
 
-        void drawObject( const RenderQueue::Object& obj );
-
     private:
 
         using RenderQueueList = std::vector<RenderQueue>;

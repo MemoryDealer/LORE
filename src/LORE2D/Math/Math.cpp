@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,16 +24,26 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Include this file for all Lore2D functionality.
+#include "Math.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "LorePrerequisites.h"
+using namespace Lore;
 
-// Core.
-#include <LORE2D/Core/Context.h>
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Math.
-#include <LORE2D/Math/Math.h>
+const real Math::PI = real( 4.0f * atan( 1.0f ) );
+const real Math::TWO_PI = real( 2.f * PI );
+const real Math::HALF_PI = real( 0.5f * PI );
+
+const real Math::_FDegToRad = PI / real( 180.f );
+const real Math::_FRadToDeg = real( 180.f ) / PI;
+
+const Vec3 Math::POSITIVE_X_AXIS = Vec3( 1.f, 0.f, 0.f );
+const Vec3 Math::NEGATIVE_X_AXIS = Vec3( -1.f, 0.f, 0.f );
+const Vec3 Math::POSITIVE_Y_AXIS = Vec3( 0.f, 1.f, 0.f );
+const Vec3 Math::NEGATIVE_Y_AXIS = Vec3( 0.f, -1.f, 0.f );
+const Vec3 Math::POSITIVE_Z_AXIS = Vec3( 0.f, 0.f, 1.f );
+const Vec3 Math::NEGATIVE_Z_AXIS = Vec3( 0.f, 0.f, -1.f );
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

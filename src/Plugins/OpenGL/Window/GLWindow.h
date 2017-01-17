@@ -64,13 +64,6 @@ namespace Lore { namespace OpenGL {
 
         void updateRenderViews();
 
-    private:
-
-        //
-        // Callbacks.
-
-        static void _frameBufferSizeCallback( GLFWwindow* window, int width, int height );
-
     };
 
 }}

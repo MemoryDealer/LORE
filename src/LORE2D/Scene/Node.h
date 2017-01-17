@@ -67,12 +67,6 @@ namespace Lore {
             , worldMatrix()
             { }
 
-            enum Space {
-                Local,
-                Parent,
-                World
-            };
-
         };
 
     public:
@@ -106,6 +100,16 @@ namespace Lore {
         void translate( const Vec2& offset );
 
         void translate( const real xOffset, const real yOffset );
+
+        void rotate( const Radian& angle, const TransformSpace& ts = TransformSpace::Local );
+
+        void rotate( const Degree& angle, const TransformSpace& ts = TransformSpace::Local );
+
+        void rotate( const Vec3& axis, const Radian& angle, const TransformSpace& ts = TransformSpace::Local );
+
+        void rotate( const Vec3& axis, const Degree& angle, const TransformSpace& ts = TransformSpace::Local );
+
+        void rotate( const Quaternion& q, const TransformSpace& ts = TransformSpace::Local );
 
         void setScale( const Vec2& scale );
 

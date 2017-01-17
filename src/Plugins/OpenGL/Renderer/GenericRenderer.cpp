@@ -139,9 +139,7 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
             RenderQueue::ObjectList& objects = rlPair.second;
             for ( auto& objPair : objects ) {
                 for ( auto& obj : objPair.second ) {
-                    // TODO:
-                    // Add window callback handler class
-
+                    // Calculate model-view-projection matrix for this object.
                     Matrix4 mvp = viewProjection * obj.model;
 
                     pass.program->setUniformVar( "transform", mvp );
@@ -154,8 +152,6 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
 
             pass.program->getVertexBuffer()->unbind();
         }
-        
-        
     }
 }
 
@@ -168,13 +164,6 @@ void GenericRenderer::activateQueue( const uint id, Lore::RenderQueue& rq )
     if ( _activeQueues.end() == lookup ) {
         _activeQueues.insert( { id, rq } );
     }
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void GenericRenderer::drawObject( const Lore::RenderQueue::Object& obj )
-{
-
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -146,6 +146,7 @@ namespace Lore {
             re.z = x * rhs.y - y * rhs.x;
             return re;
         }
+
     };
 
     template<typename T>

@@ -32,20 +32,37 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+real Quaternion::getNormalLength() const
+{
+    return w * w + x * x + y * y + z * z;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+real Quaternion::normalize()
+{
+    real len = getNormalLength();
+    real factor = 1.f / std::sqrtf( len );
+    *this = *this * factor;
+    return len;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 Matrix3 Quaternion::createRotationMatrix() const
 {
-    real tx = x + x;
-    real ty = y + y;
-    real tz = z + z;
-    real twx = tx * w;
-    real twy = ty * w;
-    real twz = tz * w;
-    real txx = tx * x;
-    real txy = ty * x;
-    real txz = tz * x;
-    real tyy = ty * y;
-    real tyz = tz * y;
-    real tzz = tz * z;
+    const real tx = x + x;
+    const real ty = y + y;
+    const real tz = z + z;
+    const real twx = tx * w;
+    const real twy = ty * w;
+    const real twz = tz * w;
+    const real txx = tx * x;
+    const real txy = ty * x;
+    const real txz = tz * x;
+    const real tyy = ty * y;
+    const real tyz = tz * y;
+    const real tzz = tz * z;
 
     Matrix3 rot;
     rot[0][0] = 1.f - ( tyy + tzz );
@@ -59,6 +76,25 @@ Matrix3 Quaternion::createRotationMatrix() const
     rot[2][2] = 1.f - ( txx + tyy );
 
     return rot;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Quaternion Quaternion::operator * ( const Quaternion& rhs ) const
+{
+    return Quaternion(
+        w * rhs.w - x * rhs.x - y * rhs.y - z * rhs.z,
+        w * rhs.x + x * rhs.w + y * rhs.z - z * rhs.y,
+        w * rhs.y + y * rhs.w + z * rhs.x - x * rhs.z,
+        w * rhs.z + z * rhs.w + x * rhs.y - y * rhs.x
+    );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Quaternion Quaternion::operator * ( const real r ) const
+{
+    return Quaternion( r * w, r * x, r * y, r * z );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
