@@ -24,100 +24,87 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "GLResourceLoader.h"
-
-#include <LORE2D/Resource/Material.h>
-#include <LORE2D/Scene/Camera.h>
-
-#include <Plugins/OpenGL/Resource/Renderable/GLTexture.h>
-#include <Plugins/OpenGL/Shader/GLGPUProgram.h>
-#include <Plugins/OpenGL/Shader/GLShader.h>
-#include <Plugins/OpenGL/Shader/GLVertexBuffer.h>
+#include "ResourceLoader.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-using namespace Lore::OpenGL;
+using namespace Lore;
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+const string ResourceLoader::DefaultGroupName = "Default";
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 ResourceLoader::ResourceLoader()
+: _activeGroup( nullptr )
+, _groups()
 {
+    // Create default resource group.
+    _activeGroup = _groups.insert( DefaultGroupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-ResourceLoader::~ResourceLoader()
+void ResourceLoader::setActiveGroup( const string& group )
 {
+    _activeGroup = _groups.get( group );
+    lore_log( "ResourceLoader: Active group set to " + group );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::TexturePtr ResourceLoader::loadTexture( const string& name, const string& file, const string& group )
+void ResourceLoader::resetActiveGroup()
 {
-    auto texture = std::make_unique<Texture>( name, file );
-
-    auto handle = _getGroup( group )->textures.insert( name, std::move( texture ) );
-    return handle;
+    _activeGroup = _groups.get( DefaultGroupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::GPUProgramPtr ResourceLoader::createGPUProgram( const string& name, const string& group )
+void ResourceLoader::createGroup( const string& name )
 {
-    auto program = std::make_unique<GPUProgram>( name );
-
-    auto handle = _getGroup( group )->programs.insert( name, std::move( program ) );
-    return handle;
+    _groups.insert( name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::ShaderPtr ResourceLoader::createVertexShader( const string& name, const string& group )
+void ResourceLoader::destroyGroup( const string& name )
 {
-    auto shader = std::make_unique<Shader>( name, Shader::Type::Vertex );
-
-    auto handle = _getGroup( group )->vertexShaders.insert( name, std::move( shader ) );
-    return handle;
+    unloadGroup( name );
+    _groups.remove( name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::ShaderPtr ResourceLoader::createFragmentShader( const string& name, const string& group )
+void ResourceLoader::addResourceLocation( const string& file, const bool recursive )
 {
-    auto shader = std::make_unique<Shader>( name, Shader::Type::Fragment );
-
-    auto handle = _getGroup( group )->fragmentShaders.insert( name, std::move( shader ) );
-    return handle;
+    // Platform specific directory traversal.
+    // ...
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::VertexBufferPtr ResourceLoader::createVertexBuffer( const string& name, const VertexBuffer::Type& type, const string& group )
+void ResourceLoader::loadGroup( const string& name )
 {
-    auto vb = std::make_unique<VertexBuffer>( type );
 
-    auto handle = _getGroup( group )->vertexBuffers.insert( name, std::move( vb ) );
-    return handle;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::MaterialPtr ResourceLoader::createMaterial( const string& name, const string& group )
+void ResourceLoader::unloadGroup( const string& name )
 {
-    auto mat = std::make_unique<Material>( name );
 
-    auto handle = _getGroup( group )->materials.insert( name, std::move( mat ) );
-    return handle;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::CameraPtr ResourceLoader::createCamera( const string& name, const string& group )
+ResourceGroupPtr ResourceLoader::_getGroup( const string& group )
 {
-    auto cam = std::make_unique<Camera>( name );
+    if ( group == DefaultGroupName ) {
+        return _activeGroup;
+    }
 
-    auto handle = _getGroup( group )->cameras.insert( name, std::move( cam ) );
-    return handle;
+    return _groups.get( group );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

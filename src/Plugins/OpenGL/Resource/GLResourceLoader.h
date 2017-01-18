@@ -27,11 +27,6 @@
 
 #include <LORE2D/Resource/ResourceLoader.h>
 
-#include <LORE2D/Resource/Registry.h>
-#include <LORE2D/Shader/Shader.h>
-
-#include <Plugins/OpenGL/Resource/Renderable/GLTexture.h>
-
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore { namespace OpenGL {
@@ -45,44 +40,19 @@ namespace Lore { namespace OpenGL {
 
         ~ResourceLoader();
 
-        virtual TexturePtr loadTexture( const string& name, const string& file ) override;
+        virtual TexturePtr loadTexture( const string& name, const string& file, const string& group ) override;
 
-        virtual GPUProgramPtr createGPUProgram( const string& name ) override;
+        virtual GPUProgramPtr createGPUProgram( const string& name, const string& group ) override;
 
-        virtual ShaderPtr createVertexShader( const string& name ) override;
+        virtual ShaderPtr createVertexShader( const string& name, const string& group ) override;
 
-        virtual ShaderPtr createFragmentShader( const string& name ) override;
+        virtual ShaderPtr createFragmentShader( const string& name, const string& group ) override;
 
-        virtual VertexBufferPtr createVertexBuffer( const string& name, const VertexBuffer::Type& type ) override;
+        virtual VertexBufferPtr createVertexBuffer( const string& name, const VertexBuffer::Type& type, const string& group ) override;
 
-        virtual MaterialPtr createMaterial( const string& name ) override;
+        virtual MaterialPtr createMaterial( const string& name, const string& group ) override;
 
-        virtual CameraPtr createCamera( const string& name ) override;
-
-    private:
-
-        using ShaderRegistry = Registry<std::unordered_map, Shader>;
-
-    private:
-
-        Registry<std::unordered_map, Texture> _textureRegistry;
-
-        // Shaders.
-
-        Registry<std::unordered_map, GPUProgram> _gpuProgramRegistry;
-
-        ShaderRegistry _vertexShaderRegistry;
-        ShaderRegistry _fragmentShaderRegistry;
-
-        Registry<std::unordered_map, VertexBuffer> _vertexBufferRegistry;
-
-        // Materials.
-
-        Registry<std::unordered_map, Material> _materialRegistry;
-
-        // Scene.
-
-        Registry<std::unordered_map, Camera> _cameraRegistry;
+        virtual CameraPtr createCamera( const string& name, const string& group ) override;
 
     };
 

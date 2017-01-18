@@ -25,30 +25,139 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Resource/Material.h>
+#include <LORE2D/Resource/Registry.h>
+#include <LORE2D/Resource/Renderable/Texture.h>
+#include <LORE2D/Scene/Camera.h>
+#include <LORE2D/Shader/GPUProgram.h>
+#include <LORE2D/Shader/Shader.h>
 #include <LORE2D/Shader/VertexBuffer.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-    class ResourceLoader
+    enum class ResourceType
+    {
+        Texture,
+        Shader,
+        GPUProgram
+    };
+
+    struct ResourceGroup
+    {
+
+        struct IndexedResource
+        {
+            ResourceType type;
+            string file;
+            bool loaded;
+        };
+
+        // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+        using ShaderRegistry = Registry<std::unordered_map, Shader>;
+        using ResourceIndex = std::map<string, IndexedResource>;
+
+        // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+        explicit ResourceGroup( const string& name_ )
+        : name( name_ )
+        , index()
+        , textures()
+        , programs()
+        , vertexShaders()
+        , fragmentShaders()
+        , vertexBuffers()
+        , materials()
+        , cameras()
+        { }
+
+        // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+        string name;
+
+        ResourceIndex index;
+
+        Registry<std::unordered_map, Texture> textures;
+
+        // Shaders.
+
+        Registry<std::unordered_map, GPUProgram> programs;
+
+        ShaderRegistry vertexShaders;
+        ShaderRegistry fragmentShaders;
+
+        Registry<std::unordered_map, VertexBuffer> vertexBuffers;
+
+        // Materials.
+
+        Registry<std::unordered_map, Material> materials;
+
+        // Scene.
+
+        Registry<std::unordered_map, Camera> cameras;
+
+    };
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    class LORE_EXPORT ResourceLoader
     {
 
     public:
 
-        virtual TexturePtr loadTexture( const string& name, const string& file ) = 0;
+        static const string DefaultGroupName;
 
-        virtual GPUProgramPtr createGPUProgram( const string& name ) = 0;
+    public:
 
-        virtual ShaderPtr createVertexShader( const string& name ) = 0;
+        ResourceLoader();
 
-        virtual ShaderPtr createFragmentShader( const string& name ) = 0;
+        //
+        // Groups.
 
-        virtual VertexBufferPtr createVertexBuffer( const string& name, const VertexBuffer::Type& type ) = 0;
+        void setActiveGroup( const string& group );
 
-        virtual MaterialPtr createMaterial( const string& name ) = 0;
+        void resetActiveGroup();
 
-        virtual CameraPtr createCamera( const string& name ) = 0;
+        void createGroup( const string& name );
+
+        void destroyGroup( const string& name );
+
+        void addResourceLocation( const string& directory, const bool recursive = false );
+
+        void loadGroup( const string& name );
+
+        void unloadGroup( const string& name );
+
+        //
+        // Loading.
+
+        virtual TexturePtr loadTexture( const string& name, const string& file, const string& group = DefaultGroupName ) = 0;
+
+        //
+        // Factory functions.
+
+        virtual GPUProgramPtr createGPUProgram( const string& name, const string& group = DefaultGroupName ) = 0;
+
+        virtual ShaderPtr createVertexShader( const string& name, const string& group = DefaultGroupName ) = 0;
+
+        virtual ShaderPtr createFragmentShader( const string& name, const string& group = DefaultGroupName ) = 0;
+
+        virtual VertexBufferPtr createVertexBuffer( const string& name, const VertexBuffer::Type& type, const string& group = DefaultGroupName ) = 0;
+
+        virtual MaterialPtr createMaterial( const string& name, const string& group = DefaultGroupName ) = 0;
+
+        virtual CameraPtr createCamera( const string& name, const string& group = DefaultGroupName ) = 0;
+
+    protected:
+
+        ResourceGroupPtr _getGroup( const string& group );
+
+    protected:
+
+        ResourceGroupPtr _activeGroup;
+        Registry<std::unordered_map, ResourceGroup> _groups;
 
     };
 

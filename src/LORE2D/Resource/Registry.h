@@ -67,6 +67,12 @@ namespace Lore {
             return p;
         }
 
+        T* insert( const id& id_ )
+        {
+            std::unique_ptr<T> resource = std::make_unique<T>( id_ );
+            return insert( id_, std::move( resource ) );
+        }
+
         void remove( const id& id_ )
         {
             auto lookup = _container.find( id_ );

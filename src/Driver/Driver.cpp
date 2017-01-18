@@ -120,8 +120,7 @@ int main( int argc, char** argv )
         f += 0.05f;
         //node->scale( 0.025f * std::sinf( f ) );
 
-        //node->rotate( Lore::Math::POSITIVE_Y_AXIS, Lore::Radian( Lore::Math::DegreesToRadians( 0.05f ) ) );
-        //node->rotate( Lore::Math::POSITIVE_Z_AXIS, Lore::Radian( Lore::Math::PI / 120.f ) );
+        // TODO: Repro case where both quads appeared to be scaling with only rotations being done.
         node->rotate( Lore::Degree( 0.5f ) );
         node->getChild( "AChild" )->rotate( Lore::Degree( -1.f ) );
 

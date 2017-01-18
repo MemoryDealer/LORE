@@ -25,52 +25,21 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <string> // TODO: Figure out nicer way for clients to include dependencies.
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 namespace Lore {
 
-    //
-    // Forward declarations.
+    class ResourceIndexer
+    {
 
-    class Camera;
-    class GPUProgram;
-    class IRenderer;
-    class Material;
-    class Node;
-    class PostProcessor;
-    class Renderable;
-    struct ResourceGroup;
-    class Scene;
-    class Shader;
-    class Texture;
-    class VertexBuffer;
-    class Window;
+    public:
 
-    //
-    // Pointer types.
+        virtual ~ResourceIndexer() = 0;
 
-    using CameraPtr = Camera*;
-    using GPUProgramPtr = GPUProgram*;
-    using MaterialPtr = Material*;
-    using NodePtr = Node*;
-    using RendererPtr = IRenderer*;
-    using PostProcessorPtr = PostProcessor*;
-    using RenderablePtr = Renderable*;
-    using ResourceGroupPtr = ResourceGroup*;
-    using ScenePtr = Scene*;
-    using ShaderPtr = Shader*;
-    using TexturePtr = Texture*;
-    using VertexBufferPtr = VertexBuffer*;
-    using WindowPtr = Window*;
+    };
 
-    //
-    // Types.
+    static std::unique_ptr<ResourceIndexer> CreateResourceIndexer()
+    {
 
-    using real = float;
-    using uint = unsigned int;
-    using string = std::string;
+    }
 
 }
 
