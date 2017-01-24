@@ -38,6 +38,7 @@ GPUProgram::GPUProgram( const string& name )
 : Lore::GPUProgram( name )
 , _program( 0 )
 , _uniforms()
+, _transform( 0 )
 {
     _program = glCreateProgram();
 }
@@ -98,6 +99,20 @@ void GPUProgram::use()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void GPUProgram::addTransformVar( const string& id )
+{
+    _transform = glGetUniformLocation( _program, id.c_str() );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GPUProgram::setTransformVar( const Lore::Matrix4& m )
+{
+    _updateUniform( _transform, m );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void GPUProgram::addUniformVar( const string& id )
 {
     GLuint uniform = glGetUniformLocation( _program, id.c_str() );
@@ -114,8 +129,7 @@ void GPUProgram::setUniformVar( const string& id, const Lore::Matrix4& m )
     }
 
     GLuint uniform = lookup->second;
-    glm::mat4x4 mm = MathConverter::LoreToGLM( m );
-    glUniformMatrix4fv( uniform, 1, GL_FALSE, glm::value_ptr( mm ) );
+    _updateUniform( uniform, m );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -130,6 +144,14 @@ void GPUProgram::setUniformVar( const string& id, const glm::mat4x4& m )
     GLuint uniform = lookup->second;
 
     glUniformMatrix4fv( uniform, 1, GL_FALSE, glm::value_ptr( m ) );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GPUProgram::_updateUniform( const GLuint id, const Lore::Matrix4& m )
+{
+    glm::mat4x4 mm = MathConverter::LoreToGLM( m );
+    glUniformMatrix4fv( id, 1, GL_FALSE, glm::value_ptr( mm ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -39,6 +39,7 @@ const string ResourceLoader::DefaultGroupName = "Default";
 ResourceLoader::ResourceLoader()
 : _activeGroup( nullptr )
 , _groups()
+, _indexer( nullptr )
 {
     // Create default resource group.
     _activeGroup = _groups.insert( DefaultGroupName );

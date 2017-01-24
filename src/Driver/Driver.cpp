@@ -82,7 +82,7 @@ int main( int argc, char** argv )
     node = node->createChildNode( "BChildChild" );
 
     // Textures.
-    Lore::TexturePtr tex = loader.loadTexture( "tex1", "C:\\Texture.png" );
+    Lore::TexturePtr tex = loader.loadTexture( "tex1", "C:\\texture.png" );
 
     Lore::GPUProgramPtr program = loader.createGPUProgram( "GPU1" );
     Lore::ShaderPtr vshader = loader.createVertexShader( "v1" );
@@ -102,7 +102,7 @@ int main( int argc, char** argv )
     program->attachShader( fshader );
     program->link();
 
-    program->addUniformVar( "transform" );
+    program->addTransformVar( "transform" );
 
     Lore::MaterialPtr mat = loader.createMaterial( "mat1" );
     mat->getPass( 0 ).program = program;

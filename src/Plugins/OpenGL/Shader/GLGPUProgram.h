@@ -51,6 +51,10 @@ namespace Lore { namespace OpenGL {
         //
         // Uniform value updating.
 
+        virtual void addTransformVar( const string& id ) override;
+
+        virtual void setTransformVar( const Matrix4& m ) override;
+
         virtual void addUniformVar( const string& id ) override;
 
         virtual void setUniformVar( const string& id, const Matrix4& m ) override;
@@ -63,9 +67,15 @@ namespace Lore { namespace OpenGL {
 
     private:
 
+        void _updateUniform( const GLuint id, const Lore::Matrix4& m );
+
+    private:
+
         GLuint _program;
 
         UniformMap _uniforms;
+
+        GLuint _transform;
 
     };
 

@@ -142,7 +142,7 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
                     // Calculate model-view-projection matrix for this object.
                     Matrix4 mvp = viewProjection * obj.model;
 
-                    pass.program->setUniformVar( "transform", mvp );
+                    pass.program->setTransformVar( mvp );
 
                     obj.renderable->bind();
 

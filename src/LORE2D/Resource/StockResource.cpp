@@ -39,8 +39,10 @@ template<> std::unique_ptr<StockResource> StockResource::_instance = nullptr;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 StockResource::StockResource()
-: _materials()
-, _gpuPrograms()
+: _gpuPrograms()
+, _shaders()
+, _vertexBuffers()
+, _materials()
 {
 }
 
@@ -56,6 +58,29 @@ void StockResource::createStockResources()
     pass.ambient = pass.diffuse = StockColor::White;
     pass.lighting = false;
     pass.program = nullptr;
+
+    //
+    // Load stock vertex buffers.
+
+    //auto vb = createVertexBuffer( "StandardTexturedQuad_VB", VertexBuffer::Type::TexturedQuad );
+    //vb->build();
+
+    //
+    // Load stock programs.
+
+    UberShaderParameters params;
+
+    // StandardTexturedQuad:
+
+    params.numTextures = 1;
+    createUberShader( "StandardTexturedQuad", params );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+GPUProgramPtr StockResource::getGPUProgram( const string& name )
+{
+    return _gpuPrograms.get( name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

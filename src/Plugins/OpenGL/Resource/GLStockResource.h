@@ -27,7 +27,7 @@
 
 #include <LORE2D/Resource/StockResource.h>
 
-#include <Plugins/OpenGL/Shader/GLStockShaders.h>
+#include <Plugins/OpenGL/Resource/GLResourceLoader.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -38,14 +38,19 @@ namespace Lore { namespace OpenGL {
 
     public:
 
+        StockResource();
+
         virtual ~StockResource() override;
 
         virtual void createStockResources() override;
 
+        virtual GPUProgramPtr createUberShader( const string& name, const UberShaderParameters& params ) override;
+
+        virtual ResourceLoader& getResourceLoader() override;
+
     private:
 
-        StockVertexShaders _stockVertexShaders;
-        StockFragmentShaders _stockFragmentShaders;
+        ResourceLoader _loader;
 
     };
 

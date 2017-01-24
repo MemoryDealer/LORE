@@ -39,6 +39,7 @@ namespace Lore {
     static std::unique_ptr<ResourceIndexer> CreateResourceIndexer()
     {
 
+
     }
 
 }

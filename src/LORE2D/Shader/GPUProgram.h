@@ -68,6 +68,10 @@ namespace Lore {
         //
         // Uniform value updating.
 
+        virtual void addTransformVar( const string& id ) = 0;
+
+        virtual void setTransformVar( const Matrix4& m ) = 0;
+
         virtual void addUniformVar( const string& id ) = 0;
 
         virtual void setUniformVar( const string& id, const Matrix4& m ) = 0;

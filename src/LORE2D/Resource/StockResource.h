@@ -28,6 +28,7 @@
 #include <LORE2D/Core/Singleton.h>
 #include <LORE2D/Resource/Material.h>
 #include <LORE2D/Resource/Registry.h>
+#include <LORE2D/Resource/ResourceLoader.h>
 #include <LORE2D/Shader/GPUProgram.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -38,6 +39,21 @@ namespace Lore {
     {
 
     public:
+
+        struct UberShaderParameters
+        {
+            unsigned int maxLights { 0 };
+            unsigned int numTextures { 0 };
+            bool texYCoordinateFlipped { true };
+            bool colour { false }; // Modulate final output by color.
+            VertexBuffer::Type vbType { VertexBuffer::Type::TexturedQuad };
+        };
+
+        enum class GPUProgramType
+        {
+            StandardTexturedQuad,
+            StandardTexturedTriangle
+        };
 
         enum class MaterialType
         {
@@ -52,13 +68,24 @@ namespace Lore {
 
         virtual void createStockResources();
 
+        virtual GPUProgramPtr createUberShader( const string& name, const UberShaderParameters& params ) = 0;
+
+        virtual ResourceLoader& getResourceLoader() = 0;
+
         //
         // Retrieval functions for each type of stock resource.
+
+        GPUProgramPtr getGPUProgram( const string& name );
 
         MaterialPtr getMaterial( const string& name );
 
         //
         // Static helpers.
+
+        static GPUProgramPtr GetGPUProgram( const string& name )
+        {
+            return StockResource::Get().getGPUProgram( name );
+        }
 
         static MaterialPtr GetMaterial( const string& name )
         {
@@ -67,8 +94,10 @@ namespace Lore {
 
     protected:
 
-        Registry<std::unordered_map, Material> _materials;
         Registry<std::unordered_map, GPUProgram> _gpuPrograms;
+        Registry<std::unordered_map, Shader> _shaders;
+        Registry<std::unordered_map, VertexBuffer> _vertexBuffers;
+        Registry<std::unordered_map, Material> _materials;
 
     };
 

@@ -40,19 +40,19 @@ namespace Lore { namespace OpenGL {
 
         ~ResourceLoader();
 
-        virtual TexturePtr loadTexture( const string& name, const string& file, const string& group ) override;
+        virtual TexturePtr loadTexture( const string& name, const string& file, const string& group = DefaultGroupName ) override;
 
-        virtual GPUProgramPtr createGPUProgram( const string& name, const string& group ) override;
+        virtual GPUProgramPtr createGPUProgram( const string& name, const string& group = DefaultGroupName ) override;
 
-        virtual ShaderPtr createVertexShader( const string& name, const string& group ) override;
+        virtual ShaderPtr createVertexShader( const string& name, const string& group = DefaultGroupName ) override;
 
-        virtual ShaderPtr createFragmentShader( const string& name, const string& group ) override;
+        virtual ShaderPtr createFragmentShader( const string& name, const string& group = DefaultGroupName ) override;
 
-        virtual VertexBufferPtr createVertexBuffer( const string& name, const VertexBuffer::Type& type, const string& group ) override;
+        virtual VertexBufferPtr createVertexBuffer( const string& name, const VertexBuffer::Type& type, const string& group = DefaultGroupName ) override;
 
-        virtual MaterialPtr createMaterial( const string& name, const string& group ) override;
+        virtual MaterialPtr createMaterial( const string& name, const string& group = DefaultGroupName ) override;
 
-        virtual CameraPtr createCamera( const string& name, const string& group ) override;
+        virtual CameraPtr createCamera( const string& name, const string& group = DefaultGroupName ) override;
 
     };
 
