@@ -30,6 +30,9 @@
 
 #include <LORE2D/Core/NotificationCenter.h>
 
+#include <Plugins/OpenGL/Resource/GLResourceController.h>
+#include <Plugins/OpenGL/Resource/GLStockResource.h>
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 using namespace Lore::OpenGL;
@@ -57,6 +60,19 @@ Window::Window( const string& title,
 
     // Setup callbacks.
     glfwSetWindowSizeCallback( _window, WindowCallbackHandler::Size );
+
+    // Create a resource controller for each window.
+    _controller = std::make_unique<ResourceController>();
+
+    // Create stock resources as well (make this window's context active
+    // and then restore the previous one).
+    GLFWwindow* currentContext = glfwGetCurrentContext();
+    glfwMakeContextCurrent( _window );
+
+    _stockController = std::make_unique<StockResourceController>();
+    _stockController->createStockResources();
+
+    glfwMakeContextCurrent( currentContext );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

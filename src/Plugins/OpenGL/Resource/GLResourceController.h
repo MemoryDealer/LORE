@@ -25,20 +25,20 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Resource/ResourceLoader.h>
+#include <LORE2D/Resource/ResourceController.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore { namespace OpenGL {
 
-    class ResourceLoader : public Lore::ResourceLoader
+    class ResourceController : public Lore::ResourceController
     {
 
     public:
 
-        ResourceLoader();
+        ResourceController();
 
-        ~ResourceLoader();
+        virtual ~ResourceController() override;
 
         virtual TexturePtr loadTexture( const string& name, const string& file, const string& group = DefaultGroupName ) override;
 

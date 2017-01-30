@@ -48,7 +48,7 @@ namespace Lore {
 
         explicit Renderable( const string& name );
 
-        virtual ~Renderable() { }
+        virtual ~Renderable();
 
         virtual void bind() { }
 

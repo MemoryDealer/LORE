@@ -148,7 +148,7 @@ void GPUProgram::setUniformVar( const string& id, const glm::mat4x4& m )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GPUProgram::_updateUniform( const GLuint id, const Lore::Matrix4& m )
+void GPUProgram::_updateUniform( const GLint id, const Lore::Matrix4& m )
 {
     glm::mat4x4 mm = MathConverter::LoreToGLM( m );
     glUniformMatrix4fv( id, 1, GL_FALSE, glm::value_ptr( mm ) );

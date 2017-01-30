@@ -37,4 +37,7 @@
 // Math.
 #include <LORE2D/Math/Math.h>
 
+// Resource.
+#include <LORE2D/Resource/StockResource.h>
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

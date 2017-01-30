@@ -30,7 +30,7 @@
 #include <LORE2D/Plugin/RenderPluginLoader.h>
 #include <LORE2D/Renderer/IRenderer.h>
 #include <LORE2D/Resource/Registry.h>
-#include <LORE2D/Resource/ResourceLoader.h>
+#include <LORE2D/Resource/ResourceController.h>
 #include <LORE2D/Shader/GPUProgram.h>
 #include <LORE2D/Window/Window.h>
 
@@ -109,7 +109,9 @@ namespace Lore {
         //
         // Getters.
 
-        virtual ResourceLoader& getResourceLoader() = 0;
+        ResourceControllerPtr getResourceController() const;
+
+        StockResourceControllerPtr getStockResourceController() const;
 
         ///
         /// \brief Returns true if the context is active.
@@ -127,6 +129,13 @@ namespace Lore {
         {
             return _sceneRegistry.get( name );
         }
+
+        //
+        // Modifiers.
+
+        void setActiveWindow( WindowPtr window );
+
+        void setActiveWindow( const string& name );
 
         //
         // Static helper functions.
@@ -172,7 +181,13 @@ namespace Lore {
         WindowRegistry _windowRegistry;
         SceneRegistry _sceneRegistry;
 
+        WindowPtr _activeWindow;
+
         bool _active;
+
+    private:
+
+        static bool _ContextExists;
 
     };
 

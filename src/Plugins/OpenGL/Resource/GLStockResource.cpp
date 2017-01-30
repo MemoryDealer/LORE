@@ -26,32 +26,36 @@
 
 #include "GLStockResource.h"
 
+#include <Plugins/OpenGL/Resource/GLResourceController.h>
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 using namespace Lore::OpenGL;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-StockResource::StockResource()
-: _loader()
+StockResourceController::StockResourceController()
+: Lore::StockResourceController()
+{
+    _controller = std::make_unique<ResourceController>();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+StockResourceController::~StockResourceController()
 {
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-StockResource::~StockResource()
+void StockResourceController::createStockResources()
 {
+    Lore::StockResourceController::createStockResources();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void StockResource::createStockResources()
-{
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-Lore::GPUProgramPtr StockResource::createUberShader( const string& name, const UberShaderParameters& params )
+Lore::GPUProgramPtr StockResourceController::createUberShader( const string& name, const Lore::UberShaderParameters& params )
 {
     const bool textured = ( params.numTextures > 0 );
 
@@ -97,7 +101,7 @@ Lore::GPUProgramPtr StockResource::createUberShader( const string& name, const U
 
     // Compile vertex shader.
     //auto vs = std::make_unique<Shader>( name + "_VS", Shader::Type::Vertex );
-    auto vsptr = _loader.createVertexShader( name + "_VS" );
+    auto vsptr = _controller->createVertexShader( name + "_VS" );
     if ( !vsptr->loadFromSource( src ) ) {
         throw Lore::Exception( "Failed to compile uber vertex shader for " + name );
     }
@@ -136,25 +140,24 @@ Lore::GPUProgramPtr StockResource::createUberShader( const string& name, const U
     }
 
     src += "}";
-    auto fsptr = _loader.createFragmentShader( name + "_FS" );
+    auto fsptr = _controller->createFragmentShader( name + "_FS" );
     if ( !fsptr->loadFromSource( src ) ) {
         throw Lore::Exception( "Failed to compile uber fragment shader for " + name );
     }
 
     // ::::::::::::::::::::::::::::::::: //
 
+    // Attach a vertex buffer.
+    auto vbptr = _controller->createVertexBuffer( name + "_VB", params.vbType );
+    vbptr->build();
+
     //
     // GPU program.
 
-    auto program = _loader.createGPUProgram( name );
-
+    auto program = _controller->createGPUProgram( name );
+    program->setVertexBuffer( vbptr );
     program->attachShader( vsptr );
     program->attachShader( fsptr );
-
-    // Attach a vertex buffer.
-    auto vbptr = _loader.createVertexBuffer( name + "_VB", params.vbType );
-    vbptr->build();
-    program->setVertexBuffer( vbptr );
 
     if ( !program->link() ) {
         throw Lore::Exception( "Failed to link GPUProgram " + name );
@@ -163,13 +166,6 @@ Lore::GPUProgramPtr StockResource::createUberShader( const string& name, const U
     program->addTransformVar( "transform" );
 
     return program;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-ResourceLoader& StockResource::getResourceLoader()
-{
-    return _loader;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

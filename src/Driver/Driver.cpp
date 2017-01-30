@@ -56,6 +56,8 @@ const static Lore::string pshader_src =
 "}\n";
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// Note: Error 1282 on binding calls with no prior errors indicates a wrong context.
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 int main( int argc, char** argv )
 {
@@ -63,8 +65,25 @@ int main( int argc, char** argv )
 
     Lore::WindowPtr window = context->createWindow( "Test", 640, 480 );
     window->setActive();
+
+    /* 
+    To load on a thread:
+
+    "There is a way to use multiple contexts with GLFW.
+
+    Make a second invisible window that has the main window as the parent (the last parameter is for list sharing)
+    E.g.: GLUtil::_loaderWindow = glfwCreateWindow(1, 1, "whatever", nullptr, GLUtil::_mainWindow);
+    Create another thread and in its run()(or whatever) method call this: glfwMakeContextCurrent(GLUtil::_loaderWindow);
+
+    If you are using GLEW, build GLEW with the GLEW_MX define and call init() in the second thread as well. Read up on GLEW_MX about multithreaded usage. I strongly recommend boost thread specific pointers for this.
+
+    Remember to destroy the second window just like the main one. That's it. I've been using this method for background resource loading for years and haven't ran into any issues.
+
+    Hope it helps."
+    */
+
     //context->createWindow( "Test2", 720, 640 );
-    Lore::ResourceLoader& loader = context->getResourceLoader();
+    Lore::ResourceController& loader = *context->getResourceController();
 
     Lore::ScenePtr scene = context->createScene( "Default" );
     scene->setBackgroundColor( Lore::StockColor::Black );
@@ -84,29 +103,33 @@ int main( int argc, char** argv )
     // Textures.
     Lore::TexturePtr tex = loader.loadTexture( "tex1", "C:\\texture.png" );
 
-    Lore::GPUProgramPtr program = loader.createGPUProgram( "GPU1" );
-    Lore::ShaderPtr vshader = loader.createVertexShader( "v1" );
-    vshader->loadFromSource( vshader_src.c_str() );
+   // Lore::GPUProgramPtr program = loader.createGPUProgram( "GPU1" );
+   // Lore::ShaderPtr vshader = loader.createVertexShader( "v1" );
+   // vshader->loadFromSource( vshader_src.c_str() );
 
-    Lore::ShaderPtr fshader = loader.createFragmentShader( "f1" );
-    fshader->loadFromSource( pshader_src.c_str() );
+   // Lore::ShaderPtr fshader = loader.createFragmentShader( "f1" );
+   // fshader->loadFromSource( pshader_src.c_str() );
 
-    Lore::VertexBufferPtr vb = loader.createVertexBuffer( "vb1", Lore::VertexBuffer::Type::TexturedQuad );
-    vb->build();
+   // Lore::VertexBufferPtr vb = loader.createVertexBuffer( "vb1", Lore::VertexBuffer::Type::TexturedQuad );
+   // vb->build();
 
-   // ; How will changing material on renderable propagate to render queues? Should do so with pointers?
-    // Remove createVertexBuffer and have GPUProgram own one, so there's not another variable to deal with
-    // Consider doing the same for vertex and fragment shader
-    program->setVertexBuffer( vb );
-    program->attachShader( vshader );
-    program->attachShader( fshader );
-    program->link();
+   //// ; How will changing material on renderable propagate to render queues? Should do so with pointers?
+   // // Remove createVertexBuffer and have GPUProgram own one, so there's not another variable to deal with
+   // // Consider doing the same for vertex and fragment shader
+   // program->setVertexBuffer( vb );
+   // program->attachShader( vshader );
+   // program->attachShader( fshader );
+   // program->link();
 
-    program->addTransformVar( "transform" );
+   // program->addTransformVar( "transform" );
 
-    Lore::MaterialPtr mat = loader.createMaterial( "mat1" );
-    mat->getPass( 0 ).program = program;
-    tex->setMaterial( mat );
+    //Lore::MaterialPtr mat = loader.createMaterial( "mat1" );
+    //mat->getPass( 0 ).program = program;
+    //Lore::MaterialPtr mat = Lore::StockResource::GetMaterial( "StandardTexturedQuad" );
+    //Lore::MaterialPtr mat = loader.createMaterial( "mat1" );
+    //mat->getPass( 0 ).program = Lore::StockResource::GetGPUProgram( "StandardTexturedQuad" );
+    //mat->getPass( 0 ).program = program;
+    //tex->setMaterial( mat );
 
     node = scene->getNode( "A" );
     node->attachObject( ( Lore::RenderablePtr )tex );

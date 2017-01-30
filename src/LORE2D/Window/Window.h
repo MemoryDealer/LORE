@@ -118,6 +118,10 @@ namespace Lore {
             return _height;
         }
 
+        ResourceControllerPtr getResourceController() const;
+
+        StockResourceControllerPtr getStockResourceController() const;
+
     protected:
 
         using RenderViewList = std::vector<RenderView>;
@@ -131,6 +135,9 @@ namespace Lore {
         Mode _mode;
 
         RenderViewList _renderViews;
+
+        std::unique_ptr<ResourceController> _controller;
+        std::unique_ptr<StockResourceController> _stockController;
 
     };
 

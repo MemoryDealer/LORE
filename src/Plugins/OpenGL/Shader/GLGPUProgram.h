@@ -63,11 +63,11 @@ namespace Lore { namespace OpenGL {
 
     private:
 
-        using UniformMap = std::unordered_map<string, GLuint>;
+        using UniformMap = std::unordered_map<string, GLint>;
 
     private:
 
-        void _updateUniform( const GLuint id, const Lore::Matrix4& m );
+        void _updateUniform( const GLint id, const Lore::Matrix4& m );
 
     private:
 
@@ -75,7 +75,7 @@ namespace Lore { namespace OpenGL {
 
         UniformMap _uniforms;
 
-        GLuint _transform;
+        GLint _transform;
 
     };
 

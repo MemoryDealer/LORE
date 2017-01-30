@@ -27,30 +27,22 @@
 
 #include <LORE2D/Resource/StockResource.h>
 
-#include <Plugins/OpenGL/Resource/GLResourceLoader.h>
-
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore { namespace OpenGL {
 
-    class StockResource : public Lore::StockResource
+    class StockResourceController : public Lore::StockResourceController
     {
 
     public:
 
-        StockResource();
+        StockResourceController();
 
-        virtual ~StockResource() override;
+        virtual ~StockResourceController() override;
 
         virtual void createStockResources() override;
 
-        virtual GPUProgramPtr createUberShader( const string& name, const UberShaderParameters& params ) override;
-
-        virtual ResourceLoader& getResourceLoader() override;
-
-    private:
-
-        ResourceLoader _loader;
+        virtual GPUProgramPtr createUberShader( const string& name, const Lore::UberShaderParameters& params ) override;
 
     };
 

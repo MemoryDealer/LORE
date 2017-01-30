@@ -26,6 +26,9 @@
 
 #include "Window.h"
 
+#include <LORE2D/Resource/ResourceController.h>
+#include <LORE2D/Resource/StockResource.h>
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 using namespace Lore;
@@ -42,6 +45,8 @@ Window::Window( const string& title,
 , _frameBufferHeight( 0 )
 , _aspectRatio( 0.f )
 , _mode( Mode::Windowed )
+, _controller( nullptr )
+, _stockController( nullptr )
 {
 }
 
@@ -131,6 +136,20 @@ void Window::setDimensions( const int width, const int height )
 void Window::setMode( const Mode& mode )
 {
     _mode = mode;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+ResourceControllerPtr Window::getResourceController() const
+{
+    return _controller.get();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+StockResourceControllerPtr Window::getStockResourceController() const
+{
+    return _stockController.get();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

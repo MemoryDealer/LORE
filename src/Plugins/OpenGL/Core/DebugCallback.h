@@ -118,6 +118,8 @@ namespace Lore { namespace OpenGL {
                 printf( "Notification" );
                 break;
             }
+
+            printf( "\n" );
         }
 
     };

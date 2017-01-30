@@ -28,6 +28,7 @@
 
 #include <LORE2D/Core/NotificationCenter.h>
 #include <LORE2D/Core/Timestamp.h>
+#include <LORE2D/Resource/StockResource.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -45,10 +46,15 @@ using namespace Local;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+bool Context::_ContextExists = false;
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 Context::Context() noexcept
 : _windowRegistry()
 , _sceneRegistry()
 , _active( false )
+, _activeWindow( nullptr )
 {
     NotificationSubscribe( WindowEventNotification, &Context::onWindowEvent );
 }
@@ -111,8 +117,41 @@ void Context::removeErrorListener( ErrorListener listener )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+ResourceControllerPtr Context::getResourceController() const
+{
+    return _activeWindow->getResourceController();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+StockResourceControllerPtr Context::getStockResourceController() const
+{
+    return _activeWindow->getStockResourceController();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Context::setActiveWindow( WindowPtr window )
+{
+    _activeWindow = window;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Context::setActiveWindow( const string& name )
+{
+    auto window = _windowRegistry.get( name );
+    setActiveWindow( window );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 std::unique_ptr<Context> Context::Create( const RenderPlugin& renderer )
 {
+    if ( _ContextExists ) {
+        throw Lore::Exception( "A Lore context already exists for this process!" );
+    }
+
     string file;
 
     // Setup required Lore objects.
@@ -141,6 +180,10 @@ std::unique_ptr<Context> Context::Create( const RenderPlugin& renderer )
 
     // Load the context class from the plugin.
     auto context = __rpl->createContext();
+
+    StockResource::AssignContext( context.get() );
+    _ContextExists = true;
+
     return std::move( context );
 }
 
@@ -149,8 +192,10 @@ std::unique_ptr<Context> Context::Create( const RenderPlugin& renderer )
 void Context::Destroy( std::unique_ptr<Context> context )
 {
     context.reset();
+    StockResource::AssignContext( nullptr );
     Log::DeleteLogger();
     NotificationCenter::Destroy();
+    _ContextExists = false;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

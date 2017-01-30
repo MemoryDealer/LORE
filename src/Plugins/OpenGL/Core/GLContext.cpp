@@ -30,6 +30,7 @@
 
 #include <Plugins/OpenGL/Window/GLWindow.h>
 #include <Plugins/OpenGL/Renderer/RendererFactory.h>
+#include <Plugins/OpenGL/Resource/GLStockResource.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -41,7 +42,6 @@ Context::Context() noexcept
 : Lore::Context()
 , _offscreenContextWindow( nullptr )
 , _renderers()
-, _resourceLoader()
 {
     lore_log( "Initializing OpenGL render plugin context..." );
     glfwInit();
@@ -118,6 +118,11 @@ Lore::WindowPtr Context::createWindow( const string& title,
 
     // At least one window means the context is active.
     _active = true;
+
+    // If no active window yet, assign by default.
+    if ( !_activeWindow ) {
+        _activeWindow = handle;
+    }
 
     // Return a handle.
     return handle;

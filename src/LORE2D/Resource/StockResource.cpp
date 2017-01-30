@@ -26,7 +26,10 @@
 
 #include "StockResource.h"
 
+#include <LORE2D/Core/Context.h>
 #include <LORE2D/Resource/Material.h>
+#include <LORE2D/Resource/ResourceController.h>
+#include <LORE2D/Resource/StockResource.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -34,37 +37,30 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-template<> std::unique_ptr<StockResource> StockResource::_instance = nullptr;
+namespace LocalNS {
+
+    static ContextPtr ActiveContext = nullptr;
+
+}
+using namespace LocalNS;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-StockResource::StockResource()
-: _gpuPrograms()
-, _shaders()
-, _vertexBuffers()
-, _materials()
+StockResourceController::StockResourceController()
+: _controller( nullptr )
 {
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void StockResource::createStockResources()
+StockResourceController::~StockResourceController()
 {
-    //
-    // Load stock materials.
+}
 
-    auto material = std::make_unique<Material>( "BaseWhiteNoLighting" );
-    Material::Pass& pass = material->getPass( 0 );
-    pass.ambient = pass.diffuse = StockColor::White;
-    pass.lighting = false;
-    pass.program = nullptr;
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    //
-    // Load stock vertex buffers.
-
-    //auto vb = createVertexBuffer( "StandardTexturedQuad_VB", VertexBuffer::Type::TexturedQuad );
-    //vb->build();
-
+void StockResourceController::createStockResources()
+{
     //
     // Load stock programs.
 
@@ -74,20 +70,59 @@ void StockResource::createStockResources()
 
     params.numTextures = 1;
     createUberShader( "StandardTexturedQuad", params );
+
+    //
+    // Load stock materials.
+
+    /*auto material = _loader->createMaterial( "BaseWhiteNoLighting" );
+    auto& pass = material->getPass( 0 );
+    pass.ambient = pass.diffuse = StockColor::White;
+    pass.lighting = false;
+    pass.program = nullptr;*/
+
+    auto material = _controller->createMaterial( "StandardTexturedQuad" );
+    Material::Pass& pass = material->getPass( 0 );
+    pass.ambient = pass.diffuse = StockColor::White;
+    pass.lighting = false;
+    pass.program = _controller->getGPUProgram( "StandardTexturedQuad" );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-GPUProgramPtr StockResource::getGPUProgram( const string& name )
+GPUProgramPtr StockResourceController::getGPUProgram( const string& name )
 {
-    return _gpuPrograms.get( name );
+    return _controller->getGPUProgram( name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-MaterialPtr StockResource::getMaterial( const string& name )
+MaterialPtr StockResourceController::getMaterial( const string& name )
 {
-    return _materials.get( name );
+    return _controller->getMaterial( name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+GPUProgramPtr StockResource::GetGPUProgram( const string& name )
+{
+    return ActiveContext->getStockResourceController()->getGPUProgram( name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+MaterialPtr StockResource::GetMaterial( const string& name )
+{
+    return ActiveContext->getStockResourceController()->getMaterial( name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void StockResource::AssignContext( ContextPtr context )
+{
+    ActiveContext = context;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+

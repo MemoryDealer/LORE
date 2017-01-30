@@ -103,7 +103,7 @@ namespace Lore {
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    class LORE_EXPORT ResourceLoader
+    class LORE_EXPORT ResourceController
     {
 
     public:
@@ -112,7 +112,9 @@ namespace Lore {
 
     public:
 
-        ResourceLoader();
+        ResourceController();
+
+        virtual ~ResourceController();
 
         //
         // Groups.
@@ -150,6 +152,13 @@ namespace Lore {
         virtual MaterialPtr createMaterial( const string& name, const string& group = DefaultGroupName ) = 0;
 
         virtual CameraPtr createCamera( const string& name, const string& group = DefaultGroupName ) = 0;
+
+        //
+        // Getters.
+
+        GPUProgramPtr getGPUProgram( const string& name );
+
+        MaterialPtr getMaterial( const string& name );
 
     protected:
 
