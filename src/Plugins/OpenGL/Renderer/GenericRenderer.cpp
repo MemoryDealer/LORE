@@ -86,24 +86,19 @@ void GenericRenderer::addRenderable( RenderablePtr r, Lore::Matrix4& model )
 
 void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr window )
 {
+    // Update root node transform.
     NodePtr root = rv.scene->getRootNode();
     if ( root->isTransformDirty() ) {
         root->setWorldTransformationMatrix( root->getTransformationMatrix() );
     }
 
+    // Traverse the scene graph and update object transforms.
+    Lore::SceneGraphVisitor sgv;
+    sgv.visit( root );
+
     // TODO: Cache which scenes have been visited and check before doing it again.
     // [OR] move visitor to context?
     // ...
-    
-    // Traverse the scene graph and update object transforms.
-    Node::ChildNodeIterator it = root->getChildNodeIterator();
-    while ( it.hasMore() ) {
-        NodePtr node = it.getNext();
-
-        Lore::SceneGraphVisitor sgv;
-        sgv.pushMatrix( root->getWorldTransformationMatrix() );
-        sgv.visit( node );
-    }
 
     glViewport( rv.gl_viewport.x,
                 rv.gl_viewport.y,

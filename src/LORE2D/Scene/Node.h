@@ -158,6 +158,8 @@ namespace Lore {
         Matrix4 getTransformationMatrix();
         Matrix4 getWorldTransformationMatrix();
 
+        void _applyScaling();
+
         //
         // Setters.
 

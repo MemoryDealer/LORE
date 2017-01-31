@@ -30,32 +30,6 @@
 #include <LORE2D/Resource/Renderable/Texture.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-const static Lore::string vshader_src =
-"#version 450 core\n"
-"layout (location = 0) in vec2 vertex;\n"
-"layout (location = 1) in vec2 texCoord;"
-"uniform mat4 transform;\n"
-""
-"out vec2 TexCoord;"
-"void main()\n"
-"{\n"
-"gl_Position = transform * vec4(vertex, 0.0f, 1.0f);\n"
-"TexCoord = vec2(texCoord.x, 1.0 - texCoord.y);"
-"}\n";
-
-const static Lore::string pshader_src =
-"#version 450 core\n"
-"uniform sampler2D tex1;"
-"in vec2 TexCoord;"
-"out vec4 color;\n"
-"void main()\n"
-"{\n"
-//"color = vec4( 0.0f, 0.0f, 1.0f, 1.0f );\n"
-"color = texture( tex1, TexCoord);"
-"}\n";
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // Note: Error 1282 on binding calls with no prior errors indicates a wrong context.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -101,7 +75,7 @@ int main( int argc, char** argv )
     node = node->createChildNode( "BChildChild" );
 
     // Textures.
-    Lore::TexturePtr tex = loader.loadTexture( "tex1", "C:\\texture.png" );
+    Lore::TexturePtr tex = loader.loadTexture( "tex1", "C:\\Texture.jpg" );
 
    // Lore::GPUProgramPtr program = loader.createGPUProgram( "GPU1" );
    // Lore::ShaderPtr vshader = loader.createVertexShader( "v1" );
@@ -133,10 +107,17 @@ int main( int argc, char** argv )
 
     node = scene->getNode( "A" );
     node->attachObject( ( Lore::RenderablePtr )tex );
-    ///node->scale( Lore::Vec2( 0.5f, 1.0f ) );
+    node->scale( Lore::Vec2( 0.5f, 1.0f ) );
+
+    node->getChild( "AChild" )->scale( Lore::Vec2( 5.f, 1.f ) );
 
     node->getChild( "AChild" )->attachObject( ( Lore::RenderablePtr )tex );
     node->getChild( "AChild" )->setPosition( Lore::Vec2( -0.25f, 0.25f ) );
+
+    auto n2 = scene->createNode( "n2" );
+    n2->attachObject( ( Lore::RenderablePtr )tex );
+    n2->scale( Lore::Vec2( 1.2f, 0.65f ) );
+    n2->translate( 0.25f, 0.35f );
 
     float f = 0.f;
     while ( context->active() ) { 
@@ -145,8 +126,10 @@ int main( int argc, char** argv )
         //node->scale( 0.025f * std::sinf( f ) );
 
         // TODO: Repro case where both quads appeared to be scaling with only rotations being done.
-        node->rotate( Lore::Degree( 0.5f ) );
-        node->getChild( "AChild" )->rotate( Lore::Degree( -1.f ) );
+        node->rotate( Lore::Degree( 0.03f ) );
+        node->getChild( "AChild" )->rotate( Lore::Degree( -.1f ) );
+
+        n2->rotate( Lore::Degree( 0.025f ) );
 
         if ( GetAsyncKeyState( VK_F1 ) ) {
             camera->translate( -0.01f, 0.f );

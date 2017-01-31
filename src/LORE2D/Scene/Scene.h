@@ -92,6 +92,8 @@ namespace Lore {
 
         using NodeHashMap = std::unordered_map<string, std::unique_ptr<Node>>;
 
+        friend class Node;
+
     private:
 
         string _name;

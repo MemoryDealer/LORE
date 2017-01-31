@@ -41,7 +41,7 @@ using namespace Lore::OpenGL;
 namespace GLContextNS {
 
     const static int MinimumVersionMajor = 3;
-    const static int MinimumVersionMinor = 0;
+    const static int MinimumVersionMinor = 3;
 
 }
 using namespace GLContextNS;
@@ -70,7 +70,7 @@ Context::Context() noexcept
     glfwSwapInterval( 1 );
 
     // Get API version.
-    int verMajor, verMinor, verRev;
+    int verMajor, verMinor;
     glGetIntegerv( GL_MAJOR_VERSION, &verMajor );
     glGetIntegerv( GL_MINOR_VERSION, &verMinor );
     setAPIVersion( verMajor, verMinor );

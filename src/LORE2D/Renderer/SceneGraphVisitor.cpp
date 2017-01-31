@@ -56,27 +56,31 @@ void SceneGraphVisitor::pushMatrix( const Matrix4& m )
 
 void SceneGraphVisitor::visit( NodePtr node, bool worldDirty )
 {
+    const bool transformDirty = node->isTransformDirty();
+    const Matrix4 transform = node->getTransformationMatrix();// TODO: Make this function private.
     if ( worldDirty ) {
-        Matrix4 world = _stack.top() * node->getTransformationMatrix();
+        Matrix4 world = _stack.top() * transform;
         node->setWorldTransformationMatrix( world );
+        node->_applyScaling();
     }
-    else if ( node->isTransformDirty() ) {
-        Matrix4 world = _stack.top() * node->getTransformationMatrix();
+    else if ( transformDirty ) {
+        Matrix4 world = _stack.top() * transform;
         node->setWorldTransformationMatrix( world );
+        node->_applyScaling();
         worldDirty = true;
     }
 
     if ( node->hasChildNodes() ) {
-        _stack.push( node->getWorldTransformationMatrix() );
+        _stack.push( transform );
 
         Node::ChildNodeIterator it = node->getChildNodeIterator();
         while ( it.hasMore() ) {
             NodePtr child = it.getNext();
             visit( child, worldDirty );
         }
+
+        _stack.pop();
     }
-    
-    _stack.pop();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

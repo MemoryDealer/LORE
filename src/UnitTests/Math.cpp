@@ -236,22 +236,23 @@ TEST_CASE( "Matrix-matrix operations", "[math]" )
 
     SECTION( "Multiplication" )
     {
-        Lore::Matrix4 m1;
-        m1[0][0] = 1.f;
-        m1[1][0] = 2.f;
-        m1[3][3] = 1.f;
+        Lore::Matrix4 m1( 1.f, 2.f, 3.f, 4.f,
+                          4.f, 3.f, 2.f, 1.f,
+                          5.f, 6.f, 7.f, 8.f,
+                          8.f, 7.f, 6.f, 5.f );
 
-        Lore::Matrix4 m2;
-        m2[0][0] = 1.5f;
-        m2[1][0] = 3.f;
-        m2[3][0] = 0.5f;
-        m2[3][3] = 0.1f;
+        Lore::Matrix4 m2( 4.f, 3.f, 2.f, 1.f,
+                          1.f, 2.f, 3.f, 4.f,
+                          5.f, 6.f, 7.f, 8.f,
+                          8.f, 7.f, 6.f, 5.f );
 
         Lore::Matrix4 r = m1 * m2;
-        REQUIRE( r[0][0] == Approx( 1.5f ) );
-        REQUIRE( r[1][0] == Approx( 3.f ) );
-        REQUIRE( r[3][0] == Approx( 0.5f ) );
-        REQUIRE( r[3][3] == Approx( 0.1f ) );
+        for ( int i = 0; i < 4; ++i ) {
+            REQUIRE( Approx( 53.f ) == r[i][0] );
+            REQUIRE( Approx( 37.f ) == r[i][1] );
+            REQUIRE( Approx( 125.f ) == r[i][2] );
+            REQUIRE( Approx( 109.f ) == r[i][3] );
+        }
 
         Lore::Matrix4 m3, m4;
         m3[0][0] = 1.f;
@@ -305,6 +306,23 @@ TEST_CASE( "Matrix-matrix operations", "[math]" )
         REQUIRE( r2[3][1] == Approx( 185.1f ) );
         REQUIRE( r2[3][2] == Approx( 70.8f ) );
         REQUIRE( r2[3][3] == Approx( 94.6f ) );
+
+        Lore::Matrix4 m5( 0.f ), m6( 0.f );
+        m5[0][0] = 1.f;
+        m5[1][0] = 2.f;
+        m5[3][3] = 1.f;
+
+        m6[0][0] = 1.5f;
+        m6[1][0] = 3.f;
+        m6[3][0] = 0.5f;
+        m6[3][3] = 0.1f;
+
+        Lore::Matrix4 r3 = m5 * m6;
+
+        REQUIRE( Approx( 1.5f ) == r3[0][0] );
+        REQUIRE( Approx( 3.f ) == r3[1][0] );
+        REQUIRE( Approx( 0.5f ) == r3[3][0] );
+        REQUIRE( Approx( 0.1f ) == r3[3][3] );
     }
 }
 

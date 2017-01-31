@@ -56,15 +56,16 @@ Node::~Node()
 
 NodePtr Node::createChildNode( const string& name )
 {
-    NodePtr node = _scene->createNode( name );
-    node->_parent = this;
+    std::unique_ptr<Node> node( new Node( name, _scene, this ) );
+    auto insertion = _scene->_nodes.insert( { name, std::move( node ) } );
+    NodePtr p = insertion.first->second.get();
 
-    auto result = _childNodes.insert( { name, node } );
+    auto result = _childNodes.insert( { name, p } );
     if ( !result.second ) {
         throw Lore::Exception( "Failed to add child node " + name + " to " + _name );
     }
 
-    return node;
+    return p;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -256,8 +257,7 @@ Matrix4 Node::getTransformationMatrix()
 {
     if ( _transform.dirty ) {
         _transform.matrix = Math::CreateTransformationMatrix( _transform.position,
-                                                              _transform.orientation,
-                                                              _transform.scale );
+                                                              _transform.orientation );
         _transform.dirty = false;
     }
 
@@ -269,6 +269,17 @@ Matrix4 Node::getTransformationMatrix()
 Matrix4 Node::getWorldTransformationMatrix()
 {
     return _transform.worldMatrix;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Node::_applyScaling()
+{
+    Matrix4 s;
+    s[0][0] = _transform.scale.x;
+    s[1][1] = _transform.scale.y;
+
+    _transform.worldMatrix = _transform.worldMatrix * s;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
