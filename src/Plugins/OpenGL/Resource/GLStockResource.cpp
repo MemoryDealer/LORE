@@ -26,6 +26,8 @@
 
 #include "GLStockResource.h"
 
+#include <LORE2D/Core/APIVersion.h>
+
 #include <Plugins/OpenGL/Resource/GLResourceController.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -58,11 +60,14 @@ void StockResourceController::createStockResources()
 Lore::GPUProgramPtr StockResourceController::createUberShader( const string& name, const Lore::UberShaderParameters& params )
 {
     const bool textured = ( params.numTextures > 0 );
+    const string header = "#version " +
+        std::to_string( APIVersion::getMajor() ) + std::to_string( APIVersion::getMinor() ) + "0" +
+        " core\n";
 
     //
     // Vertex shader.
 
-    string src = "#version 450 core\n";
+    string src = header;
 
     //
     // Layout.
@@ -112,7 +117,7 @@ Lore::GPUProgramPtr StockResourceController::createUberShader( const string& nam
     // Fragment shader.
 
     src.clear();
-    src = "#version 450 core\n";
+    src = header;
 
     //
     // Uniforms and ins.

@@ -26,6 +26,7 @@
 
 #include "Context.h"
 
+#include <LORE2D/Core/APIVersion.h>
 #include <LORE2D/Core/NotificationCenter.h>
 #include <LORE2D/Core/Timestamp.h>
 #include <LORE2D/Resource/StockResource.h>
@@ -214,6 +215,13 @@ void Context::onWindowEvent( const Notification& n )
         break;
 
     }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Context::setAPIVersion( const int major, const int minor )
+{
+    APIVersion::Set( major, minor );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

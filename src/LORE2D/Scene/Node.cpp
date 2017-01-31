@@ -238,7 +238,7 @@ void Node::setScale( const Vec2& scale )
 
 void Node::scale( const Vec2& s )
 {
-    _transform.scale += s;
+    _transform.scale *= s;
     dirty();
 }
 

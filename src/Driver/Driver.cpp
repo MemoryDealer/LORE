@@ -133,6 +133,7 @@ int main( int argc, char** argv )
 
     node = scene->getNode( "A" );
     node->attachObject( ( Lore::RenderablePtr )tex );
+    ///node->scale( Lore::Vec2( 0.5f, 1.0f ) );
 
     node->getChild( "AChild" )->attachObject( ( Lore::RenderablePtr )tex );
     node->getChild( "AChild" )->setPosition( Lore::Vec2( -0.25f, 0.25f ) );

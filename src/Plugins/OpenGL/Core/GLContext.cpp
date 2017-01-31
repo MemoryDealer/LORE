@@ -38,6 +38,16 @@ using namespace Lore::OpenGL;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+namespace GLContextNS {
+
+    const static int MinimumVersionMajor = 3;
+    const static int MinimumVersionMinor = 0;
+
+}
+using namespace GLContextNS;
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 Context::Context() noexcept
 : Lore::Context()
 , _offscreenContextWindow( nullptr )
@@ -48,8 +58,8 @@ Context::Context() noexcept
     glfwSetErrorCallback( ErrorCallback );
     lore_log( "OpenGL render plugin context initialized!" );
 
-    glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
-    glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 5 );
+    glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, MinimumVersionMajor );
+    glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, MinimumVersionMinor );
     glfwWindowHint( GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE );
     glfwWindowHint( GLFW_VISIBLE, GLFW_FALSE );
     _offscreenContextWindow = glfwCreateWindow( 1, 1, "", nullptr, nullptr );
@@ -59,20 +69,26 @@ Context::Context() noexcept
     gladLoadGLLoader( reinterpret_cast< GLADloadproc >( glfwGetProcAddress ) );
     glfwSwapInterval( 1 );
 
-    // Setup debug callback.
-    GLint flags;
-    glGetIntegerv( GL_CONTEXT_FLAGS, &flags );
-    if ( flags & GL_CONTEXT_FLAG_DEBUG_BIT )
-    {
-        glEnable( GL_DEBUG_OUTPUT );
-        glEnable( GL_DEBUG_OUTPUT_SYNCHRONOUS );
+    // Get API version.
+    int verMajor, verMinor, verRev;
+    glGetIntegerv( GL_MAJOR_VERSION, &verMajor );
+    glGetIntegerv( GL_MINOR_VERSION, &verMinor );
+    setAPIVersion( verMajor, verMinor );
 
-        glDebugMessageCallback( ContextCallbackHandler::OpenGLDebug, nullptr );
-        glDebugMessageControl( GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE );
-    }
-    else
-    {
-        log_warning( "No debug bit set in context flags\n" );
+    // Setup debug callback.
+    if ( verMajor >= 4 && verMinor >= 3 ) {
+        GLint flags;
+        glGetIntegerv( GL_CONTEXT_FLAGS, &flags );
+        if ( flags & GL_CONTEXT_FLAG_DEBUG_BIT ) {
+            glEnable( GL_DEBUG_OUTPUT );
+            glEnable( GL_DEBUG_OUTPUT_SYNCHRONOUS );
+
+            glDebugMessageCallback( ContextCallbackHandler::OpenGLDebug, nullptr );
+            glDebugMessageControl( GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE );
+        }
+        else {
+            log_warning( "No debug bit set in context flags\n" );
+        }
     }
 }
 

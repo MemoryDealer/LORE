@@ -80,11 +80,14 @@ void StockResourceController::createStockResources()
     pass.lighting = false;
     pass.program = nullptr;*/
 
-    auto material = _controller->createMaterial( "StandardTexturedQuad" );
-    Material::Pass& pass = material->getPass( 0 );
-    pass.ambient = pass.diffuse = StockColor::White;
-    pass.lighting = false;
-    pass.program = _controller->getGPUProgram( "StandardTexturedQuad" );
+    // StandardTexturedQuad
+    {
+        auto material = _controller->createMaterial( "StandardTexturedQuad" );
+        Material::Pass& pass = material->getPass( 0 );
+        pass.ambient = pass.diffuse = StockColor::White;
+        pass.lighting = false;
+        pass.program = _controller->getGPUProgram( "StandardTexturedQuad" );
+    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

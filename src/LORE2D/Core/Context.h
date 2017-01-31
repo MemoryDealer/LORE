@@ -165,6 +165,8 @@ namespace Lore {
         /// \brief Handler for window event notifications.
         void onWindowEvent( const Notification& n );
 
+        void setAPIVersion( const int major, const int minor );
+
     protected:
 
         ///
