@@ -4,7 +4,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
