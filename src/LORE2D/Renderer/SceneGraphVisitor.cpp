@@ -34,9 +34,13 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-SceneGraphVisitor::SceneGraphVisitor()
+SceneGraphVisitor::SceneGraphVisitor( NodePtr root )
 : _stack()
+, _node( root )
 {
+    if ( _node->_transformDirty() ) {
+        _node->_updateWorldTransform( _node->_getLocalTransform() );
+    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -47,36 +51,27 @@ SceneGraphVisitor::~SceneGraphVisitor()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void SceneGraphVisitor::pushMatrix( const Matrix4& m )
+void SceneGraphVisitor::visit( bool parentDirty )
 {
-    _stack.push( m );
-}
+    const bool transformDirty = _node->_transformDirty();
+    const Matrix4 transform = _node->_getLocalTransform();
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void SceneGraphVisitor::visit( NodePtr node, bool worldDirty )
-{
-    const bool transformDirty = node->isTransformDirty();
-    const Matrix4 transform = node->getTransformationMatrix();// TODO: Make this function private.
-    if ( worldDirty ) {
-        Matrix4 world = _stack.top() * transform;
-        node->setWorldTransformationMatrix( world );
-        node->_applyScaling();
+    if ( parentDirty ) {
+        _node->_updateWorldTransform( _stack.top() * transform );
     }
     else if ( transformDirty ) {
-        Matrix4 world = _stack.top() * transform;
-        node->setWorldTransformationMatrix( world );
-        node->_applyScaling();
-        worldDirty = true;
+        _node->_updateWorldTransform( _stack.top() * transform );
+        parentDirty = true;
     }
 
-    if ( node->hasChildNodes() ) {
+    // Recurse over children.
+    if ( _node->hasChildNodes() ) {
         _stack.push( transform );
 
-        Node::ChildNodeIterator it = node->getChildNodeIterator();
+        Node::ChildNodeIterator it = _node->getChildNodeIterator();
         while ( it.hasMore() ) {
-            NodePtr child = it.getNext();
-            visit( child, worldDirty );
+            _node = it.getNext();
+            visit( parentDirty );
         }
 
         _stack.pop();

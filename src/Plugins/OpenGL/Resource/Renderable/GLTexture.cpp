@@ -40,7 +40,7 @@ Texture::Texture( const string& name, const string& file )
 , _id( 0 )
 {
     int width, height, n;
-    unsigned char* pixels = stbi_load( file.c_str(), &width, &height, &n, 0 );
+    unsigned char* pixels = stbi_load( file.c_str(), &width, &height, &n, STBI_rgb_alpha );
     if ( pixels ) {
 
         glGenTextures( 1, &_id );
@@ -53,7 +53,7 @@ Texture::Texture( const string& name, const string& file )
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
         // Create the OpenGL texture.
-        glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels );
+        glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
         glGenerateMipmap( GL_TEXTURE_2D );
 
         stbi_image_free( pixels );

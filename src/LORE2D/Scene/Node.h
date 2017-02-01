@@ -53,18 +53,18 @@ namespace Lore {
             Quaternion orientation;
             Vec2 scale;
 
-            Matrix4 matrix; // Local transformation matrix.
+            Matrix4 local; // Local transformation matrix.
             bool dirty; // True if matrix needs update.
 
-            Matrix4 worldMatrix; // Derived transformation in scene graph.
+            Matrix4 world; // Derived transformation in scene graph.
 
             Transform()
             : position()
             , orientation()
             , scale( 1.f, 1.f )
-            , matrix()
+            , local()
             , dirty( true )
-            , worldMatrix()
+            , world()
             { }
 
         };
@@ -117,11 +117,6 @@ namespace Lore {
 
         void scale( const real s );
 
-        ///
-        /// \brief Sets node's transformation matrix to dirty - it will be updated before
-        ///     next frame is rendered.
-        void dirty();
-
         //
         // Getters.
 
@@ -145,25 +140,10 @@ namespace Lore {
             return _transform.scale;
         }
 
-        inline bool isTransformDirty() const
-        {
-            return _transform.dirty;
-        }
-
         inline bool hasChildNodes() const
         {
             return !( _childNodes.empty() );
         }
-
-        Matrix4 getTransformationMatrix();
-        Matrix4 getWorldTransformationMatrix();
-
-        void _applyScaling();
-
-        //
-        // Setters.
-
-        void setWorldTransformationMatrix( const Matrix4& w );
 
         //
         // Deleted functions/operators.
@@ -175,8 +155,27 @@ namespace Lore {
 
         // Only scenes can construct nodes.
         friend class Scene;
+        friend class SceneGraphVisitor;
+
+    private:
 
         Node( const string& name, ScenePtr scene, NodePtr parent );
+
+        //
+        // Scene graph operations.
+
+        ///
+        /// \brief Sets node's transformation matrix to dirty - it will be updated before
+        ///     next frame is rendered.
+        void _dirty();
+
+        bool _transformDirty() const;
+
+        Matrix4 _getLocalTransform();
+
+        Matrix4 _getWorldTransform() const;
+
+        void _updateWorldTransform( const Matrix4& m );
 
     private:
 

@@ -75,7 +75,7 @@ int main( int argc, char** argv )
     node = node->createChildNode( "BChildChild" );
 
     // Textures.
-    Lore::TexturePtr tex = loader.loadTexture( "tex1", "C:\\Texture.jpg" );
+    Lore::TexturePtr tex = loader.loadTexture( "tex1", "C:\\tex.png" );
 
    // Lore::GPUProgramPtr program = loader.createGPUProgram( "GPU1" );
    // Lore::ShaderPtr vshader = loader.createVertexShader( "v1" );
@@ -109,14 +109,14 @@ int main( int argc, char** argv )
     node->attachObject( ( Lore::RenderablePtr )tex );
     node->scale( Lore::Vec2( 0.5f, 1.0f ) );
 
-    node->getChild( "AChild" )->scale( Lore::Vec2( 5.f, 1.f ) );
+    node->getChild( "AChild" )->scale( Lore::Vec2( 1.f, 1.f ) );
 
     node->getChild( "AChild" )->attachObject( ( Lore::RenderablePtr )tex );
     node->getChild( "AChild" )->setPosition( Lore::Vec2( -0.25f, 0.25f ) );
 
     auto n2 = scene->createNode( "n2" );
     n2->attachObject( ( Lore::RenderablePtr )tex );
-    n2->scale( Lore::Vec2( 1.2f, 0.65f ) );
+    n2->scale( Lore::Vec2( 4.2f, 0.65f ) );
     n2->translate( 0.25f, 0.35f );
 
     float f = 0.f;
@@ -126,8 +126,8 @@ int main( int argc, char** argv )
         //node->scale( 0.025f * std::sinf( f ) );
 
         // TODO: Repro case where both quads appeared to be scaling with only rotations being done.
-        node->rotate( Lore::Degree( 0.03f ) );
-        node->getChild( "AChild" )->rotate( Lore::Degree( -.1f ) );
+        node->rotate( Lore::Degree( 0.5f ) );
+        //node->getChild( "AChild" )->rotate( Lore::Degree( -.1f ) );
 
         n2->rotate( Lore::Degree( 0.025f ) );
 

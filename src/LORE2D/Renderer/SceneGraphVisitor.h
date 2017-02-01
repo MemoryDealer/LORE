@@ -36,17 +36,16 @@ namespace Lore {
 
     public:
 
-        SceneGraphVisitor();
+        SceneGraphVisitor( NodePtr root );
 
         ~SceneGraphVisitor();
 
-        void pushMatrix( const Matrix4& m );
-
-        void visit( NodePtr node, bool worldDirty = false );
+        void visit( bool parentDirty = false );
 
     private:
 
         std::stack<Matrix4> _stack;
+        NodePtr _node;
 
     };
 

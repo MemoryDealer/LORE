@@ -143,7 +143,7 @@ void Node::attachObject( RenderablePtr r )
 
     case Renderable::Type::Texture:
         _renderables.insert( { r->getName(), r } );
-        _scene->getRenderer()->addRenderable( r, _transform.worldMatrix );
+        _scene->getRenderer()->addRenderable( r, _transform.world );
         break;
     }
 }
@@ -153,7 +153,7 @@ void Node::attachObject( RenderablePtr r )
 void Node::setPosition( const Vec2& position )
 {
     _transform.position = position;
-    dirty();
+    _dirty();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -161,7 +161,7 @@ void Node::setPosition( const Vec2& position )
 void Node::translate( const Vec2& offset )
 {
     _transform.position += offset;
-    dirty();
+    _dirty();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -170,7 +170,7 @@ void Node::translate( const real xOffset, const real yOffset )
 {
     _transform.position.x += xOffset;
     _transform.position.y += yOffset;
-    dirty();
+    _dirty();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -224,7 +224,7 @@ void Node::rotate( const Quaternion& q, const TransformSpace& ts )
         break;
     }
 
-    dirty();
+    _dirty();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -232,7 +232,7 @@ void Node::rotate( const Quaternion& q, const TransformSpace& ts )
 void Node::setScale( const Vec2& scale )
 {
     _transform.scale = scale;
-    dirty();
+    _dirty();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -240,7 +240,7 @@ void Node::setScale( const Vec2& scale )
 void Node::scale( const Vec2& s )
 {
     _transform.scale *= s;
-    dirty();
+    _dirty();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -252,49 +252,50 @@ void Node::scale( const real s )
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Matrix4 Node::getTransformationMatrix()
+void Node::_dirty()
+{
+    _transform.dirty = true;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+bool Node::_transformDirty() const
+{
+    return _transform.dirty;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Matrix4 Node::_getLocalTransform()
 {
     if ( _transform.dirty ) {
-        _transform.matrix = Math::CreateTransformationMatrix( _transform.position,
-                                                              _transform.orientation );
+        _transform.local = Math::CreateTransformationMatrix( _transform.position,
+                                                             _transform.orientation );
         _transform.dirty = false;
     }
 
-    return _transform.matrix;
+    return _transform.local;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Matrix4 Node::getWorldTransformationMatrix()
+Matrix4 Node::_getWorldTransform() const
 {
-    return _transform.worldMatrix;
+    return _transform.world;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Node::_applyScaling()
+void Node::_updateWorldTransform( const Matrix4& m )
 {
+    // Apply scaling to final world transform.
     Matrix4 s;
     s[0][0] = _transform.scale.x;
     s[1][1] = _transform.scale.y;
 
-    _transform.worldMatrix = _transform.worldMatrix * s;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Node::setWorldTransformationMatrix( const Matrix4& w )
-{
-    _transform.worldMatrix = w;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Node::dirty()
-{
-    _transform.dirty = true;
+    _transform.world = m * s;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
