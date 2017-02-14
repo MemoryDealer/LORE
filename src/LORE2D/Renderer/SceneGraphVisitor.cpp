@@ -41,6 +41,10 @@ SceneGraphVisitor::SceneGraphVisitor( NodePtr root )
     if ( _node->_transformDirty() ) {
         _node->_updateWorldTransform( _node->_getLocalTransform() );
     }
+
+    // Recursively push down scale changes to child nodes. This must be done
+    // here because scales are not included in transform/rotation matrix updates.
+    _node->_updateChildrenScale();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

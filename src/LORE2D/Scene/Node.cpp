@@ -81,6 +81,8 @@ void Node::attachChildNode( NodePtr node )
     if ( !result.second ) {
         throw Lore::Exception( "Failed to attach node to node " + _name );
     }
+
+    node->_parent = this;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -292,10 +294,29 @@ void Node::_updateWorldTransform( const Matrix4& m )
 {
     // Apply scaling to final world transform.
     Matrix4 s;
-    s[0][0] = _transform.scale.x;
-    s[1][1] = _transform.scale.y;
+    s[0][0] = _transform.derivedScale.x;
+    s[1][1] = _transform.derivedScale.y;
 
     _transform.world = m * s;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Node::_updateChildrenScale()
+{
+    if ( _parent && _parent->getName() == "root" ) {
+        _transform.derivedScale = _transform.scale;
+    }
+
+    auto it = getChildNodeIterator();
+    while ( it.hasMore() ) {
+        auto node = it.getNext();
+        auto scale = node->getScale();
+        node->_transform.derivedScale = _transform.derivedScale * scale;
+
+        // Recurse on all children.
+        node->_updateChildrenScale();
+    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

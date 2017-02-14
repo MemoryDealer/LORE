@@ -52,6 +52,7 @@ namespace Lore {
             Vec2 position;
             Quaternion orientation;
             Vec2 scale;
+            Vec2 derivedScale;
 
             Matrix4 local; // Local transformation matrix.
             bool dirty; // True if matrix needs update.
@@ -62,6 +63,7 @@ namespace Lore {
             : position()
             , orientation()
             , scale( 1.f, 1.f )
+            , derivedScale( 1.f, 1.f )
             , local()
             , dirty( true )
             , world()
@@ -140,6 +142,11 @@ namespace Lore {
             return _transform.scale;
         }
 
+        inline Vec2 getDerivedScale() const
+        {
+            return _transform.derivedScale;
+        }
+
         inline bool hasChildNodes() const
         {
             return !( _childNodes.empty() );
@@ -176,6 +183,8 @@ namespace Lore {
         Matrix4 _getWorldTransform() const;
 
         void _updateWorldTransform( const Matrix4& m );
+
+        void _updateChildrenScale();
 
     private:
 

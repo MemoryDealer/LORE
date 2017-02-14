@@ -75,7 +75,7 @@ int main( int argc, char** argv )
     node = node->createChildNode( "BChildChild" );
 
     // Textures.
-    Lore::TexturePtr tex = loader.loadTexture( "tex1", "C:\\tex.png" );
+    Lore::TexturePtr tex = loader.loadTexture( "tex1", "C:\\texture.png" );
 
    // Lore::GPUProgramPtr program = loader.createGPUProgram( "GPU1" );
    // Lore::ShaderPtr vshader = loader.createVertexShader( "v1" );
@@ -106,16 +106,16 @@ int main( int argc, char** argv )
     //tex->setMaterial( mat );
 
     node = scene->getNode( "A" );
-    node->attachObject( ( Lore::RenderablePtr )tex );
-    node->scale( Lore::Vec2( 0.5f, 1.0f ) );
+    node->attachObject( tex );
+    node->scale( Lore::Vec2( 2.f, 1.0f ) );
 
-    node->getChild( "AChild" )->scale( Lore::Vec2( 1.f, 1.f ) );
+    node->getChild( "AChild" )->scale( Lore::Vec2( 0.5f, 1.f ) );
 
-    node->getChild( "AChild" )->attachObject( ( Lore::RenderablePtr )tex );
+    node->getChild( "AChild" )->attachObject( tex );
     node->getChild( "AChild" )->setPosition( Lore::Vec2( -0.25f, 0.25f ) );
 
     auto n2 = scene->createNode( "n2" );
-    n2->attachObject( ( Lore::RenderablePtr )tex );
+    n2->attachObject( tex );
     n2->scale( Lore::Vec2( 4.2f, 0.65f ) );
     n2->translate( 0.25f, 0.35f );
 
