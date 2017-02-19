@@ -25,58 +25,47 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#pragma warning( disable: 4311 )
-#pragma warning( disable: 4312 )
-#pragma warning( disable: 4661 )
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 namespace Lore {
 
     ///
-    /// \class Singleton
-    /// \brief Generic singleton class for any singletons to inherit from.
-    template<typename T>
-    class LORE_EXPORT Singleton
+    /// \class Exception
+    /// \brief The core Lore exception object. Specialized exceptions should
+    /// derive from this class.
+    class Exception : public std::exception
+    {
+
+    protected:
+
+        string _what = "Unknown exception";
+        
+    public:
+
+        explicit Exception( const string& what )
+        : _what( what )
+        {
+        }
+
+    };
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    ///
+    /// \class ItemIdentityException
+    /// \brief Thrown when attempting to access an item by name that doesn't exist.
+    class ItemIdentityException : public Exception
     {
 
     public:
 
-        Singleton()
+        explicit ItemIdentityException( const string& what )
+        : Exception( what )
         {
         }
 
-        virtual ~Singleton()
+        virtual char const* what() const override
         {
+            return ( "ItemIdentityException: " + _what ).c_str();
         }
-
-        ///
-        /// \brief Allocates the singleton.
-        static void Initialize()
-        {
-            _instance = std::make_unique<T>();
-        }
-
-        ///
-        /// \brief Frees the singleton from memory.
-        static void Destroy()
-        {
-            _instance.reset();
-        }
-
-        static T& Get()
-        {
-            return *_instance;
-        }
-
-        static T* GetPtr()
-        {
-            return _instance;
-        }
-
-    protected:
-
-        static std::unique_ptr<T> _instance;
 
     };
 

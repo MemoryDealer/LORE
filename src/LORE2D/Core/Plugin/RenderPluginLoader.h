@@ -25,60 +25,67 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#pragma warning( disable: 4311 )
-#pragma warning( disable: 4312 )
-#pragma warning( disable: 4661 )
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+#include <LORE2D/Window/Window.h>
 
 namespace Lore {
 
-    ///
-    /// \class Singleton
-    /// \brief Generic singleton class for any singletons to inherit from.
-    template<typename T>
-    class LORE_EXPORT Singleton
+    class Context;
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    class LORE_EXPORT IRenderPluginLoader
     {
 
     public:
 
-        Singleton()
-        {
-        }
+        virtual ~IRenderPluginLoader() { }
 
-        virtual ~Singleton()
-        {
-        }
+        virtual bool load( const string& file ) = 0;
 
-        ///
-        /// \brief Allocates the singleton.
-        static void Initialize()
-        {
-            _instance = std::make_unique<T>();
-        }
-
-        ///
-        /// \brief Frees the singleton from memory.
-        static void Destroy()
-        {
-            _instance.reset();
-        }
-
-        static T& Get()
-        {
-            return *_instance;
-        }
-
-        static T* GetPtr()
-        {
-            return _instance;
-        }
+        virtual std::unique_ptr<Context> createContext() = 0;
 
     protected:
 
-        static std::unique_ptr<T> _instance;
+        virtual void free() = 0;
 
     };
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+#if defined( _WIN32 ) || defined( _WIN64 )
+#include <Windows.h>
+
+    class LORE_EXPORT RenderPluginLoader : public IRenderPluginLoader
+    {
+
+    private:
+
+        HMODULE _hModule;
+
+    public:
+
+        explicit constexpr RenderPluginLoader();
+
+        virtual ~RenderPluginLoader() override;
+
+        virtual bool load( const string& file ) override;
+
+        virtual std::unique_ptr<Context> createContext() override;
+
+    protected:
+
+        virtual void free() override;
+
+    };
+#endif
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    inline std::unique_ptr<IRenderPluginLoader> CreateRenderPluginLoader()
+    {
+        std::unique_ptr<IRenderPluginLoader> rpl = std::make_unique<RenderPluginLoader>();
+        return rpl;
+    }
 
 }
 

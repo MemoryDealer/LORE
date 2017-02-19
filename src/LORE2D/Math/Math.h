@@ -45,6 +45,9 @@ namespace Lore {
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
     
+    ///
+    /// \class Math
+    /// \brief Class with purely static members and functions for common procedures.
     class LORE_EXPORT Math final
     {
 
@@ -70,6 +73,9 @@ namespace Lore {
 
         // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+        ///
+        /// \brief Creates 4x4 matrix from a 3D position, orientation, and scale.
+        ///     Note the scale must be uniform.
         static inline Matrix4 CreateTransformationMatrix( const Vec3& position,
                                                           const Quaternion& orientation,
                                                           const Vec3& scale )
@@ -103,6 +109,8 @@ namespace Lore {
 
         // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+        ///
+        /// \brief Creates 4x4 matrix from a position and orientation.
         static inline Matrix4 CreateTransformationMatrix( const Vec2& position,
                                                           const Quaternion& orientation )
         {
@@ -133,6 +141,9 @@ namespace Lore {
 
         // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+        ///
+        /// \brief Creates 4x4 matrix from a 2D position, orientation, and scale.
+        ///     Note the scale must be uniform.
         static inline Matrix4 CreateTransformationMatrix( const Vec2& position,
                                                           const Quaternion& orientation,
                                                           const Vec2& scale )
@@ -167,6 +178,8 @@ namespace Lore {
 
         // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+        ///
+        /// \brief Creates an orthographic, left-handed, projection matrix.
         static inline Matrix4 OrthoLH( const float left, const float right,
                                        const float bottom, const float top,
                                        const float zNear, const float zFar )
@@ -186,6 +199,8 @@ namespace Lore {
 
         // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+        ///
+        /// \brief Creates an orthographic, right-handed, projection matrix.
         static inline Matrix4 OrthoRH( const float left, const float right,
                                        const float bottom, const float top,
                                        const float zNear, const float zFar )
@@ -205,11 +220,15 @@ namespace Lore {
 
         // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+        ///
+        /// \brief Converts value from degrees to radians.
         static inline real DegreesToRadians( const real degrees )
         {
             return degrees * _FDegToRad;
         }
 
+        ///
+        /// \brief Converts value from radians to degrees.
         static inline real RadiansToDegrees( const real radians )
         {
             return radians * _FRadToDeg;
@@ -219,9 +238,13 @@ namespace Lore {
         // Quaternion factory functions.
         // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+        ///
+        /// \brief Creates Quaternion from 3D axis and angle in radians.
         static inline Quaternion CreateQuaternion( const Vec3& axis,
                                                    const Radian& angle );
 
+        ///
+        /// \brief Creates Quaternion from 3D axis and angle in degrees.
         static inline Quaternion CreateQuaternion( const Vec3& axis,
                                                    const Degree& angle );
 
@@ -229,6 +252,9 @@ namespace Lore {
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+    ///
+    /// \class Radian
+    /// \brief Representation of a radian value.
     class Radian final
     {
 
@@ -243,8 +269,12 @@ namespace Lore {
         //
         // Conversion.
 
+        ///
+        /// \brief Returns radian value as degree.
         real valueDegrees() const;
 
+        ///
+        /// \brief Returns radian value.
         real valueRadians() const
         {
             return _value;
@@ -293,6 +323,9 @@ namespace Lore {
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+    ///
+    /// \class Degree
+    /// \brief Represents a degree value.
     class Degree final
     {
 
@@ -309,11 +342,15 @@ namespace Lore {
         //
         // Conversion.
 
+        ///
+        /// \brief Returns degree value.
         real valueDegrees() const
         {
             return _value;
         }
 
+        ///
+        /// \brief Returns degree value in radians.
         real valueRadians() const;
 
         real valueAngleUnits() const;
@@ -368,6 +405,8 @@ namespace Lore {
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+    ///
+    /// \brief Constructs Quaternion from 3D axis and angle in radians.
     inline Quaternion Math::CreateQuaternion( const Vec3& axis,
                                               const Radian& angle )
     {
@@ -382,6 +421,8 @@ namespace Lore {
         return q;
     }
 
+    ///
+    /// \brief Constructs Quaternion from 3D axis and angle in degrees.
     inline Quaternion Math::CreateQuaternion( const Vec3& axis,
                                               const Degree& angle )
     {

@@ -29,7 +29,7 @@ namespace Lore {
 
     ///
     /// \class Timer
-    /// \brief Tracks elapsed time in seconds, once started.
+    /// \brief Tracks elapsed time in seconds.
     class Timer final
     {
 
@@ -37,12 +37,30 @@ namespace Lore {
 
         Timer();
 
-        float totalTime() const;
-        float deltaTime() const;
+        ~Timer() = default;
 
+        ///
+        /// \brief Return elapsed time in seconds since timer start, not including pauses.
+        float getDeltaTime() const;
+
+        ///
+        /// \brief Returns total time elapsed time in seconds from application start.
+        float getTotalElapsedTime() const;
+
+        ///
+        /// \brief Resets delta time since timer was last started.
         void reset();
+
+        ///
+        /// \brief Begins tracking delta time.
         void start();
+
+        ///
+        /// \brief Stops tracking delta time, until start() is called again.
         void stop();
+
+        ///
+        /// \brief Moves delta time along based on elapsed time since last call to tick().
         void tick();
 
     private:
@@ -50,11 +68,13 @@ namespace Lore {
         double mSecondsPerCount;
         double mDeltaTime;
 
+#if LORE_PLATFORM == LORE_WINDOWS
         __int64 mBaseTime;
         __int64 mPausedTime;
         __int64 mStopTime;
         __int64 mPrevTime;
         __int64 mCurrTime;
+#endif
 
         bool mStopped;
 

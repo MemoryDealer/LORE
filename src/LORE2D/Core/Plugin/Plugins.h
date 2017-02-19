@@ -25,58 +25,15 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#pragma warning( disable: 4311 )
-#pragma warning( disable: 4312 )
-#pragma warning( disable: 4661 )
+// Official plugin data.
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-    ///
-    /// \class Singleton
-    /// \brief Generic singleton class for any singletons to inherit from.
-    template<typename T>
-    class LORE_EXPORT Singleton
-    {
+    enum class RenderPlugin {
 
-    public:
-
-        Singleton()
-        {
-        }
-
-        virtual ~Singleton()
-        {
-        }
-
-        ///
-        /// \brief Allocates the singleton.
-        static void Initialize()
-        {
-            _instance = std::make_unique<T>();
-        }
-
-        ///
-        /// \brief Frees the singleton from memory.
-        static void Destroy()
-        {
-            _instance.reset();
-        }
-
-        static T& Get()
-        {
-            return *_instance;
-        }
-
-        static T* GetPtr()
-        {
-            return _instance;
-        }
-
-    protected:
-
-        static std::unique_ptr<T> _instance;
+        OpenGL
 
     };
 

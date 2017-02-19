@@ -31,6 +31,8 @@
 
 namespace Lore {
 
+    // Since Matrix classes are generated using templates, provide macros for
+    // generate scalable default member functions for template class specializations.
 #define DEFAULT_MEMBERS( C, R )\
     Matrix()\
     : m()\
@@ -80,6 +82,14 @@ namespace Lore {
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+    ///
+    /// \class Matrix
+    /// \brief Represents a matrix of CxR elements, using column vectors.
+    /// For example, a 4x4 matrix is represented as so:
+    /// | v1.x  v2.x  v3.x  v4.x |
+    /// | v1.y  v2.y  v3.y  v4.y |
+    /// | v1.z  v2.z  v3.z  v4.z |
+    /// | v1.w  v2.w  v3.w  v4.w |
     template<typename T, int C, int R>
     struct Matrix
     {
@@ -102,7 +112,8 @@ namespace Lore {
         //
         // Operators.
 
-        
+        ///
+        /// \brief Converts matrix into identity matrix.
         void makeIdentity()
         {
             for ( int i = 0; i<C; ++i ) {
@@ -141,7 +152,7 @@ namespace Lore {
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     //
-    // Specialize Matrix3/4.
+    // Specialize Matrix4.
 
     template<typename T>
     struct Matrix<T, 4, 4>
@@ -154,12 +165,6 @@ namespace Lore {
     public:
 
         DEFAULT_MEMBERS( 4, 4 );
-
-        Matrix( const Vec3& position,
-                const Vec3& scale )
-        : m()
-        {
-        }
 
         Matrix( const T m00, const T m01, const T m02, const T m03,
                 const T m10, const T m11, const T m12, const T m13,
@@ -179,6 +184,7 @@ namespace Lore {
 
     };
 
+    // Provide macros for all operators we'll define for a Matrix, to avoid duplicate code.
 #define DEFINE_UNARY_OP( op )\
     template<typename T, int C, int R>\
     Matrix<T, C, R> operator op ( const Matrix<T, C, R>& rhs )\
@@ -268,9 +274,7 @@ template<typename T, int C, int R>\
 #undef DEFINE_INPLACE_OP
 #undef DEFINE_INPLACE_SCALAR_OP
 
-    //
-    // Multiplication.
-
+    // Matrix multiplication.
     template<typename T, int C, int R>
     Matrix<T, C, R> operator * ( Matrix<T, C, R> const& a, Matrix<T, R, C> const& b )
     {
@@ -290,6 +294,8 @@ template<typename T, int C, int R>\
 
         return re;
     }
+
+#undef DEFAULT_MEMBERS
 
 }
 

@@ -24,7 +24,9 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "APIVersion.h"
+#include "RenderPluginLoader.h"
+
+#include <LORE2D/Core/Context.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -32,42 +34,71 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace APIVersionNS {
-
-    static int Major = 0;
-    static int Minor = 0;
-
-}
-using namespace APIVersionNS;
+#if defined( _WIN32 ) || defined( _WIN64 )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-int APIVersion::GetMajor()
+constexpr
+RenderPluginLoader::RenderPluginLoader()
+: _hModule( nullptr )
 {
-    return Major;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-int APIVersion::GetMinor()
+RenderPluginLoader::~RenderPluginLoader()
 {
-    return Minor;
+    free();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-string APIVersion::GetString()
+bool RenderPluginLoader::load( const string& file )
 {
-    return std::to_string( Major ) +
-        "." + std::to_string( Minor );
+    free(); 
+
+    _hModule = LoadLibrary( file.c_str() );
+    if ( nullptr == _hModule ) {
+        log_critical( "Unable to load render plugin " + file );
+        return false;
+    }
+
+    log_debug( "Render plugin " + file + " successfully loaded" );
+
+    return true;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void APIVersion::Set( const int major, const int minor )
+std::unique_ptr<Context> RenderPluginLoader::createContext()
 {
-    Major = major;
-    Minor = minor;
+    using CreateContextPtr = Context*( *)( );
+
+    CreateContextPtr ccp = reinterpret_cast< CreateContextPtr >(
+        GetProcAddress( _hModule, "CreateContext" ) );
+    if ( nullptr == ccp ) {
+        log_critical( "Unable to get CreateContext function pointer from render plugin" );
+        return nullptr;
+    }
+
+    // Allocate the render plugin's context.
+    Context* context = ccp();
+
+    std::unique_ptr<Context> p( context );
+    return std::move( p );
 }
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void RenderPluginLoader::free()
+{
+    if ( _hModule ) {
+        FreeLibrary( _hModule );
+    }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+#endif
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

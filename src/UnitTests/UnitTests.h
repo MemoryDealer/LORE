@@ -25,4 +25,18 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+// Platform define:
+
+#define LORE_WINDOWS 0
+#define LORE_LINUX 1
+#define LORE_APPLE 2
+
+#if defined( WIN32 ) || defined( _WIN32 )
+#define LORE_PLATFORM LORE_WINDOWS
+#elif defined( LINUX ) || defined( _LINUX )
+#define LORE_PLATFORM LORE_LINUX
+#elif defined( APPLE ) || defined( _APPLE )
+#define LORE_PLATFORM LORE_APPLE
+#endif
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

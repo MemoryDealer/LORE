@@ -106,7 +106,7 @@ Context::~Context()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Context::renderFrame( const float dt )
+void Context::renderFrame( const float lagMultiplier )
 {
     glfwPollEvents();
 

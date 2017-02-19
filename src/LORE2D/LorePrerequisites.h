@@ -73,7 +73,7 @@
 // Lore.
 #include "Exports.h"
 #include "Types.h"
-#include "Logging/Log.h"
-#include "Exception.h"
+#include "Core/Logging/Log.h"
+#include "Core/Exception.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
