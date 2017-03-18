@@ -69,6 +69,11 @@ namespace Lore {
             return *_instance;
         }
 
+        static T* GetPtr()
+        {
+            return _instance;
+        }
+
     protected:
 
         static std::unique_ptr<T> _instance;

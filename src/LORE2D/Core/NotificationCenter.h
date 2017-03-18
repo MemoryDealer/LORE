@@ -49,13 +49,16 @@ namespace Lore {
 
     public:
 
-        constexpr explicit NotificationCenter();
+        constexpr NotificationCenter();
 
         ~NotificationCenter();
 
         ///
         /// \brief Registers a notification handler function to be called when a
         ///     notification is fired through the NotificationCenter.
+        /// \param T The Notification type to subscribe to.
+        /// \param handler Pointer to function that is called when Notification type
+        ///     T is triggered.
         template<typename T>
         void subscribe( NotificationHandler handler )
         {
@@ -65,6 +68,8 @@ namespace Lore {
 
         ///
         /// \brief Removes handler from list of registered handlers for specified notification.
+        /// \param T The Notification type to unsubscribe from.
+        /// \param handler Pointer to function that was registered to handle this Notification.
         template<typename T>
         void unsubscribe( NotificationHandler handler )
         {
@@ -154,8 +159,6 @@ namespace Lore {
         using SubscriptionMap = std::unordered_map<std::type_index, HandlerList>;
 
     private:
-
-        static std::unique_ptr<NotificationCenter> _instance;
 
         SubscriptionMap _subscriptions;
 

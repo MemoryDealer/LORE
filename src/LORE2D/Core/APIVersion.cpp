@@ -42,24 +42,24 @@ using namespace APIVersionNS;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-int APIVersion::getMajor()
+int APIVersion::GetMajor()
 {
     return Major;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-int APIVersion::getMinor()
+int APIVersion::GetMinor()
 {
     return Minor;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-string APIVersion::getString()
+string APIVersion::GetString()
 {
-    return std::to_string( Major ) +
-        "." + std::to_string( Minor );
+    static string str = std::to_string( Major ) + std::to_string( Minor );
+    return str;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

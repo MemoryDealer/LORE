@@ -61,7 +61,7 @@ Lore::GPUProgramPtr StockResourceController::createUberShader( const string& nam
 {
     const bool textured = ( params.numTextures > 0 );
     const string header = "#version " +
-        std::to_string( APIVersion::getMajor() ) + std::to_string( APIVersion::getMinor() ) + "0" +
+        std::to_string( APIVersion::GetMajor() ) + std::to_string( APIVersion::GetMinor() ) + "0" +
         " core\n";
 
     //

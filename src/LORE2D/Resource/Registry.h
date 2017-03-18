@@ -87,7 +87,7 @@ namespace Lore {
         {
             auto lookup = _container.find( id_ );
             if ( _container.end() == lookup ) {
-                throw Lore::Exception( "Resource with id " + id_ + " does not exist" );
+                throw Lore::ItemIdentityException( "Resource with id " + id_ + " does not exist" );
             }
 
             return lookup->second.get();
@@ -176,7 +176,7 @@ namespace Lore {
 
             auto lookup = _container.find( id_ );
             if ( _container.end() == lookup ) {
-                throw Lore::Exception( "Resource with id " + id_ + " does not exist" );
+                throw Lore::ItemIdentityException( "Resource with id " + id_ + " does not exist" );
             }
 
             return lookup->second.get();

@@ -31,6 +31,9 @@
 
 namespace Lore {
 
+    ///
+    /// \class Quaternion
+    /// \brief Representation of a quaternion.
     struct LORE_EXPORT Quaternion
     {
 
@@ -53,10 +56,16 @@ namespace Lore {
         , z( z_ )
         { }
 
+        ///
+        /// \brief Returns normal length of Quaternion.
         real getNormalLength() const;
 
+        ///
+        /// \brief Normalizes the Quaternion.
         real normalize();
 
+        ///
+        /// \brief Returns 3x3 matrix representing orientation of Quaternion.
         Matrix3 createRotationMatrix() const;
 
         //

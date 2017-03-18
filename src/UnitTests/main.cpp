@@ -33,9 +33,11 @@ int main( int argc, char** const argv )
 {
     int result = Catch::Session().run( argc, argv );
 
+#if LORE_PLATFORM == LORE_WINDOWS
     if ( IsDebuggerPresent() ) {
         getchar(); // Allow user to see results when running in debugger.
     }
+#endif
 
     return result;
 }

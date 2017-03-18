@@ -45,7 +45,7 @@ namespace Lore { namespace OpenGL {
         //
         // Rendering.
 
-        virtual void renderFrame( const float dt ) override;
+        virtual void renderFrame( const float lagMultiplier = 1.f ) override;
 
         //
         // Factory/Destruction functions.

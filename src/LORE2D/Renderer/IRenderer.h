@@ -31,68 +31,69 @@
 
 namespace Lore {
 
+    ///
+    /// \struct RenderQueue
+    /// \brief Holds a list of Renderables for rendering. RenderQueues are organized
+    ///     and handled by the IRenderer implementation.
+    struct RenderQueue
+    {
+
+        // Lore supports 100 render queues, rendered in order from 0-99.
+        static const uint Background = 0;
+        static const uint General = 50;
+        static const uint Foreground = 99;
+
+        // :::::: //
+
+        using MatrixList = std::vector<Matrix4*>;
+        using RenderableMap = std::map<RenderablePtr, MatrixList>;
+        using MaterialMap = std::map<MaterialPtr, RenderableMap>;
+
+        MaterialMap solids;
+
+        // TODO: Structure this so renderable entries can be removed.
+        struct Entry
+        {
+            //MatrixList::const_iterator matrixIt;
+            //RenderableMap::const_iterator renderableIt;
+        };
+
+    };
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    ///
+    /// \class IRenderer
+    /// \brief Interface for Renderers - the object that knows how to interpret
+    ///     a RenderView and a Scene's scene graph and present an image to the 
+    ///     window. Render plugins shall define these implementations.
+    class IRenderer
+    {
+
+    public:
+
+        virtual ~IRenderer() { }
+
         ///
-        /// \class IRenderer
-        /// \brief Interface for Renderers - the object that knows how to interpret
-        ///     a RenderView and a Scene's scene graph and present an image to the 
-        ///     window. Render plugins shall define these implementations.
-        class IRenderer
-        {
+        /// \brief Registers a Renderable object for rendering. This should be
+        ///     called when a Renderable is attached to a Node.
+        virtual RenderQueue::Entry addRenderable( RenderablePtr r,
+                                                  Matrix4& model ) = 0;
 
-        public:
+        ///
+        /// \brief Uses internal Renderable lists to create a frame buffer using
+        ///     the provided RenderView.
+        virtual void present( const RenderView& rv,
+                              const WindowPtr window ) = 0;
 
-            virtual ~IRenderer() { }
+    };
 
-            virtual void addRenderable( RenderablePtr r, Matrix4& model ) = 0;
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-            virtual void present( const RenderView& rv, const WindowPtr window ) = 0;
-
-        };
-        using RendererPtr = IRenderer*;
-
-        // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-        enum class RendererType {
-            Generic
-        };
-
-        // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-        struct RenderQueue
-        {
-
-            static const uint Background = 0;
-            static const uint General = 50;
-            static const uint Foreground = 99;
-
-            // :::::: //
-
-            struct Object
-            {
-
-                RenderablePtr renderable;
-                Matrix4& model;
-
-                Object( RenderablePtr r, Matrix4& m )
-                : renderable( r )
-                , model( m )
-                { }
-
-            };
-
-            // :::::: //
-
-            // TODO: Cleanup naming of this stuff
-            using Objects = std::vector<Object>;
-            using ObjectList = std::map<RenderablePtr, Objects>;
-            using RenderableList = std::map<MaterialPtr, ObjectList>;
-
-            // :::::: //
-
-            RenderableList solids;
-            RenderableList sortedTransparents;
-
-        };
+    // All built-in LORE renderer types.
+    enum class RendererType {
+        Generic
+    };
 
 }
 

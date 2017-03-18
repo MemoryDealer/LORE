@@ -28,8 +28,8 @@
 namespace Lore {
 
     ///
-    /// \class Iterator
-    /// \brief Wrapper for iterators of containers.
+    /// \class IteratorWrapper
+    /// \brief Wrapper for iterators of containers, used to implement container iterators.
     template<typename T, typename ItType, typename ValType>
     class IteratorWrapper
     {
@@ -45,11 +45,15 @@ namespace Lore {
         : _begin( begin ), _current( begin ), _end( end )
         { }
 
+        ///
+        /// \brief Returns true if the iterator has more values to iterate on.
         bool hasMore() const
         {
             return ( _current != _end );
         }
 
+        ///
+        /// \brief Advances iterator to next element.
         void moveNext()
         {
             ++_current;
@@ -85,6 +89,9 @@ namespace Lore {
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+    ///
+    /// \class MapIteratorWrapper
+    /// \brief Implements IteratorWrapper for map containers.
     template<typename T, typename ItType>
     class MapIteratorWrapper : public IteratorWrapper<T, ItType, typename T::mapped_type>
     {
@@ -126,6 +133,9 @@ namespace Lore {
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+    ///
+    /// \class MapIterator
+    /// \brief An iterator for map containers.
     template<typename T>
     class MapIterator : public MapIteratorWrapper<T, typename T::iterator>
     {
@@ -144,6 +154,9 @@ namespace Lore {
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+    ///
+    /// \class ConstMapIterator
+    /// \brief A constant iterator for map containers.
     template<typename T>
     class ConstMapIterator : public MapIteratorWrapper<T, typename T::const_iterator>
     {
@@ -164,7 +177,7 @@ namespace Lore {
 
     ///
     /// \class UniqueMapIterator
-    /// \brief For iterating a map with value of unique_ptr<T>.
+    /// \brief For iterating a map with value type of unique_ptr<T>.
     template<typename T>
     class UniqueMapIterator : public MapIteratorWrapper<T, typename T::iterator>
     {
@@ -194,6 +207,9 @@ namespace Lore {
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+    ///
+    /// \class UniqueMapIterator
+    /// \brief For constant iterating a map with value type of unique_ptr<T>.
     template<typename T>
     class ConstUniqueMapIterator : public MapIteratorWrapper<T, typename T::const_iterator>
     {

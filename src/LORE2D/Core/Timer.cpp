@@ -32,7 +32,7 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#ifdef _WIN32
+#if LORE_PLATFORM == LORE_WINDOWS
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -54,7 +54,14 @@ Timer::Timer()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-float Timer::totalTime( void ) const
+float Timer::getDeltaTime( void ) const
+{
+    return static_cast<float>( mDeltaTime );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+float Timer::getTotalElapsedTime( void ) const
 {
     if ( mStopped ) {
         return static_cast<float>( ( (
@@ -64,13 +71,6 @@ float Timer::totalTime( void ) const
         return static_cast<float>( ( (
             mCurrTime - mPausedTime ) - mBaseTime ) * mSecondsPerCount );
     }
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-float Timer::deltaTime( void ) const
-{
-    return static_cast<float>( mDeltaTime );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -139,6 +139,6 @@ void Timer::tick( void )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#endif // _WIN32
+#endif // LORE_WINDOWS
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -25,37 +25,47 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Math/Math.h>
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 namespace Lore {
 
     ///
-    /// \class SceneGraphVisitor
-    /// \brief Traverses a scene graph (e.g., a Node and all of its children) and
-    ///     carries down transformation updates as needed.
-    class LORE_EXPORT SceneGraphVisitor
+    /// \class Exception
+    /// \brief The core Lore exception object. Specialized exceptions should
+    /// derive from this class.
+    class Exception : public std::exception
+    {
+
+    protected:
+
+        string _what = "Unknown exception";
+        
+    public:
+
+        explicit Exception( const string& what )
+        : _what( what )
+        {
+        }
+
+    };
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    ///
+    /// \class ItemIdentityException
+    /// \brief Thrown when attempting to access an item by name that doesn't exist.
+    class ItemIdentityException : public Exception
     {
 
     public:
 
-        ///
-        /// \brief Constructor that takes root node as parameter, updates its
-        ///     world transform, and updates the scale of all children.
-        SceneGraphVisitor( NodePtr root );
+        explicit ItemIdentityException( const string& what )
+        : Exception( what )
+        {
+        }
 
-        ~SceneGraphVisitor();
-
-        ///
-        /// \brief Recursive function which updates the transformation matrix
-        ///     of all child nodes.
-        void visit( bool parentDirty = false );
-
-    private:
-
-        std::stack<Matrix4> _stack;
-        NodePtr _node;
+        virtual char const* what() const override
+        {
+            return ( "ItemIdentityException: " + _what ).c_str();
+        }
 
     };
 

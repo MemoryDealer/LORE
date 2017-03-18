@@ -26,6 +26,7 @@
 
 #include "GenericRenderer.h"
 
+#include <LORE2D/Math/Math.h>
 #include <LORE2D/Renderer/SceneGraphVisitor.h>
 #include <LORE2D/Resource/Renderable/Renderable.h>
 #include <LORE2D/Scene/Camera.h>
@@ -60,26 +61,29 @@ GenericRenderer::~GenericRenderer()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GenericRenderer::addRenderable( RenderablePtr r, Lore::Matrix4& model )
+Lore::RenderQueue::Entry GenericRenderer::addRenderable( RenderablePtr r, Lore::Matrix4& model )
 {
     const uint queueId = r->getRenderQueue();
 
-    RenderQueue::Object obj( r, model );
     RenderQueue& queue = _queues.at( queueId );
+    RenderQueue::Entry entry;
 
-    // Insert render queue object into list for associated material.
-    // TODO: Deal with transparents
-    //queue.solids[r->getMaterial()].insert( { r, obj } );
-    auto& rl = queue.solids[r->getMaterial()];
-    auto lookup = rl.find( r );
-    if ( rl.end() == lookup ) {
-        rl.insert( { r, RenderQueue::Objects() } );
-    }
+    // Get the right RenderableMap for this material.
+    MaterialPtr mat = r->getMaterial();
+    RenderQueue::RenderableMap& rm = queue.solids[mat];
 
-    rl.at( r ).push_back( obj );
+    // Add this model matrix to the list for this renderable.
+    RenderQueue::MatrixList& matrixList = rm[r];
+    matrixList.push_back( &model );
+
+    // Store iterators in entry record for quick removal.
+    //entry.matrixIt = matrixList.cend();
+    //entry.renderableIt = rm.find( r );
 
     // Add this queue to the active queue list if not already there.
     activateQueue( queueId, _queues[queueId] );
+
+    return entry;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -112,35 +116,11 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
     const Matrix4 viewProjection = projection * rv.camera->getViewMatrix();
     
     // Iterate through all active render queues and render each object.
-    for ( const auto& rqPair : _activeQueues ) {
-        RenderQueue& rq = rqPair.second;
+    for ( const auto& activeQueue : _activeQueues ) {
+        RenderQueue& queue = activeQueue.second;
 
-        RenderQueue::RenderableList& renderables = rq.solids;
-        for ( auto& rlPair : renderables ) {
-            Lore::MaterialPtr mat = rlPair.first;
-
-            // Bind material settings to pipeline.
-            Lore::Material::Pass& pass = mat->getPass( 0 );
-            pass.program->use();
-
-            pass.program->getVertexBuffer()->bind();
-
-            RenderQueue::ObjectList& objects = rlPair.second;
-            for ( auto& objPair : objects ) {
-                for ( auto& obj : objPair.second ) {
-                    // Calculate model-view-projection matrix for this object.
-                    Matrix4 mvp = viewProjection * obj.model;
-
-                    pass.program->setTransformVar( mvp );
-
-                    obj.renderable->bind();
-
-                    pass.program->getVertexBuffer()->draw();
-                }
-            }
-
-            pass.program->getVertexBuffer()->unbind();
-        }
+        // Render solids.
+        renderMaterialMap( queue.solids, viewProjection );
     }
 }
 
@@ -152,6 +132,46 @@ void GenericRenderer::activateQueue( const uint id, Lore::RenderQueue& rq )
     auto lookup = _activeQueues.find( id );
     if ( _activeQueues.end() == lookup ) {
         _activeQueues.insert( { id, rq } );
+    }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GenericRenderer::renderMaterialMap( const Lore::RenderQueue::MaterialMap& mm,
+                                         const Lore::Matrix4& viewProjection ) const
+{
+    for ( auto& pair : mm ) {
+        MaterialPtr material = pair.first;
+        const RenderQueue::RenderableMap& rm = pair.second;
+
+        // Setup material settings.
+        // TODO: Multi-pass rendering.
+        Lore::Material::Pass& pass = material->getPass( 0 );
+        VertexBufferPtr vb = pass.program->getVertexBuffer();
+        pass.program->use();
+        vb->bind();
+        
+        // For each renderable, iterate over its matrix entries and render.
+        for ( auto& renderablePair : rm ) {
+            RenderablePtr renderable = renderablePair.first;
+            const RenderQueue::MatrixList& matrices = renderablePair.second;
+
+            // Setup this renderable for rendering all of its instances.
+            renderable->bind();
+
+            for ( const auto model : matrices ) {
+                // Calculate model-view-projection matrix for this object.
+                Matrix4 mvp = viewProjection * *model;
+
+                // Update the MVP value in the shader.
+                pass.program->setTransformVar( mvp );
+
+                // Draw the renderable.
+                vb->draw();
+            }
+        }
+
+        vb->unbind();
     }
 }
 

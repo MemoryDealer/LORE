@@ -70,6 +70,8 @@ void SceneGraphVisitor::visit( bool parentDirty )
 
     // Recurse over children.
     if ( _node->hasChildNodes() ) {
+        // Push this node's transform onto the stack, so the next call can
+        // use it to calculate its derived transform.
         _stack.push( transform );
 
         Node::ChildNodeIterator it = _node->getChildNodeIterator();
@@ -78,6 +80,7 @@ void SceneGraphVisitor::visit( bool parentDirty )
             visit( parentDirty );
         }
 
+        // Recursion on this node's children is done, we can pop off the transform.
         _stack.pop();
     }
 }

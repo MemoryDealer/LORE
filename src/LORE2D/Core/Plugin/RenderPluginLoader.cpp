@@ -34,7 +34,7 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#if defined( _WIN32 ) || defined( _WIN64 )
+#if LORE_PLATFORM == LORE_WINDOWS
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -72,8 +72,10 @@ bool RenderPluginLoader::load( const string& file )
 
 std::unique_ptr<Context> RenderPluginLoader::createContext()
 {
+    // Function pointer to create the context.
     using CreateContextPtr = Context*( *)( );
 
+    // Get address of CreateContext function inside DLL.
     CreateContextPtr ccp = reinterpret_cast< CreateContextPtr >(
         GetProcAddress( _hModule, "CreateContext" ) );
     if ( nullptr == ccp ) {
@@ -81,9 +83,10 @@ std::unique_ptr<Context> RenderPluginLoader::createContext()
         return nullptr;
     }
 
-    // Allocate the render plugin's context.
+    // Call the DLL's CreateContext() - allocate the render plugin's context.
     Context* context = ccp();
 
+    // Place Context object into unique_ptr to meet Lore's standard.
     std::unique_ptr<Context> p( context );
     return std::move( p );
 }
