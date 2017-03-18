@@ -3,7 +3,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -26,7 +26,10 @@
 
 #include "StockResource.h"
 
+#include <LORE2D/Core/Context.h>
 #include <LORE2D/Resource/Material.h>
+#include <LORE2D/Resource/ResourceController.h>
+#include <LORE2D/Resource/StockResource.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -34,35 +37,95 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-template<> std::unique_ptr<StockResource> StockResource::_instance = nullptr;
+namespace LocalNS {
+
+    static ContextPtr ActiveContext = nullptr;
+
+}
+using namespace LocalNS;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-StockResource::StockResource()
-: _materials()
-, _gpuPrograms()
+StockResourceController::StockResourceController()
+: _controller( nullptr )
 {
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void StockResource::createStockResources()
+StockResourceController::~StockResourceController()
 {
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void StockResourceController::createStockResources()
+{
+    //
+    // Load stock programs.
+
+    UberShaderParameters params;
+
+    // StandardTexturedQuad:
+
+    params.numTextures = 1;
+    createUberShader( "StandardTexturedQuad", params );
+
     //
     // Load stock materials.
 
-    auto material = std::make_unique<Material>( "BaseWhiteNoLighting" );
-    Material::Pass& pass = material->getPass( 0 );
+    /*auto material = _loader->createMaterial( "BaseWhiteNoLighting" );
+    auto& pass = material->getPass( 0 );
     pass.ambient = pass.diffuse = StockColor::White;
     pass.lighting = false;
-    pass.program = nullptr;
+    pass.program = nullptr;*/
+
+    // StandardTexturedQuad
+    {
+        auto material = _controller->createMaterial( "StandardTexturedQuad" );
+        Material::Pass& pass = material->getPass( 0 );
+        pass.ambient = pass.diffuse = StockColor::White;
+        pass.lighting = false;
+        pass.program = _controller->getGPUProgram( "StandardTexturedQuad" );
+    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-MaterialPtr StockResource::getMaterial( const string& name )
+GPUProgramPtr StockResourceController::getGPUProgram( const string& name )
 {
-    return _materials.get( name );
+    return _controller->getGPUProgram( name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+MaterialPtr StockResourceController::getMaterial( const string& name )
+{
+    return _controller->getMaterial( name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+GPUProgramPtr StockResource::GetGPUProgram( const string& name )
+{
+    return ActiveContext->getStockResourceController()->getGPUProgram( name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+MaterialPtr StockResource::GetMaterial( const string& name )
+{
+    return ActiveContext->getStockResourceController()->getMaterial( name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void StockResource::AssignContext( ContextPtr context )
+{
+    ActiveContext = context;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+

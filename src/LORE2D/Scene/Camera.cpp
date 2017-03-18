@@ -24,10 +24,9 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Window.h"
+#include "Camera.h"
 
-#include <LORE2D/Resource/ResourceController.h>
-#include <LORE2D/Resource/StockResource.h>
+#include <LORE2D/Math/Math.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -35,121 +34,113 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Window::Window( const string& title,
-                const int width,
-                const int height )
-: _title( title )
-, _width( width )
-, _height( height )
-, _frameBufferWidth( 0 )
-, _frameBufferHeight( 0 )
-, _aspectRatio( 0.f )
-, _mode( Mode::Windowed )
-, _controller( nullptr )
-, _stockController( nullptr )
+Camera::Camera( const string& name )
+: _name( name )
+, _position()
+, _scale( 1.f, 1.f )
+, _view()
+, _dirty( true )
 {
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Window::~Window()
+Camera::~Camera()
 {
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Window::addRenderView( const RenderView& renderView )
+void Camera::setPosition( const Vec2& pos )
 {
-    // Verify this render view does not already exist.
-    for ( const auto& rv : _renderViews ) {
-        if ( rv == renderView ) {
-            throw Lore::Exception( "RenderView " + renderView.name +
-                                   " already exists in Window " + _title );
-        }
+    _position = pos;
+    dirty();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Camera::setPosition( const real x, const real y )
+{
+    _position.x = x;
+    _position.y = y;
+    dirty();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Camera::translate( const Vec2& offset )
+{
+    _position += offset;
+    dirty();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Camera::translate( const real xOffset, const real yOffset )
+{
+    _position.x += xOffset;
+    _position.y += yOffset;
+    dirty();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Camera::zoom( const real amount )
+{
+    _scale.x += amount;
+    _scale.y += amount;
+    dirty();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Camera::setZoom( const real amount )
+{
+    _scale.x = _scale.y = amount;
+    dirty();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Camera::dirty()
+{
+    _dirty = true;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Matrix4 Camera::getViewMatrix()
+{
+    if ( _dirty ) {
+        _updateViewMatrix();
     }
 
-    lore_log( "Adding RenderView " + renderView.name + " to Window " + _title );
-    _renderViews.push_back( renderView );
+    return _view;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Window::removeRenderView( const RenderView& renderView )
+void Camera::_updateViewMatrix()
 {
-    removeRenderView( renderView.name );
-}
+    /*_view[3] = _view[0] * _position.x + _view[1] * _position.y + _view[3];
+    _position.x = 0.f;
+    _position.y = 0.f;*/
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    /*Vec4 zoom( _scale.x, _scale.y, 1.f, 1.f );
+    _view[0] *= zoom;
+    _view[1] *= zoom;
+    _view[2] *= zoom;
+    _scale.x = _scale.y = 1.f;
 
-void Window::removeRenderView( const string& name )
-{
-    for ( auto it = _renderViews.begin(); it != _renderViews.end(); ) {
-        const RenderView& rv = ( *it );
-        if ( rv.name == name ) {
-            lore_log( "Removing RenderView " + name + " from Window " + _title );
-            it = _renderViews.erase( it );
-            break;
-        }
-        else {
-            ++it;
-        }
-    }
-}
+    _view[3].x = _position.x;
+    _view[3].y = _position.y;*/
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    // TODO: Handle zooming properly.
+    _view = Math::CreateTransformationMatrix( _position,
+                                              Quaternion(),
+                                              _scale );
 
-RenderView& Window::getRenderView( const string& name )
-{
-    for ( auto& rv : _renderViews ) {
-        if ( name == rv.name ) {
-            return rv;
-        }
-    }
-
-    throw Lore::Exception( "RenderView " + name + " does not exist in Window " + _title );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Window::resetRenderViews()
-{
-    _renderViews.clear();
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Window::setTitle( const string& title )
-{
-    _title = title;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Window::setDimensions( const int width, const int height )
-{
-    _width = width;
-    _height = height;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Window::setMode( const Mode& mode )
-{
-    _mode = mode;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-ResourceControllerPtr Window::getResourceController() const
-{
-    return _controller.get();
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-StockResourceControllerPtr Window::getStockResourceController() const
-{
-    return _stockController.get();
+    _dirty = false;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

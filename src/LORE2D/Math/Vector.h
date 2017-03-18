@@ -4,7 +4,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -27,6 +27,8 @@
 
 namespace Lore {
 
+    // Since Vector classes are generated using templates, provide macros for
+    // generate scalable default member functions for template class specializations.
 #define DEFAULT_MEMBERS( N )\
     Vector()\
     {\
@@ -138,6 +140,8 @@ namespace Lore {
 
         DEFAULT_MEMBERS( 3 );
 
+        ///
+        /// \brief Returns cross product of this vector with rhs.
         Vector<T, 3> cross( const Vector<T, 3>& rhs )
         {
             Vector<T, 3> re;
@@ -146,6 +150,7 @@ namespace Lore {
             re.z = x * rhs.y - y * rhs.x;
             return re;
         }
+
     };
 
     template<typename T>
@@ -166,8 +171,6 @@ namespace Lore {
 
         DEFAULT_MEMBERS( 4 );
     };
-
-#undef DEFAULT_MEMBERS
 
     //
     // Operator overloads.
@@ -253,6 +256,8 @@ namespace Lore {
 #undef VEC_UNARY_OP
 #undef VEC_BINARY_OP
 #undef VEC_INPLACE_OP
+
+#undef DEFAULT_MEMBERS
 
 }
 

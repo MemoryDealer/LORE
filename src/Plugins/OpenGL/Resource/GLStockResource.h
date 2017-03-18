@@ -4,7 +4,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -27,25 +27,22 @@
 
 #include <LORE2D/Resource/StockResource.h>
 
-#include <Plugins/OpenGL/Shader/GLStockShaders.h>
-
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore { namespace OpenGL {
 
-    class StockResource : public Lore::StockResource
+    class StockResourceController : public Lore::StockResourceController
     {
 
     public:
 
-        virtual ~StockResource() override;
+        StockResourceController();
+
+        virtual ~StockResourceController() override;
 
         virtual void createStockResources() override;
 
-    private:
-
-        StockVertexShaders _stockVertexShaders;
-        StockFragmentShaders _stockFragmentShaders;
+        virtual GPUProgramPtr createUberShader( const string& name, const Lore::UberShaderParameters& params ) override;
 
     };
 

@@ -24,7 +24,9 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Quaternion.h"
+#include "RenderPluginLoader.h"
+
+#include <LORE2D/Core/Context.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -32,69 +34,74 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-real Quaternion::getNormalLength() const
+#if LORE_PLATFORM == LORE_WINDOWS
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+constexpr
+RenderPluginLoader::RenderPluginLoader()
+: _hModule( nullptr )
 {
-    return w * w + x * x + y * y + z * z;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-real Quaternion::normalize()
+RenderPluginLoader::~RenderPluginLoader()
 {
-    real len = getNormalLength();
-    real factor = 1.f / std::sqrtf( len );
-    *this = *this * factor;
-    return len;
+    free();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Matrix3 Quaternion::createRotationMatrix() const
+bool RenderPluginLoader::load( const string& file )
 {
-    const real tx = x + x;
-    const real ty = y + y;
-    const real tz = z + z;
-    const real twx = tx * w;
-    const real twy = ty * w;
-    const real twz = tz * w;
-    const real txx = tx * x;
-    const real txy = ty * x;
-    const real txz = tz * x;
-    const real tyy = ty * y;
-    const real tyz = tz * y;
-    const real tzz = tz * z;
+    free(); 
 
-    Matrix3 rot;
-    rot[0][0] = 1.f - ( tyy + tzz );
-    rot[0][1] = txy - twz;
-    rot[0][2] = txz + twy;
-    rot[1][0] = txy + twz;
-    rot[1][1] = 1.f - ( txx + tzz );
-    rot[1][2] = tyz - twx;
-    rot[2][0] = txz - twy;
-    rot[2][1] = tyz + twx;
-    rot[2][2] = 1.f - ( txx + tyy );
+    _hModule = LoadLibrary( file.c_str() );
+    if ( nullptr == _hModule ) {
+        log_critical( "Unable to load render plugin " + file );
+        return false;
+    }
 
-    return rot;
+    log_debug( "Render plugin " + file + " successfully loaded" );
+
+    return true;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Quaternion Quaternion::operator * ( const Quaternion& rhs ) const
+std::unique_ptr<Context> RenderPluginLoader::createContext()
 {
-    return Quaternion(
-        w * rhs.w - x * rhs.x - y * rhs.y - z * rhs.z,
-        w * rhs.x + x * rhs.w + y * rhs.z - z * rhs.y,
-        w * rhs.y + y * rhs.w + z * rhs.x - x * rhs.z,
-        w * rhs.z + z * rhs.w + x * rhs.y - y * rhs.x
-    );
+    // Function pointer to create the context.
+    using CreateContextPtr = Context*( *)( );
+
+    // Get address of CreateContext function inside DLL.
+    CreateContextPtr ccp = reinterpret_cast< CreateContextPtr >(
+        GetProcAddress( _hModule, "CreateContext" ) );
+    if ( nullptr == ccp ) {
+        log_critical( "Unable to get CreateContext function pointer from render plugin" );
+        return nullptr;
+    }
+
+    // Call the DLL's CreateContext() - allocate the render plugin's context.
+    Context* context = ccp();
+
+    // Place Context object into unique_ptr to meet Lore's standard.
+    std::unique_ptr<Context> p( context );
+    return std::move( p );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Quaternion Quaternion::operator * ( const real r ) const
+void RenderPluginLoader::free()
 {
-    return Quaternion( r * w, r * x, r * y, r * z );
+    if ( _hModule ) {
+        FreeLibrary( _hModule );
+    }
 }
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+#endif
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

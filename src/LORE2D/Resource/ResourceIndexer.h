@@ -4,7 +4,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -25,50 +25,23 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore { namespace OpenGL {
+namespace Lore {
 
-    class StockVertexShaders final
+    class ResourceIndexer
     {
 
     public:
 
-        enum class Type
-        {
-            Generic
-        };
-
-        struct Parameters
-        {
-            bool pos2D;
-            bool texCoord;
-        };
-
-    public:
-
-        StockVertexShaders();
-
-        //TODO: Return Shader object
-        string& get( const Type& t );
-
-    private:
-
-        void create( const Parameters& p );
-
-    private:
-
-        std::unordered_map<Type, string> _shaders;
+        virtual ~ResourceIndexer() = 0;
 
     };
 
-    class StockFragmentShaders final
+    static std::unique_ptr<ResourceIndexer> CreateResourceIndexer()
     {
 
-    public:
 
-        static const string Generic;
+    }
 
-    };
-
-}}
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

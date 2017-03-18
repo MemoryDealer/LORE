@@ -3,7 +3,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -24,9 +24,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "RenderPluginLoader.h"
-
-#include <LORE2D/Core/Context.h>
+#include "APIVersion.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -34,71 +32,42 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#if defined( _WIN32 ) || defined( _WIN64 )
+namespace APIVersionNS {
+
+    static int Major = 0;
+    static int Minor = 0;
+
+}
+using namespace APIVersionNS;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-constexpr
-RenderPluginLoader::RenderPluginLoader()
-: _hModule( nullptr )
+int APIVersion::GetMajor()
 {
+    return Major;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-RenderPluginLoader::~RenderPluginLoader()
+int APIVersion::GetMinor()
 {
-    free();
+    return Minor;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-bool RenderPluginLoader::load( const string& file )
+string APIVersion::GetString()
 {
-    free(); 
-
-    _hModule = LoadLibrary( file.c_str() );
-    if ( nullptr == _hModule ) {
-        log_critical( "Unable to load render plugin " + file );
-        return false;
-    }
-
-    log_debug( "Render plugin " + file + " successfully loaded" );
-
-    return true;
+    static string str = std::to_string( Major ) + std::to_string( Minor );
+    return str;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-std::unique_ptr<Context> RenderPluginLoader::createContext()
+void APIVersion::Set( const int major, const int minor )
 {
-    using CreateContextPtr = Context*( *)( );
-
-    CreateContextPtr ccp = reinterpret_cast< CreateContextPtr >(
-        GetProcAddress( _hModule, "CreateContext" ) );
-    if ( nullptr == ccp ) {
-        log_critical( "Unable to get CreateContext function pointer from render plugin" );
-        return nullptr;
-    }
-
-    // Allocate the render plugin's context.
-    Context* context = ccp();
-
-    std::unique_ptr<Context> p( context );
-    return std::move( p );
+    Major = major;
+    Minor = minor;
 }
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void RenderPluginLoader::free()
-{
-    if ( _hModule ) {
-        FreeLibrary( _hModule );
-    }
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-#endif
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

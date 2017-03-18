@@ -4,7 +4,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -25,26 +25,58 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Shader/VertexBuffer.h>
+#include <LORE2D/Math/Math.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-    class ResourceLoader
+    class LORE_EXPORT Camera final
     {
 
     public:
 
-        virtual TexturePtr loadTexture( const string& name, const string& file ) = 0;
+        explicit Camera( const string& name );
 
-        virtual GPUProgramPtr createGPUProgram( const string& name ) = 0;
+        ~Camera();
 
-        virtual ShaderPtr createVertexShader( const string& name ) = 0;
+        //
+        // Modifiers.
 
-        virtual ShaderPtr createFragmentShader( const string& name ) = 0;
+        void setPosition( const Vec2& pos );
 
-        virtual VertexBufferPtr createVertexBuffer( const string& name, const VertexBuffer::Type& type ) = 0;
+        void setPosition( const real x, const real y );
+
+        void translate( const Vec2& offset );
+
+        void translate( const real xOffset, const real yOffset );
+
+        void zoom( const real amount );
+
+        void setZoom( const real amount );
+
+        // TODO: Set projection mode (Ortho/Persp).
+
+        //
+        // Getters.
+
+        Matrix4 getViewMatrix();
+
+        void dirty();
+
+    private:
+
+        void _updateViewMatrix();
+
+    private:
+
+        string _name;
+
+        Vec2 _position;
+        Vec2 _scale;
+        Matrix4 _view;
+
+        bool _dirty;
 
     };
 

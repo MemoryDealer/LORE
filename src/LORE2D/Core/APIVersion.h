@@ -25,37 +25,43 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Resource/Renderable/Texture.h>
+namespace Lore {
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-namespace Lore { namespace OpenGL {
-
-    class Texture : public Lore::Texture
+    ///
+    /// \class APIVersion
+    /// \brief Provides static methods for getting the active rendering API version
+    ///     (e.g., if the OpenGL plugin is used, it will return the OpenGL version).
+    /// This is dependent on what the user has installed on their machine.
+    class LORE_EXPORT APIVersion
     {
 
     public:
 
-        explicit Texture( const string& name, const string& file );
+        ///
+        /// \brief Returns major version as integer value.
+        static int GetMajor();
 
-        virtual ~Texture() override;
+        ///
+        /// \brief Returns minor version as integer value.
+        static int GetMinor();
 
-        virtual void bind() override;
-
-        //
-        // Getters.
-
-        GLuint getID() const
-        {
-            return _id;
-        }
+        ///
+        /// \brief Returns major and minor version as string
+        ///     (e.g., "4.3", for example).
+        static string GetString();
 
     private:
 
-        GLuint _id;
+        // Provide Context access to internal method Set(), so render plugin
+        // Context objects can set the API version.
+        friend class Context;
+
+    private:
+
+        static void Set( const int major, const int minor );
 
     };
 
-}}
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

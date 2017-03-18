@@ -4,7 +4,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -25,15 +25,47 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Official plugin data.
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 namespace Lore {
 
-    enum class RenderPlugin {
+    ///
+    /// \class Exception
+    /// \brief The core Lore exception object. Specialized exceptions should
+    /// derive from this class.
+    class Exception : public std::exception
+    {
 
-        OpenGL
+    protected:
+
+        string _what = "Unknown exception";
+        
+    public:
+
+        explicit Exception( const string& what )
+        : _what( what )
+        {
+        }
+
+    };
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    ///
+    /// \class ItemIdentityException
+    /// \brief Thrown when attempting to access an item by name that doesn't exist.
+    class ItemIdentityException : public Exception
+    {
+
+    public:
+
+        explicit ItemIdentityException( const string& what )
+        : Exception( what )
+        {
+        }
+
+        virtual char const* what() const override
+        {
+            return ( "ItemIdentityException: " + _what ).c_str();
+        }
 
     };
 

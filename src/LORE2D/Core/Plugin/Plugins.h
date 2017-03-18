@@ -4,7 +4,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -25,55 +25,18 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Resource/ResourceLoader.h>
-
-#include <LORE2D/Resource/Registry.h>
-#include <LORE2D/Shader/Shader.h>
-
-#include <Plugins/OpenGL/Resource/Renderable/GLTexture.h>
+// Official LORE2D plugin data.
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore { namespace OpenGL {
+namespace Lore {
 
-    class ResourceLoader : public Lore::ResourceLoader
-    {
+    enum class RenderPlugin {
 
-    public:
-
-        ResourceLoader();
-
-        ~ResourceLoader();
-
-        virtual TexturePtr loadTexture( const string& name, const string& file ) override;
-
-        virtual GPUProgramPtr createGPUProgram( const string& name ) override;
-
-        virtual ShaderPtr createVertexShader( const string& name ) override;
-
-        virtual ShaderPtr createFragmentShader( const string& name ) override;
-
-        virtual VertexBufferPtr createVertexBuffer( const string& name, const VertexBuffer::Type& type ) override;
-
-    private:
-
-        using ShaderRegistry = Registry<std::unordered_map, Shader>;
-
-    private:
-
-        Registry<std::unordered_map, Texture> _textureRegistry;
-
-        // Shaders.
-
-        Registry<std::unordered_map, GPUProgram> _gpuProgramRegistry;
-
-        ShaderRegistry _vertexShaderRegistry;
-        ShaderRegistry _fragmentShaderRegistry;
-
-        Registry<std::unordered_map, VertexBuffer> _vertexBufferRegistry;
+        OpenGL
 
     };
 
-}}
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

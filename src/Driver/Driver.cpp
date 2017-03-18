@@ -3,7 +3,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -26,39 +26,11 @@
 
 #include <memory>
 #include <LORE2D/Lore.h>
+#include <LORE2D/Resource/Material.h>
+#include <LORE2D/Resource/Renderable/Texture.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-const static Lore::string vshader_src =
-"#version 450 core\n"
-"layout (location = 0) in vec3 position;\n"
-"layout (location = 1) in vec3 color;\n"
-"layout (location = 2) in vec2 texCoord;\n"
-"out vec3 inColor;\n"
-"out vec2 TexCoord;\n"
-"uniform mat4 transform;\n"
-"void main()\n"
-"{\n"
-"gl_Position = transform * vec4(position, 1.0);\n"
-"inColor = color;\n"
-"TexCoord = texCoord;\n"
-"}\n";
-
-const static Lore::string pshader_src =
-"#version 450 core\n"
-"in vec3 inColor;\n"
-"in vec2 TexCoord;\n"
-"out vec4 color;\n"
-"uniform vec4 sColor;\n"
-"uniform sampler2D tex;\n"
-"uniform sampler2D tex2;\n"
-"uniform float mixValue;\n"
-"void main()\n"
-"{\n"
-"float a = texture(tex2, TexCoord).a;\n"
-"color = mix( texture(tex, TexCoord), texture(tex2, TexCoord), a * mixValue);\n"
-"}\n";
-
+// Note: Error 1282 on binding calls with no prior errors indicates a wrong context.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 int main( int argc, char** argv )
@@ -66,13 +38,34 @@ int main( int argc, char** argv )
     auto context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
 
     Lore::WindowPtr window = context->createWindow( "Test", 640, 480 );
-    context->createWindow( "Test2", 720, 640 );
+    window->setActive();
+
+    /* 
+    To load on a thread:
+
+    "There is a way to use multiple contexts with GLFW.
+
+    Make a second invisible window that has the main window as the parent (the last parameter is for list sharing)
+    E.g.: GLUtil::_loaderWindow = glfwCreateWindow(1, 1, "whatever", nullptr, GLUtil::_mainWindow);
+    Create another thread and in its run()(or whatever) method call this: glfwMakeContextCurrent(GLUtil::_loaderWindow);
+
+    If you are using GLEW, build GLEW with the GLEW_MX define and call init() in the second thread as well. Read up on GLEW_MX about multithreaded usage. I strongly recommend boost thread specific pointers for this.
+
+    Remember to destroy the second window just like the main one. That's it. I've been using this method for background resource loading for years and haven't ran into any issues.
+
+    Hope it helps."
+    */
+
+    //context->createWindow( "Test2", 720, 640 );
+    Lore::ResourceController& loader = *context->getResourceController();
 
     Lore::ScenePtr scene = context->createScene( "Default" );
-    scene->setBackgroundColor( Lore::StockColor::White );
+    scene->setBackgroundColor( Lore::StockColor::Black );
 
-    Lore::Viewport vp( 0.f, 0.f, 0.5f, 1.f );
+    Lore::Viewport vp( 0.f, 0.f, 1.f, 1.f );
+    Lore::CameraPtr camera = loader.createCamera( "cam1" );
     Lore::RenderView rv( "main", scene, vp );
+    rv.camera = camera;
     window->addRenderView( rv );
 
     Lore::NodePtr node = scene->createNode( "A" );
@@ -81,36 +74,82 @@ int main( int argc, char** argv )
     node = node->createChildNode( "BChild" );
     node = node->createChildNode( "BChildChild" );
 
-    Lore::ResourceLoader& loader = context->getResourceLoader();
-
     // Textures.
-    Lore::TexturePtr tex = loader.loadTexture( "tex1", "C:\\Texture.png" );
-    node->attachObject( (Lore::RenderablePtr)tex );
+    Lore::TexturePtr tex = loader.loadTexture( "tex1", "C:\\texture.png" );
 
-    Lore::GPUProgramPtr program = loader.createGPUProgram( "GPU1" );
-    Lore::ShaderPtr vshader = loader.createVertexShader( "v1" );
-    vshader->loadFromSource( vshader_src.c_str() );
+   // Lore::GPUProgramPtr program = loader.createGPUProgram( "GPU1" );
+   // Lore::ShaderPtr vshader = loader.createVertexShader( "v1" );
+   // vshader->loadFromSource( vshader_src.c_str() );
 
-    Lore::ShaderPtr fshader = loader.createFragmentShader( "f1" );
-    fshader->loadFromSource( pshader_src.c_str() );
+   // Lore::ShaderPtr fshader = loader.createFragmentShader( "f1" );
+   // fshader->loadFromSource( pshader_src.c_str() );
 
-    Lore::VertexBufferPtr vb = loader.createVertexBuffer( "vb1", Lore::VertexBuffer::Type::Quad );
-    vb->addAttribute( Lore::VertexBuffer::AttributeType::Float, 3 );
-    vb->addAttribute( Lore::VertexBuffer::AttributeType::Float, 3 );
-    vb->build();
+   // Lore::VertexBufferPtr vb = loader.createVertexBuffer( "vb1", Lore::VertexBuffer::Type::TexturedQuad );
+   // vb->build();
 
-    program->setVertexBuffer( vb );
-    program->attachShader( vshader );
-    program->attachShader( fshader );
-    program->link();
+   //// ; How will changing material on renderable propagate to render queues? Should do so with pointers?
+   // // Remove createVertexBuffer and have GPUProgram own one, so there's not another variable to deal with
+   // // Consider doing the same for vertex and fragment shader
+   // program->setVertexBuffer( vb );
+   // program->attachShader( vshader );
+   // program->attachShader( fshader );
+   // program->link();
 
-    auto it = scene->getNode( "A" )->getChildNodeIterator();
-    while ( it.hasMore() ) {
-        node = it.getNext();
-        ;
-    }
+   // program->addTransformVar( "transform" );
 
-    while ( context->active() ) {
+    //Lore::MaterialPtr mat = loader.createMaterial( "mat1" );
+    //mat->getPass( 0 ).program = program;
+    //Lore::MaterialPtr mat = Lore::StockResource::GetMaterial( "StandardTexturedQuad" );
+    //Lore::MaterialPtr mat = loader.createMaterial( "mat1" );
+    //mat->getPass( 0 ).program = Lore::StockResource::GetGPUProgram( "StandardTexturedQuad" );
+    //mat->getPass( 0 ).program = program;
+    //tex->setMaterial( mat );
+
+    node = scene->getNode( "A" );
+    node->attachObject( tex );
+    node->scale( Lore::Vec2( 2.f, 1.0f ) );
+
+    node->getChild( "AChild" )->scale( Lore::Vec2( 0.5f, 1.f ) );
+
+    node->getChild( "AChild" )->attachObject( tex );
+    node->getChild( "AChild" )->setPosition( Lore::Vec2( -0.25f, 0.25f ) );
+
+    auto n2 = scene->createNode( "n2" );
+    n2->attachObject( tex );
+    n2->scale( Lore::Vec2( 4.2f, 0.65f ) );
+    n2->translate( 0.25f, 0.35f );
+
+    float f = 0.f;
+    while ( context->active() ) { 
+        //node->translate( 0.05f * std::sinf( f ), 0.05f * std::cosf( f ) );
+        f += 0.05f;
+        //node->scale( 0.025f * std::sinf( f ) );
+
+        // TODO: Repro case where both quads appeared to be scaling with only rotations being done.
+        node->rotate( Lore::Degree( 0.5f ) );
+        //node->getChild( "AChild" )->rotate( Lore::Degree( -.1f ) );
+
+        n2->rotate( Lore::Degree( 0.025f ) );
+
+        if ( GetAsyncKeyState( VK_F1 ) ) {
+            camera->translate( -0.01f, 0.f );
+        }
+        else if ( GetAsyncKeyState( VK_F2 ) ) {
+            camera->translate( 0.01f, 0.f );
+        }
+        else if ( GetAsyncKeyState( VK_F3 ) ) {
+            camera->translate( 0.f, -0.01f );
+        }
+        else if ( GetAsyncKeyState( VK_F4 ) ) {
+            camera->translate( 0.f, 0.01f );
+        }
+        else if ( GetAsyncKeyState( VK_F5 ) ) {
+            camera->zoom( 0.01f );
+        }
+        else if ( GetAsyncKeyState( VK_F6 ) ) {
+            camera->zoom( -0.01f );
+        }
+
         context->renderFrame( 0 );
     }
 

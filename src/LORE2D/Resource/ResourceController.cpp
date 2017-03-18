@@ -24,9 +24,8 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Window.h"
+#include "ResourceController.h"
 
-#include <LORE2D/Resource/ResourceController.h>
 #include <LORE2D/Resource/StockResource.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -35,121 +34,101 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Window::Window( const string& title,
-                const int width,
-                const int height )
-: _title( title )
-, _width( width )
-, _height( height )
-, _frameBufferWidth( 0 )
-, _frameBufferHeight( 0 )
-, _aspectRatio( 0.f )
-, _mode( Mode::Windowed )
-, _controller( nullptr )
-, _stockController( nullptr )
+const string ResourceController::DefaultGroupName = "Default";
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+ResourceController::ResourceController()
+: _activeGroup( nullptr )
+, _groups()
+, _indexer( nullptr )
+{
+    // Create default resource group.
+    _activeGroup = _groups.insert( DefaultGroupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+ResourceController::~ResourceController()
 {
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Window::~Window()
+void ResourceController::setActiveGroup( const string& group )
 {
+    _activeGroup = _groups.get( group );
+    lore_log( "ResourceLoader: Active group set to " + group );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Window::addRenderView( const RenderView& renderView )
+void ResourceController::resetActiveGroup()
 {
-    // Verify this render view does not already exist.
-    for ( const auto& rv : _renderViews ) {
-        if ( rv == renderView ) {
-            throw Lore::Exception( "RenderView " + renderView.name +
-                                   " already exists in Window " + _title );
-        }
+    _activeGroup = _groups.get( DefaultGroupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void ResourceController::createGroup( const string& name )
+{
+    _groups.insert( name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void ResourceController::destroyGroup( const string& name )
+{
+    unloadGroup( name );
+    _groups.remove( name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void ResourceController::addResourceLocation( const string& file, const bool recursive )
+{
+    // Platform specific directory traversal.
+    // ...
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void ResourceController::loadGroup( const string& name )
+{
+
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void ResourceController::unloadGroup( const string& name )
+{
+
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+GPUProgramPtr ResourceController::getGPUProgram( const string& name )
+{
+    return _activeGroup->programs.get( name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+MaterialPtr ResourceController::getMaterial( const string& name )
+{
+    return _activeGroup->materials.get( name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+ResourceGroupPtr ResourceController::_getGroup( const string& group )
+{
+    if ( group == DefaultGroupName ) {
+        return _activeGroup;
     }
 
-    lore_log( "Adding RenderView " + renderView.name + " to Window " + _title );
-    _renderViews.push_back( renderView );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Window::removeRenderView( const RenderView& renderView )
-{
-    removeRenderView( renderView.name );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Window::removeRenderView( const string& name )
-{
-    for ( auto it = _renderViews.begin(); it != _renderViews.end(); ) {
-        const RenderView& rv = ( *it );
-        if ( rv.name == name ) {
-            lore_log( "Removing RenderView " + name + " from Window " + _title );
-            it = _renderViews.erase( it );
-            break;
-        }
-        else {
-            ++it;
-        }
-    }
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-RenderView& Window::getRenderView( const string& name )
-{
-    for ( auto& rv : _renderViews ) {
-        if ( name == rv.name ) {
-            return rv;
-        }
-    }
-
-    throw Lore::Exception( "RenderView " + name + " does not exist in Window " + _title );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Window::resetRenderViews()
-{
-    _renderViews.clear();
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Window::setTitle( const string& title )
-{
-    _title = title;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Window::setDimensions( const int width, const int height )
-{
-    _width = width;
-    _height = height;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Window::setMode( const Mode& mode )
-{
-    _mode = mode;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-ResourceControllerPtr Window::getResourceController() const
-{
-    return _controller.get();
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-StockResourceControllerPtr Window::getStockResourceController() const
-{
-    return _stockController.get();
+    return _groups.get( group );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

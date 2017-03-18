@@ -3,7 +3,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -30,6 +30,19 @@
 
 using namespace Lore::OpenGL;
 
+GLfloat quad_vertices [] = {
+    // Positions          // Colors           // Texture Coords
+    0.1f,  0.1f,
+    0.1f, -0.1f,
+    -0.1f, -0.1f,
+    -0.1f,  0.1f
+};
+
+GLuint quad_indices [] = {
+    //0, 1, 2, 3
+    1, 0, 2, 3
+};
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 VertexBuffer::VertexBuffer( const Lore::VertexBuffer::Type& type )
@@ -39,8 +52,24 @@ VertexBuffer::VertexBuffer( const Lore::VertexBuffer::Type& type )
 , _ebo( 0 )
 , _vertices()
 , _indices()
+, _mode( 0 )
+, _glType( GL_UNSIGNED_INT )
 {
+    switch ( type ) {
+    default:
+    case Type::Custom:
+        _mode = GL_TRIANGLES;
+        break;
 
+    case Type::Quad:
+        _mode = GL_TRIANGLE_STRIP;
+        break;
+
+    case Type::Triangle:
+        _mode = GL_TRIANGLES;
+        break;
+
+    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -59,11 +88,24 @@ void VertexBuffer::build()
         throw Lore::Exception( "Unknown vertex buffer type" );
 
     case VertexBuffer::Type::Quad:
-        _vertices = { 0.5f, 0.5f, 0.f,      1.f, 1.f,
-                      0.5f, -0.5f, 0.f,     1.f, 0.f,
-                      -0.5f, -0.5f, 0.f,    0.f, 0.f,
-                      -0.5f, -0.5f, 0.f,    0.f, 1.f };
-        _indices = { 0.f, 1.f, 2.f, 3.f }; // FLOAT???
+        _vertices = { 0.1f, 0.1f,
+                      0.1f, -0.1f,
+                     -0.1f, -0.1f,
+                     -0.1f, 0.1f };
+        _indices = { 1, 0, 2, 3 };
+
+        addAttribute( AttributeType::Float, 2 );
+        break;
+
+    case VertexBuffer::Type::TexturedQuad:
+        _vertices = { 0.1f, 0.1f,      1.f, 1.f,
+                      0.1f, -0.1f,     1.f, 0.f,
+                     -0.1f, -0.1f,     0.f, 0.f,
+                     -0.1f, 0.1f,      0.f, 1.f };
+        _indices = { 1, 0, 2, 3 };
+
+        addAttribute( AttributeType::Float, 2 );
+        addAttribute( AttributeType::Float, 2 );
         break;
     }
 
@@ -74,15 +116,15 @@ void VertexBuffer::build()
     glBindVertexArray( _vao );
 
     glBindBuffer( GL_ARRAY_BUFFER, _vbo );
-    glBufferData( GL_ARRAY_BUFFER, sizeof( _vertices ), &_vertices, GL_STATIC_DRAW );
+    glBufferData( GL_ARRAY_BUFFER, sizeof( GLfloat ) * _vertices.size(), _vertices.data(), GL_STATIC_DRAW );
 
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, _ebo );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( _indices ), &_indices, GL_STATIC_DRAW );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( GLuint ) * _indices.size(), _indices.data(), GL_STATIC_DRAW );
 
     // Attributes.
-    uint idx = 0;
-    uint offset = 0;
-    int stride = 0;
+    GLsizei idx = 0;
+    GLsizei offset = 0;
+    GLsizei stride = 0;
 
     // Get stride value from all attributes.
     for ( const auto& attr : _attributes ) {
@@ -107,7 +149,12 @@ void VertexBuffer::build()
 
         }
 
-        glVertexAttribPointer( idx, attr.size, type, GL_FALSE, stride, reinterpret_cast< GLvoid* >( offset * typeSize ) );
+        glVertexAttribPointer( idx,
+                               attr.size,
+                               type,
+                               GL_FALSE,
+                               stride * static_cast<GLsizei>( typeSize ),
+                               reinterpret_cast< GLvoid* >( offset * typeSize ) );
         glEnableVertexAttribArray( idx++ );
 
         offset += attr.size;
@@ -124,7 +171,21 @@ void VertexBuffer::build()
 
 void VertexBuffer::bind()
 {
+    glBindVertexArray( _vao );
+}
 
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void VertexBuffer::unbind()
+{
+    glBindVertexArray( 0 );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void VertexBuffer::draw()
+{
+    glDrawElements( GL_TRIANGLE_STRIP, static_cast<GLsizei>( _indices.size() ), GL_UNSIGNED_INT, 0 );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

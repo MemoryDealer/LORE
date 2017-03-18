@@ -4,7 +4,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -58,9 +58,23 @@ namespace Lore {
         }
 
         //
+        // Getters.
+
+        inline VertexBufferPtr getVertexBuffer() const
+        {
+            return _vertexBuffer;
+        }
+
+        //
         // Uniform value updating.
 
-        virtual void setUniformMatrix4( const string& name, const Matrix4& mat ) = 0;
+        virtual void addTransformVar( const string& id ) = 0;
+
+        virtual void setTransformVar( const Matrix4& m ) = 0;
+
+        virtual void addUniformVar( const string& id ) = 0;
+
+        virtual void setUniformVar( const string& id, const Matrix4& m ) = 0;
 
     protected:
 

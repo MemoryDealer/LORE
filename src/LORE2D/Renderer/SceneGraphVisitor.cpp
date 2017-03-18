@@ -3,7 +3,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -34,9 +34,17 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-SceneGraphVisitor::SceneGraphVisitor()
+SceneGraphVisitor::SceneGraphVisitor( NodePtr root )
 : _stack()
+, _node( root )
 {
+    if ( _node->_transformDirty() ) {
+        _node->_updateWorldTransform( _node->_getLocalTransform() );
+    }
+
+    // Recursively push down scale changes to child nodes. This must be done
+    // here because scales are not included in transform/rotation matrix updates.
+    _node->_updateChildrenScale();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -47,38 +55,34 @@ SceneGraphVisitor::~SceneGraphVisitor()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void SceneGraphVisitor::pushMatrix( const Matrix4 m )
+void SceneGraphVisitor::visit( bool parentDirty )
 {
-    _stack.push( m );
-}
+    const bool transformDirty = _node->_transformDirty();
+    const Matrix4 transform = _node->_getLocalTransform();
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void SceneGraphVisitor::visit( NodePtr node, bool worldDirty )
-{
-    Vec4 v = _stack.top()[0];
-    v = v * v;
-    if ( worldDirty ) {
-        Matrix4 world = _stack.top() * node->getTransformationMatrix();
-        node->setWorldTransformationMatrix( world );
+    if ( parentDirty ) {
+        _node->_updateWorldTransform( _stack.top() * transform );
     }
-    else if ( node->isTransformDirty() ) {
-        Matrix4 world = _stack.top() * node->getTransformationMatrix();
-        node->setWorldTransformationMatrix( world );
-        worldDirty = true;
+    else if ( transformDirty ) {
+        _node->_updateWorldTransform( _stack.top() * transform );
+        parentDirty = true;
     }
 
-    if ( node->hasChildNodes() ) {
-        _stack.push( node->getWorldTransformationMatrix() );
+    // Recurse over children.
+    if ( _node->hasChildNodes() ) {
+        // Push this node's transform onto the stack, so the next call can
+        // use it to calculate its derived transform.
+        _stack.push( transform );
 
-        Node::ChildNodeIterator it = node->getChildNodeIterator();
+        Node::ChildNodeIterator it = _node->getChildNodeIterator();
         while ( it.hasMore() ) {
-            NodePtr child = it.getNext();
-            visit( child, worldDirty );
+            _node = it.getNext();
+            visit( parentDirty );
         }
+
+        // Recursion on this node's children is done, we can pop off the transform.
+        _stack.pop();
     }
-    
-    _stack.pop();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

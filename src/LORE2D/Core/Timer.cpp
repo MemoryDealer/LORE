@@ -3,7 +3,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -32,7 +32,7 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#ifdef _WIN32
+#if LORE_PLATFORM == LORE_WINDOWS
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -54,7 +54,14 @@ Timer::Timer()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-float Timer::totalTime( void ) const
+float Timer::getDeltaTime( void ) const
+{
+    return static_cast<float>( mDeltaTime );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+float Timer::getTotalElapsedTime( void ) const
 {
     if ( mStopped ) {
         return static_cast<float>( ( (
@@ -64,13 +71,6 @@ float Timer::totalTime( void ) const
         return static_cast<float>( ( (
             mCurrTime - mPausedTime ) - mBaseTime ) * mSecondsPerCount );
     }
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-float Timer::deltaTime( void ) const
-{
-    return static_cast<float>( mDeltaTime );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -139,6 +139,6 @@ void Timer::tick( void )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#endif // _WIN32
+#endif // LORE_WINDOWS
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -4,7 +4,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -27,7 +27,7 @@
 
 #include <LORE2D/Lore.h>
 
-#include <Plugins/OpenGL/Resource/GLResourceLoader.h>
+#include <Plugins/OpenGL/Resource/GLResourceController.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -45,7 +45,7 @@ namespace Lore { namespace OpenGL {
         //
         // Rendering.
 
-        virtual void renderFrame( const float dt ) override;
+        virtual void renderFrame( const float lagMultiplier = 1.f ) override;
 
         //
         // Factory/Destruction functions.
@@ -71,14 +71,6 @@ namespace Lore { namespace OpenGL {
 
         virtual string getRenderPluginName() const override;
 
-        //
-        // Getters.
-
-        virtual Lore::ResourceLoader& getResourceLoader()
-        {
-            return _resourceLoader;
-        }
-
     private:
 
         using RendererMap = std::unordered_map <Lore::RendererType, std::unique_ptr<Lore::IRenderer>>;
@@ -87,7 +79,6 @@ namespace Lore { namespace OpenGL {
 
         GLFWwindow* _offscreenContextWindow;
         RendererMap _renderers;
-        ResourceLoader _resourceLoader;
 
     };
 

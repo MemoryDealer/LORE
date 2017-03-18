@@ -4,7 +4,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -31,11 +31,19 @@
 
 namespace Lore {
 
+    ///
+    /// \class Material
+    /// \brief Contains data on how to render an object, including lighting, colors,
+    ///     and shader effects.
+    /// \details Can have N number of passes.
     class LORE_EXPORT Material final
     {
 
     public:
 
+        ///
+        /// \class Material::Pass
+        /// \brief A single vertex and pixel shader pass.
         struct Pass final
         {
             bool lighting;
@@ -60,7 +68,10 @@ namespace Lore {
         //
         // Getters.
 
-        Pass& getPass( const size_t idx )
+        ///
+        /// \brief Returns reference to Pass at specified index. All Materials have
+        ///     at least one pass.
+        Pass& getPass( const size_t idx = 0 )
         {
             assert( idx <= _passes.size() );
             return _passes[idx];

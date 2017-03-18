@@ -4,7 +4,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -26,11 +26,11 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 #include <LORE2D/Core/NotificationCenter.h>
-#include <LORE2D/Plugin/Plugins.h>
-#include <LORE2D/Plugin/RenderPluginLoader.h>
+#include <LORE2D/Core/Plugin/Plugins.h>
+#include <LORE2D/Core/Plugin/RenderPluginLoader.h>
 #include <LORE2D/Renderer/IRenderer.h>
 #include <LORE2D/Resource/Registry.h>
-#include <LORE2D/Resource/ResourceLoader.h>
+#include <LORE2D/Resource/ResourceController.h>
 #include <LORE2D/Shader/GPUProgram.h>
 #include <LORE2D/Window/Window.h>
 
@@ -40,7 +40,7 @@ namespace Lore {
 
     ///
     /// \class Context
-    /// \brief The owner of all Lore functionality. 
+    /// \brief The single owner of all Lore functionality.
     class LORE_EXPORT Context
     {
 
@@ -53,7 +53,7 @@ namespace Lore {
 
     public:
 
-        explicit Context() noexcept;
+        Context() noexcept;
 
         virtual ~Context();
 
@@ -62,7 +62,7 @@ namespace Lore {
 
         ///
         /// \brief Renders a single frame using configured Windows and Scenes.
-        virtual void renderFrame( const real dt ) = 0;
+        virtual void renderFrame( const real lagMultiplier = 1.f ) = 0;
 
         //
         // Factory/Destruction functions.
@@ -76,16 +76,20 @@ namespace Lore {
 
         ///
         /// \brief Destroys specified window. If this is the last remaining window,
-        ///     the context will no longer be active.
+        ///     the context will no longer be active (calls to active() will return false).
         virtual void destroyWindow( WindowPtr window ) = 0;
 
         ///
-        /// \brief Creates a scene, assigns, the specified renderer, and returns a handle to it.
-        virtual ScenePtr createScene( const string& name, const RendererType& rt = RendererType::Generic );
+        /// \brief Creates a scene, assigns to it the specified renderer type, and returns a handle to it.
+        virtual ScenePtr createScene( const string& name,
+                                      const RendererType& rt = RendererType::Generic );
 
         ///
         /// \brief Destroys specified scene and all of its nodes.
         virtual void destroyScene( const string& name );
+
+        ///
+        /// \brief Destroys specified scene and all of its nodes.
         virtual void destroyScene( ScenePtr scene );
 
         //
@@ -93,13 +97,14 @@ namespace Lore {
 
         ///
         /// \brief Returns name of the loaded render plugin.
+        ///     Example: "OpenGL" or "Direct3D".
         virtual string getRenderPluginName() const = 0;
 
         //
         // Callbacks.
 
         ///
-        /// \brief Registers ErrorListener function pointer to be called when an error occurs.
+        /// \brief Registers ErrorListener function pointer to be called when a Lore error occurs.
         void addErrorListener( ErrorListener listener );
 
         ///
@@ -109,24 +114,63 @@ namespace Lore {
         //
         // Getters.
 
-        virtual ResourceLoader& getResourceLoader() = 0;
-
         ///
-        /// \brief Returns true if the context is active.
+        /// \brief Returns true if the context is active (requires at least one window).
         inline bool active() const
         {
             return _active;
         }
 
+        ///
+        /// \brief Returns pointer to the Context's active ResourceController, which is used to
+        ///     create, destroy, load, and unload resources.
+        /// \details The "active" ResourceController is determined by the active Window. Each
+        ///     Window manages its own resources, and has its own ResourceController.
+        ResourceControllerPtr getResourceController() const;
+
+        ///
+        /// \brief Returns pointer to the Context's active StockResourceController, which is used
+        ///     for acquiring pointers to stock resources such as textures, vertex buffers,
+        ///     GPUPrograms, etc.
+        /// \details The "active" StockResourceController is determined by the active Window. Each
+        ///     Window has its own StockResourceController.
+        StockResourceControllerPtr getStockResourceController() const;
+
+        ///
+        /// \brief Returns pointer to Window in Context of the specified name.
+        ///     Throws ItemIdentityException if not found.
         WindowPtr getWindow( const string& title )
         {
             return _windowRegistry.get( title );
         }
 
+        ///
+        /// \brief Returns pointer to Scene in Context of the specified name.
+        ///     Throws ItemIdentityException if not found.
         ScenePtr getScene( const string& name )
         {
             return _sceneRegistry.get( name );
         }
+
+        //
+        // Modifiers.
+
+        ///
+        /// \brief Sets active Window of Context.
+        /// \details Succeeding calls to getResourceController()
+        ///     will return the ResourceController for this Window. Calls to this function may
+        ///     invalidate previously acquired pointers to the active ResourceController
+        ///     (e.g., they can still point to the ResourceController of a different Window).
+        void setActiveWindow( WindowPtr window );
+
+        ///
+        /// \brief Sets active Window of Context by Window name.
+        /// \details Succeeding calls to getResourceController()
+        ///     will return the ResourceController for this Window. Calls to this function may
+        ///     invalidate previously acquired pointers to the active ResourceController
+        ///     (e.g., they can still point to the ResourceController of a different Window).
+        /// Throws ItemIdentityException if Window of specified name is not found.
+        void setActiveWindow( const string& name );
 
         //
         // Static helper functions.
@@ -138,7 +182,7 @@ namespace Lore {
         static std::unique_ptr<Context> Create( const RenderPlugin& renderPlugin );
 
         ///
-        /// \brief Frees all associated memory of Context.
+        /// \brief Frees all associated memory and GPU resources of Context.
         static void Destroy( std::unique_ptr<Context> context );
 
         //
@@ -156,6 +200,11 @@ namespace Lore {
         /// \brief Handler for window event notifications.
         void onWindowEvent( const Notification& n );
 
+        ///
+        /// \brief To be called by derived render plugin Context classes, so the
+        ///     Context object can know the rendering API version.
+        void setAPIVersion( const int major, const int minor );
+
     protected:
 
         ///
@@ -172,7 +221,14 @@ namespace Lore {
         WindowRegistry _windowRegistry;
         SceneRegistry _sceneRegistry;
 
+        WindowPtr _activeWindow;
+
+        // True if one or more Windows exist in Context.
         bool _active;
+
+    private:
+
+        static bool _ContextExists;
 
     };
 
@@ -190,6 +246,7 @@ namespace Lore {
         Context::Destroy( std::move( context ) );
     }
 
+    // Helper macro to cleanup Context without having to call std::move().
 #define DestroyLoreContext( c ) Lore::DestroyContext( std::move( c ) )
 
 }

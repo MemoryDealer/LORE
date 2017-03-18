@@ -25,34 +25,29 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Resource/Renderable/Texture.h>
+#include <LORE2D/Window/Window.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore { namespace OpenGL {
 
-    class Texture : public Lore::Texture
+    class WindowCallbackHandler final
     {
 
     public:
 
-        explicit Texture( const string& name, const string& file );
-
-        virtual ~Texture() override;
-
-        virtual void bind() override;
-
-        //
-        // Getters.
-
-        GLuint getID() const
+        inline static WindowPtr GetWindowPtr( GLFWwindow* window )
         {
-            return _id;
+            return static_cast< WindowPtr >( glfwGetWindowUserPointer( window ) );
         }
 
-    private:
+        // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        GLuint _id;
+        inline static void Size( GLFWwindow* window, int width, int height )
+        {
+            auto p = GetWindowPtr( window );
+            p->setDimensions( width, height );
+        }
 
     };
 

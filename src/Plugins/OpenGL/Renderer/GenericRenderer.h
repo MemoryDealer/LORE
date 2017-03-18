@@ -4,7 +4,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -49,15 +49,18 @@ namespace Lore { namespace OpenGL {
 
         virtual ~GenericRenderer() override;
 
-        virtual void addRenderable( Lore::RenderablePtr r, Lore::Matrix4& model ) override;
+        virtual RenderQueue::Entry addRenderable( Lore::RenderablePtr r,
+                                                  Lore::Matrix4& model ) override;
 
-        virtual void present( const Lore::RenderView& rv ) override;
+        virtual void present( const Lore::RenderView& rv,
+                              const WindowPtr window ) override;
 
     private:
 
         void activateQueue( const uint id, Lore::RenderQueue& rq );
 
-        void drawObject( const RenderQueue::Object& obj );
+        void renderMaterialMap( const RenderQueue::MaterialMap& mm,
+                                const Matrix4& viewProjection ) const;
 
     private:
 

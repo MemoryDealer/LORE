@@ -4,7 +4,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -29,7 +29,7 @@ namespace Lore {
 
     ///
     /// \class ITimestamper
-    /// \brief Interface for Timestamper class per-platform. 
+    /// \brief Interface for Timestamper class. 
     class ITimestamper
     {
 
@@ -43,11 +43,11 @@ namespace Lore {
 
     };
 
-#if defined( _WIN32 ) || defined( _WIN64 )
+#if LORE_PLATFORM == LORE_WINDOWS
 
     ///
     /// \class Timestamper
-    /// \brief Win32 implementation for ITimestamper.
+    /// \brief Windows implementation for ITimestamper.
     class Timestamper : public ITimestamper
     {
 
@@ -62,6 +62,9 @@ namespace Lore {
 #endif
 
     extern void CreateTimestamper();
+
+    ///
+    /// \copydoc ITimerstamper::generate()
     extern string GenerateTimestamp();
 
 }

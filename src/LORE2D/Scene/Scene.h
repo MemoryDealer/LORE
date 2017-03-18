@@ -4,7 +4,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -36,6 +36,8 @@ namespace Lore {
     /// \class Scene
     /// \brief Contains all information to render a scene to an area in a window,
     ///     or to a texture.
+    /// \details A Scene contains a collection of Nodes, all of which inherit from
+    ///     the Scene's root Node.
     class LORE_EXPORT Scene final
     {
 
@@ -91,6 +93,8 @@ namespace Lore {
     private:
 
         using NodeHashMap = std::unordered_map<string, std::unique_ptr<Node>>;
+
+        friend class Node;
 
     private:
 

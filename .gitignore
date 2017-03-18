@@ -42,3 +42,5 @@ src/ipch
 *.opendb
 *.sdf
 *.ipch
+
+*.opensdf

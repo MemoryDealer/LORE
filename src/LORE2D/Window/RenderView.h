@@ -4,7 +4,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Scene/Camera.h>
 #include <LORE2D/Scene/Scene.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -71,21 +72,22 @@ namespace Lore {
     {
 
         string name;
-        Scene* scene;
-        //Cam
+        ScenePtr scene;
+        CameraPtr camera;
         //PostProcesser
+
+        Viewport viewport;
 
         // Viewports are stored in a union, so each render plugin can do the 
         // conversion once, when the RenderView is added to a window.
         union
         {
 
-            Viewport viewport;
-
             struct
             {
                 int x, y;
                 uint width, height;
+                real aspectRatio;
             }  gl_viewport;
 
         };
@@ -93,12 +95,14 @@ namespace Lore {
         RenderView( const string& name_ )
         : name ( name_ )
         , scene( nullptr )
+        , camera( nullptr )
         , viewport()
         { }
 
         RenderView( const string& name_, Scene* scene_ )
         : name( name_ )
         , scene( scene_ )
+        , camera( nullptr )
         , viewport( )
         {
         }
@@ -106,6 +110,7 @@ namespace Lore {
         RenderView( const string& name_, Scene* scene_, const Viewport& viewport_ )
         : name( name_ )
         , scene( scene_ )
+        , camera( nullptr )
         , viewport( viewport_ )
         { }
 

@@ -4,7 +4,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -51,22 +51,31 @@ namespace Lore { namespace OpenGL {
         //
         // Uniform value updating.
 
-        virtual void setUniformMatrix4( const string& name, const Matrix4& mat ) override;
+        virtual void addTransformVar( const string& id ) override;
 
-        //
-        // OpenGL uniform value updaters.
+        virtual void setTransformVar( const Matrix4& m ) override;
 
-        /*void setUniformMatrix4fv( const string& name, glm::mat4x4& m );*/
+        virtual void addUniformVar( const string& id ) override;
+
+        virtual void setUniformVar( const string& id, const Matrix4& m ) override;
+
+        void setUniformVar( const string& id, const glm::mat4x4& m );
 
     private:
 
-        using UniformMap = std::unordered_map<string, GLuint>;
+        using UniformMap = std::unordered_map<string, GLint>;
+
+    private:
+
+        void _updateUniform( const GLint id, const Lore::Matrix4& m );
 
     private:
 
         GLuint _program;
 
         UniformMap _uniforms;
+
+        GLint _transform;
 
     };
 

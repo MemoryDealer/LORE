@@ -3,7 +3,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -26,9 +26,15 @@
 
 #include "GenericRenderer.h"
 
+#include <LORE2D/Math/Math.h>
 #include <LORE2D/Renderer/SceneGraphVisitor.h>
 #include <LORE2D/Resource/Renderable/Renderable.h>
+#include <LORE2D/Scene/Camera.h>
 #include <LORE2D/Shader/GPUProgram.h>
+
+#include <Plugins/OpenGL/Math/MathConverter.h>
+#include <Plugins/OpenGL/Shader/GLGPUProgram.h>
+#include <Plugins/OpenGL/Window/GLWindow.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -55,43 +61,42 @@ GenericRenderer::~GenericRenderer()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GenericRenderer::addRenderable( RenderablePtr r, Lore::Matrix4& model )
+Lore::RenderQueue::Entry GenericRenderer::addRenderable( RenderablePtr r, Lore::Matrix4& model )
 {
     const uint queueId = r->getRenderQueue();
 
-    RenderQueue::Object obj( r, model );
     RenderQueue& queue = _queues.at( queueId );
+    RenderQueue::Entry entry;
 
-    // Insert render queue object into list for associated material.
-    // TODO: Deal with transparents
-    queue.solids[r->getMaterial()].insert( { r, obj } );
+    // Get the right RenderableMap for this material.
+    MaterialPtr mat = r->getMaterial();
+    RenderQueue::RenderableMap& rm = queue.solids[mat];
+
+    // Add this model matrix to the list for this renderable.
+    RenderQueue::MatrixList& matrixList = rm[r];
+    matrixList.push_back( &model );
+
+    // Store iterators in entry record for quick removal.
+    //entry.matrixIt = matrixList.cend();
+    //entry.renderableIt = rm.find( r );
 
     // Add this queue to the active queue list if not already there.
     activateQueue( queueId, _queues[queueId] );
+
+    return entry;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GenericRenderer::present( const Lore::RenderView& rv )
+void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr window )
 {
-    NodePtr root = rv.scene->getRootNode();
-    if ( root->isTransformDirty() ) {
-        root->setWorldTransformationMatrix( root->getTransformationMatrix() );
-    }
+    // Traverse the scene graph and update object transforms.
+    Lore::SceneGraphVisitor sgv( rv.scene->getRootNode() );
+    sgv.visit();
 
     // TODO: Cache which scenes have been visited and check before doing it again.
     // [OR] move visitor to context?
     // ...
-    
-    // Traverse the scene graph and update object transforms.
-    Node::ChildNodeIterator it = root->getChildNodeIterator();
-    while ( it.hasMore() ) {
-        NodePtr node = it.getNext();
-
-        Lore::SceneGraphVisitor sgv;
-        sgv.pushMatrix( root->getWorldTransformationMatrix() );
-        sgv.visit( node );
-    }
 
     glViewport( rv.gl_viewport.x,
                 rv.gl_viewport.y,
@@ -102,36 +107,20 @@ void GenericRenderer::present( const Lore::RenderView& rv )
     glClearColor( bg.r, bg.g, bg.b, bg.a );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
+    // Setup view-projection matrix.
+    // TODO: Take viewport dimensions into account. Cache more things inside window.
+    const float aspectRatio = window->getAspectRatio();
+    const Matrix4 projection = Math::OrthoRH( -aspectRatio, aspectRatio,
+                                              -1.f, 1.f,
+                                              100.f, -100.f );
+    const Matrix4 viewProjection = projection * rv.camera->getViewMatrix();
+    
     // Iterate through all active render queues and render each object.
-    for ( const auto& rqPair : _activeQueues ) {
-        RenderQueue& rq = rqPair.second;
+    for ( const auto& activeQueue : _activeQueues ) {
+        RenderQueue& queue = activeQueue.second;
 
-        RenderQueue::RenderableList& renderables = rq.solids;
-        for ( auto& rlPair : renderables ) {
-            Lore::MaterialPtr mat = rlPair.first;
-
-            // Bind material settings to pipeline.
-            Lore::Material::Pass& pass = mat->getPass( 0 );
-            pass.program->use();
-
-            RenderQueue::ObjectList& objects = rlPair.second;
-            for ( auto& objPair : objects ) {
-                RenderQueue::Object& obj = objPair.second;
-
-                // Set program matrix...
-                // ...
-                //have setModelViewWorld( mat )
-                //    in GPUProgram, values are located in constructor and saved off
-
-                obj.renderable->bind();
-
-                // Draw based on material...
-                drawObject( obj );
-                // ...
-            }
-        }
-        
-        
+        // Render solids.
+        renderMaterialMap( queue.solids, viewProjection );
     }
 }
 
@@ -148,9 +137,42 @@ void GenericRenderer::activateQueue( const uint id, Lore::RenderQueue& rq )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GenericRenderer::drawObject( const Lore::RenderQueue::Object& obj )
+void GenericRenderer::renderMaterialMap( const Lore::RenderQueue::MaterialMap& mm,
+                                         const Lore::Matrix4& viewProjection ) const
 {
+    for ( auto& pair : mm ) {
+        MaterialPtr material = pair.first;
+        const RenderQueue::RenderableMap& rm = pair.second;
 
+        // Setup material settings.
+        // TODO: Multi-pass rendering.
+        Lore::Material::Pass& pass = material->getPass( 0 );
+        VertexBufferPtr vb = pass.program->getVertexBuffer();
+        pass.program->use();
+        vb->bind();
+        
+        // For each renderable, iterate over its matrix entries and render.
+        for ( auto& renderablePair : rm ) {
+            RenderablePtr renderable = renderablePair.first;
+            const RenderQueue::MatrixList& matrices = renderablePair.second;
+
+            // Setup this renderable for rendering all of its instances.
+            renderable->bind();
+
+            for ( const auto model : matrices ) {
+                // Calculate model-view-projection matrix for this object.
+                Matrix4 mvp = viewProjection * *model;
+
+                // Update the MVP value in the shader.
+                pass.program->setTransformVar( mvp );
+
+                // Draw the renderable.
+                vb->draw();
+            }
+        }
+
+        vb->unbind();
+    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

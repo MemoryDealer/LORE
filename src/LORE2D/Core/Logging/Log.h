@@ -4,7 +4,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -47,7 +47,9 @@ namespace Lore {
     ///
     /// \class Logger
     /// \brief Writes log messages to Lore.log file in same directory as executable.
-    class LORE_EXPORT Logger final
+    /// \details All logging should be done through the static methods of the helper
+    ///     class Log.
+    class Logger final
     {
 
     private:
@@ -61,6 +63,10 @@ namespace Lore {
 
         std::ofstream _stream;
         std::queue<Message> _messageQueue;
+
+        //
+        // Provide thread materials, as the actual output to the log file is done
+        // on a separate thread, which must be woken up when log messages are available.
 
         std::thread _thread;
         std::mutex _mutex;
@@ -115,14 +121,28 @@ namespace Lore {
 
     };
 
+    ///
+    /// \class Log
+    /// \brief Contains only static methods for logging
     class LORE_EXPORT Log final
     {
 
     public:
-
+        
+        ///
+        /// \brief Writes message with timestamp to log file at information level.
         static void Write( const string& text );
 
+        ///
+        /// \brief Writes message with timestamp to log file at specified level.
         static void Write( const LogLevel& lvl, const string& text );
+
+    private:
+
+        // Provide Context access so only it can create a logger.
+        friend class Context;
+
+    private:
 
         static void AllocateLogger();
 
@@ -138,6 +158,8 @@ namespace Lore {
 #define lore_log( text )        Log::Write( LogLevel::Information, text )
 #define log_debug( text )       Log::Write( LogLevel::Debug, text )
 #define log_trace( text )       Log::Write( LogLevel::Trace, text )
+#define log_trace_entry         Log::Write( LogLevel::Trace, ( "Entry >>> " + __FILE__ + ": " + __FUNCTION__ + " - Line " + __LINE__ ) );
+#define log_trace_exit          Log::Write( LogLevel::Trace, ( "Exit  >>> " + __FILE__ + ": " + __FUNCTION__ + " - Line " + __LINE__ ) );
 
 }
 

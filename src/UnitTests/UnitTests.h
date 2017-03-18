@@ -4,7 +4,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -24,5 +24,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+// Platform define:
+
+#define LORE_WINDOWS 0
+#define LORE_LINUX 1
+#define LORE_APPLE 2
+
+#if defined( WIN32 ) || defined( _WIN32 )
+#define LORE_PLATFORM LORE_WINDOWS
+#elif defined( LINUX ) || defined( _LINUX )
+#define LORE_PLATFORM LORE_LINUX
+#elif defined( APPLE ) || defined( _APPLE )
+#define LORE_PLATFORM LORE_APPLE
+#endif
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -25,34 +25,34 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Resource/Renderable/Texture.h>
+#include <LORE2D/Resource/ResourceController.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore { namespace OpenGL {
 
-    class Texture : public Lore::Texture
+    class ResourceController : public Lore::ResourceController
     {
 
     public:
 
-        explicit Texture( const string& name, const string& file );
+        ResourceController();
 
-        virtual ~Texture() override;
+        virtual ~ResourceController() override;
 
-        virtual void bind() override;
+        virtual TexturePtr loadTexture( const string& name, const string& file, const string& group = DefaultGroupName ) override;
 
-        //
-        // Getters.
+        virtual GPUProgramPtr createGPUProgram( const string& name, const string& group = DefaultGroupName ) override;
 
-        GLuint getID() const
-        {
-            return _id;
-        }
+        virtual ShaderPtr createVertexShader( const string& name, const string& group = DefaultGroupName ) override;
 
-    private:
+        virtual ShaderPtr createFragmentShader( const string& name, const string& group = DefaultGroupName ) override;
 
-        GLuint _id;
+        virtual VertexBufferPtr createVertexBuffer( const string& name, const VertexBuffer::Type& type, const string& group = DefaultGroupName ) override;
+
+        virtual MaterialPtr createMaterial( const string& name, const string& group = DefaultGroupName ) override;
+
+        virtual CameraPtr createCamera( const string& name, const string& group = DefaultGroupName ) override;
 
     };
 

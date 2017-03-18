@@ -4,7 +4,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -73,25 +73,32 @@ namespace Lore {
 
         virtual void setMode( const Mode& mode );
 
+        virtual void setActive() = 0;
+
         //
         // Getters.
 
-        string getTitle() const
+        inline string getTitle() const
         {
             return _title;
         }
 
-        int getWidth() const
+        inline int getWidth() const
         {
             return _frameBufferWidth;
         }
 
-        int getHeight() const
+        inline int getHeight() const
         {
             return _frameBufferHeight;
         }
 
-        void getDimensions( int& width, int& height )
+        inline real getAspectRatio() const
+        {
+            return _aspectRatio;
+        }
+
+        inline void getDimensions( int& width, int& height )
         {
             width = _frameBufferWidth;
             height = _frameBufferHeight;
@@ -99,17 +106,21 @@ namespace Lore {
 
         ///
         /// \brief Returns full width of window, including borders.
-        int getFullWidth() const
+        inline int getFullWidth() const
         {
             return _width;
         }
 
         ///
         /// \brief Returns full height of window, including borders.
-        int getFullHeight() const
+        inline int getFullHeight() const
         {
             return _height;
         }
+
+        ResourceControllerPtr getResourceController() const;
+
+        StockResourceControllerPtr getStockResourceController() const;
 
     protected:
 
@@ -120,9 +131,13 @@ namespace Lore {
         string _title;
         int _width, _height;
         int _frameBufferWidth, _frameBufferHeight;
+        real _aspectRatio;
         Mode _mode;
 
         RenderViewList _renderViews;
+
+        std::unique_ptr<ResourceController> _controller;
+        std::unique_ptr<StockResourceController> _stockController;
 
     };
 

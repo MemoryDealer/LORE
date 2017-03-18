@@ -4,7 +4,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -67,6 +67,12 @@ namespace Lore {
             return p;
         }
 
+        T* insert( const id& id_ )
+        {
+            std::unique_ptr<T> resource = std::make_unique<T>( id_ );
+            return insert( id_, std::move( resource ) );
+        }
+
         void remove( const id& id_ )
         {
             auto lookup = _container.find( id_ );
@@ -81,7 +87,7 @@ namespace Lore {
         {
             auto lookup = _container.find( id_ );
             if ( _container.end() == lookup ) {
-                throw Lore::Exception( "Resource with id " + id_ + " does not exist" );
+                throw Lore::ItemIdentityException( "Resource with id " + id_ + " does not exist" );
             }
 
             return lookup->second.get();
@@ -170,7 +176,7 @@ namespace Lore {
 
             auto lookup = _container.find( id_ );
             if ( _container.end() == lookup ) {
-                throw Lore::Exception( "Resource with id " + id_ + " does not exist" );
+                throw Lore::ItemIdentityException( "Resource with id " + id_ + " does not exist" );
             }
 
             return lookup->second.get();

@@ -3,7 +3,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -28,6 +28,7 @@
 
 #include <LORE2D/Renderer/IRenderer.h>
 #include <LORE2D/Resource/Material.h>
+#include <LORE2D/Resource/StockResource.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -37,13 +38,19 @@ using namespace Lore;
 
 Renderable::Renderable( const string& name )
 : _name( name )
-, _material( nullptr )
+, _material( StockResource::GetMaterial( "StandardTexturedQuad" ) ) // Default material.
 , _renderQueue( RenderQueue::General )
 , _attached( false )
 , _type( Type::Unknown )
 {
     // TODO: Get default stock material.
     
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Renderable::~Renderable()
+{
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -3,7 +3,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -24,64 +24,26 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "GLStockShaders.h"
+#include "Math.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-using namespace Lore::OpenGL;
+using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-StockVertexShaders::StockVertexShaders()
-: _shaders()
-{
+const real Math::PI = real( 4.0f * atan( 1.0f ) );
+const real Math::TWO_PI = real( 2.f * PI );
+const real Math::HALF_PI = real( 0.5f * PI );
 
-}
+const real Math::_FDegToRad = PI / real( 180.f );
+const real Math::_FRadToDeg = real( 180.f ) / PI;
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-string& StockVertexShaders::get( const Type& t )
-{
-    auto lookup = _shaders.find( t );
-    if ( _shaders.end() != lookup ) {
-        return lookup->second;
-    }
-
-    throw Lore::Exception( "Stock shader not found" );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void StockVertexShaders::create( const Parameters& p )
-{
-    string s( "#version 430 core\n" );
-
-    uint location = 0;
-    if ( p.pos2D ) {
-        s += "layout (location = " + std::to_string( location++ ) + ") in vec2 in_Pos;";
-    }
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-//
-//const string StockVertexShaders::Generic =
-//"#version 330 core\n"
-//""
-//"layout (location = 0) in vec2 in_Pos;"
-//"layout (location = 1) in vec2 in_TexCoord;"
-//""
-//"uniform mat4 mvp;"
-//"uniform mat4 model;"
-//""
-//"out vec2 FPos;"
-//"out vec2 FTexCoord;"
-//""
-//"void main()"
-//"{"
-//"gl_Position = mvp * vec4(in_Pos, 1.0f);"
-//"FPos = (model * vec4(in_Pos, 1.0f)).xy;"
-//"FTexCoord = vec2(in_TexCoord.x, 1.0 - in_TexCoord.y);"
-//"}"
-//;
+const Vec3 Math::POSITIVE_X_AXIS = Vec3( 1.f, 0.f, 0.f );
+const Vec3 Math::NEGATIVE_X_AXIS = Vec3( -1.f, 0.f, 0.f );
+const Vec3 Math::POSITIVE_Y_AXIS = Vec3( 0.f, 1.f, 0.f );
+const Vec3 Math::NEGATIVE_Y_AXIS = Vec3( 0.f, -1.f, 0.f );
+const Vec3 Math::POSITIVE_Z_AXIS = Vec3( 0.f, 0.f, 1.f );
+const Vec3 Math::NEGATIVE_Z_AXIS = Vec3( 0.f, 0.f, -1.f );
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
