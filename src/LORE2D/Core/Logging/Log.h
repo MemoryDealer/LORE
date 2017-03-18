@@ -121,6 +121,9 @@ namespace Lore {
 
     };
 
+    ///
+    /// \class Log
+    /// \brief Contains only static methods for logging
     class LORE_EXPORT Log final
     {
 
@@ -136,6 +139,7 @@ namespace Lore {
 
     private:
 
+        // Provide Context access so only it can create a logger.
         friend class Context;
 
     private:

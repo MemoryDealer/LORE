@@ -36,6 +36,8 @@ namespace Lore {
     /// \class Scene
     /// \brief Contains all information to render a scene to an area in a window,
     ///     or to a texture.
+    /// \details A Scene contains a collection of Nodes, all of which inherit from
+    ///     the Scene's root Node.
     class LORE_EXPORT Scene final
     {
 

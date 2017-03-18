@@ -45,47 +45,13 @@ namespace Lore {
 
         // :::::: //
 
-        ///
-        /// \struct RenderQueue::RenderableInstance
-        /// \brief Associates a Renderable object with its world matrix.
-        /// \details Since the same Renderable can be attached to multiple Nodes,
-        ///     these are used by the renderer to distinguish between such instances.
-        //struct RenderableInstance
-        //{
-
-        //    RenderablePtr renderable;
-        //    Matrix4& model; // References a Node's world matrix, which this Renderable is attached to.
-
-        //    RenderableInstance( RenderablePtr r, Matrix4& m )
-        //    : renderable( r )
-        //    , model( m )
-        //    { }
-
-        //};
-
-        // :::::: //
-
-
-        //using RenderableInstanceList = std::vector<RenderableInstance>;
-
-        //using ObjectList = std::map<RenderablePtr, RenderableInstanceList>;
-        //using RenderableList = std::map<MaterialPtr, ObjectList>;
-
-        //// :::::: //
-
-        //RenderableList solids;
-        //RenderableList sortedTransparents;
-
-        // :::::: //
-
-
-
         using MatrixList = std::vector<Matrix4*>;
         using RenderableMap = std::map<RenderablePtr, MatrixList>;
         using MaterialMap = std::map<MaterialPtr, RenderableMap>;
 
         MaterialMap solids;
 
+        // TODO: Structure this so renderable entries can be removed.
         struct Entry
         {
             //MatrixList::const_iterator matrixIt;

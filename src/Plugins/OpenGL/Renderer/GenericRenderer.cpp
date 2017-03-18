@@ -121,35 +121,6 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
 
         // Render solids.
         renderMaterialMap( queue.solids, viewProjection );
-
-        //RenderQueue& rq = rqPair.second;
-
-        //RenderQueue::RenderableList& renderables = rq.solids;
-        //for ( auto& rlPair : renderables ) {
-        //    Lore::MaterialPtr mat = rlPair.first;
-
-        //    // Bind material settings to pipeline.
-        //    Lore::Material::Pass& pass = mat->getPass( 0 );
-        //    pass.program->use();
-
-        //    pass.program->getVertexBuffer()->bind();
-
-        //    RenderQueue::ObjectList& objects = rlPair.second;
-        //    for ( auto& objPair : objects ) {
-        //        for ( auto& obj : objPair.second ) {
-        //            // Calculate model-view-projection matrix for this object.
-        //            Matrix4 mvp = viewProjection * obj.model;
-
-        //            pass.program->setTransformVar( mvp );
-
-        //            obj.renderable->bind();
-
-        //            pass.program->getVertexBuffer()->draw();
-        //        }
-        //    }
-
-        //    pass.program->getVertexBuffer()->unbind();
-        //}
     }
 }
 

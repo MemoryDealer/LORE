@@ -31,15 +31,25 @@
 
 namespace Lore {
 
+    ///
+    /// \class SceneGraphVisitor
+    /// \brief Traverses a scene graph (e.g., a Node and all of its children) and
+    ///     carries down transformation updates as needed.
     class LORE_EXPORT SceneGraphVisitor
     {
 
     public:
 
+        ///
+        /// \brief Constructor that takes root node as parameter, updates its
+        ///     world transform, and updates the scale of all children.
         SceneGraphVisitor( NodePtr root );
 
         ~SceneGraphVisitor();
 
+        ///
+        /// \brief Recursive function which updates the transformation matrix
+        ///     of all child nodes.
         void visit( bool parentDirty = false );
 
     private:

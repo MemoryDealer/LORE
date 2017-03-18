@@ -55,6 +55,8 @@ namespace Lore {
 
         void setZoom( const real amount );
 
+        // TODO: Set projection mode (Ortho/Persp).
+
         //
         // Getters.
 

@@ -58,8 +58,8 @@ int APIVersion::GetMinor()
 
 string APIVersion::GetString()
 {
-    return std::to_string( Major ) +
-        "." + std::to_string( Minor );
+    static string str = std::to_string( Major ) + std::to_string( Minor );
+    return str;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
