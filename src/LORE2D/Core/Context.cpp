@@ -3,7 +3,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -26,8 +26,10 @@
 
 #include "Context.h"
 
+#include <LORE2D/Core/APIVersion.h>
 #include <LORE2D/Core/NotificationCenter.h>
 #include <LORE2D/Core/Timestamp.h>
+#include <LORE2D/Resource/StockResource.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -45,9 +47,15 @@ using namespace Local;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+bool Context::_ContextExists = false;
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 Context::Context() noexcept
 : _windowRegistry()
+, _sceneRegistry()
 , _active( false )
+, _activeWindow( nullptr )
 {
     NotificationSubscribe( WindowEventNotification, &Context::onWindowEvent );
 }
@@ -57,6 +65,33 @@ Context::Context() noexcept
 Context::~Context()
 {
     NotificationUnsubscribe( WindowEventNotification, &Context::onWindowEvent );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+ScenePtr Context::createScene( const string& name, const RendererType& rt )
+{
+    auto scene = std::make_unique<Scene>( name );
+
+    lore_log( "Scene " + name + " created successfully" );
+
+    ScenePtr handle = _sceneRegistry.insert( name, std::move( scene ) );
+    return handle;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Context::destroyScene( const string& name )
+{
+    _sceneRegistry.remove( name );
+    lore_log( "Scene " + name + " destroyed successfully" );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Context::destroyScene( ScenePtr scene )
+{
+    destroyScene( scene->getName() );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -83,8 +118,41 @@ void Context::removeErrorListener( ErrorListener listener )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+ResourceControllerPtr Context::getResourceController() const
+{
+    return _activeWindow->getResourceController();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+StockResourceControllerPtr Context::getStockResourceController() const
+{
+    return _activeWindow->getStockResourceController();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Context::setActiveWindow( WindowPtr window )
+{
+    _activeWindow = window;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Context::setActiveWindow( const string& name )
+{
+    auto window = _windowRegistry.get( name );
+    setActiveWindow( window );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 std::unique_ptr<Context> Context::Create( const RenderPlugin& renderer )
 {
+    if ( _ContextExists ) {
+        throw Lore::Exception( "A Lore context already exists for this process!" );
+    }
+
     string file;
 
     // Setup required Lore objects.
@@ -113,6 +181,10 @@ std::unique_ptr<Context> Context::Create( const RenderPlugin& renderer )
 
     // Load the context class from the plugin.
     auto context = __rpl->createContext();
+
+    StockResource::AssignContext( context.get() );
+    _ContextExists = true;
+
     return std::move( context );
 }
 
@@ -121,8 +193,10 @@ std::unique_ptr<Context> Context::Create( const RenderPlugin& renderer )
 void Context::Destroy( std::unique_ptr<Context> context )
 {
     context.reset();
+    StockResource::AssignContext( nullptr );
     Log::DeleteLogger();
     NotificationCenter::Destroy();
+    _ContextExists = false;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -141,6 +215,13 @@ void Context::onWindowEvent( const Notification& n )
         break;
 
     }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Context::setAPIVersion( const int major, const int minor )
+{
+    APIVersion::Set( major, minor );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

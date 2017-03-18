@@ -4,7 +4,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -27,6 +27,8 @@
 
 namespace Lore {
 
+    // Since Vector classes are generated using templates, provide macros for
+    // generate scalable default member functions for template class specializations.
 #define DEFAULT_MEMBERS( N )\
     Vector()\
     {\
@@ -104,9 +106,6 @@ namespace Lore {
     using Vec3 = Vector<float, 3>;
     using Vec4 = Vector<float, 4>;
 
-    using Colori = Vector<int, 4>;
-    using Colorf = Vector<float, 4>;
-
     //
     // Specialize component access for all vector sizes.
 
@@ -119,7 +118,7 @@ namespace Lore {
             struct { T u, v; };
         };
 
-        Vector( const T x_, const T y_ )
+        constexpr Vector( const T x_, const T y_ )
         : x( x_ ), y( y_ )
         { }
 
@@ -135,12 +134,14 @@ namespace Lore {
             struct { T r, g, b; };
         };
 
-        Vector( const T x_, const T y_, const T z_ )
+        constexpr Vector( const T x_, const T y_, const T z_ )
         : x( x_ ), y( y_ ), z( z_ )
         { }
 
         DEFAULT_MEMBERS( 3 );
 
+        ///
+        /// \brief Returns cross product of this vector with rhs.
         Vector<T, 3> cross( const Vector<T, 3>& rhs )
         {
             Vector<T, 3> re;
@@ -149,6 +150,7 @@ namespace Lore {
             re.z = x * rhs.y - y * rhs.x;
             return re;
         }
+
     };
 
     template<typename T>
@@ -163,14 +165,12 @@ namespace Lore {
             Vector<T, 3> rgb;
         };
 
-        Vector( const T x_, const T y_, const T z_, const T w_ )
+        constexpr Vector( const T x_, const T y_, const T z_, const T w_ )
         : x( x_ ), y( y_ ), z( z_ ), w( w_ )
         { }
 
         DEFAULT_MEMBERS( 4 );
     };
-
-#undef DEFAULT_MEMBERS
 
     //
     // Operator overloads.
@@ -256,6 +256,8 @@ namespace Lore {
 #undef VEC_UNARY_OP
 #undef VEC_BINARY_OP
 #undef VEC_INPLACE_OP
+
+#undef DEFAULT_MEMBERS
 
 }
 

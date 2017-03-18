@@ -4,7 +4,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -25,15 +25,68 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Official plugin data.
+#include <LORE2D/Math/Math.h>
+#include <LORE2D/Shader/Shader.h>
+#include <LORE2D/Shader/VertexBuffer.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-    enum class RenderPlugin {
+    class LORE_EXPORT GPUProgram
+    {
 
-        OpenGL
+    public:
+
+        explicit GPUProgram( const string& name );
+
+        virtual ~GPUProgram();
+
+        virtual void attachShader( ShaderPtr shader );
+
+        virtual ShaderPtr getAttachedShader( const Shader::Type& type );
+
+        void setVertexBuffer( VertexBufferPtr vb );
+
+        virtual bool link() = 0;
+
+        virtual void use() = 0;
+
+        inline bool hasAttachedShader( const Shader::Type& type )
+        {
+            return ( _shaders.find( type ) != _shaders.end() );
+        }
+
+        //
+        // Getters.
+
+        inline VertexBufferPtr getVertexBuffer() const
+        {
+            return _vertexBuffer;
+        }
+
+        //
+        // Uniform value updating.
+
+        virtual void addTransformVar( const string& id ) = 0;
+
+        virtual void setTransformVar( const Matrix4& m ) = 0;
+
+        virtual void addUniformVar( const string& id ) = 0;
+
+        virtual void setUniformVar( const string& id, const Matrix4& m ) = 0;
+
+    protected:
+
+        using ShaderMap = std::unordered_map<Shader::Type, ShaderPtr>;
+
+    protected:
+
+        string _name;
+
+        ShaderMap _shaders;
+        
+        VertexBufferPtr _vertexBuffer;
 
     };
 

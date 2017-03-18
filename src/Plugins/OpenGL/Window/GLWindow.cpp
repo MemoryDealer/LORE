@@ -3,7 +3,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -26,7 +26,12 @@
 
 #include "GLWindow.h"
 
+#include "CallbackHandler.h"
+
 #include <LORE2D/Core/NotificationCenter.h>
+
+#include <Plugins/OpenGL/Resource/GLResourceController.h>
+#include <Plugins/OpenGL/Resource/GLStockResource.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -35,8 +40,8 @@ using namespace Lore::OpenGL;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Window::Window( const string& title,
-                const uint width,
-                const uint height )
+                const int width,
+                const int height )
 : Lore::Window( title, width, height )
 , _window( nullptr )
 {
@@ -45,6 +50,29 @@ Window::Window( const string& title,
                                 _title.c_str(),
                                 nullptr,
                                 nullptr );
+
+    // Store user pointer to Lore Window class for callbacks.
+    glfwSetWindowUserPointer( _window, reinterpret_cast< void* >( this ) );
+
+    // Store frame buffer size.
+    glfwGetFramebufferSize( _window, &_frameBufferWidth, &_frameBufferHeight );
+    _aspectRatio = static_cast< float >( _frameBufferWidth ) / _frameBufferHeight;
+
+    // Setup callbacks.
+    glfwSetWindowSizeCallback( _window, WindowCallbackHandler::Size );
+
+    // Create a resource controller for each window.
+    _controller = std::make_unique<ResourceController>();
+
+    // Create stock resources as well (make this window's context active
+    // and then restore the previous one).
+    GLFWwindow* currentContext = glfwGetCurrentContext();
+    glfwMakeContextCurrent( _window );
+
+    _stockController = std::make_unique<StockResourceController>();
+    _stockController->createStockResources();
+
+    glfwMakeContextCurrent( currentContext );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -69,19 +97,72 @@ void Window::renderFrame()
 
     glfwMakeContextCurrent( _window );
 
-    // Scenes...
-
-    glClearColor( 0.2f, 0.2f, 0.2f, 1.f );
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    // Render each Scene with the corresponding RenderView data.
+    for ( const RenderView& rv : _renderViews ) {
+        RendererPtr renderer = rv.scene->getRenderer();
+        renderer->present( rv, this );
+    }
 
     glfwSwapBuffers( _window );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void Window::addRenderView( const Lore::RenderView& renderView )
+{
+    // Convert Viewport to gl_viewport.
+    RenderView rv = renderView;
+    Viewport vp = rv.viewport;
+    rv.gl_viewport.x = static_cast< int >( vp.x * static_cast<float>( _frameBufferWidth ) );
+    rv.gl_viewport.y = static_cast< int >( vp.y * static_cast<float>( _frameBufferHeight ) );
+    rv.gl_viewport.width = static_cast< int >( vp.width * static_cast<float>( _frameBufferWidth ) );
+    rv.gl_viewport.height = static_cast< int >( vp.height * static_cast<float>( _frameBufferHeight ) );
+
+    rv.gl_viewport.aspectRatio = static_cast< real >( rv.gl_viewport.width ) / rv.gl_viewport.height;
+
+    Lore::Window::addRenderView( rv );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void Window::setTitle( const string& title )
 {
-    
+    Lore::Window::setTitle( title );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Window::setDimensions( const int width, const int height )
+{
+    Lore::Window::setDimensions( width, height );
+
+    glfwSetWindowSize( _window, width, height );
+
+    // Store frame buffer size.
+    glfwGetFramebufferSize( _window, &_frameBufferWidth, &_frameBufferHeight );
+
+    _aspectRatio = static_cast< float >( _frameBufferWidth ) / _frameBufferHeight;
+
+    updateRenderViews();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Window::setActive()
+{
+    glfwMakeContextCurrent( _window );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Window::updateRenderViews()
+{
+    for ( auto& rv : _renderViews ) {
+        rv.gl_viewport.x = static_cast< int >( rv.viewport.x * static_cast<float>( _frameBufferWidth ) );
+        rv.gl_viewport.y = static_cast< int >( rv.viewport.y * static_cast<float>( _frameBufferHeight ) );
+        rv.gl_viewport.width = static_cast< int >( rv.viewport.width * static_cast<float>( _frameBufferWidth ) );
+        rv.gl_viewport.height = static_cast< int >( rv.viewport.height * static_cast<float>( _frameBufferHeight ) );
+    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

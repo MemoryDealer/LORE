@@ -3,7 +3,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -24,9 +24,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "RenderPluginLoader.h"
-
-#include <LORE2D/Core/Context.h>
+#include "Quaternion.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -34,71 +32,69 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#if defined( _WIN32 ) || defined( _WIN64 )
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-constexpr
-RenderPluginLoader::RenderPluginLoader()
-: _hModule( nullptr )
+real Quaternion::getNormalLength() const
 {
+    return w * w + x * x + y * y + z * z;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-RenderPluginLoader::~RenderPluginLoader()
+real Quaternion::normalize()
 {
-    free();
+    real len = getNormalLength();
+    real factor = 1.f / std::sqrtf( len );
+    *this = *this * factor;
+    return len;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-bool RenderPluginLoader::load( const string& file )
+Matrix3 Quaternion::createRotationMatrix() const
 {
-    free(); 
+    const real tx = x + x;
+    const real ty = y + y;
+    const real tz = z + z;
+    const real twx = tx * w;
+    const real twy = ty * w;
+    const real twz = tz * w;
+    const real txx = tx * x;
+    const real txy = ty * x;
+    const real txz = tz * x;
+    const real tyy = ty * y;
+    const real tyz = tz * y;
+    const real tzz = tz * z;
 
-    _hModule = LoadLibrary( file.c_str() );
-    if ( nullptr == _hModule ) {
-        log_critical( "Unable to load render plugin " + file );
-        return false;
-    }
+    Matrix3 rot;
+    rot[0][0] = 1.f - ( tyy + tzz );
+    rot[0][1] = txy - twz;
+    rot[0][2] = txz + twy;
+    rot[1][0] = txy + twz;
+    rot[1][1] = 1.f - ( txx + tzz );
+    rot[1][2] = tyz - twx;
+    rot[2][0] = txz - twy;
+    rot[2][1] = tyz + twx;
+    rot[2][2] = 1.f - ( txx + tyy );
 
-    log_debug( "Render plugin " + file + " successfully loaded" );
-
-    return true;
+    return rot;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-std::unique_ptr<Context> RenderPluginLoader::createContext()
+Quaternion Quaternion::operator * ( const Quaternion& rhs ) const
 {
-    using CreateContextPtr = Context*( *)( );
-
-    CreateContextPtr ccp = reinterpret_cast< CreateContextPtr >(
-        GetProcAddress( _hModule, "CreateContext" ) );
-    if ( nullptr == ccp ) {
-        log_critical( "Unable to get CreateContext function pointer from render plugin" );
-        return nullptr;
-    }
-
-    // Allocate the render plugin's context.
-    Context* context = ccp();
-
-    std::unique_ptr<Context> p( context );
-    return std::move( p );
+    return Quaternion(
+        w * rhs.w - x * rhs.x - y * rhs.y - z * rhs.z,
+        w * rhs.x + x * rhs.w + y * rhs.z - z * rhs.y,
+        w * rhs.y + y * rhs.w + z * rhs.x - x * rhs.z,
+        w * rhs.z + z * rhs.w + x * rhs.y - y * rhs.x
+    );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void RenderPluginLoader::free()
+Quaternion Quaternion::operator * ( const real r ) const
 {
-    if ( _hModule ) {
-        FreeLibrary( _hModule );
-    }
+    return Quaternion( r * w, r * x, r * y, r * z );
 }
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-#endif
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

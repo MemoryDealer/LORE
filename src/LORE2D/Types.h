@@ -4,7 +4,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -27,16 +27,48 @@
 
 #include <string> // TODO: Figure out nicer way for clients to include dependencies.
 
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 namespace Lore {
 
     //
     // Forward declarations.
 
+    class Camera;
+    class Context;
+    class GPUProgram;
+    class IRenderer;
+    class Material;
+    class Node;
+    class PostProcessor;
+    class Renderable;
+    class ResourceController;
+    struct ResourceGroup;
+    class Scene;
+    class Shader;
+    class StockResourceController;
+    class Texture;
+    class VertexBuffer;
     class Window;
 
     //
     // Pointer types.
 
+    using CameraPtr = Camera*;
+    using ContextPtr = Context*;
+    using GPUProgramPtr = GPUProgram*;
+    using MaterialPtr = Material*;
+    using NodePtr = Node*;
+    using RendererPtr = IRenderer*;
+    using PostProcessorPtr = PostProcessor*;
+    using RenderablePtr = Renderable*;
+    using ResourceControllerPtr = ResourceController*;
+    using ResourceGroupPtr = ResourceGroup*;
+    using ScenePtr = Scene*;
+    using ShaderPtr = Shader*;
+    using StockResourceControllerPtr = StockResourceController*;
+    using TexturePtr = Texture*;
+    using VertexBufferPtr = VertexBuffer*;
     using WindowPtr = Window*;
 
     //

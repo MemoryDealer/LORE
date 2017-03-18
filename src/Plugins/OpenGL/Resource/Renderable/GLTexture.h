@@ -4,7 +4,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -25,68 +25,37 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Window/Window.h>
+#include <LORE2D/Resource/Renderable/Texture.h>
 
-namespace Lore {
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    class Context;
+namespace Lore { namespace OpenGL {
 
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-    class LORE_EXPORT IRenderPluginLoader
+    class Texture : public Lore::Texture
     {
 
     public:
 
-        virtual ~IRenderPluginLoader() { }
+        explicit Texture( const string& name, const string& file );
 
-        virtual bool load( const string& file ) = 0;
+        virtual ~Texture() override;
 
-        virtual std::unique_ptr<Context> createContext() = 0;
+        virtual void bind() override;
 
-    protected:
+        //
+        // Getters.
 
-        virtual void free() = 0;
-
-    };
-
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-#if defined( _WIN32 ) || defined( _WIN64 )
-#include <Windows.h>
-
-    class LORE_EXPORT RenderPluginLoader : public IRenderPluginLoader
-    {
+        GLuint getID() const
+        {
+            return _id;
+        }
 
     private:
 
-        HMODULE _hModule;
-
-    public:
-
-        explicit constexpr RenderPluginLoader();
-
-        virtual ~RenderPluginLoader() override;
-
-        virtual bool load( const string& file ) override;
-
-        virtual std::unique_ptr<Context> createContext() override;
-
-    protected:
-
-        virtual void free() override;
+        GLuint _id;
 
     };
-#endif
 
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-    inline std::unique_ptr<IRenderPluginLoader> CreateRenderPluginLoader()
-    {
-        std::unique_ptr<IRenderPluginLoader> rpl = std::make_unique<RenderPluginLoader>();
-        return rpl;
-    }
-
-}
+}}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

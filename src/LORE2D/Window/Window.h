@@ -4,7 +4,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -25,6 +25,10 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Window/RenderView.h>
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 namespace Lore {
 
     class LORE_EXPORT Window
@@ -41,8 +45,8 @@ namespace Lore {
     public:
 
         explicit Window( const string& title,
-                         const uint width,
-                         const uint height );
+                         const int width,
+                         const int height );
 
         virtual ~Window();
 
@@ -51,28 +55,89 @@ namespace Lore {
 
         virtual void renderFrame() { }
 
+        virtual void addRenderView( const RenderView& renderView );
+
+        virtual void removeRenderView( const RenderView& renderView );
+        virtual void removeRenderView( const string& name );
+
+        virtual RenderView& getRenderView( const string& name );
+
+        virtual void resetRenderViews();
+
         //
         // Modifiers.
 
         virtual void setTitle( const string& title );
 
-        virtual void setDimensions( const uint width, const uint height );
+        virtual void setDimensions( const int width, const int height );
 
         virtual void setMode( const Mode& mode );
+
+        virtual void setActive() = 0;
 
         //
         // Getters.
 
-        string getTitle() const
+        inline string getTitle() const
         {
             return _title;
         }
 
+        inline int getWidth() const
+        {
+            return _frameBufferWidth;
+        }
+
+        inline int getHeight() const
+        {
+            return _frameBufferHeight;
+        }
+
+        inline real getAspectRatio() const
+        {
+            return _aspectRatio;
+        }
+
+        inline void getDimensions( int& width, int& height )
+        {
+            width = _frameBufferWidth;
+            height = _frameBufferHeight;
+        }
+
+        ///
+        /// \brief Returns full width of window, including borders.
+        inline int getFullWidth() const
+        {
+            return _width;
+        }
+
+        ///
+        /// \brief Returns full height of window, including borders.
+        inline int getFullHeight() const
+        {
+            return _height;
+        }
+
+        ResourceControllerPtr getResourceController() const;
+
+        StockResourceControllerPtr getStockResourceController() const;
+
+    protected:
+
+        using RenderViewList = std::vector<RenderView>;
+
     protected:
 
         string _title;
-        uint _width, _height;
+        int _width, _height;
+        int _frameBufferWidth, _frameBufferHeight;
+        real _aspectRatio;
         Mode _mode;
+
+        RenderViewList _renderViews;
+
+        std::unique_ptr<ResourceController> _controller;
+        std::unique_ptr<StockResourceController> _stockController;
 
     };
 

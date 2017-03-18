@@ -4,7 +4,7 @@
 // This source file is part of LORE2D
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016 Jordan Sparks
+// Copyright (c) 2016-2017 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -41,8 +41,8 @@ namespace Lore { namespace OpenGL {
     public:
 
         explicit Window( const string& title,
-                         const uint width,
-                         const uint height );
+                         const int width,
+                         const int height );
 
         virtual ~Window() override;
 
@@ -51,7 +51,18 @@ namespace Lore { namespace OpenGL {
 
         virtual void renderFrame() override;
 
+        virtual void addRenderView( const RenderView& renderView ) override;
+
+        //
+        // Modifiers.
+
         virtual void setTitle( const string& title ) override;
+
+        virtual void setDimensions( const int width, const int height ) override;
+
+        virtual void setActive() override;
+
+        void updateRenderViews();
 
     };
 
