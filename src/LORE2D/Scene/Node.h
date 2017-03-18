@@ -27,6 +27,7 @@
 
 #include <LORE2D/Core/Iterator.h>
 #include <LORE2D/Math/Math.h>
+#include <LORE2D/Memory/MemoryPool.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -36,7 +37,7 @@ namespace Lore {
     /// \class Node
     /// \brief A scene node in its scene graph. May contain any renderable or
     ///     attachable objects.
-    class LORE_EXPORT Node
+    class LORE_EXPORT Node : public Alloc<Node>
     {
 
     public:
@@ -163,8 +164,12 @@ namespace Lore {
         // Only scenes can construct nodes.
         friend class Scene;
         friend class SceneGraphVisitor;
+        friend class MemoryPool<Node>;
 
     private:
+
+        //DELETE
+        Node() { }
 
         Node( const string& name, ScenePtr scene, NodePtr parent );
 

@@ -33,6 +33,12 @@
 // Note: Error 1282 on binding calls with no prior errors indicates a wrong context.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Memory/MemoryPool.h>
+
+Lore::MemoryPool<Lore::Node> pool( 100 );
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 int main( int argc, char** argv )
 {
     auto context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
