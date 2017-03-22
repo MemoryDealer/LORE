@@ -48,10 +48,18 @@ namespace Lore {
 
         virtual ~Alloc() { }
 
+    protected:
+
+        ///
+        /// \brief Must be implemented by child classes to reset all internal
+        ///     data to default. This is called when the object is "freed" in
+        ///     the memory pool.
+        virtual void _reset() = 0;
+
     private:
 
         bool _inUse;
-        Alloc* _next;
+        T* _next;
 
     private:
 

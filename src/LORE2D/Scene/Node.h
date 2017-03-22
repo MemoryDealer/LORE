@@ -27,7 +27,7 @@
 
 #include <LORE2D/Core/Iterator.h>
 #include <LORE2D/Math/Math.h>
-#include <LORE2D/Memory/MemoryPool.h>
+#include <LORE2D/Memory/Alloc.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -158,6 +158,10 @@ namespace Lore {
 
         Node( const Node& rhs ) = delete;
         Node& operator = ( const Node& rhs ) = delete;
+
+    protected:
+
+        virtual void _reset() override;
 
     private:
 

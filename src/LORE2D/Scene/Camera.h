@@ -26,12 +26,13 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 #include <LORE2D/Math/Math.h>
+#include <LORE2D/Memory/Alloc.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-    class LORE_EXPORT Camera final
+    class LORE_EXPORT Camera final : public Alloc<Camera>
     {
 
     public:
@@ -63,6 +64,10 @@ namespace Lore {
         Matrix4 getViewMatrix();
 
         void dirty();
+
+    protected:
+
+        virtual void _reset() override;
 
     private:
 

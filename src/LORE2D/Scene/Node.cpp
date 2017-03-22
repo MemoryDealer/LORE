@@ -256,6 +256,17 @@ void Node::scale( const real s )
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void Node::_reset()
+{
+    _transform = Transform();
+    _renderables.clear();
+    _scene = nullptr;
+    _parent = nullptr;
+    _childNodes.clear();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void Node::_dirty()
 {
     _transform.dirty = true;

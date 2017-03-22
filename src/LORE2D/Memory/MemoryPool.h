@@ -31,8 +31,23 @@
 
 namespace Lore {
 
+    class MemoryPoolBase
+    {
+
+    public:
+
+        virtual ~MemoryPoolBase() { }
+
+        virtual void resize( const size_t newSize ) = 0;
+
+        virtual void resetAll() = 0;
+
+    };
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
     template<typename T>
-    class MemoryPool
+    class MemoryPool final : public MemoryPoolBase
     {
 
     public:
@@ -41,22 +56,35 @@ namespace Lore {
 
     public:
 
-        MemoryPool( const size_t size )
-        : _size( size )
+        MemoryPool( const string& name, const size_t size )
+        : _name( name )
+        , _size( size )
         , _objects()
         , _next( nullptr )
         {
+            // Allocate pool and each object.
             _objects = new T*[_size];
             for ( int i = 0; i < _size; ++i ) {
                 _objects[i] = new T();
             }
 
+            // Setup linked list.
             for ( int i = 0; i < _size - 1; ++i ) {
                 _objects[i]->_next = _objects[i + 1];
             }
 
+            // Setup head and tail.
             _next = _objects[0];
             _objects[_size - 1]->_next = nullptr;
+        }
+
+        ~MemoryPool()
+        {
+            for ( int i = 0; i < _size; ++i ) {
+                delete _objects[i];
+            }
+
+            delete [] _objects;
         }
 
         T* create()
@@ -64,14 +92,58 @@ namespace Lore {
             assert( nullptr != _next );
 
             T* p = _next;
+            assert( false == p->_inUse );
             p->_inUse = true;
             _next = p->_next;
 
             return p;
         }
 
+        void destroy( T* object )
+        {
+            assert( true == object->_inUse );
+
+            // Reset object to default.
+            object->_inUse = false;
+            object->_reset();
+
+            // Put this object at the front of the list.
+            object->_next = _next;
+            _next = object;
+        }
+
+        virtual void resize( const size_t newSize ) override
+        {
+            // ...
+        }
+
+        virtual void resetAll() override
+        {
+            for ( int i = 0; i < _size; ++i ) {
+                _objects[i]->_inUse = false;
+                _objects[i]->_reset();
+            }
+        }
+
+        //
+        // Information.
+
+        size_t getSizeInBytes()
+        {
+            return sizeof( T ) * _size;
+        }
+
+        void printUsage()
+        {
+            printf( "Pool %s usage: \n\n", _name.c_str() );
+            for ( int i = 0; i < _size; ++i ) {
+                printf( "Object %d %s\n", i, ( _objects[i]->_inUse ) ? "[x]" : "[ ]" );
+            }
+        }
+
     private:
 
+        string _name;
         size_t _size;
         List _objects;
 

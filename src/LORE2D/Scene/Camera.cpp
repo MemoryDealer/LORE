@@ -109,6 +109,16 @@ void Camera::dirty()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void Camera::_reset()
+{
+    _position = Vec2();
+    _scale = Vec2( 1.f, 1.f );
+    _view = Matrix4();
+    _dirty = true;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 Matrix4 Camera::getViewMatrix()
 {
     if ( _dirty ) {

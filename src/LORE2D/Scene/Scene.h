@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Memory/Alloc.h>
 #include <LORE2D/Resource/Color.h>
 #include <LORE2D/Scene/Node.h>
 
@@ -38,7 +39,7 @@ namespace Lore {
     ///     or to a texture.
     /// \details A Scene contains a collection of Nodes, all of which inherit from
     ///     the Scene's root Node.
-    class LORE_EXPORT Scene final
+    class LORE_EXPORT Scene final : public Alloc<Scene>
     {
 
     public:
@@ -89,6 +90,10 @@ namespace Lore {
         {
             return _bgColor;
         }
+
+    protected:
+
+        virtual void _reset() override;
 
     private:
 
