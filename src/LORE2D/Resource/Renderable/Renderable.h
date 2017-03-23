@@ -25,12 +25,16 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Memory/Alloc.h>
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 namespace Lore {
 
     ///
     /// \class Renderable
     /// \brief The base class of anything that can be attached to a node.
-    class LORE_EXPORT Renderable
+    class LORE_EXPORT Renderable : public Alloc<Renderable>
     {
 
     public:

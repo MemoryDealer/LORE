@@ -40,11 +40,13 @@ namespace Lore { namespace OpenGL {
 
     public:
 
-        explicit Window( const string& title,
-                         const int width,
-                         const int height );
+        Window();
 
         virtual ~Window() override;
+
+        void init( const string& title,
+                   const int width,
+                   const int height );
 
         //
         // Rendering.
@@ -63,6 +65,10 @@ namespace Lore { namespace OpenGL {
         virtual void setActive() override;
 
         void updateRenderViews();
+
+    protected:
+
+        virtual void _reset() override;
 
     };
 

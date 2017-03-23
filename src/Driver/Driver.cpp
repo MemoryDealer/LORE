@@ -67,8 +67,6 @@ int main( int argc, char** argv )
 
     auto nn1 = cluster.create<Lore::Node>();
 
-    auto p = Lore::GetPrimaryResourceController();
-
     cluster.resetAllPools();
 
     Lore::Node* nodes[10];
@@ -189,7 +187,7 @@ int main( int argc, char** argv )
             camera->zoom( -0.01f );
         }
 
-        context->renderFrame( 0 );
+        context->renderFrame();
     }
 
     DestroyLoreContext( context );

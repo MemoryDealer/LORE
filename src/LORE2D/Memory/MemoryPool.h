@@ -56,7 +56,7 @@ namespace Lore {
 
     public:
 
-        MemoryPool( const string& name, const size_t size )
+        inline MemoryPool( const string& name, const size_t size )
         : _name( name )
         , _size( size )
         , _objects()
@@ -78,7 +78,7 @@ namespace Lore {
             _objects[_size - 1]->_next = nullptr;
         }
 
-        ~MemoryPool()
+        inline ~MemoryPool()
         {
             for ( int i = 0; i < _size; ++i ) {
                 delete _objects[i];
@@ -87,7 +87,7 @@ namespace Lore {
             delete [] _objects;
         }
 
-        T* create()
+        inline T* create()
         {
             assert( nullptr != _next );
 
@@ -99,7 +99,7 @@ namespace Lore {
             return p;
         }
 
-        void destroy( T* object )
+        inline void destroy( T* object )
         {
             assert( true == object->_inUse );
 
@@ -112,12 +112,12 @@ namespace Lore {
             _next = object;
         }
 
-        virtual void resize( const size_t newSize ) override
+        inline virtual void resize( const size_t newSize ) override
         {
             // ...
         }
 
-        virtual void resetAll() override
+        inline virtual void resetAll() override
         {
             for ( int i = 0; i < _size; ++i ) {
                 _objects[i]->_inUse = false;
@@ -128,12 +128,12 @@ namespace Lore {
         //
         // Information.
 
-        size_t getSizeInBytes()
+        inline size_t getSizeInBytes()
         {
             return sizeof( T ) * _size;
         }
 
-        void printUsage()
+        inline void printUsage()
         {
             printf( "Pool %s usage: \n\n", _name.c_str() );
             for ( int i = 0; i < _size; ++i ) {

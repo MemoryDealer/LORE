@@ -39,11 +39,24 @@ using namespace Lore::OpenGL;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Window::Window( const string& title,
-                const int width,
-                const int height )
-: Lore::Window( title, width, height )
+Window::Window()
+: Lore::Window()
 , _window( nullptr )
+{
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Window::~Window()
+{
+    _reset();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Window::init( const string& title,
+                   const int width,
+                   const int height )
 {
     _window = glfwCreateWindow( _width,
                                 _height,
@@ -73,13 +86,6 @@ Window::Window( const string& title,
     _stockController->createStockResources();
 
     glfwMakeContextCurrent( currentContext );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-Window::~Window()
-{
-    glfwDestroyWindow( _window );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -163,6 +169,20 @@ void Window::updateRenderViews()
         rv.gl_viewport.width = static_cast< int >( rv.viewport.width * static_cast<float>( _frameBufferWidth ) );
         rv.gl_viewport.height = static_cast< int >( rv.viewport.height * static_cast<float>( _frameBufferHeight ) );
     }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Window::_reset()
+{
+    glfwDestroyWindow( _window );
+    _width = _height = _frameBufferWidth = _frameBufferHeight = 0;
+    _aspectRatio = 0;
+    _mode = Window::Mode::Windowed;
+    _renderViews.clear();
+    _controller.reset();
+    _stockController.reset();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

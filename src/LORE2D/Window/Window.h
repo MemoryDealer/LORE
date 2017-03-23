@@ -25,13 +25,14 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Memory/Alloc.h>
 #include <LORE2D/Window/RenderView.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-    class LORE_EXPORT Window
+    class LORE_EXPORT Window : public Alloc<Window>
     {
 
     public:
@@ -44,9 +45,7 @@ namespace Lore {
 
     public:
 
-        explicit Window( const string& title,
-                         const int width,
-                         const int height );
+        Window();
 
         virtual ~Window();
 

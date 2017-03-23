@@ -35,12 +35,10 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Window::Window( const string& title,
-                const int width,
-                const int height )
-: _title( title )
-, _width( width )
-, _height( height )
+Window::Window()
+: _title()
+, _width( 0 )
+, _height( 0 )
 , _frameBufferWidth( 0 )
 , _frameBufferHeight( 0 )
 , _aspectRatio( 0.f )

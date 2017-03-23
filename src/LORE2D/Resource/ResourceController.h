@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Memory/Alloc.h>
 #include <LORE2D/Resource/Material.h>
 #include <LORE2D/Resource/Registry.h>
 #include <LORE2D/Resource/Renderable/Texture.h>
@@ -45,7 +46,7 @@ namespace Lore {
         GPUProgram
     };
 
-    struct ResourceGroup
+    struct ResourceGroup : public Alloc<ResourceGroup>
     {
 
         struct IndexedResource
@@ -62,7 +63,7 @@ namespace Lore {
 
         // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        explicit ResourceGroup( const string& name_ )
+        inline explicit ResourceGroup( const string& name_ )
         : name( name_ )
         , index()
         , textures()
@@ -98,6 +99,16 @@ namespace Lore {
         // Scene.
 
         Registry<std::unordered_map, Camera> cameras;
+
+        // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    protected:
+
+        inline virtual void _reset() override
+        {
+            index.clear();
+            // TODO: CLeanup
+        }
 
     };
 

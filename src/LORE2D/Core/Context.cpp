@@ -60,6 +60,7 @@ Context::Context() noexcept
     // Setup default memory pool settings.
     _poolCluster.registerPool<Camera>( 64 );
     _poolCluster.registerPool<Node>( 1024 );
+    _poolCluster.registerPool<ResourceGroup>( 4 );
     _poolCluster.registerPool<Scene>( 32 );
 
     // TODO: Parse pool settings from cfg file (Lua).
@@ -76,19 +77,23 @@ Context::~Context()
 
 ScenePtr Context::createScene( const string& name, const RendererType& rt )
 {
-    auto scene = std::make_unique<Scene>( name );
+    auto scene = _poolCluster.create<Scene>();
+    scene->setName( name );
+    _sceneRegistry.insert( name, scene );
 
     lore_log( "Scene " + name + " created successfully" );
 
-    ScenePtr handle = _sceneRegistry.insert( name, std::move( scene ) );
-    return handle;
+    return scene;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Context::destroyScene( const string& name )
 {
+    auto scene = _sceneRegistry.get( name );
+    _poolCluster.destroy<Scene>( scene );
     _sceneRegistry.remove( name );
+    
     lore_log( "Scene " + name + " destroyed successfully" );
 }
 

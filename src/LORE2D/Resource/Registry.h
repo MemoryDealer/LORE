@@ -42,8 +42,8 @@ namespace Lore {
 
     public:
 
-        using Iterator = UniqueMapIterator<MapType<string, std::unique_ptr<T>, MapParams ...>>;
-        using ConstIterator = ConstUniqueMapIterator<MapType<string, std::unique_ptr<T>, MapParams ...>>;
+        using Iterator = UniqueMapIterator<MapType<string, T*, MapParams ...>>;
+        using ConstIterator = ConstUniqueMapIterator<MapType<string, T*, MapParams ...>>;
 
     public:
 
@@ -53,24 +53,14 @@ namespace Lore {
         {
         }
 
-        T* insert( const id& id_, std::unique_ptr<T> resource )
+        void insert( const id& id_, T* resource )
         {
             if ( _container.find( id_ ) != _container.end() ) {
                 throw Lore::Exception( "Resource with id " + id_ + " already exists" );
             }
 
-            T* p = resource.get();
-
             auto it = _container.begin();
-            auto result = _container.insert( it, std::pair<id, std::unique_ptr<T>>( id_, std::move( resource ) ) );
-            
-            return p;
-        }
-
-        T* insert( const id& id_ )
-        {
-            std::unique_ptr<T> resource = std::make_unique<T>( id_ );
-            return insert( id_, std::move( resource ) );
+            _container.insert( it, std::pair<id, T*>( id_, resource ) );
         }
 
         void remove( const id& id_ )
@@ -78,6 +68,7 @@ namespace Lore {
             auto lookup = _container.find( id_ );
             if ( _container.end() == lookup ) {
                 log_warning( "Tried to remove resource with id " + id_ + " which does not exist" );
+                return;
             }
 
             _container.erase( id_ );
@@ -90,7 +81,7 @@ namespace Lore {
                 throw Lore::ItemIdentityException( "Resource with id " + id_ + " does not exist" );
             }
 
-            return lookup->second.get();
+            return lookup->second;
         }
 
         size_t size() const
@@ -121,105 +112,14 @@ namespace Lore {
 
     private:
 
-        MapType<string, std::unique_ptr<T>, MapParams ...> _container;
+        MapType<string, T*, MapParams ...> _container;
 
     };
 
     ///
     /// \class SafeRegistry
     /// \brief Thread-safe version of Registry.
-    template<template <typename ...> typename MapType, typename T, typename ... MapParams>
-    class SafeRegistry
-    {
 
-    public:
-
-        using Iterator = UniqueMapIterator<MapType<string, std::unique_ptr<T>, MapParams ...>>;
-        using ConstIterator = ConstUniqueMapIterator<MapType<string, std::unique_ptr<T>, MapParams ...>>;
-
-    public:
-
-        constexpr
-        explicit SafeRegistry()
-        : _container()
-        , _mutex()
-        {
-        }
-
-        void insert( const id& id_, std::unique_ptr<T> resource )
-        {
-            std::lock_guard<std::mutex> lock( _mutex );
-            
-            if ( _container.find( id_ ) != _container.end() ) {
-                throw Lore::Exception( "Resource with id " + id_ + " already exists" );
-            }
-
-            auto it = _container.begin();
-            _container.insert( it, std::pair<id, std::unique_ptr<T>>( id_, std::move( resource ) ) );
-        }
-
-        void remove( const id& id_ )
-        {
-            std::lock_guard<std::mutex> lock( _mutex );
-
-            auto lookup = _container.find( id_ );
-            if ( _container.end() == lookup ) {
-                log_warning( "Tried to remove resource with id " + id_ + " which does not exist" );
-            }
-
-            _container.erase( id_ );
-        }
-
-        T* get( const id& id_ ) const
-        {
-            std::lock_guard<std::mutex> lock( _mutex );
-
-            auto lookup = _container.find( id_ );
-            if ( _container.end() == lookup ) {
-                throw Lore::ItemIdentityException( "Resource with id " + id_ + " does not exist" );
-            }
-
-            return lookup->second.get();
-        }
-
-        size_t size() const
-        {
-            std::lock_guard<std::mutex> lock( _mutex );
-            return _container.size();
-        }
-
-        bool empty() const
-        {
-            std::lock_guard<std::mutex> lock( _mutex );
-            return _container.empty();
-        }
-
-        // Not really thread-safe since returning an iterator...
-        Iterator getIterator()
-        {
-            std::lock_guard<std::mutex> lock( _mutex );
-            return Iterator( std::begin( _container ), std::end( _container ) );
-        }
-
-        ConstIterator getConstIterator()
-        {
-            std::lock_guard<std::mutex> lock( _mutex );
-            return ConstIterator( std::begin( _container ), std::end( _container ) );
-        }
-
-        //
-        // Deleted functions/operators.
-
-        SafeRegistry& operator = ( const SafeRegistry& rhs ) = delete;
-        SafeRegistry( const SafeRegistry& rhs ) = delete;
-
-    private:
-
-        MapType<string, std::unique_ptr<T>, MapParams ...> _container;
-
-        mutable std::mutex _mutex;
-
-    };
 
 }
 

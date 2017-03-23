@@ -36,9 +36,11 @@ namespace Lore { namespace OpenGL {
 
     public:
 
-        explicit Texture( const string& name, const string& file );
+        explicit Texture( const string& name );
 
         virtual ~Texture() override;
+
+        virtual void loadFromFile( const string& file ) override;
 
         virtual void bind() override;
 
@@ -49,6 +51,10 @@ namespace Lore { namespace OpenGL {
         {
             return _id;
         }
+
+    protected:
+
+        virtual void _reset() override;
 
     private:
 

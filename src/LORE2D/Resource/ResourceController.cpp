@@ -44,7 +44,12 @@ ResourceController::ResourceController()
 , _indexer( nullptr )
 {
     // Create default resource group.
-    _activeGroup = _groups.insert( DefaultGroupName );
+    auto rg = MemoryAccess::GetPrimaryPoolCluster()->create<ResourceGroup>();
+    rg->name = DefaultGroupName;
+
+    // Store and set to active group.
+    _groups.insert( DefaultGroupName, rg );
+    _activeGroup = rg;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -72,7 +77,10 @@ void ResourceController::resetActiveGroup()
 
 void ResourceController::createGroup( const string& name )
 {
-    _groups.insert( name );
+    auto rg = MemoryAccess::GetPrimaryPoolCluster()->create<ResourceGroup>();
+    rg->name = name;
+
+    _groups.insert( name, rg );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -80,6 +88,9 @@ void ResourceController::createGroup( const string& name )
 void ResourceController::destroyGroup( const string& name )
 {
     unloadGroup( name );
+
+    auto rg = _groups.get( name );
+    MemoryAccess::GetPrimaryPoolCluster()->destroy<ResourceGroup>( rg );
     _groups.remove( name );
 }
 

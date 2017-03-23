@@ -90,6 +90,10 @@ Context::Context() noexcept
             log_warning( "No debug bit set in context flags\n" );
         }
     }
+
+    // Setup default memory pool settings.
+    _poolCluster.registerPool<Texture>( 64 );
+    _poolCluster.registerPool<Window>( 1 );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -125,23 +129,24 @@ Lore::WindowPtr Context::createWindow( const string& title,
                                        const uint height,
                                        const Window::Mode& mode )
 {
-    auto window = std::make_unique<Window>( title, width, height );
+    auto window = _poolCluster.create<Window>();
+    window->setTitle( title );
+    window->setDimensions( width, height );
     window->setMode( mode );
+    _windowRegistry.insert( title, window );
 
     lore_log( "Window " + title + " created successfully" );
-
-    Lore::WindowPtr handle = _windowRegistry.insert( title, std::move( window ) );
 
     // At least one window means the context is active.
     _active = true;
 
     // If no active window yet, assign by default.
     if ( !_activeWindow ) {
-        _activeWindow = handle;
+        _activeWindow = window;
     }
 
     // Return a handle.
-    return handle;
+    return window;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -149,8 +154,9 @@ Lore::WindowPtr Context::createWindow( const string& title,
 void Context::destroyWindow( Lore::WindowPtr window )
 {
     const string title = window->getTitle();
-
+    _poolCluster.destroy<Window>( window );
     _windowRegistry.remove( title );
+
     lore_log( "Window " + title + " destroyed successfully" );
 
     // Context is no longer considered active if all windows have been destroyed.

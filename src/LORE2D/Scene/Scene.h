@@ -58,12 +58,17 @@ namespace Lore {
         //
         // Setters.
 
-        void setRenderer( RendererPtr renderer )
+        inline void setName( const string& name )
+        {
+            _name = name;
+        }
+
+        inline void setRenderer( RendererPtr renderer )
         {
             _renderer = renderer;
         }
 
-        void setBackgroundColor( const Color& color )
+        inline void setBackgroundColor( const Color& color )
         {
             _bgColor = color;
         }
@@ -71,22 +76,22 @@ namespace Lore {
         //
         // Getters.
 
-        NodePtr getRootNode()
+        inline NodePtr getRootNode()
         {
             return &_root;
         }
 
-        RendererPtr getRenderer() const
+        inline RendererPtr getRenderer() const
         {
             return _renderer;
         }
 
-        string getName() const
+        inline string getName() const
         {
             return _name;
         }
 
-        Color getBackgroundColor() const
+        inline Color getBackgroundColor() const
         {
             return _bgColor;
         }

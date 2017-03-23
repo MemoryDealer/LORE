@@ -25,9 +25,11 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+#include <LORE2D/Memory/PoolCluster.h>
 
-    class PoolCluster;
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+namespace Lore {
 
     ///
     /// \class MemoryAccess
