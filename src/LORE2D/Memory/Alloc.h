@@ -1,3 +1,4 @@
+#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -24,52 +25,56 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "GPUProgram.h"
+template<typename T>
+class MemoryPool;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-using namespace Lore;
+namespace Lore {
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    ///
+    /// \class Alloc
+    /// \brief Base class for all objects managed in memory pools.
+    template<typename T>
+    class Alloc
+    {
 
-GPUProgram::GPUProgram()
-: _shaders()
-, _vertexBuffer( nullptr )
-{
-}
+    public:
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+        Alloc()
+        : _inUse( false )
+        , _next( nullptr )
+        { }
 
-GPUProgram::~GPUProgram()
-{
-}
+        virtual ~Alloc() { }
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+        ///
+        /// \brief Returns true if object has been requested for use in memory pool.
+        /// After it is destroyed in the memory pool, it is no longer in use.
+        bool getInUse() const
+        {
+            return _inUse;
+        }
 
-void GPUProgram::attachShader( ShaderPtr shader )
-{
-    const Shader::Type type = shader->getType();
+    private:
 
-    _shaders[type] = shader;
-}
+        ///
+        /// \brief Must be implemented by child classes to reset all internal
+        ///     data to default. This is called when the object is "freed" in
+        ///     the memory pool.
+        inline virtual void _reset() = 0;
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    private:
 
-ShaderPtr GPUProgram::getAttachedShader( const Shader::Type& type )
-{
-    auto lookup = _shaders.find( type );
-    if ( _shaders.end() != lookup ) {
-        return lookup->second;
-    }
+        bool _inUse;
+        T* _next;
 
-    throw Lore::Exception( "Attached shader type not in GPUProgram " );
-}
+    private:
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+        friend class MemoryPool<T>;
 
-void GPUProgram::setVertexBuffer( VertexBufferPtr vb )
-{
-    _vertexBuffer = vb;
+    };
+
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

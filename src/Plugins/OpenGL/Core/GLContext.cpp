@@ -31,6 +31,10 @@
 #include <Plugins/OpenGL/Window/GLWindow.h>
 #include <Plugins/OpenGL/Renderer/RendererFactory.h>
 #include <Plugins/OpenGL/Resource/GLStockResource.h>
+#include <Plugins/OpenGL/Resource/Renderable/GLTexture.h>
+#include <Plugins/OpenGL/Shader/GLGPUProgram.h>
+#include <Plugins/OpenGL/Shader/GLShader.h>
+#include <Plugins/OpenGL/Shader/GLVertexBuffer.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -58,8 +62,8 @@ Context::Context() noexcept
     glfwSetErrorCallback( ErrorCallback );
     lore_log( "OpenGL render plugin context initialized!" );
 
-    glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, MinimumVersionMajor );
-    glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, MinimumVersionMinor );
+    glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
+    glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 3 );
     glfwWindowHint( GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE );
     glfwWindowHint( GLFW_VISIBLE, GLFW_FALSE );
     _offscreenContextWindow = glfwCreateWindow( 1, 1, "", nullptr, nullptr );
@@ -106,6 +110,20 @@ Context::~Context()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void Context::initConfiguration()
+{
+    Lore::Context::initConfiguration();
+
+    // Setup default memory pool settings.
+    _poolCluster.registerPool<GPUProgram, GLGPUProgram>( 16 );
+    _poolCluster.registerPool<Shader, GLShader>( 32 );
+    _poolCluster.registerPool<Texture, GLTexture>( 64 );
+    _poolCluster.registerPool<VertexBuffer, GLVertexBuffer>( 32 );
+    _poolCluster.registerPool<Window, GLWindow>( 1 );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void Context::renderFrame( const float lagMultiplier )
 {
     glfwPollEvents();
@@ -123,25 +141,25 @@ void Context::renderFrame( const float lagMultiplier )
 Lore::WindowPtr Context::createWindow( const string& title,
                                        const uint width,
                                        const uint height,
-                                       const Window::Mode& mode )
+                                       const Lore::Window::Mode& mode )
 {
-    auto window = std::make_unique<Window>( title, width, height );
+    auto window = _poolCluster.create<Window, GLWindow>();
+    window->init( title, width, height );
     window->setMode( mode );
+    _windowRegistry.insert( title, window );
 
     lore_log( "Window " + title + " created successfully" );
-
-    Lore::WindowPtr handle = _windowRegistry.insert( title, std::move( window ) );
 
     // At least one window means the context is active.
     _active = true;
 
     // If no active window yet, assign by default.
     if ( !_activeWindow ) {
-        _activeWindow = handle;
+        _activeWindow = window;
     }
 
     // Return a handle.
-    return handle;
+    return window;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -149,8 +167,9 @@ Lore::WindowPtr Context::createWindow( const string& title,
 void Context::destroyWindow( Lore::WindowPtr window )
 {
     const string title = window->getTitle();
-
+    _poolCluster.destroy<Window, GLWindow>( window ); // TODO: Modify memory pool to store base & derived type?
     _windowRegistry.remove( title );
+
     lore_log( "Window " + title + " destroyed successfully" );
 
     // Context is no longer considered active if all windows have been destroyed.

@@ -24,7 +24,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "GPUProgram.h"
+#include "MemoryAccess.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -32,44 +32,25 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-GPUProgram::GPUProgram()
-: _shaders()
-, _vertexBuffer( nullptr )
+namespace MemoryAccessNS {
+
+    static PoolCluster* PrimaryPoolCluster;
+
+}
+using namespace MemoryAccessNS;
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+PoolCluster* MemoryAccess::GetPrimaryPoolCluster()
 {
+    return PrimaryPoolCluster;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-GPUProgram::~GPUProgram()
+void MemoryAccess::_SetPrimaryPoolCluster( PoolCluster* pc )
 {
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void GPUProgram::attachShader( ShaderPtr shader )
-{
-    const Shader::Type type = shader->getType();
-
-    _shaders[type] = shader;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-ShaderPtr GPUProgram::getAttachedShader( const Shader::Type& type )
-{
-    auto lookup = _shaders.find( type );
-    if ( _shaders.end() != lookup ) {
-        return lookup->second;
-    }
-
-    throw Lore::Exception( "Attached shader type not in GPUProgram " );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void GPUProgram::setVertexBuffer( VertexBufferPtr vb )
-{
-    _vertexBuffer = vb;
+    PrimaryPoolCluster = pc;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -41,21 +41,19 @@ namespace Local {
 
     std::unique_ptr<IRenderPluginLoader> __rpl;
     std::vector<Context::ErrorListener> __errorListeners;
+    Context* _activeContextPtr = nullptr;
 
 }
 using namespace Local;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-bool Context::_ContextExists = false;
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 Context::Context() noexcept
 : _windowRegistry()
 , _sceneRegistry()
-, _active( false )
 , _activeWindow( nullptr )
+, _poolCluster( "Primary" )
+, _active( false )
 {
     NotificationSubscribe( WindowEventNotification, &Context::onWindowEvent );
 }
@@ -69,21 +67,38 @@ Context::~Context()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void Context::initConfiguration()
+{
+    // Setup default memory pool settings.
+    _poolCluster.registerPool<Camera>( 32 );
+    _poolCluster.registerPool<Material>( 32 );
+    _poolCluster.registerPool<Node>( 1024 );
+    _poolCluster.registerPool<Scene>( 32 );
+
+    // TODO: Parse pool settings from cfg file (Lua).
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 ScenePtr Context::createScene( const string& name, const RendererType& rt )
 {
-    auto scene = std::make_unique<Scene>( name );
+    auto scene = _poolCluster.create<Scene>();
+    scene->setName( name );
+    _sceneRegistry.insert( name, scene );
 
     lore_log( "Scene " + name + " created successfully" );
 
-    ScenePtr handle = _sceneRegistry.insert( name, std::move( scene ) );
-    return handle;
+    return scene;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Context::destroyScene( const string& name )
 {
+    auto scene = _sceneRegistry.get( name );
+    _poolCluster.destroy<Scene>( scene );
     _sceneRegistry.remove( name );
+    
     lore_log( "Scene " + name + " destroyed successfully" );
 }
 
@@ -149,7 +164,7 @@ void Context::setActiveWindow( const string& name )
 
 std::unique_ptr<Context> Context::Create( const RenderPlugin& renderer )
 {
-    if ( _ContextExists ) {
+    if ( _activeContextPtr ) {
         throw Lore::Exception( "A Lore context already exists for this process!" );
     }
 
@@ -183,7 +198,11 @@ std::unique_ptr<Context> Context::Create( const RenderPlugin& renderer )
     auto context = __rpl->createContext();
 
     StockResource::AssignContext( context.get() );
-    _ContextExists = true;
+    MemoryAccess::_SetPrimaryPoolCluster( &context->_poolCluster );
+    _activeContextPtr = context.get();
+
+    // Apply configuration settings or use defaults.
+    context->initConfiguration();
 
     return std::move( context );
 }
@@ -194,9 +213,10 @@ void Context::Destroy( std::unique_ptr<Context> context )
 {
     context.reset();
     StockResource::AssignContext( nullptr );
+    MemoryAccess::_SetPrimaryPoolCluster( nullptr );
     Log::DeleteLogger();
     NotificationCenter::Destroy();
-    _ContextExists = false;
+    _activeContextPtr = nullptr;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

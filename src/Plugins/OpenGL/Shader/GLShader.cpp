@@ -32,9 +32,21 @@ using namespace Lore::OpenGL;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Shader::Shader( const string& name, const Shader::Type& type )
-: Lore::Shader( name, type )
-, _shader( 0 )
+GLShader::GLShader()
+: _shader( 0 )
+{
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+GLShader::~GLShader()
+{
+    unload();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLShader::init( const Shader::Type& type )
 {
     GLenum shaderType = 0;
     switch ( type ) {
@@ -56,14 +68,7 @@ Shader::Shader( const string& name, const Shader::Type& type )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Shader::~Shader()
-{
-    unload();
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-bool Shader::loadFromFile( const string& file )
+bool GLShader::loadFromFile( const string& file )
 {
 
     return false;
@@ -71,7 +76,7 @@ bool Shader::loadFromFile( const string& file )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-bool Shader::loadFromSource( const string& source )
+bool GLShader::loadFromSource( const string& source )
 {
     const char* psrc = source.c_str();
 
@@ -94,10 +99,18 @@ bool Shader::loadFromSource( const string& source )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Shader::unload()
+void GLShader::unload()
 {
     glDeleteShader( _shader );
     _loaded = false;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLShader::_reset()
+{
+    unload();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

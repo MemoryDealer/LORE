@@ -32,13 +32,14 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Scene::Scene( const string& name )
-: _name( name )
-, _bgColor( StockColor::Black )
+Scene::Scene()
+: _bgColor( StockColor::Black )
 , _renderer( nullptr )
-, _root( "root", this, nullptr )
+, _root()
 , _nodes()
 {
+    _root.setName( "root" );
+    _root._scene = this;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -52,18 +53,14 @@ Scene::~Scene()
 NodePtr Scene::createNode( const string& name )
 {
     // Note: Not using make_unique here because Node's new operator is private.
-    std::unique_ptr<Node> node( new Node( name, this, nullptr ) );
+    auto node = MemoryAccess::GetPrimaryPoolCluster()->create<Node>();
+    node->setName( name );
+    node->_scene = this;
 
-    auto result = _nodes.insert( { name, std::move( node ) } );
-    if ( !result.second ) {
-        throw Lore::Exception( "Failed to insert node " + name + " into Scene " + _name );
-    }
+    _nodes.insert( name, node );
+    _root.attachChildNode( node );
 
-    NodePtr p = result.first->second.get();
-
-    _root.attachChildNode( p );
-
-    return p;
+    return node;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -77,28 +74,31 @@ void Scene::destroyNode( NodePtr node )
 
 void Scene::destroyNode( const string& name )
 {
-    auto lookup = _nodes.find( name );
-    if ( _nodes.end() == lookup ) {
-        throw Lore::Exception( "Tried to destroy node " + name + " that does not exist in scene + " + name );
+    auto node = _nodes.get( name );
+
+    if ( node ) {
+        // Detach node from parent before destroying.
+        node->detachFromParent();
+        _nodes.remove( name );
     }
-
-    // Detach node from parent before destroying.
-    NodePtr node = lookup->second.get();
-    node->detachFromParent();
-
-    _nodes.erase( lookup );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 NodePtr Scene::getNode( const string& name )
 {
-    auto lookup = _nodes.find( name );
-    if ( _nodes.end() == lookup ) {
-        throw Lore::Exception( "Node " + name + " does not exist in Scene " + _name );
-    }
+    return _nodes.get( name );
+}
 
-    return lookup->second.get();
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Scene::_reset()
+{
+    _bgColor = StockColor::Black;
+    _renderer = nullptr;
+    //_root
+    //_nodes.clear();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

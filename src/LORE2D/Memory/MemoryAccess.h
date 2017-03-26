@@ -1,3 +1,4 @@
+#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -24,52 +25,32 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "GPUProgram.h"
+#include <LORE2D/Memory/PoolCluster.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-using namespace Lore;
+namespace Lore {
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    ///
+    /// \class MemoryAccess
+    /// \brief Purely static method class for accessing the Context's pool cluster.
+    class LORE_EXPORT MemoryAccess final
+    {
 
-GPUProgram::GPUProgram()
-: _shaders()
-, _vertexBuffer( nullptr )
-{
-}
+    public:
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+        static PoolCluster* GetPrimaryPoolCluster();
 
-GPUProgram::~GPUProgram()
-{
-}
+    private:
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+        static void _SetPrimaryPoolCluster( PoolCluster* pc );
 
-void GPUProgram::attachShader( ShaderPtr shader )
-{
-    const Shader::Type type = shader->getType();
+    private:
 
-    _shaders[type] = shader;
-}
+        friend class Context;
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    };
 
-ShaderPtr GPUProgram::getAttachedShader( const Shader::Type& type )
-{
-    auto lookup = _shaders.find( type );
-    if ( _shaders.end() != lookup ) {
-        return lookup->second;
-    }
-
-    throw Lore::Exception( "Attached shader type not in GPUProgram " );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void GPUProgram::setVertexBuffer( VertexBufferPtr vb )
-{
-    _vertexBuffer = vb;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

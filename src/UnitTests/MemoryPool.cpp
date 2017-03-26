@@ -24,52 +24,64 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "GPUProgram.h"
+#include "catch.hpp"
+#include <LORE2D/Lore.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-using namespace Lore;
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-GPUProgram::GPUProgram()
-: _shaders()
-, _vertexBuffer( nullptr )
+TEST_CASE( "Memory Pool", "[memory]" )
 {
+    const size_t size = 128;
+    Lore::MemoryPool<Lore::Node> pool( "test", size );
+
+    SECTION( "Creation/destruction" )
+    {
+        // Create some objects.
+        std::vector<Lore::Node*> nodes;
+        for ( int i = 0; i < size; ++i ) {
+            nodes.push_back( pool.create() );
+            REQUIRE( true == nodes[i]->getInUse() );
+        }
+
+        pool.destroy( nodes[50] );
+        REQUIRE( false == nodes[50]->getInUse() );
+
+        pool.destroyAll();
+        for ( int i = 0; i < size; ++i ) {
+            REQUIRE( false == pool.getObjectAt( i )->getInUse() );
+        }
+    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-GPUProgram::~GPUProgram()
+TEST_CASE( "Pool Cluster", "[memory]" )
 {
-}
+    const size_t size = 128;
+    Lore::PoolCluster cluster( "test" );
+    cluster.registerPool<Lore::Node>( size );
+    cluster.registerPool<Lore::Camera>( size );
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    SECTION( "Creation/destruction" )
+    {
+        std::vector<Lore::Node*> nodes;
+        std::vector<Lore::Camera*> shaders;
+        for ( int i = 0; i < size; ++i ) {
+            nodes.push_back( cluster.create<Lore::Node>() );
+            shaders.push_back( cluster.create<Lore::Camera>() );
 
-void GPUProgram::attachShader( ShaderPtr shader )
-{
-    const Shader::Type type = shader->getType();
+            REQUIRE( true == nodes[i]->getInUse() );
+            REQUIRE( true == shaders[i]->getInUse() );
+        }
 
-    _shaders[type] = shader;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-ShaderPtr GPUProgram::getAttachedShader( const Shader::Type& type )
-{
-    auto lookup = _shaders.find( type );
-    if ( _shaders.end() != lookup ) {
-        return lookup->second;
+        cluster.destroy<Lore::Node>( nodes[100] );
+        cluster.destroy<Lore::Camera>( shaders[100] );
+        REQUIRE( false == nodes[100]->getInUse() );
+        REQUIRE( false == shaders[100]->getInUse() );
     }
 
-    throw Lore::Exception( "Attached shader type not in GPUProgram " );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void GPUProgram::setVertexBuffer( VertexBufferPtr vb )
-{
-    _vertexBuffer = vb;
+    cluster.unregisterPool<Lore::Node>();
+    cluster.unregisterPool<Lore::Camera>();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

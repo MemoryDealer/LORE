@@ -45,9 +45,11 @@ namespace Lore {
 
     public:
 
-        Texture( const string& name );
+        Texture();
 
         virtual ~Texture() override { }
+
+        virtual void loadFromFile( const string& file ) = 0;
 
     };
 

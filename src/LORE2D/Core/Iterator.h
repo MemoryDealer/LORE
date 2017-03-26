@@ -178,7 +178,7 @@ namespace Lore {
     ///
     /// \class UniqueMapIterator
     /// \brief For iterating a map with value type of unique_ptr<T>.
-    template<typename T>
+    /*template<typename T>
     class UniqueMapIterator : public MapIteratorWrapper<T, typename T::iterator>
     {
 
@@ -203,14 +203,14 @@ namespace Lore {
             return ( _current++ )->second.get();
         }
 
-    };
+    };*/
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     ///
     /// \class UniqueMapIterator
     /// \brief For constant iterating a map with value type of unique_ptr<T>.
-    template<typename T>
+    /*template<typename T>
     class ConstUniqueMapIterator : public MapIteratorWrapper<T, typename T::const_iterator>
     {
 
@@ -235,7 +235,7 @@ namespace Lore {
             return ( _current++ )->second.get();
         }
 
-    };
+    };*/
 
 }
 

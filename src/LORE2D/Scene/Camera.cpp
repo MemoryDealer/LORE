@@ -34,9 +34,8 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Camera::Camera( const string& name )
-: _name( name )
-, _position()
+Camera::Camera()
+: _position()
 , _scale( 1.f, 1.f )
 , _view()
 , _dirty( true )
@@ -104,6 +103,16 @@ void Camera::setZoom( const real amount )
 
 void Camera::dirty()
 {
+    _dirty = true;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Camera::_reset()
+{
+    _position = Vec2();
+    _scale = Vec2( 1.f, 1.f );
+    _view = Matrix4();
     _dirty = true;
 }
 

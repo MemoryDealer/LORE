@@ -32,8 +32,8 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Material::Material( const string& name )
-: _name( name )
+Material::Material()
+: _name()
 , _passes()
 {
     // By default a material should have at least one pass.
@@ -45,6 +45,14 @@ Material::Material( const string& name )
 Material::~Material()
 {
 
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Material::_reset()
+{
+    _passes.clear();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

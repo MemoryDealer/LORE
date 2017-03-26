@@ -73,7 +73,9 @@
 // Lore.
 #include "Exports.h"
 #include "Types.h"
+#include "Core/ClassMacros.h"
 #include "Core/Logging/Log.h"
 #include "Core/Exception.h"
+#include "Memory/MemoryAccess.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

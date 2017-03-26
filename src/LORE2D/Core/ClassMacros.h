@@ -1,3 +1,4 @@
+#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -24,52 +25,28 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "GPUProgram.h"
+// 
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-using namespace Lore;
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-GPUProgram::GPUProgram()
-: _shaders()
-, _vertexBuffer( nullptr )
-{
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-GPUProgram::~GPUProgram()
-{
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void GPUProgram::attachShader( ShaderPtr shader )
-{
-    const Shader::Type type = shader->getType();
-
-    _shaders[type] = shader;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-ShaderPtr GPUProgram::getAttachedShader( const Shader::Type& type )
-{
-    auto lookup = _shaders.find( type );
-    if ( _shaders.end() != lookup ) {
-        return lookup->second;
-    }
-
-    throw Lore::Exception( "Attached shader type not in GPUProgram " );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void GPUProgram::setVertexBuffer( VertexBufferPtr vb )
-{
-    _vertexBuffer = vb;
-}
+#define LORE_OBJECT_BODY()\
+protected:\
+    string _name;\
+    string _resourceGroupName;\
+    \
+public:\
+    string getName() const{\
+        return _name;\
+    }\
+    \
+    void setName( const string& name ){\
+        _name = name;\
+    }\
+    string getResourceGroupName(){\
+        return _resourceGroupName;\
+    }\
+    \
+    void setResourceGroupName( const string& name ){\
+        _resourceGroupName = name;\
+    }\
+private:\
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -25,7 +25,9 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Memory/Alloc.h>
 #include <LORE2D/Resource/Color.h>
+#include <LORE2D/Resource/Registry.h>
 #include <LORE2D/Scene/Node.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -38,12 +40,14 @@ namespace Lore {
     ///     or to a texture.
     /// \details A Scene contains a collection of Nodes, all of which inherit from
     ///     the Scene's root Node.
-    class LORE_EXPORT Scene final
+    class LORE_EXPORT Scene final : public Alloc<Scene>
     {
+
+        LORE_OBJECT_BODY()
 
     public:
 
-        explicit Scene( const string& name );
+        Scene();
 
         ~Scene();
 
@@ -57,12 +61,12 @@ namespace Lore {
         //
         // Setters.
 
-        void setRenderer( RendererPtr renderer )
+        inline void setRenderer( RendererPtr renderer )
         {
             _renderer = renderer;
         }
 
-        void setBackgroundColor( const Color& color )
+        inline void setBackgroundColor( const Color& color )
         {
             _bgColor = color;
         }
@@ -70,35 +74,34 @@ namespace Lore {
         //
         // Getters.
 
-        NodePtr getRootNode()
+        inline NodePtr getRootNode()
         {
             return &_root;
         }
 
-        RendererPtr getRenderer() const
+        inline RendererPtr getRenderer() const
         {
             return _renderer;
         }
 
-        string getName() const
-        {
-            return _name;
-        }
-
-        Color getBackgroundColor() const
+        inline Color getBackgroundColor() const
         {
             return _bgColor;
         }
 
     private:
 
-        using NodeHashMap = std::unordered_map<string, std::unique_ptr<Node>>;
+        //friend class MemoryPool<Scene>;
+        virtual void _reset() override;
+
+    private:
+
+        using NodeMap = Registry<std::unordered_map, Node>;
 
         friend class Node;
 
     private:
 
-        string _name;
         Color _bgColor;
 
         // The type of renderer this scene uses.
@@ -109,7 +112,7 @@ namespace Lore {
 
         // Convenient hash map of all nodes for quick lookup.
         // This is the owner of all nodes; they are stored as unique_ptrs.
-        NodeHashMap _nodes;
+        NodeMap _nodes;
 
     };
 

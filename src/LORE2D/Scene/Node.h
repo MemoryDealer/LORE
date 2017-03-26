@@ -27,6 +27,8 @@
 
 #include <LORE2D/Core/Iterator.h>
 #include <LORE2D/Math/Math.h>
+#include <LORE2D/Memory/Alloc.h>
+#include <LORE2D/Resource/Registry.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -36,14 +38,16 @@ namespace Lore {
     /// \class Node
     /// \brief A scene node in its scene graph. May contain any renderable or
     ///     attachable objects.
-    class LORE_EXPORT Node
+    class LORE_EXPORT Node : public Alloc<Node>
     {
+
+        LORE_OBJECT_BODY()
 
     public:
 
-        using NodeMap = std::map<string, NodePtr>;
-        using ChildNodeIterator = MapIterator<NodeMap>;
-        using ConstChildNodeIterator = ConstMapIterator<NodeMap>;
+        using NodeMap = Registry<std::map, Node>;
+        using ChildNodeIterator = NodeMap::Iterator;
+        using ConstChildNodeIterator = NodeMap::ConstIterator;
         using RenderableList = std::unordered_map<string, RenderablePtr>;
 
         struct Transform
@@ -85,7 +89,7 @@ namespace Lore {
 
         ChildNodeIterator getChildNodeIterator();
 
-        ConstChildNodeIterator getConstChildNodeIterator() const;
+        ConstChildNodeIterator getConstChildNodeIterator();
 
         void detachFromParent();
 
@@ -122,11 +126,6 @@ namespace Lore {
         //
         // Getters.
 
-        inline string getName() const
-        {
-            return _name;
-        }
-
         inline NodePtr getParent() const
         {
             return _parent;
@@ -158,15 +157,20 @@ namespace Lore {
         Node( const Node& rhs ) = delete;
         Node& operator = ( const Node& rhs ) = delete;
 
+    protected:
+
+        virtual void _reset() override;
+
     private:
 
         // Only scenes can construct nodes.
         friend class Scene;
         friend class SceneGraphVisitor;
+        friend class MemoryPool<Node>;
 
     private:
 
-        Node( const string& name, ScenePtr scene, NodePtr parent );
+        Node();
 
         //
         // Scene graph operations.
@@ -187,8 +191,6 @@ namespace Lore {
         void _updateChildrenScale();
 
     private:
-
-        string _name;
 
         Transform _transform;
 

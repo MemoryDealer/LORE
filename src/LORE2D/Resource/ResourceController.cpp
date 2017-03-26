@@ -39,12 +39,16 @@ const string ResourceController::DefaultGroupName = "Default";
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 ResourceController::ResourceController()
-: _activeGroup( nullptr )
-, _groups()
+: _groups()
+, _defaultGroup( nullptr )
 , _indexer( nullptr )
 {
     // Create default resource group.
-    _activeGroup = _groups.insert( DefaultGroupName );
+    auto rg = std::make_unique<ResourceGroup>( DefaultGroupName );
+
+    // Store and set to active group.
+    _groups.insert( { DefaultGroupName, std::move( rg ) } );
+    _defaultGroup = rg.get();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -55,37 +59,27 @@ ResourceController::~ResourceController()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void ResourceController::setActiveGroup( const string& group )
-{
-    _activeGroup = _groups.get( group );
-    lore_log( "ResourceLoader: Active group set to " + group );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void ResourceController::resetActiveGroup()
-{
-    _activeGroup = _groups.get( DefaultGroupName );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 void ResourceController::createGroup( const string& name )
 {
-    _groups.insert( name );
+    auto rg = std::make_unique<ResourceGroup>( name );
+
+    _groups.insert( { name, std::move( rg ) } );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void ResourceController::destroyGroup( const string& name )
 {
-    unloadGroup( name );
-    _groups.remove( name );
+    auto group = _getGroup( name );
+    if ( DefaultGroupName != group->name ) {
+        unloadGroup( name );
+        _groups.erase( _groups.find( name ) );
+    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void ResourceController::addResourceLocation( const string& file, const bool recursive )
+void ResourceController::addResourceLocation( const string& file, const bool recursive, const string& groupName )
 {
     // Platform specific directory traversal.
     // ...
@@ -107,28 +101,30 @@ void ResourceController::unloadGroup( const string& name )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-GPUProgramPtr ResourceController::getGPUProgram( const string& name )
+GPUProgramPtr ResourceController::getGPUProgram( const string& name, const string& groupName )
 {
-    return _activeGroup->programs.get( name );
+    return _getGroup( groupName )->programs.get( name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-MaterialPtr ResourceController::getMaterial( const string& name )
+MaterialPtr ResourceController::getMaterial( const string& name, const string& groupName )
 {
-    return _activeGroup->materials.get( name );
+    return _getGroup( groupName )->materials.get( name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-ResourceGroupPtr ResourceController::_getGroup( const string& group )
+ResourceGroupPtr ResourceController::_getGroup( const string& groupName )
 {
-    if ( group == DefaultGroupName ) {
-        return _activeGroup;
+    auto lookup = _groups.find( groupName );
+    if ( _groups.end() != lookup ) {
+        return lookup->second.get();
     }
 
-    return _groups.get( group );
+    log_warning( "Resource group " + groupName + " not found, using default resource group" );
+    return _defaultGroup;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

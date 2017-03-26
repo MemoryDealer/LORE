@@ -25,10 +25,16 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Memory/Alloc.h>
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 namespace Lore {
 
     class LORE_EXPORT VertexBuffer
     {
+
+        LORE_OBJECT_BODY()
 
     public:
 
@@ -48,7 +54,7 @@ namespace Lore {
 
     public:
 
-        explicit VertexBuffer( const Type& type );
+        VertexBuffer();
 
         virtual ~VertexBuffer() { }
 

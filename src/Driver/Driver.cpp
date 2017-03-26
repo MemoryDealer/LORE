@@ -33,6 +33,10 @@
 // Note: Error 1282 on binding calls with no prior errors indicates a wrong context.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Memory/PoolCluster.h>
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 int main( int argc, char** argv )
 {
     auto context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
@@ -150,7 +154,15 @@ int main( int argc, char** argv )
             camera->zoom( -0.01f );
         }
 
-        context->renderFrame( 0 );
+        if ( GetAsyncKeyState( VK_F8 ) ) {
+            static bool destroyed = false;
+            if ( !destroyed ) {
+                loader.destroyTexture( tex );
+                destroyed = true;
+            }
+        }
+
+        context->renderFrame();
     }
 
     DestroyLoreContext( context );

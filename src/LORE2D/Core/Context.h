@@ -28,6 +28,7 @@
 #include <LORE2D/Core/NotificationCenter.h>
 #include <LORE2D/Core/Plugin/Plugins.h>
 #include <LORE2D/Core/Plugin/RenderPluginLoader.h>
+#include <LORE2D/Memory/PoolCluster.h>
 #include <LORE2D/Renderer/IRenderer.h>
 #include <LORE2D/Resource/Registry.h>
 #include <LORE2D/Resource/ResourceController.h>
@@ -56,6 +57,8 @@ namespace Lore {
         Context() noexcept;
 
         virtual ~Context();
+
+        virtual void initConfiguration();
 
         //
         // Rendering.
@@ -223,12 +226,10 @@ namespace Lore {
 
         WindowPtr _activeWindow;
 
+        PoolCluster _poolCluster;
+
         // True if one or more Windows exist in Context.
         bool _active;
-
-    private:
-
-        static bool _ContextExists;
 
     };
 
