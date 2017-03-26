@@ -48,6 +48,14 @@ namespace Lore {
 
         virtual ~Alloc() { }
 
+        ///
+        /// \brief Returns true if object has been requested for use in memory pool.
+        /// After it is destroyed in the memory pool, it is no longer in use.
+        bool getInUse() const
+        {
+            return _inUse;
+        }
+
     private:
 
         ///

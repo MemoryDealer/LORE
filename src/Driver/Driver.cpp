@@ -155,7 +155,11 @@ int main( int argc, char** argv )
         }
 
         if ( GetAsyncKeyState( VK_F8 ) ) {
-            loader.destroyTexture( tex );
+            static bool destroyed = false;
+            if ( !destroyed ) {
+                loader.destroyTexture( tex );
+                destroyed = true;
+            }
         }
 
         context->renderFrame();

@@ -115,11 +115,11 @@ void Context::initConfiguration()
     Lore::Context::initConfiguration();
 
     // Setup default memory pool settings.
-    _poolCluster.registerPool<GLGPUProgram>( 16 );
-    _poolCluster.registerPool<GLShader>( 32 );
-    _poolCluster.registerPool<GLTexture>( 64 );
-    _poolCluster.registerPool<GLVertexBuffer>( 32 );
-    _poolCluster.registerPool<GLWindow>( 1 );
+    _poolCluster.registerPool<GPUProgram, GLGPUProgram>( 16 );
+    _poolCluster.registerPool<Shader, GLShader>( 32 );
+    _poolCluster.registerPool<Texture, GLTexture>( 64 );
+    _poolCluster.registerPool<VertexBuffer, GLVertexBuffer>( 32 );
+    _poolCluster.registerPool<Window, GLWindow>( 1 );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -143,7 +143,7 @@ Lore::WindowPtr Context::createWindow( const string& title,
                                        const uint height,
                                        const Lore::Window::Mode& mode )
 {
-    auto window = _poolCluster.create<GLWindow>();
+    auto window = _poolCluster.create<Window, GLWindow>();
     window->init( title, width, height );
     window->setMode( mode );
     _windowRegistry.insert( title, window );
@@ -167,7 +167,7 @@ Lore::WindowPtr Context::createWindow( const string& title,
 void Context::destroyWindow( Lore::WindowPtr window )
 {
     const string title = window->getTitle();
-    _poolCluster.destroy<GLWindow>( static_cast<GLWindow*>( window ) ); // TODO: Modify memory pool to store base & derived type?
+    _poolCluster.destroy<Window, GLWindow>( window ); // TODO: Modify memory pool to store base & derived type?
     _windowRegistry.remove( title );
 
     lore_log( "Window " + title + " destroyed successfully" );

@@ -44,7 +44,7 @@ namespace Lore {
 
         virtual void resize( const size_t newSize ) = 0;
 
-        virtual void resetAll() = 0;
+        virtual void destroyAll() = 0;
 
     };
 
@@ -126,13 +126,20 @@ namespace Lore {
             //...
         }
 
-        inline virtual void resetAll() override
+        inline virtual void destroyAll() override
         {
             for ( int i = 0; i < _size; ++i ) {
                 Alloc<T>* alloc = _objects[i];
                 alloc->_inUse = false;
                 alloc->_reset();
             }
+        }
+
+        inline T* getObjectAt( const size_t idx )
+        {
+            assert( idx < _size );
+
+            return _objects[idx];
         }
 
         //

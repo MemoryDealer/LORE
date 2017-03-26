@@ -56,7 +56,7 @@ ResourceController::~ResourceController()
 
 Lore::TexturePtr ResourceController::loadTexture( const string& name, const string& file, const string& groupName )
 {
-    auto texture = MemoryAccess::GetPrimaryPoolCluster()->create<GLTexture>();
+    auto texture = MemoryAccess::GetPrimaryPoolCluster()->create<Lore::Texture, GLTexture>();
     texture->setName( name );
     texture->setResourceGroupName( groupName );
     texture->setMaterial( StockResource::GetMaterial( "StandardTexturedQuad" ) );
@@ -70,7 +70,7 @@ Lore::TexturePtr ResourceController::loadTexture( const string& name, const stri
 
 Lore::GPUProgramPtr ResourceController::createGPUProgram( const string& name, const string& groupName )
 {
-    auto program = MemoryAccess::GetPrimaryPoolCluster()->create<GLGPUProgram>();
+    auto program = MemoryAccess::GetPrimaryPoolCluster()->create<GPUProgram, GLGPUProgram>();
     program->setName( name );
     program->setResourceGroupName( groupName );
     program->init();
@@ -83,7 +83,7 @@ Lore::GPUProgramPtr ResourceController::createGPUProgram( const string& name, co
 
 Lore::ShaderPtr ResourceController::createVertexShader( const string& name, const string& groupName )
 {
-    auto shader = MemoryAccess::GetPrimaryPoolCluster()->create<GLShader>();
+    auto shader = MemoryAccess::GetPrimaryPoolCluster()->create<Shader, GLShader>();
     shader->setName( name );
     shader->setResourceGroupName( groupName );
     shader->init( Shader::Type::Vertex );
@@ -96,7 +96,7 @@ Lore::ShaderPtr ResourceController::createVertexShader( const string& name, cons
 
 Lore::ShaderPtr ResourceController::createFragmentShader( const string& name, const string& groupName )
 {
-    auto shader = MemoryAccess::GetPrimaryPoolCluster()->create<GLShader>();
+    auto shader = MemoryAccess::GetPrimaryPoolCluster()->create<Shader, GLShader>();
     shader->setName( name );
     shader->setResourceGroupName( groupName );
     shader->init( Shader::Type::Fragment );
@@ -109,7 +109,7 @@ Lore::ShaderPtr ResourceController::createFragmentShader( const string& name, co
 
 Lore::VertexBufferPtr ResourceController::createVertexBuffer( const string& name, const Lore::VertexBuffer::Type& type, const string& groupName )
 {
-    auto vb = MemoryAccess::GetPrimaryPoolCluster()->create<GLVertexBuffer>();
+    auto vb = MemoryAccess::GetPrimaryPoolCluster()->create<VertexBuffer, GLVertexBuffer>();
     vb->setName( name );
     vb->setResourceGroupName( groupName );
     vb->init( type );
@@ -148,7 +148,7 @@ void ResourceController::destroyTexture( Lore::TexturePtr texture )
     auto groupName = texture->getResourceGroupName();
     _getGroup( groupName )->textures.remove( texture->getName() );
 
-    MemoryAccess::GetPrimaryPoolCluster()->destroy<GLTexture>( texture );
+    MemoryAccess::GetPrimaryPoolCluster()->destroy<Texture, GLTexture>( texture );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

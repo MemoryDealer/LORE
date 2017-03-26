@@ -50,13 +50,13 @@ namespace Lore {
         //
         // Pool management.
 
-        template<typename T>
+        template<typename T, typename TDerived = T>
         void registerPool( const size_t size )
         {
             auto t = std::type_index( typeid( T ) );
             auto lookup = _pools.find( t );
             if ( _pools.end() == lookup ) {
-                _pools[t] = std::make_unique<MemoryPool<T>>( typeid( T ).name(), size );
+                _pools[t] = std::make_unique<MemoryPool<TDerived>>( typeid( TDerived ).name(), size );
             }
         }
 
@@ -82,37 +82,38 @@ namespace Lore {
         void resetAllPools()
         {
             for ( auto& pair : _pools ) {
-                pair.second->resetAll();
+                pair.second->destroyAll();
             }
         }
 
         //
         // Object management.
 
-        template<typename T>
-        T* create()
+        template<typename T, typename TDerived = T>
+        TDerived* create()
         {
             auto pool = _getPool<T>();
             if ( pool ) {
-                MemoryPool<T>* TPool = static_cast< MemoryPool<T>* >( pool );
+                MemoryPool<TDerived>* TPool = static_cast< MemoryPool<TDerived>* >( pool );
                 return TPool->create();
             }
 
             throw Lore::Exception( "PoolCluster::create<T>: Pool of type " +
-                                   string( typeid( T ).name() ) + " does not exist" );
+                                   string( typeid( TDerived ).name() ) + " does not exist" );
         }
 
-        template<typename T>
+        template<typename T, typename TDerived = T>
         void destroy( T* object )
         {
             auto pool = _getPool<T>();
             if ( pool ) {
-                MemoryPool<T>* TPool = static_cast< MemoryPool<T>* >( pool );
-                TPool->destroy( object );
+                // TODO: Can this be done without casting?
+                MemoryPool<TDerived>* TPool = static_cast< MemoryPool<TDerived>* >( pool );
+                TPool->destroy( static_cast<TDerived*>( object ) );
             }
             else {
                 throw Lore::Exception( "PoolCluster::create<T>: Pool of type " +
-                                       string( typeid( T ).name() ) + " does not exist" );
+                                       string( typeid( TDerived ).name() ) + " does not exist" );
             }
         }
 
