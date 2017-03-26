@@ -56,70 +56,82 @@ ResourceController::~ResourceController()
 
 Lore::TexturePtr ResourceController::loadTexture( const string& name, const string& file, const string& group )
 {
-    auto texture = std::make_unique<Texture>( name, file );
+    auto texture = MemoryAccess::GetPrimaryPoolCluster()->create<GLTexture>();
+    texture->setName( name );
+    texture->setMaterial( StockResource::GetMaterial( "StandardTexturedQuad" ) );
+    texture->loadFromFile( file );
 
-    auto handle = _getGroup( group )->textures.insert( name, std::move( texture ) );
-    return handle;
+    _getGroup( group )->textures.insert( name, texture );
+    return texture;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Lore::GPUProgramPtr ResourceController::createGPUProgram( const string& name, const string& group )
 {
-    auto program = std::make_unique<GPUProgram>( name );
+    auto program = MemoryAccess::GetPrimaryPoolCluster()->create<GLGPUProgram>();
+    program->setName( name );
 
-    auto handle = _getGroup( group )->programs.insert( name, std::move( program ) );
-    return handle;
+    _getGroup( group )->programs.insert( name, program );
+    return program;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Lore::ShaderPtr ResourceController::createVertexShader( const string& name, const string& group )
 {
-    auto shader = std::make_unique<Shader>( name, Shader::Type::Vertex );
+    auto shader = MemoryAccess::GetPrimaryPoolCluster()->create<GLShader>();
+    shader->setName( name );
+    shader->init( Shader::Type::Vertex );
 
-    auto handle = _getGroup( group )->vertexShaders.insert( name, std::move( shader ) );
-    return handle;
+    _getGroup( group )->vertexShaders.insert( name, shader );
+    return shader;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Lore::ShaderPtr ResourceController::createFragmentShader( const string& name, const string& group )
 {
-    auto shader = std::make_unique<Shader>( name, Shader::Type::Fragment );
+    auto shader = MemoryAccess::GetPrimaryPoolCluster()->create<GLShader>();
+    shader->setName( name );
+    shader->init( Shader::Type::Fragment );
 
-    auto handle = _getGroup( group )->fragmentShaders.insert( name, std::move( shader ) );
-    return handle;
+    _getGroup( group )->fragmentShaders.insert( name, shader );
+    return shader;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::VertexBufferPtr ResourceController::createVertexBuffer( const string& name, const VertexBuffer::Type& type, const string& group )
+Lore::VertexBufferPtr ResourceController::createVertexBuffer( const string& name, const Lore::VertexBuffer::Type& type, const string& group )
 {
-    auto vb = std::make_unique<VertexBuffer>( type );
+    auto vb = MemoryAccess::GetPrimaryPoolCluster()->create<GLVertexBuffer>();
+    vb->setName( name );
+    vb->init( type );
 
-    auto handle = _getGroup( group )->vertexBuffers.insert( name, std::move( vb ) );
-    return handle;
+    _getGroup( group )->vertexBuffers.insert( name, vb );
+    return vb;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Lore::MaterialPtr ResourceController::createMaterial( const string& name, const string& group )
 {
-    auto mat = std::make_unique<Material>( name );
+    auto mat = MemoryAccess::GetPrimaryPoolCluster()->create<Material>();
+    mat->setName( name );
 
-    auto handle = _getGroup( group )->materials.insert( name, std::move( mat ) );
-    return handle;
+    _getGroup( group )->materials.insert( name, mat );
+    return mat;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Lore::CameraPtr ResourceController::createCamera( const string& name, const string& group )
 {
-    auto cam = std::make_unique<Camera>( name );
+    auto cam = MemoryAccess::GetPrimaryPoolCluster()->create<Camera>();
+    cam->setName( name );
 
-    auto handle = _getGroup( group )->cameras.insert( name, std::move( cam ) );
-    return handle;
+    _getGroup( group )->cameras.insert( name, cam );
+    return cam;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

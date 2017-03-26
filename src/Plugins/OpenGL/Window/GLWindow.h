@@ -31,7 +31,8 @@
 
 namespace Lore { namespace OpenGL {
 
-    class Window final : public Lore::Window
+    class GLWindow final : public Lore::Window,
+                           public Alloc<GLWindow>
     {
 
     private:
@@ -40,9 +41,9 @@ namespace Lore { namespace OpenGL {
 
     public:
 
-        Window();
+        GLWindow();
 
-        virtual ~Window() override;
+        virtual ~GLWindow() override;
 
         void init( const string& title,
                    const int width,

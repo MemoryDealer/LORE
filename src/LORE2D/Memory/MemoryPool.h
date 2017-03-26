@@ -78,7 +78,7 @@ namespace Lore {
             _objects[_size - 1]->_next = nullptr;
         }
 
-        inline ~MemoryPool()
+        inline virtual ~MemoryPool() override
         {
             for ( int i = 0; i < _size; ++i ) {
                 delete _objects[i];
@@ -103,12 +103,14 @@ namespace Lore {
         {
             assert( true == object->_inUse );
 
+            Alloc<T>* alloc = object;
+
             // Reset object to default.
-            object->_inUse = false;
-            object->_reset();
+            alloc->_inUse = false;
+            alloc->_reset();
 
             // Put this object at the front of the list.
-            object->_next = _next;
+            alloc->_next = _next;
             _next = object;
         }
 
@@ -120,8 +122,9 @@ namespace Lore {
         inline virtual void resetAll() override
         {
             for ( int i = 0; i < _size; ++i ) {
-                _objects[i]->_inUse = false;
-                _objects[i]->_reset();
+                Alloc<T>* alloc = _objects[i];
+                alloc->_inUse = false;
+                alloc->_reset();
             }
         }
 
@@ -137,7 +140,7 @@ namespace Lore {
         {
             printf( "Pool %s usage: \n\n", _name.c_str() );
             for ( int i = 0; i < _size; ++i ) {
-                printf( "Object %d %s\n", i, ( _objects[i]->_inUse ) ? "[x]" : "[ ]" );
+                printf( "Object %d \t[%s]\n", i, ( _objects[i]->_inUse ) ? "x" : " " );
             }
         }
 

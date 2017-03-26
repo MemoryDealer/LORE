@@ -46,7 +46,7 @@ namespace Lore {
         GPUProgram
     };
 
-    struct ResourceGroup : public Alloc<ResourceGroup>
+    struct LORE_EXPORT ResourceGroup
     {
 
         struct IndexedResource
@@ -100,16 +100,6 @@ namespace Lore {
 
         Registry<std::unordered_map, Camera> cameras;
 
-        // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-    protected:
-
-        inline virtual void _reset() override
-        {
-            index.clear();
-            // TODO: CLeanup
-        }
-
     };
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -130,15 +120,11 @@ namespace Lore {
         //
         // Groups.
 
-        void setActiveGroup( const string& group );
-
-        void resetActiveGroup();
-
         void createGroup( const string& name );
 
         void destroyGroup( const string& name );
 
-        void addResourceLocation( const string& directory, const bool recursive = false );
+        void addResourceLocation( const string& directory, const bool recursive = false, const string& groupName = DefaultGroupName );
 
         void loadGroup( const string& name );
 
@@ -147,38 +133,42 @@ namespace Lore {
         //
         // Loading.
 
-        virtual TexturePtr loadTexture( const string& name, const string& file, const string& group = DefaultGroupName ) = 0;
+        virtual TexturePtr loadTexture( const string& name, const string& file, const string& groupName = DefaultGroupName ) = 0;
 
         //
         // Factory functions.
 
-        virtual GPUProgramPtr createGPUProgram( const string& name, const string& group = DefaultGroupName ) = 0;
+        virtual GPUProgramPtr createGPUProgram( const string& name, const string& groupName = DefaultGroupName ) = 0;
 
-        virtual ShaderPtr createVertexShader( const string& name, const string& group = DefaultGroupName ) = 0;
+        virtual ShaderPtr createVertexShader( const string& name, const string& groupName = DefaultGroupName ) = 0;
 
-        virtual ShaderPtr createFragmentShader( const string& name, const string& group = DefaultGroupName ) = 0;
+        virtual ShaderPtr createFragmentShader( const string& name, const string& groupName = DefaultGroupName ) = 0;
 
-        virtual VertexBufferPtr createVertexBuffer( const string& name, const VertexBuffer::Type& type, const string& group = DefaultGroupName ) = 0;
+        virtual VertexBufferPtr createVertexBuffer( const string& name, const VertexBuffer::Type& type, const string& groupName = DefaultGroupName ) = 0;
 
-        virtual MaterialPtr createMaterial( const string& name, const string& group = DefaultGroupName ) = 0;
+        virtual MaterialPtr createMaterial( const string& name, const string& groupName = DefaultGroupName ) = 0;
 
-        virtual CameraPtr createCamera( const string& name, const string& group = DefaultGroupName ) = 0;
+        virtual CameraPtr createCamera( const string& name, const string& groupName = DefaultGroupName ) = 0;
 
         //
         // Getters.
 
-        GPUProgramPtr getGPUProgram( const string& name );
+        GPUProgramPtr getGPUProgram( const string& name, const string& groupName = DefaultGroupName );
 
-        MaterialPtr getMaterial( const string& name );
-
-    protected:
-
-        ResourceGroupPtr _getGroup( const string& group );
+        MaterialPtr getMaterial( const string& name, const string& groupName = DefaultGroupName );
 
     protected:
 
-        ResourceGroupPtr _activeGroup;
-        Registry<std::unordered_map, ResourceGroup> _groups;
+        using ResourceGroupMap = std::unordered_map<std::string, std::unique_ptr<ResourceGroup>>;
+
+    protected:
+
+        ResourceGroupPtr _getGroup( const string& groupName );
+
+    protected:
+
+        ResourceGroupMap _groups;
+        ResourceGroupPtr _defaultGroup;
         std::unique_ptr<ResourceIndexer> _indexer;
 
     };

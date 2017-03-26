@@ -45,7 +45,7 @@ namespace Lore {
 
     public:
 
-        Texture( const string& name );
+        Texture();
 
         virtual ~Texture() override { }
 

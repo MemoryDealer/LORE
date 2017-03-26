@@ -32,8 +32,8 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-VertexBuffer::VertexBuffer( const Type& type )
-: _type( type )
+VertexBuffer::VertexBuffer()
+: _type()
 , _attributes()
 {
 

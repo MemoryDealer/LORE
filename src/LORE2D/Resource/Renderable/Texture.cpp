@@ -32,8 +32,7 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Texture::Texture( const string& name )
-: Renderable( name )
+Texture::Texture()
 {
     _type = Renderable::Type::Texture;
 }

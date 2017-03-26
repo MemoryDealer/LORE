@@ -31,14 +31,17 @@
 
 namespace Lore { namespace OpenGL {
 
-    class VertexBuffer : public Lore::VertexBuffer
+    class GLVertexBuffer : public Lore::VertexBuffer,
+                           public Alloc<GLVertexBuffer>
     {
 
     public:
 
-        explicit VertexBuffer( const Lore::VertexBuffer::Type& type );
+        GLVertexBuffer();
 
-        virtual ~VertexBuffer() override;
+        virtual ~GLVertexBuffer() override;
+
+        void init( const Lore::VertexBuffer::Type& type );
 
         virtual void build() override;
 
@@ -47,6 +50,10 @@ namespace Lore { namespace OpenGL {
         virtual void unbind() override;
 
         virtual void draw() override;
+
+    private:
+
+        virtual void _reset() override;
 
     private:
 

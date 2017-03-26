@@ -34,8 +34,10 @@ namespace Lore {
     ///
     /// \class Renderable
     /// \brief The base class of anything that can be attached to a node.
-    class LORE_EXPORT Renderable : public Alloc<Renderable>
+    class LORE_EXPORT Renderable
     {
+
+        LORE_OBJECT_BODY()
 
     public:
 
@@ -50,7 +52,7 @@ namespace Lore {
 
     public:
 
-        explicit Renderable( const string& name );
+        Renderable();
 
         virtual ~Renderable();
 
@@ -58,11 +60,6 @@ namespace Lore {
 
         //
         // Getters.
-
-        inline string getName() const
-        {
-            return _name;
-        }
 
         inline Type getType() const
         {
@@ -99,7 +96,6 @@ namespace Lore {
 
     protected:
 
-        string _name;
         MaterialPtr _material;
         uint _renderQueue;
         bool _attached;

@@ -35,9 +35,6 @@
 
 #include <LORE2D/Memory/PoolCluster.h>
 
-Lore::MemoryPool<Lore::Node> pool( "test", 11 );
-Lore::PoolCluster cluster( "cluster1" );
-
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 int main( int argc, char** argv )
@@ -62,36 +59,6 @@ int main( int argc, char** argv )
 
     Hope it helps."
     */
-
-    cluster.registerPool<Lore::Node>( 100 );
-
-    auto nn1 = cluster.create<Lore::Node>();
-
-    cluster.resetAllPools();
-
-    Lore::Node* nodes[10];
-    for ( int i = 0; i < 10; ++i ) {
-        nodes[i] = pool.create();
-    }
-
-    for ( int i = 0; i < 10; ++i ) {
-        if ( i % 2 == 0 ) {
-            pool.destroy( nodes[i] );
-        }
-    }
-
-    nodes[0] = pool.create();
-    //nodes[2] = pool.create();
-    nodes[4] = pool.create();
-    //nodes[6] = pool.create();
-    auto n1 = pool.create();
-    pool.destroy( nodes[5] );
-    auto n22 = pool.create();
-    pool.destroy( n22 );
-    n22 = pool.create();
-
-
-    pool.printUsage();
 
     //context->createWindow( "Test2", 720, 640 );
     Lore::ResourceController& loader = *context->getResourceController();

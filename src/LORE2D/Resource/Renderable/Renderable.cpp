@@ -36,9 +36,8 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Renderable::Renderable( const string& name )
-: _name( name )
-, _material( StockResource::GetMaterial( "StandardTexturedQuad" ) ) // Default material.
+Renderable::Renderable()
+: _material()
 , _renderQueue( RenderQueue::General )
 , _attached( false )
 , _type( Type::Unknown )

@@ -31,14 +31,15 @@
 
 namespace Lore { namespace OpenGL {
 
-    class Texture : public Lore::Texture
+    class GLTexture : public Lore::Texture,
+                      public Alloc<GLTexture>
     {
 
     public:
 
-        explicit Texture( const string& name );
+        GLTexture();
 
-        virtual ~Texture() override;
+        virtual ~GLTexture() override;
 
         virtual void loadFromFile( const string& file ) override;
 

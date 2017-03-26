@@ -45,8 +45,8 @@ GLuint quad_indices [] = {
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-VertexBuffer::VertexBuffer( const Lore::VertexBuffer::Type& type )
-: Lore::VertexBuffer( type )
+GLVertexBuffer::GLVertexBuffer()
+: Lore::VertexBuffer()
 , _vbo( 0 )
 , _vao( 0 )
 , _ebo( 0 )
@@ -55,7 +55,20 @@ VertexBuffer::VertexBuffer( const Lore::VertexBuffer::Type& type )
 , _mode( 0 )
 , _glType( GL_UNSIGNED_INT )
 {
-    switch ( type ) {
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+GLVertexBuffer::~GLVertexBuffer()
+{
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
+{
+    _type = type;
+    switch ( _type ) {
     default:
     case Type::Custom:
         _mode = GL_TRIANGLES;
@@ -74,13 +87,7 @@ VertexBuffer::VertexBuffer( const Lore::VertexBuffer::Type& type )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-VertexBuffer::~VertexBuffer()
-{
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void VertexBuffer::build()
+void GLVertexBuffer::build()
 {
     // First generate vertices and indices.
     switch ( _type ) {
@@ -169,23 +176,31 @@ void VertexBuffer::build()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void VertexBuffer::bind()
+void GLVertexBuffer::bind()
 {
     glBindVertexArray( _vao );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void VertexBuffer::unbind()
+void GLVertexBuffer::unbind()
 {
     glBindVertexArray( 0 );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void VertexBuffer::draw()
+void GLVertexBuffer::draw()
 {
-    glDrawElements( GL_TRIANGLE_STRIP, static_cast<GLsizei>( _indices.size() ), GL_UNSIGNED_INT, 0 );
+    glDrawElements( _mode, static_cast<GLsizei>( _indices.size() ), GL_UNSIGNED_INT, 0 );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLVertexBuffer::_reset()
+{
+    // TODO:
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

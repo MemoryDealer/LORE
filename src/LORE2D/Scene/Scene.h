@@ -27,6 +27,7 @@
 
 #include <LORE2D/Memory/Alloc.h>
 #include <LORE2D/Resource/Color.h>
+#include <LORE2D/Resource/Registry.h>
 #include <LORE2D/Scene/Node.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -42,9 +43,11 @@ namespace Lore {
     class LORE_EXPORT Scene final : public Alloc<Scene>
     {
 
+        LORE_OBJECT_BODY()
+
     public:
 
-        explicit Scene( const string& name );
+        Scene();
 
         ~Scene();
 
@@ -57,11 +60,6 @@ namespace Lore {
 
         //
         // Setters.
-
-        inline void setName( const string& name )
-        {
-            _name = name;
-        }
 
         inline void setRenderer( RendererPtr renderer )
         {
@@ -86,29 +84,24 @@ namespace Lore {
             return _renderer;
         }
 
-        inline string getName() const
-        {
-            return _name;
-        }
-
         inline Color getBackgroundColor() const
         {
             return _bgColor;
         }
 
-    protected:
+    private:
 
+        //friend class MemoryPool<Scene>;
         virtual void _reset() override;
 
     private:
 
-        using NodeHashMap = std::unordered_map<string, std::unique_ptr<Node>>;
+        using NodeMap = Registry<std::unordered_map, Node>;
 
         friend class Node;
 
     private:
 
-        string _name;
         Color _bgColor;
 
         // The type of renderer this scene uses.
@@ -119,7 +112,7 @@ namespace Lore {
 
         // Convenient hash map of all nodes for quick lookup.
         // This is the owner of all nodes; they are stored as unique_ptrs.
-        NodeHashMap _nodes;
+        NodeMap _nodes;
 
     };
 

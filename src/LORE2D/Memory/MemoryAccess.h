@@ -34,7 +34,7 @@ namespace Lore {
     ///
     /// \class MemoryAccess
     /// \brief Purely static method class for accessing the Context's pool cluster.
-    class MemoryAccess final
+    class LORE_EXPORT MemoryAccess final
     {
 
     public:

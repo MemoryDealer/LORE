@@ -42,8 +42,8 @@ namespace Lore {
 
     public:
 
-        using Iterator = UniqueMapIterator<MapType<string, T*, MapParams ...>>;
-        using ConstIterator = ConstUniqueMapIterator<MapType<string, T*, MapParams ...>>;
+        using Iterator = MapIterator<MapType<string, T*, MapParams ...>>;
+        using ConstIterator = ConstMapIterator<MapType<string, T*, MapParams ...>>;
 
     public:
 

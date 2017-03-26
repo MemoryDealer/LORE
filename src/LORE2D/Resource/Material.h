@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Memory/Alloc.h>
 #include <LORE2D/Resource/Color.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -36,8 +37,10 @@ namespace Lore {
     /// \brief Contains data on how to render an object, including lighting, colors,
     ///     and shader effects.
     /// \details Can have N number of passes.
-    class LORE_EXPORT Material final
+    class LORE_EXPORT Material final : public Alloc<Material>
     {
+
+        LORE_OBJECT_BODY()
 
     public:
 
@@ -61,9 +64,9 @@ namespace Lore {
 
     public:
 
-        explicit Material( const string& name );
+        Material();
 
-        ~Material();
+        virtual ~Material() override;
 
         //
         // Getters.
@@ -83,7 +86,10 @@ namespace Lore {
 
     private:
 
-        string _name;
+        virtual void _reset() override;
+
+    private:
+
         PassList _passes;
 
     };

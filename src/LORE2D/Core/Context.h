@@ -58,6 +58,8 @@ namespace Lore {
 
         virtual ~Context();
 
+        virtual void initConfiguration();
+
         //
         // Rendering.
 

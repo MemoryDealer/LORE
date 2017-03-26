@@ -36,12 +36,11 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Node::Node( const string& name, ScenePtr scene, NodePtr parent )
-: _name( name )
-, _transform()
+Node::Node()
+: _transform()
 , _renderables()
-, _scene( scene )
-, _parent( parent )
+, _scene( nullptr )
+, _parent( nullptr )
 , _childNodes()
 {
 }
@@ -56,16 +55,15 @@ Node::~Node()
 
 NodePtr Node::createChildNode( const string& name )
 {
-    std::unique_ptr<Node> node( new Node( name, _scene, this ) );
-    auto insertion = _scene->_nodes.insert( { name, std::move( node ) } );
-    NodePtr p = insertion.first->second.get();
+    auto node = MemoryAccess::GetPrimaryPoolCluster()->create<Node>();
+    node->setName( name );
+    node->_scene = _scene;
+    node->_parent = this;
+    
+    _scene->_nodes.insert( name, node );
+    _childNodes.insert( name, node );
 
-    auto result = _childNodes.insert( { name, p } );
-    if ( !result.second ) {
-        throw Lore::Exception( "Failed to add child node " + name + " to " + _name );
-    }
-
-    return p;
+    return node;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -77,10 +75,7 @@ void Node::attachChildNode( NodePtr node )
                                " is already a child of " + node->getParent()->getName() );
     }
 
-    auto result = _childNodes.insert( { node->getName(), node } );
-    if ( !result.second ) {
-        throw Lore::Exception( "Failed to attach node to node " + _name );
-    }
+    _childNodes.insert( node->getName(), node );
 
     node->_parent = this;
 }
@@ -89,39 +84,28 @@ void Node::attachChildNode( NodePtr node )
 
 void Node::removeChildNode( NodePtr node )
 {
-    auto lookup = _childNodes.find( node->getName() );
-    if ( _childNodes.end() == lookup ) {
-        throw Lore::Exception( "Tried to remove child node " + node->getName() + " from node " + _name +
-                               ", which is not a child" );
-    }
-
-    _childNodes.erase( lookup );
+    _childNodes.remove( node->getName() );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 NodePtr Node::getChild( const string& name )
 {
-    auto lookup = _childNodes.find( name );
-    if ( _childNodes.end() == lookup ) {
-        throw Lore::Exception( "Child node " + name + " does not exist in node " + _name );
-    }
-
-    return lookup->second;
+    return _childNodes.get( name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Node::ChildNodeIterator Node::getChildNodeIterator()
 {
-    return ChildNodeIterator( std::begin( _childNodes ), std::end( _childNodes ) );
+    return _childNodes.getIterator();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Node::ConstChildNodeIterator Node::getConstChildNodeIterator() const
+Node::ConstChildNodeIterator Node::getConstChildNodeIterator()
 {
-    return ConstChildNodeIterator( std::cbegin( _childNodes ), std::cend( _childNodes ) );
+    return _childNodes.getConstIterator();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -146,6 +130,7 @@ void Node::attachObject( RenderablePtr r )
     case Renderable::Type::Texture:
         _renderables.insert( { r->getName(), r } );
         _scene->getRenderer()->addRenderable( r, _transform.world );
+        r->_notifyAttached();
         break;
     }
 }
@@ -262,7 +247,7 @@ void Node::_reset()
     _renderables.clear();
     _scene = nullptr;
     _parent = nullptr;
-    _childNodes.clear();
+    //_childNodes.clear();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

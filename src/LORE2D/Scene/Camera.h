@@ -35,9 +35,11 @@ namespace Lore {
     class LORE_EXPORT Camera final : public Alloc<Camera>
     {
 
+        LORE_OBJECT_BODY()
+
     public:
 
-        explicit Camera( const string& name );
+        Camera();
 
         ~Camera();
 
@@ -74,8 +76,6 @@ namespace Lore {
         void _updateViewMatrix();
 
     private:
-
-        string _name;
 
         Vec2 _position;
         Vec2 _scale;

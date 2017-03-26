@@ -26,6 +26,7 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 #include <LORE2D/Math/Math.h>
+#include <LORE2D/Memory/Alloc.h>
 #include <LORE2D/Shader/Shader.h>
 #include <LORE2D/Shader/VertexBuffer.h>
 
@@ -36,9 +37,11 @@ namespace Lore {
     class LORE_EXPORT GPUProgram
     {
 
+        LORE_OBJECT_BODY()
+
     public:
 
-        explicit GPUProgram( const string& name );
+        GPUProgram();
 
         virtual ~GPUProgram();
 
@@ -81,8 +84,6 @@ namespace Lore {
         using ShaderMap = std::unordered_map<Shader::Type, ShaderPtr>;
 
     protected:
-
-        string _name;
 
         ShaderMap _shaders;
         

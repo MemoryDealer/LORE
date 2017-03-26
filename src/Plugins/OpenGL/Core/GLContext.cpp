@@ -31,6 +31,10 @@
 #include <Plugins/OpenGL/Window/GLWindow.h>
 #include <Plugins/OpenGL/Renderer/RendererFactory.h>
 #include <Plugins/OpenGL/Resource/GLStockResource.h>
+#include <Plugins/OpenGL/Resource/Renderable/GLTexture.h>
+#include <Plugins/OpenGL/Shader/GLGPUProgram.h>
+#include <Plugins/OpenGL/Shader/GLShader.h>
+#include <Plugins/OpenGL/Shader/GLVertexBuffer.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -58,8 +62,8 @@ Context::Context() noexcept
     glfwSetErrorCallback( ErrorCallback );
     lore_log( "OpenGL render plugin context initialized!" );
 
-    glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, MinimumVersionMajor );
-    glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, MinimumVersionMinor );
+    glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
+    glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 3 );
     glfwWindowHint( GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE );
     glfwWindowHint( GLFW_VISIBLE, GLFW_FALSE );
     _offscreenContextWindow = glfwCreateWindow( 1, 1, "", nullptr, nullptr );
@@ -90,10 +94,6 @@ Context::Context() noexcept
             log_warning( "No debug bit set in context flags\n" );
         }
     }
-
-    // Setup default memory pool settings.
-    _poolCluster.registerPool<Texture>( 64 );
-    _poolCluster.registerPool<Window>( 1 );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -106,6 +106,20 @@ Context::~Context()
     glfwSetErrorCallback( nullptr );
     glfwTerminate();
     lore_log( "OpenGL render plugin context terminated!" );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Context::initConfiguration()
+{
+    Lore::Context::initConfiguration();
+
+    // Setup default memory pool settings.
+    _poolCluster.registerPool<GLGPUProgram>( 16 );
+    _poolCluster.registerPool<GLShader>( 32 );
+    _poolCluster.registerPool<GLTexture>( 64 );
+    _poolCluster.registerPool<GLVertexBuffer>( 32 );
+    _poolCluster.registerPool<GLWindow>( 1 );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -127,11 +141,10 @@ void Context::renderFrame( const float lagMultiplier )
 Lore::WindowPtr Context::createWindow( const string& title,
                                        const uint width,
                                        const uint height,
-                                       const Window::Mode& mode )
+                                       const Lore::Window::Mode& mode )
 {
-    auto window = _poolCluster.create<Window>();
-    window->setTitle( title );
-    window->setDimensions( width, height );
+    auto window = _poolCluster.create<GLWindow>();
+    window->init( title, width, height );
     window->setMode( mode );
     _windowRegistry.insert( title, window );
 
@@ -154,7 +167,7 @@ Lore::WindowPtr Context::createWindow( const string& title,
 void Context::destroyWindow( Lore::WindowPtr window )
 {
     const string title = window->getTitle();
-    _poolCluster.destroy<Window>( window );
+    _poolCluster.destroy<GLWindow>( static_cast<GLWindow*>( window ) ); // TODO: Modify memory pool to store base & derived type?
     _windowRegistry.remove( title );
 
     lore_log( "Window " + title + " destroyed successfully" );

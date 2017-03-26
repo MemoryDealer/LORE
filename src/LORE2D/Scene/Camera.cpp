@@ -34,9 +34,8 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Camera::Camera( const string& name )
-: _name( name )
-, _position()
+Camera::Camera()
+: _position()
 , _scale( 1.f, 1.f )
 , _view()
 , _dirty( true )

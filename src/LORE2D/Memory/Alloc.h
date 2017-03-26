@@ -36,7 +36,7 @@ namespace Lore {
     /// \class Alloc
     /// \brief Base class for all objects managed in memory pools.
     template<typename T>
-    class LORE_EXPORT Alloc
+    class Alloc
     {
 
     public:
@@ -48,13 +48,13 @@ namespace Lore {
 
         virtual ~Alloc() { }
 
-    protected:
+    private:
 
         ///
         /// \brief Must be implemented by child classes to reset all internal
         ///     data to default. This is called when the object is "freed" in
         ///     the memory pool.
-        virtual void _reset() = 0;
+        inline virtual void _reset() = 0;
 
     private:
 

@@ -25,10 +25,16 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Memory/Alloc.h>
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 namespace Lore {
 
     class LORE_EXPORT Shader
     {
+
+        LORE_OBJECT_BODY()
 
     public:
 
@@ -39,9 +45,8 @@ namespace Lore {
 
     public:
 
-        Shader( const string& name, const Shader::Type& type )
-        : _name( name )
-        , _type( type )
+        Shader()
+        : _type()
         , _loaded( false )
         { }
 
@@ -55,11 +60,6 @@ namespace Lore {
 
         //
         // Getters.
-
-        string getName() const
-        {
-            return _name;
-        }
 
         virtual Type getType() const
         {
@@ -78,7 +78,6 @@ namespace Lore {
 
     protected:
 
-        string _name;
         Type _type;
         bool _loaded;
 

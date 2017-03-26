@@ -32,7 +32,7 @@
 
 namespace Lore {
 
-    class LORE_EXPORT Window : public Alloc<Window>
+    class LORE_EXPORT Window
     {
 
     public:

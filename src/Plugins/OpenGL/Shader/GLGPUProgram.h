@@ -33,14 +33,15 @@
 
 namespace Lore { namespace OpenGL {
 
-    class GPUProgram : public Lore::GPUProgram
+    class GLGPUProgram : public Lore::GPUProgram,
+                         public Alloc<GLGPUProgram>
     {
 
     public:
 
-        explicit GPUProgram( const string& name );
+        GLGPUProgram();
 
-        virtual ~GPUProgram() override;
+        virtual ~GLGPUProgram() override;
 
         virtual void attachShader( ShaderPtr shader ) override;
 
@@ -68,6 +69,8 @@ namespace Lore { namespace OpenGL {
     private:
 
         void _updateUniform( const GLint id, const Lore::Matrix4& m );
+
+        virtual void _reset() override;
 
     private:
 

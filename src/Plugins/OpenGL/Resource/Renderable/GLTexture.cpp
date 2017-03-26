@@ -35,22 +35,21 @@ using namespace Lore::OpenGL;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Texture::Texture( const string& name )
-: Lore::Texture( name )
-, _id( 0 )
+GLTexture::GLTexture()
+: _id( 0 )
 {
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Texture::~Texture()
+GLTexture::~GLTexture()
 {
     _reset();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Texture::loadFromFile( const string& file )
+void GLTexture::loadFromFile( const string& file )
 {
     int width, height, n;
     unsigned char* pixels = stbi_load( file.c_str(), &width, &height, &n, STBI_rgb_alpha );
@@ -76,7 +75,7 @@ void Texture::loadFromFile( const string& file )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Texture::bind()
+void GLTexture::bind()
 {
     glBindTexture( GL_TEXTURE_2D, _id );
 }
@@ -84,7 +83,7 @@ void Texture::bind()
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Texture::_reset()
+void GLTexture::_reset()
 {
     glDeleteTextures( 1, &_id );
 }

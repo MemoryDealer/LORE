@@ -34,8 +34,8 @@ using namespace Lore::OpenGL;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-GPUProgram::GPUProgram( const string& name )
-: Lore::GPUProgram( name )
+GLGPUProgram::GLGPUProgram()
+: Lore::GPUProgram()
 , _program( 0 )
 , _uniforms()
 , _transform( 0 )
@@ -45,30 +45,29 @@ GPUProgram::GPUProgram( const string& name )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-GPUProgram::~GPUProgram()
+GLGPUProgram::~GLGPUProgram()
 {
-    glDeleteProgram( _program );
+    _reset();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GPUProgram::attachShader( Lore::ShaderPtr shader )
+void GLGPUProgram::attachShader( Lore::ShaderPtr shader )
 {
     if ( !shader->isLoaded() ) {
-        log_error( "Shader " + shader->getName() +
-                   " is not loaded, not attaching to GPUProgram" + _name );
+        log_error( "Shader not loaded, not attaching to GPUProgram" + _name );
         return;
     }
 
     Lore::GPUProgram::attachShader( shader );
 
-    GLuint id = shader->getUintId(); // TODO: Use getData("", &vptr);
+    GLuint id = shader->getUintId(); // TODO: Use getData("", &voidptr);
     glAttachShader( _program, id );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-bool GPUProgram::link()
+bool GLGPUProgram::link()
 {
     glLinkProgram( _program );
 
@@ -92,28 +91,28 @@ bool GPUProgram::link()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GPUProgram::use()
+void GLGPUProgram::use()
 {
     glUseProgram( _program );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GPUProgram::addTransformVar( const string& id )
+void GLGPUProgram::addTransformVar( const string& id )
 {
     _transform = glGetUniformLocation( _program, id.c_str() );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GPUProgram::setTransformVar( const Lore::Matrix4& m )
+void GLGPUProgram::setTransformVar( const Lore::Matrix4& m )
 {
     _updateUniform( _transform, m );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GPUProgram::addUniformVar( const string& id )
+void GLGPUProgram::addUniformVar( const string& id )
 {
     GLuint uniform = glGetUniformLocation( _program, id.c_str() );
     _uniforms.insert( { id, uniform } );
@@ -121,7 +120,7 @@ void GPUProgram::addUniformVar( const string& id )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GPUProgram::setUniformVar( const string& id, const Lore::Matrix4& m )
+void GLGPUProgram::setUniformVar( const string& id, const Lore::Matrix4& m )
 {
     auto lookup = _uniforms.find( id );
     if ( _uniforms.end() == lookup ) {
@@ -134,7 +133,7 @@ void GPUProgram::setUniformVar( const string& id, const Lore::Matrix4& m )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GPUProgram::setUniformVar( const string& id, const glm::mat4x4& m )
+void GLGPUProgram::setUniformVar( const string& id, const glm::mat4x4& m )
 {
     auto lookup = _uniforms.find( id );
     if ( _uniforms.end() == lookup ) {
@@ -147,11 +146,21 @@ void GPUProgram::setUniformVar( const string& id, const glm::mat4x4& m )
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GPUProgram::_updateUniform( const GLint id, const Lore::Matrix4& m )
+void GLGPUProgram::_updateUniform( const GLint id, const Lore::Matrix4& m )
 {
     glm::mat4x4 mm = MathConverter::LoreToGLM( m );
     glUniformMatrix4fv( id, 1, GL_FALSE, glm::value_ptr( mm ) );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLGPUProgram::_reset()
+{
+    glDeleteProgram( _program );
+    _uniforms.clear();
+    _transform = 0;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

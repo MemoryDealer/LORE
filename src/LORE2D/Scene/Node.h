@@ -28,6 +28,7 @@
 #include <LORE2D/Core/Iterator.h>
 #include <LORE2D/Math/Math.h>
 #include <LORE2D/Memory/Alloc.h>
+#include <LORE2D/Resource/Registry.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -40,11 +41,13 @@ namespace Lore {
     class LORE_EXPORT Node : public Alloc<Node>
     {
 
+        LORE_OBJECT_BODY()
+
     public:
 
-        using NodeMap = std::map<string, NodePtr>;
-        using ChildNodeIterator = MapIterator<NodeMap>;
-        using ConstChildNodeIterator = ConstMapIterator<NodeMap>;
+        using NodeMap = Registry<std::map, Node>;
+        using ChildNodeIterator = NodeMap::Iterator;
+        using ConstChildNodeIterator = NodeMap::ConstIterator;
         using RenderableList = std::unordered_map<string, RenderablePtr>;
 
         struct Transform
@@ -86,7 +89,7 @@ namespace Lore {
 
         ChildNodeIterator getChildNodeIterator();
 
-        ConstChildNodeIterator getConstChildNodeIterator() const;
+        ConstChildNodeIterator getConstChildNodeIterator();
 
         void detachFromParent();
 
@@ -122,11 +125,6 @@ namespace Lore {
 
         //
         // Getters.
-
-        inline string getName() const
-        {
-            return _name;
-        }
 
         inline NodePtr getParent() const
         {
@@ -172,10 +170,7 @@ namespace Lore {
 
     private:
 
-        //DELETE
-        Node() { }
-
-        Node( const string& name, ScenePtr scene, NodePtr parent );
+        Node();
 
         //
         // Scene graph operations.
@@ -196,8 +191,6 @@ namespace Lore {
         void _updateChildrenScale();
 
     private:
-
-        string _name;
 
         Transform _transform;
 

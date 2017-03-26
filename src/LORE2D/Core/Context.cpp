@@ -56,14 +56,6 @@ Context::Context() noexcept
 , _active( false )
 {
     NotificationSubscribe( WindowEventNotification, &Context::onWindowEvent );
-
-    // Setup default memory pool settings.
-    _poolCluster.registerPool<Camera>( 64 );
-    _poolCluster.registerPool<Node>( 1024 );
-    _poolCluster.registerPool<ResourceGroup>( 4 );
-    _poolCluster.registerPool<Scene>( 32 );
-
-    // TODO: Parse pool settings from cfg file (Lua).
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -71,6 +63,19 @@ Context::Context() noexcept
 Context::~Context()
 {
     NotificationUnsubscribe( WindowEventNotification, &Context::onWindowEvent );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Context::initConfiguration()
+{
+    // Setup default memory pool settings.
+    _poolCluster.registerPool<Camera>( 32 );
+    _poolCluster.registerPool<Material>( 32 );
+    _poolCluster.registerPool<Node>( 1024 );
+    _poolCluster.registerPool<Scene>( 32 );
+
+    // TODO: Parse pool settings from cfg file (Lua).
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -195,6 +200,9 @@ std::unique_ptr<Context> Context::Create( const RenderPlugin& renderer )
     StockResource::AssignContext( context.get() );
     MemoryAccess::_SetPrimaryPoolCluster( &context->_poolCluster );
     _activeContextPtr = context.get();
+
+    // Apply configuration settings or use defaults.
+    context->initConfiguration();
 
     return std::move( context );
 }

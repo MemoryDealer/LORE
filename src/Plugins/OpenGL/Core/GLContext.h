@@ -42,6 +42,8 @@ namespace Lore { namespace OpenGL {
 
         virtual ~Context() override;
 
+        virtual void initConfiguration() override;
+
         //
         // Rendering.
 
