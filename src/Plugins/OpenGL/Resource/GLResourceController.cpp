@@ -54,85 +54,111 @@ ResourceController::~ResourceController()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::TexturePtr ResourceController::loadTexture( const string& name, const string& file, const string& group )
+Lore::TexturePtr ResourceController::loadTexture( const string& name, const string& file, const string& groupName )
 {
     auto texture = MemoryAccess::GetPrimaryPoolCluster()->create<GLTexture>();
     texture->setName( name );
+    texture->setResourceGroupName( groupName );
     texture->setMaterial( StockResource::GetMaterial( "StandardTexturedQuad" ) );
     texture->loadFromFile( file );
 
-    _getGroup( group )->textures.insert( name, texture );
+    _getGroup( groupName )->textures.insert( name, texture );
     return texture;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::GPUProgramPtr ResourceController::createGPUProgram( const string& name, const string& group )
+Lore::GPUProgramPtr ResourceController::createGPUProgram( const string& name, const string& groupName )
 {
     auto program = MemoryAccess::GetPrimaryPoolCluster()->create<GLGPUProgram>();
     program->setName( name );
+    program->setResourceGroupName( groupName );
     program->init();
 
-    _getGroup( group )->programs.insert( name, program );
+    _getGroup( groupName )->programs.insert( name, program );
     return program;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::ShaderPtr ResourceController::createVertexShader( const string& name, const string& group )
+Lore::ShaderPtr ResourceController::createVertexShader( const string& name, const string& groupName )
 {
     auto shader = MemoryAccess::GetPrimaryPoolCluster()->create<GLShader>();
     shader->setName( name );
+    shader->setResourceGroupName( groupName );
     shader->init( Shader::Type::Vertex );
 
-    _getGroup( group )->vertexShaders.insert( name, shader );
+    _getGroup( groupName )->vertexShaders.insert( name, shader );
     return shader;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::ShaderPtr ResourceController::createFragmentShader( const string& name, const string& group )
+Lore::ShaderPtr ResourceController::createFragmentShader( const string& name, const string& groupName )
 {
     auto shader = MemoryAccess::GetPrimaryPoolCluster()->create<GLShader>();
     shader->setName( name );
+    shader->setResourceGroupName( groupName );
     shader->init( Shader::Type::Fragment );
 
-    _getGroup( group )->fragmentShaders.insert( name, shader );
+    _getGroup( groupName )->fragmentShaders.insert( name, shader );
     return shader;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::VertexBufferPtr ResourceController::createVertexBuffer( const string& name, const Lore::VertexBuffer::Type& type, const string& group )
+Lore::VertexBufferPtr ResourceController::createVertexBuffer( const string& name, const Lore::VertexBuffer::Type& type, const string& groupName )
 {
     auto vb = MemoryAccess::GetPrimaryPoolCluster()->create<GLVertexBuffer>();
     vb->setName( name );
+    vb->setResourceGroupName( groupName );
     vb->init( type );
 
-    _getGroup( group )->vertexBuffers.insert( name, vb );
+    _getGroup( groupName )->vertexBuffers.insert( name, vb );
     return vb;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::MaterialPtr ResourceController::createMaterial( const string& name, const string& group )
+Lore::MaterialPtr ResourceController::createMaterial( const string& name, const string& groupName )
 {
     auto mat = MemoryAccess::GetPrimaryPoolCluster()->create<Material>();
     mat->setName( name );
+    mat->setResourceGroupName( groupName );
 
-    _getGroup( group )->materials.insert( name, mat );
+    _getGroup( groupName )->materials.insert( name, mat );
     return mat;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::CameraPtr ResourceController::createCamera( const string& name, const string& group )
+Lore::CameraPtr ResourceController::createCamera( const string& name, const string& groupName )
 {
     auto cam = MemoryAccess::GetPrimaryPoolCluster()->create<Camera>();
     cam->setName( name );
 
-    _getGroup( group )->cameras.insert( name, cam );
+    _getGroup( groupName )->cameras.insert( name, cam );
     return cam;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void ResourceController::destroyTexture( Lore::TexturePtr texture )
+{
+    auto groupName = texture->getResourceGroupName();
+    _getGroup( groupName )->textures.remove( texture->getName() );
+
+    MemoryAccess::GetPrimaryPoolCluster()->destroy<GLTexture>( texture );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void ResourceController::destroyTexture( const string& name, const string& groupName )
+{
+    auto texture = _getGroup( groupName )->textures.get( name );
+    if ( texture ) {
+        destroyTexture( texture );
+    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -154,6 +154,10 @@ int main( int argc, char** argv )
             camera->zoom( -0.01f );
         }
 
+        if ( GetAsyncKeyState( VK_F8 ) ) {
+            loader.destroyTexture( tex );
+        }
+
         context->renderFrame();
     }
 

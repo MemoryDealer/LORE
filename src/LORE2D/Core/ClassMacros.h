@@ -30,6 +30,7 @@
 #define LORE_OBJECT_BODY()\
 protected:\
     string _name;\
+    string _resourceGroupName;\
     \
 public:\
     string getName() const{\
@@ -38,6 +39,13 @@ public:\
     \
     void setName( const string& name ){\
         _name = name;\
+    }\
+    string getResourceGroupName(){\
+        return _resourceGroupName;\
+    }\
+    \
+    void setResourceGroupName( const string& name ){\
+        _resourceGroupName = name;\
     }\
 private:\
 

@@ -31,6 +31,10 @@
 
 namespace Lore {
 
+    ///
+    /// \class MemoryPoolBase
+    /// \brief Non-template base class for MemoryPool, so instances can be
+    ///     stored in a map in the PoolCluster class.
     class MemoryPoolBase
     {
 
@@ -46,6 +50,9 @@ namespace Lore {
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+    ///
+    /// \class MemoryPool
+    /// \brief Generic memory pool with O(1) creation/deletion time.
     template<typename T>
     class MemoryPool final : public MemoryPoolBase
     {
@@ -116,7 +123,7 @@ namespace Lore {
 
         inline virtual void resize( const size_t newSize ) override
         {
-            // ...
+            //...
         }
 
         inline virtual void resetAll() override

@@ -157,6 +157,13 @@ namespace Lore {
 
         MaterialPtr getMaterial( const string& name, const string& groupName = DefaultGroupName );
 
+        //
+        // Destruction.
+
+        virtual void destroyTexture( TexturePtr texture ) = 0;
+
+        virtual void destroyTexture( const string& name, const string& groupName = DefaultGroupName ) = 0;
+
     protected:
 
         using ResourceGroupMap = std::unordered_map<std::string, std::unique_ptr<ResourceGroup>>;

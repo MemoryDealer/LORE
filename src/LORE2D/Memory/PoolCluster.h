@@ -56,8 +56,7 @@ namespace Lore {
             auto t = std::type_index( typeid( T ) );
             auto lookup = _pools.find( t );
             if ( _pools.end() == lookup ) {
-                //_pools[t] = std::make_unique<MemoryPool<T>>( typeid( T ).name(), size );
-                _pools[t] = new MemoryPool<T>( typeid( T ).name(), size );
+                _pools[t] = std::make_unique<MemoryPool<T>>( typeid( T ).name(), size );
             }
         }
 
@@ -111,12 +110,15 @@ namespace Lore {
                 MemoryPool<T>* TPool = static_cast< MemoryPool<T>* >( pool );
                 TPool->destroy( object );
             }
+            else {
+                throw Lore::Exception( "PoolCluster::create<T>: Pool of type " +
+                                       string( typeid( T ).name() ) + " does not exist" );
+            }
         }
 
     private:
 
-        //using PoolTable = std::unordered_map<std::type_index, std::unique_ptr<MemoryPoolBase>>;
-        using PoolTable = std::unordered_map<std::type_index, MemoryPoolBase*>;
+        using PoolTable = std::unordered_map<std::type_index, std::unique_ptr<MemoryPoolBase>>;
 
     private:
 
@@ -126,8 +128,7 @@ namespace Lore {
             auto t = std::type_index( typeid( T ) );
             auto lookup = _pools.find( t );
             if ( _pools.end() != lookup ) {
-                //return lookup->second.get();
-                return lookup->second;
+                return lookup->second.get();
             }
 
             return nullptr;
