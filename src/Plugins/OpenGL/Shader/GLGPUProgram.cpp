@@ -40,7 +40,6 @@ GLGPUProgram::GLGPUProgram()
 , _uniforms()
 , _transform( 0 )
 {
-    _program = glCreateProgram();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -48,6 +47,13 @@ GLGPUProgram::GLGPUProgram()
 GLGPUProgram::~GLGPUProgram()
 {
     _reset();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLGPUProgram::init()
+{
+    _program = glCreateProgram();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

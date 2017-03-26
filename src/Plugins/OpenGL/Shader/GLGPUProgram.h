@@ -43,6 +43,8 @@ namespace Lore { namespace OpenGL {
 
         virtual ~GLGPUProgram() override;
 
+        void init();
+
         virtual void attachShader( ShaderPtr shader ) override;
 
         virtual bool link() override;

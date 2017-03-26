@@ -192,7 +192,7 @@ void GLVertexBuffer::unbind()
 
 void GLVertexBuffer::draw()
 {
-    glDrawElements( _mode, static_cast<GLsizei>( _indices.size() ), GL_UNSIGNED_INT, 0 );
+    glDrawElements( GL_TRIANGLE_STRIP, static_cast<GLsizei>( _indices.size() ), GL_UNSIGNED_INT, 0 );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

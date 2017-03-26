@@ -71,6 +71,7 @@ Lore::GPUProgramPtr ResourceController::createGPUProgram( const string& name, co
 {
     auto program = MemoryAccess::GetPrimaryPoolCluster()->create<GLGPUProgram>();
     program->setName( name );
+    program->init();
 
     _getGroup( group )->programs.insert( name, program );
     return program;
