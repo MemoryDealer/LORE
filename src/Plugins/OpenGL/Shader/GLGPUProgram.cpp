@@ -130,7 +130,8 @@ void GLGPUProgram::setUniformVar( const string& id, const Lore::Matrix4& m )
 {
     auto lookup = _uniforms.find( id );
     if ( _uniforms.end() == lookup ) {
-        throw Lore::Exception( "Uniform variable " + id + " does not exist" );
+        log_warning( "Tried to set uniform " + id + " in " + _name + " which does not exist" );
+        return;
     }
 
     GLuint uniform = lookup->second;
@@ -139,11 +140,27 @@ void GLGPUProgram::setUniformVar( const string& id, const Lore::Matrix4& m )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void GLGPUProgram::setUniformVar( const string& id, const Lore::Vec3& v )
+{
+    auto lookup = _uniforms.find( id );
+    if ( _uniforms.end() == lookup ) {
+        log_warning( "Tried to set uniform " + id + " in " + _name + " which does not exist" );
+        return;
+    }
+
+    GLuint uniform = lookup->second;
+    glm::vec3 glmv = MathConverter::LoreToGLM( v );
+    glUniform3fv( uniform, 1, glm::value_ptr( glmv ) );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void GLGPUProgram::setUniformVar( const string& id, const glm::mat4x4& m )
 {
     auto lookup = _uniforms.find( id );
     if ( _uniforms.end() == lookup ) {
-        throw Lore::Exception( "Uniform variable " + id + " does not exist" );
+        log_warning( "Tried to set uniform " + id + " in " + _name + " which does not exist" );
+        return;
     }
 
     GLuint uniform = lookup->second;

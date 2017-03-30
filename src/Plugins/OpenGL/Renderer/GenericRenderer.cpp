@@ -104,7 +104,7 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
                 rv.gl_viewport.height );
 
     Color bg = rv.scene->getBackgroundColor();
-    glClearColor( bg.r, bg.g, bg.b, bg.a );
+    glClearColor( bg.r, bg.g, bg.b, 0.f );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     // Setup view-projection matrix.
@@ -147,8 +147,9 @@ void GenericRenderer::renderMaterialMap( const Lore::RenderQueue::MaterialMap& m
         // Setup material settings.
         // TODO: Multi-pass rendering.
         Lore::Material::Pass& pass = material->getPass( 0 );
-        VertexBufferPtr vb = pass.program->getVertexBuffer();
-        pass.program->use();
+        VertexBufferPtr vb = pass.getProgram()->getVertexBuffer();
+        pass.getProgram()->use();
+
         vb->bind();
         
         // For each renderable, iterate over its matrix entries and render.
@@ -164,8 +165,8 @@ void GenericRenderer::renderMaterialMap( const Lore::RenderQueue::MaterialMap& m
                 Matrix4 mvp = viewProjection * *model;
 
                 // Update the MVP value in the shader.
-                pass.program->setTransformVar( mvp );
-
+                pass.getProgram()->setTransformVar( mvp );
+                printf( "%d\n", glGetError() );
                 // Draw the renderable.
                 vb->draw();
             }

@@ -79,6 +79,8 @@ namespace Lore {
 
         virtual void setUniformVar( const string& id, const Matrix4& m ) = 0;
 
+        virtual void setUniformVar( const string& id, const Vec3& v ) = 0;
+
     protected:
 
         using ShaderMap = std::unordered_map<Shader::Type, ShaderPtr>;

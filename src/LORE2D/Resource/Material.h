@@ -27,6 +27,7 @@
 
 #include <LORE2D/Memory/Alloc.h>
 #include <LORE2D/Resource/Color.h>
+#include <LORE2D/Shader/GPUProgram.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -47,19 +48,92 @@ namespace Lore {
         ///
         /// \class Material::Pass
         /// \brief A single vertex and pixel shader pass.
-        struct Pass final
+        class Pass final
         {
-            bool lighting;
-            Color ambient;
-            Color diffuse;
-            GPUProgramPtr program;
 
-            Pass()
-            : lighting( true )
-            , ambient( StockColor::White )
-            , diffuse( StockColor::White )
-            , program( nullptr )
+        public:
+
+            inline Pass()
+            : _emissive( StockColor::White )
+            , _lighting( true )
+            , _ambient( StockColor::White )
+            , _diffuse( StockColor::White )
+            , _program( nullptr )
             { }
+
+            inline ~Pass()
+            { }
+
+            //
+            // Getters.
+
+            inline Color getEmissive() const
+            {
+                return _emissive;
+            }
+
+            inline bool getLightingEnabled() const
+            {
+                return _lighting;
+            }
+
+            inline Color getAmbient() const
+            {
+                return _ambient;
+            }
+
+            inline Color getDiffuse() const
+            {
+                return _diffuse;
+            }
+
+            inline GPUProgramPtr getProgram() const
+            {
+                return _program;
+            }
+
+            //
+            // Setters.
+
+            inline void setEmissive( const Color& color )
+            {
+                _emissive = color;
+                _program->setUniformVar( "emissive", _emissive );
+            }
+
+            inline void setLightingEnabled( const bool enabled )
+            {
+                _lighting = enabled;
+            }
+
+            inline void setAmbient( const Color& color )
+            {
+                _ambient = color;
+                _program->setUniformVar( "ambient", color );
+            }
+
+            inline void setDiffuse( const Color& color )
+            {
+                _diffuse = color;
+                _program->setUniformVar( "diffuse", _diffuse );
+            }
+
+            inline void setGPUProgram( GPUProgramPtr program )
+            {
+                _program = program;
+                setEmissive( _emissive );
+                setAmbient( _ambient );
+                setDiffuse( _diffuse );
+            }
+
+        private:
+
+            Color _emissive;
+            bool _lighting;
+            Color _ambient;
+            Color _diffuse;
+            GPUProgramPtr _program;
+
         };
 
     public:

@@ -35,10 +35,10 @@ namespace Lore {
 
     struct UberShaderParameters
     {
-        unsigned int maxLights { 0 };
-        unsigned int numTextures { 0 };
+        unsigned int maxLights { 4 };
+        unsigned int numTextures { 1 };
         bool texYCoordinateFlipped { true };
-        bool colour { false }; // Modulate final output by color.
+        bool emissive { true }; // Modulate final output by color, regardless of scene lighting.
         VertexBuffer::Type vbType { VertexBuffer::Type::TexturedQuad };
     };
 

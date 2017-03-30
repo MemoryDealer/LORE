@@ -79,7 +79,7 @@ int main( int argc, char** argv )
     node = node->createChildNode( "BChildChild" );
 
     // Textures.
-    Lore::TexturePtr tex = loader.loadTexture( "tex1", "C:\\texture.png" );
+    Lore::TexturePtr tex = loader.loadTexture( "tex1", "C:\\doggo.png" );
 
    // Lore::GPUProgramPtr program = loader.createGPUProgram( "GPU1" );
    // Lore::ShaderPtr vshader = loader.createVertexShader( "v1" );
@@ -110,7 +110,12 @@ int main( int argc, char** argv )
     //tex->setMaterial( mat );
 
     node = scene->getNode( "A" );
+    tex->getMaterial()->getPass().setEmissive( Lore::Color( 0.f, 1.f, 0.f ) );
     node->attachObject( tex );
+
+    // TODO: This change should propagate to renderer.
+    tex->setMaterial( context->getStockResourceController()->getMaterial( "BaseWhiteNoLighting" ) );
+
     node->scale( Lore::Vec2( 2.f, 1.0f ) );
 
     node->getChild( "AChild" )->scale( Lore::Vec2( 0.5f, 1.f ) );
