@@ -147,8 +147,12 @@ void GenericRenderer::renderMaterialMap( const Lore::RenderQueue::MaterialMap& m
         // Setup material settings.
         // TODO: Multi-pass rendering.
         Lore::Material::Pass& pass = material->getPass( 0 );
-        VertexBufferPtr vb = pass.getProgram()->getVertexBuffer();
-        pass.getProgram()->use();
+        Lore::GPUProgramPtr program = pass.program;
+        VertexBufferPtr vb = program->getVertexBuffer();
+        program->use();
+
+        // Setup per-material uniform values.
+        program->setUniformVar( "emissive", pass.emissive);
 
         vb->bind();
         
@@ -165,7 +169,7 @@ void GenericRenderer::renderMaterialMap( const Lore::RenderQueue::MaterialMap& m
                 Matrix4 mvp = viewProjection * *model;
 
                 // Update the MVP value in the shader.
-                pass.getProgram()->setTransformVar( mvp );
+                program->setTransformVar( mvp );
                 printf( "%d\n", glGetError() );
                 // Draw the renderable.
                 vb->draw();

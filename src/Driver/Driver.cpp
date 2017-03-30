@@ -110,7 +110,7 @@ int main( int argc, char** argv )
     //tex->setMaterial( mat );
 
     node = scene->getNode( "A" );
-    tex->getMaterial()->getPass().setEmissive( Lore::Color( 0.f, 1.f, 0.f ) );
+    tex->getMaterial()->getPass().emissive = Lore::Color( 0.f, 1.f, 0.f );
     node->attachObject( tex );
 
     // TODO: This change should propagate to renderer.
