@@ -30,6 +30,8 @@
 #include <LORE2D/Renderer/SceneGraphVisitor.h>
 #include <LORE2D/Resource/Renderable/Renderable.h>
 #include <LORE2D/Scene/Camera.h>
+#include <LORE2D/Scene/Light.h>
+#include <LORE2D/Scene/Scene.h>
 #include <LORE2D/Shader/GPUProgram.h>
 
 #include <Plugins/OpenGL/Math/MathConverter.h>
@@ -120,7 +122,7 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
         RenderQueue& queue = activeQueue.second;
 
         // Render solids.
-        renderMaterialMap( queue.solids, viewProjection );
+        renderMaterialMap( rv.scene, queue.solids, viewProjection );
     }
 }
 
@@ -137,7 +139,8 @@ void GenericRenderer::activateQueue( const uint id, Lore::RenderQueue& rq )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GenericRenderer::renderMaterialMap( const Lore::RenderQueue::MaterialMap& mm,
+void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
+                                         Lore::RenderQueue::MaterialMap& mm,
                                          const Lore::Matrix4& viewProjection ) const
 {
     for ( auto& pair : mm ) {
@@ -151,8 +154,32 @@ void GenericRenderer::renderMaterialMap( const Lore::RenderQueue::MaterialMap& m
         VertexBufferPtr vb = program->getVertexBuffer();
         program->use();
 
+        program->setUniformVar( "emissive", pass.emissive );
+
         // Setup per-material uniform values.
-        program->setUniformVar( "emissive", pass.emissive);
+        if ( pass.lighting ) {
+            //
+            // Set material lighting data.
+
+            program->setUniformVar( "diffuse", pass.diffuse );
+
+            //
+            // Set scene values.
+
+            program->setUniformVar( "ambient", scene->getAmbientLightColor() );
+
+            program->setUniformVar( "numLights", scene->getLightCount() );
+
+            auto lights = scene->getLightIterator();
+            std::vector<LightPtr> lightArray;
+            while ( lights.hasMore() ) {
+                auto light = lights.getNext();
+                lightArray.push_back( light );
+            }
+
+            program->updateLights( lightArray );
+
+        }
 
         vb->bind();
         
@@ -170,7 +197,11 @@ void GenericRenderer::renderMaterialMap( const Lore::RenderQueue::MaterialMap& m
 
                 // Update the MVP value in the shader.
                 program->setTransformVar( mvp );
-                printf( "%d\n", glGetError() );
+
+                if ( pass.lighting ) {
+                    program->setUniformVar( "model", *model );
+                }
+
                 // Draw the renderable.
                 vb->draw();
             }

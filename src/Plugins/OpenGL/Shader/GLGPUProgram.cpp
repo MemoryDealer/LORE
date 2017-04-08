@@ -26,6 +26,7 @@
 
 #include "GLGPUProgram.h"
 
+#include <LORE2D/Scene/Light.h>
 #include <LORE2D/Shader/Shader.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -128,47 +129,87 @@ void GLGPUProgram::addUniformVar( const string& id )
 
 void GLGPUProgram::setUniformVar( const string& id, const Lore::Matrix4& m )
 {
-    auto lookup = _uniforms.find( id );
-    if ( _uniforms.end() == lookup ) {
-        log_warning( "Tried to set uniform " + id + " in " + _name + " which does not exist" );
-        return;
+    auto uniform = _getUniform( id );
+    if ( -1 != uniform ) {
+        _updateUniform( uniform, m );
     }
-
-    GLuint uniform = lookup->second;
-    _updateUniform( uniform, m );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void GLGPUProgram::setUniformVar( const string& id, const Lore::Vec3& v )
 {
-    auto lookup = _uniforms.find( id );
-    if ( _uniforms.end() == lookup ) {
-        log_warning( "Tried to set uniform " + id + " in " + _name + " which does not exist" );
-        return;
+    auto uniform = _getUniform( id );
+    if ( -1 != uniform ) {
+        glm::vec3 glmv = MathConverter::LoreToGLM( v );
+        glUniform3fv( uniform, 1, glm::value_ptr( glmv ) );
     }
+}
 
-    GLuint uniform = lookup->second;
-    glm::vec3 glmv = MathConverter::LoreToGLM( v );
-    glUniform3fv( uniform, 1, glm::value_ptr( glmv ) );
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLGPUProgram::setUniformVar( const string& id, const int i )
+{
+    auto uniform = _getUniform( id );
+    if ( -1 != uniform ) {
+        glUniform1i( uniform, static_cast<GLint>( i ) );
+    }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLGPUProgram::updateLights( const std::vector<Lore::LightPtr>& lights )
+{
+    int i = 0;
+    for ( const auto& l : lights ) {
+        const string idx( "lights[" + std::to_string( i ) + "]" );
+
+        //
+        // Update all light properties.
+        
+        auto posID = glGetUniformLocation( _program, ( idx + ".pos" ).c_str() );
+        auto colorID = glGetUniformLocation( _program, ( idx + ".color" ).c_str() );
+        auto constantID = glGetUniformLocation( _program, ( idx + ".constant" ).c_str() );
+        auto linearID = glGetUniformLocation( _program, ( idx + ".linear" ).c_str() );
+        auto quadraticID = glGetUniformLocation( _program, ( idx + ".quadratic" ).c_str() );
+        auto intensityID = glGetUniformLocation( _program, ( idx + ".intensity" ).c_str() );
+
+        glUniform2f( posID, l->getPosition().x, l->getPosition().y );
+        glUniform3f( colorID, l->getColor().r, l->getColor().g, l->getColor().b );
+        glUniform1f( constantID, l->getConstant() );
+        glUniform1f( linearID, l->getLinear() );
+        glUniform1f( quadraticID, l->getQuadratic() );
+        glUniform1f( intensityID, l->getIntensity() );
+        
+        ++i;
+    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void GLGPUProgram::setUniformVar( const string& id, const glm::mat4x4& m )
 {
-    auto lookup = _uniforms.find( id );
-    if ( _uniforms.end() == lookup ) {
-        log_warning( "Tried to set uniform " + id + " in " + _name + " which does not exist" );
-        return;
+    auto uniform = _getUniform( id );
+    if ( -1 != uniform ) {
+        glUniformMatrix4fv( uniform, 1, GL_FALSE, glm::value_ptr( m ) );
     }
-
-    GLuint uniform = lookup->second;
-
-    glUniformMatrix4fv( uniform, 1, GL_FALSE, glm::value_ptr( m ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+GLuint GLGPUProgram::_getUniform( const string& id )
+{
+    auto lookup = _uniforms.find( id );
+    if ( _uniforms.end() == lookup ) {
+        log_warning( "Tried to get uniform " + id + " in " + _name + " which does not exist" );
+        return -1;
+    }
+
+    // Return uniform GLuint value.
+    return lookup->second;
+}
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void GLGPUProgram::_updateUniform( const GLint id, const Lore::Matrix4& m )

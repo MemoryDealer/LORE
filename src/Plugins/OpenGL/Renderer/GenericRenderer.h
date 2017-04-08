@@ -59,7 +59,8 @@ namespace Lore { namespace OpenGL {
 
         void activateQueue( const uint id, Lore::RenderQueue& rq );
 
-        void renderMaterialMap( const RenderQueue::MaterialMap& mm,
+        void renderMaterialMap( const Lore::ScenePtr scene,
+                                RenderQueue::MaterialMap& mm,
                                 const Matrix4& viewProjection ) const;
 
     private:

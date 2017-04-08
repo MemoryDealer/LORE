@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,73 +24,42 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Shader/GPUProgram.h>
-
-#include <Plugins/OpenGL/Math/MathConverter.h>
+#include "Light.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore { namespace OpenGL {
+using namespace Lore;
 
-    class GLGPUProgram : public Lore::GPUProgram,
-                         public Alloc<GLGPUProgram>
-    {
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    public:
+Light::Light()
+: _position()
+, _color( StockColor::Black )
+, _range( 7.f )
+, _constant( 1.f )
+, _linear( 0.7f )
+, _quadratic( 1.8f )
+, _intensity( 1.f )
+{
+}
 
-        GLGPUProgram();
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        virtual ~GLGPUProgram() override;
+Light::~Light()
+{
+}
 
-        void init();
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        virtual void attachShader( ShaderPtr shader ) override;
-
-        virtual bool link() override;
-
-        virtual void use() override;
-
-        //
-        // Uniform value updating.
-
-        virtual void addTransformVar( const string& id ) override;
-
-        virtual void setTransformVar( const Matrix4& m ) override;
-
-        virtual void addUniformVar( const string& id ) override;
-
-        virtual void setUniformVar( const string& id, const Matrix4& m ) override;
-
-        virtual void setUniformVar( const string& id, const Vec3& v ) override;
-
-        virtual void setUniformVar( const string& id, const int i ) override;
-
-        virtual void updateLights( const std::vector<LightPtr>& lights ) override;
-
-        void setUniformVar( const string& id, const glm::mat4x4& m );
-
-    private:
-
-        using UniformMap = std::unordered_map<string, GLint>;
-
-    private:
-
-        GLuint _getUniform( const string& id );
-
-        void _updateUniform( const GLint id, const Lore::Matrix4& m );
-
-        virtual void _reset() override;
-
-    private:
-
-        GLuint _program;
-
-        UniformMap _uniforms;
-
-        GLint _transform;
-
-    };
-
-}}
+void Light::_reset()
+{
+    _position = Vec2();
+    _color = StockColor::Black;
+    _range = 7.f;
+    _constant = 1.f;
+    _linear = 0.7f;
+    _quadratic = 1.8f;
+    _intensity = 1.f;
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

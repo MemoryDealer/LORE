@@ -28,6 +28,7 @@
 #include <LORE2D/Memory/Alloc.h>
 #include <LORE2D/Resource/Color.h>
 #include <LORE2D/Resource/Registry.h>
+#include <LORE2D/Scene/Light.h>
 #include <LORE2D/Scene/Node.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -45,6 +46,11 @@ namespace Lore {
 
         LORE_OBJECT_BODY()
 
+    private:
+
+        using NodeMap = Registry<std::unordered_map, Node>;
+        using LightMap = Registry<std::unordered_map, Light>;
+
     public:
 
         Scene();
@@ -58,6 +64,11 @@ namespace Lore {
 
         NodePtr getNode( const string& name );
 
+        LightPtr createLight( const string& name );
+
+        void destroyLight( LightPtr light );
+        void destroyLight( const string& name );
+
         //
         // Setters.
 
@@ -69,6 +80,11 @@ namespace Lore {
         inline void setBackgroundColor( const Color& color )
         {
             _bgColor = color;
+        }
+
+        inline void setAmbientLightColor( const Color& color )
+        {
+            _ambientLightColor = color;
         }
 
         //
@@ -89,14 +105,24 @@ namespace Lore {
             return _bgColor;
         }
 
+        Color getAmbientLightColor() const
+        {
+            return _ambientLightColor;
+        }
+
+        inline int getLightCount() const
+        {
+            return static_cast< int >( _lights.size() );
+        }
+
+        LightMap::ConstIterator getLightIterator() const
+        {
+            return _lights.getConstIterator();
+        }
+
     private:
 
-        //friend class MemoryPool<Scene>;
         virtual void _reset() override;
-
-    private:
-
-        using NodeMap = Registry<std::unordered_map, Node>;
 
         friend class Node;
 
@@ -113,6 +139,13 @@ namespace Lore {
         // Convenient hash map of all nodes for quick lookup.
         // This is the owner of all nodes; they are stored as unique_ptrs.
         NodeMap _nodes;
+
+        //
+        // Lighting.
+
+        Color _ambientLightColor;
+
+        LightMap _lights;
 
     };
 

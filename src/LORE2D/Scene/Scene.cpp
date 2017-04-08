@@ -37,6 +37,8 @@ Scene::Scene()
 , _renderer( nullptr )
 , _root()
 , _nodes()
+, _ambientLightColor( StockColor::Black )
+, _lights()
 {
     _root.setName( "root" );
     _root._scene = this;
@@ -88,6 +90,37 @@ void Scene::destroyNode( const string& name )
 NodePtr Scene::getNode( const string& name )
 {
     return _nodes.get( name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+LightPtr Scene::createLight( const string& name )
+{
+    auto light = MemoryAccess::GetPrimaryPoolCluster()->create<Light>();
+    light->setName( name );
+
+    _lights.insert( name, light );
+
+    return light;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Scene::destroyLight( LightPtr light )
+{
+    destroyLight( light->getName() );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Scene::destroyLight( const string& name )
+{
+    auto light = _lights.get( name );
+
+    if ( light ) {
+        destroyLight( light );
+        _lights.remove( name );
+    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

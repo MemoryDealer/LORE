@@ -81,44 +81,17 @@ int main( int argc, char** argv )
     // Textures.
     Lore::TexturePtr tex = loader.loadTexture( "tex1", "C:\\doggo.png" );
 
-   // Lore::GPUProgramPtr program = loader.createGPUProgram( "GPU1" );
-   // Lore::ShaderPtr vshader = loader.createVertexShader( "v1" );
-   // vshader->loadFromSource( vshader_src.c_str() );
-
-   // Lore::ShaderPtr fshader = loader.createFragmentShader( "f1" );
-   // fshader->loadFromSource( pshader_src.c_str() );
-
-   // Lore::VertexBufferPtr vb = loader.createVertexBuffer( "vb1", Lore::VertexBuffer::Type::TexturedQuad );
-   // vb->build();
-
-   //// ; How will changing material on renderable propagate to render queues? Should do so with pointers?
-   // // Remove createVertexBuffer and have GPUProgram own one, so there's not another variable to deal with
-   // // Consider doing the same for vertex and fragment shader
-   // program->setVertexBuffer( vb );
-   // program->attachShader( vshader );
-   // program->attachShader( fshader );
-   // program->link();
-
-   // program->addTransformVar( "transform" );
-
-    //Lore::MaterialPtr mat = loader.createMaterial( "mat1" );
-    //mat->getPass( 0 ).program = program;
-    //Lore::MaterialPtr mat = Lore::StockResource::GetMaterial( "StandardTexturedQuad" );
-    //Lore::MaterialPtr mat = loader.createMaterial( "mat1" );
-    //mat->getPass( 0 ).program = Lore::StockResource::GetGPUProgram( "StandardTexturedQuad" );
-    //mat->getPass( 0 ).program = program;
-    //tex->setMaterial( mat );
-
     node = scene->getNode( "A" );
-    tex->getMaterial()->getPass().emissive = Lore::Color( 0.f, 1.f, 0.f );
+    tex->getMaterial()->getPass().emissive = Lore::Color( 1.f, 1.f, 1.f );
+    //tex->setMaterial( context->getStockResourceController()->getMaterial( "BaseWhiteNoLighting" ) );
     node->attachObject( tex );
 
     // TODO: This change should propagate to renderer.
-    tex->setMaterial( context->getStockResourceController()->getMaterial( "BaseWhiteNoLighting" ) );
+    
 
-    node->scale( Lore::Vec2( 2.f, 1.0f ) );
+    node->scale( Lore::Vec2( 20.f, 11.0f ) );
 
-    node->getChild( "AChild" )->scale( Lore::Vec2( 0.5f, 1.f ) );
+    /*node->getChild( "AChild" )->scale( Lore::Vec2( 0.5f, 1.f ) );
 
     node->getChild( "AChild" )->attachObject( tex );
     node->getChild( "AChild" )->setPosition( Lore::Vec2( -0.25f, 0.25f ) );
@@ -126,7 +99,11 @@ int main( int argc, char** argv )
     auto n2 = scene->createNode( "n2" );
     n2->attachObject( tex );
     n2->scale( Lore::Vec2( 4.2f, 0.65f ) );
-    n2->translate( 0.25f, 0.35f );
+    n2->translate( 0.25f, 0.35f );*/
+
+    auto light = scene->createLight( "l1" );
+    light->setColor( Lore::StockColor::Blue );
+    //light->setAttenuation( 3250.f, 1.f, 0.0014f, 0.000007f );
 
     float f = 0.f;
     while ( context->active() ) { 
@@ -136,9 +113,9 @@ int main( int argc, char** argv )
 
         // TODO: Repro case where both quads appeared to be scaling with only rotations being done.
         node->rotate( Lore::Degree( 0.5f ) );
-        //node->getChild( "AChild" )->rotate( Lore::Degree( -.1f ) );
+        ////node->getChild( "AChild" )->rotate( Lore::Degree( -.1f ) );
 
-        n2->rotate( Lore::Degree( 0.025f ) );
+        //n2->rotate( Lore::Degree( 0.025f ) );
 
         if ( GetAsyncKeyState( VK_F1 ) ) {
             camera->translate( -0.01f, 0.f );

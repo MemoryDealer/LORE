@@ -25,72 +25,96 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Math/Math.h>
 #include <LORE2D/Memory/Alloc.h>
 #include <LORE2D/Resource/Color.h>
-#include <LORE2D/Shader/GPUProgram.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-    ///
-    /// \class Material
-    /// \brief Contains data on how to render an object, including lighting, colors,
-    ///     and shader effects.
-    /// \details Can have N number of passes.
-    class LORE_EXPORT Material final : public Alloc<Material>
+    class Light final : public Alloc<Light>
     {
 
         LORE_OBJECT_BODY()
 
     public:
 
-        ///
-        /// \class Material::Pass
-        /// \brief A single vertex and pixel shader pass.
-        struct Pass final
-        {
+        Light();
 
-            Color emissive;
-            bool lighting;
-            Color ambient;
-            Color diffuse;
-            GPUProgramPtr program;
-
-            inline Pass()
-            : emissive( StockColor::Black )
-            , lighting( true )
-            , ambient( StockColor::White )
-            , diffuse( StockColor::White )
-            , program( nullptr )
-            { }
-
-            inline ~Pass()
-            { }
-
-        };
-
-    public:
-
-        Material();
-
-        virtual ~Material() override;
+        virtual ~Light() override;
 
         //
         // Getters.
 
-        ///
-        /// \brief Returns reference to Pass at specified index. All Materials have
-        ///     at least one pass.
-        Pass& getPass( const size_t idx = 0 )
+        inline Vec2 getPosition() const
         {
-            assert( idx <= _passes.size() );
-            return _passes[idx];
+            return _position;
         }
 
-    private:
+        inline Color getColor() const
+        {
+            return _color;
+        }
 
-        using PassList = std::vector<Pass>;
+        inline real getRange() const
+        {
+            return _range;
+        }
+
+        inline real getConstant() const
+        {
+            return _constant;
+        }
+
+        inline real getLinear() const
+        {
+            return _linear;
+        }
+
+        inline real getQuadratic() const
+        {
+            return _quadratic;
+        }
+
+        inline real getIntensity() const
+        {
+            return _intensity;
+        }
+
+        //
+        // Setters.
+
+        inline void setPosition( const Vec2& pos )
+        {
+            _position = pos;
+        }
+
+        inline void setColor( const Color& color )
+        {
+            _color = color;
+        }
+
+        inline void setAttenuation( const real range,
+                                    const real constant,
+                                    const real linear,
+                                    const real quadratic )
+        {
+            _range = range;
+            _constant = constant;
+            _linear = linear;
+            _quadratic = quadratic;
+        }
+
+        inline void setRange( const real range )
+        {
+            _range = range;
+        }
+
+        inline void setIntensity( const real intensity )
+        {
+            _intensity = intensity;
+        }
 
     private:
 
@@ -98,7 +122,15 @@ namespace Lore {
 
     private:
 
-        PassList _passes;
+        Vec2 _position;
+        Color _color;
+
+        // Attenuation.
+        real _range;
+        real _constant;
+        real _linear;
+        real _quadratic;
+        real _intensity;
 
     };
 

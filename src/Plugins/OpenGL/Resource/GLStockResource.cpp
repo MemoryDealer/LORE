@@ -53,7 +53,6 @@ StockResourceController::~StockResourceController()
 void StockResourceController::createStockResources()
 {
     Lore::StockResourceController::createStockResources();
-    printf( "%d\n", glGetError() );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -148,7 +147,7 @@ Lore::GPUProgramPtr StockResourceController::createUberShader( const string& nam
 
     if ( lit ) {
         src += "struct Light {";
-        src += "vec3 pos;";
+        src += "vec2 pos;";
         src += "vec3 color;";
         src += "float constant;";
         src += "float linear;";
@@ -157,7 +156,7 @@ Lore::GPUProgramPtr StockResourceController::createUberShader( const string& nam
         src += "};";
 
         src += "uniform Light lights[" + std::to_string( params.maxLights ) + "];";
-        src += "uniform int numLights;";
+        //src += "uniform int numLights;";
 
         src += "uniform vec3 ambient;";
         src += "uniform vec3 diffuse;";
@@ -189,14 +188,19 @@ Lore::GPUProgramPtr StockResourceController::createUberShader( const string& nam
     }
 
     if ( lit ) {
-        src += "for(int i=0; i<numLights; ++i){";
+        /*src += "for(int i=0; i<numLights; ++i){";
         src += "Light l = lights[i];";
-        src += "const float d = distance(l.pos, vec3(InPos, 0.0));";
+        src += "const float d = distance(vec3(l.pos, 0.0), vec3(InPos, 0.0));";
         src += "const float att = l.intensity / (l.constant + l.linear * d + l.quadratic * pow(d, 2.0));";
         src += "diffuseLighting *= l.color * diffuse * att;";
-        src += "}";
-    }
+        src += "}";*/
 
+        src += "Light l = lights[0];";
+        src += "const float d = distance(vec3(l.pos, 0.0), vec3(InPos, 0.0));";
+        src += "const float att = l.intensity / (l.constant + l.linear * d + l.quadratic * pow(d, 2.0));";
+        src += "diffuseLighting = l.color * diffuse * att;";
+    }
+    //src += "diffuseLighting = vec3(0.0, 0.0, 1.0);";
     src += "texSample *= vec4(diffuseLighting, 1.0);";
 
     if ( lit ) {
@@ -229,10 +233,16 @@ Lore::GPUProgramPtr StockResourceController::createUberShader( const string& nam
         throw Lore::Exception( "Failed to link GPUProgram " + name );
     }
 
+    //
+    // Add uniforms.
+
     program->addTransformVar( "transform" );
 
     if ( lit ) {
         program->addUniformVar( "model" );
+        program->addUniformVar( "ambient" );
+        program->addUniformVar( "diffuse" );
+        //program->addUniformVar( "numLights" );
     }
 
     if ( params.emissive ) {

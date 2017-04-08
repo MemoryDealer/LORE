@@ -65,9 +65,9 @@ void StockResourceController::createStockResources()
     // Load stock programs.
 
     UberShaderParameters params;
+    //params.maxLights = 0;
 
     // StandardTexturedQuad:
-
     createUberShader( "StandardTexturedQuad", params );
 
     params.numTextures = 0;
@@ -86,14 +86,14 @@ void StockResourceController::createStockResources()
     {
         auto material = _controller->createMaterial( "StandardTexturedQuad" );
         Material::Pass& pass = material->getPass( 0 );
-        pass.lighting = false;
+        pass.lighting = true;
         pass.program = _controller->getGPUProgram( "StandardTexturedQuad" );
     }
 
     {
         auto material = _controller->createMaterial( "BaseWhiteNoLighting" );
         Material::Pass& pass = material->getPass( 0 );
-        pass.lighting = false;
+        pass.lighting = true;
         pass.program = _controller->getGPUProgram( "StandardQuad" );
     }
 }

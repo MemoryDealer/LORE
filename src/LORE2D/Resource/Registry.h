@@ -99,7 +99,7 @@ namespace Lore {
             return Iterator( std::begin( _container ), std::end( _container ) );
         }
 
-        ConstIterator getConstIterator()
+        ConstIterator getConstIterator() const
         {
             return ConstIterator( std::begin( _container ), std::end( _container ) );
         }
