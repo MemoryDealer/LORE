@@ -82,16 +82,16 @@ int main( int argc, char** argv )
     Lore::TexturePtr tex = loader.loadTexture( "tex1", "C:\\doggo.png" );
 
     node = scene->getNode( "A" );
-    tex->getMaterial()->getPass().emissive = Lore::Color( 1.f, 1.f, 1.f );
-    //tex->setMaterial( context->getStockResourceController()->getMaterial( "BaseWhiteNoLighting" ) );
+    //tex->getMaterial()->getPass().emissive = Lore::Color( 0.f, 0.2f, 0.f );
+    //
     node->attachObject( tex );
 
     // TODO: This change should propagate to renderer.
     
+    node->scale( Lore::Vec2( 12.f, 12.0f ) );
 
-    node->scale( Lore::Vec2( 20.f, 11.0f ) );
-
-    /*node->getChild( "AChild" )->scale( Lore::Vec2( 0.5f, 1.f ) );
+    /*tex->setMaterial( context->getStockResourceController()->getMaterial( "BaseWhiteNoLighting" ) );
+    node->getChild( "AChild" )->scale( Lore::Vec2( 0.5f, 1.f ) );
 
     node->getChild( "AChild" )->attachObject( tex );
     node->getChild( "AChild" )->setPosition( Lore::Vec2( -0.25f, 0.25f ) );
@@ -102,12 +102,16 @@ int main( int argc, char** argv )
     n2->translate( 0.25f, 0.35f );*/
 
     auto light = scene->createLight( "l1" );
-    light->setColor( Lore::StockColor::Blue );
+    light->setColor( Lore::Color( 0.2f, 1.f, 0.2f ) );
     //light->setAttenuation( 3250.f, 1.f, 0.0014f, 0.000007f );
+
+    node->attachObject( light );
+
+    scene->setAmbientLightColor( Lore::Color( 0.12f, 0.12f, 0.12f ) );
 
     float f = 0.f;
     while ( context->active() ) { 
-        //node->translate( 0.05f * std::sinf( f ), 0.05f * std::cosf( f ) );
+        node->translate( 0.05f * std::sinf( f ), 0.05f * std::cosf( f ) );
         f += 0.05f;
         //node->scale( 0.025f * std::sinf( f ) );
 
@@ -118,16 +122,18 @@ int main( int argc, char** argv )
         //n2->rotate( Lore::Degree( 0.025f ) );
 
         if ( GetAsyncKeyState( VK_F1 ) ) {
-            camera->translate( -0.01f, 0.f );
+            //camera->translate( -0.01f, 0.f );
+            node->translate( -0.01f, 0.f );
         }
         else if ( GetAsyncKeyState( VK_F2 ) ) {
-            camera->translate( 0.01f, 0.f );
+            //camera->translate( 0.01f, 0.f );
+            node->translate( 0.01f, 0.f );
         }
         else if ( GetAsyncKeyState( VK_F3 ) ) {
-            camera->translate( 0.f, -0.01f );
+            //camera->translate( 0.f, -0.01f );
         }
         else if ( GetAsyncKeyState( VK_F4 ) ) {
-            camera->translate( 0.f, 0.01f );
+            //camera->translate( 0.f, 0.01f );
         }
         else if ( GetAsyncKeyState( VK_F5 ) ) {
             camera->zoom( 0.01f );

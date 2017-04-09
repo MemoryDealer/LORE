@@ -42,6 +42,7 @@ Node::Node()
 , _scene( nullptr )
 , _parent( nullptr )
 , _childNodes()
+, _lights()
 {
 }
 
@@ -130,6 +131,12 @@ void Node::attachObject( RenderablePtr r )
     case Renderable::Type::Texture:
         _renderables.insert( { r->getName(), r } );
         _scene->getRenderer()->addRenderable( r, _transform.world );
+        r->_notifyAttached();
+        break;
+
+    case Renderable::Type::Light:
+        _renderables.insert( { r->getName(), r } );
+        _lights.push_back( static_cast<LightPtr>( r ) );
         r->_notifyAttached();
         break;
     }
@@ -271,6 +278,13 @@ Matrix4 Node::_getLocalTransform()
     if ( _transform.dirty ) {
         _transform.local = Math::CreateTransformationMatrix( _transform.position,
                                                              _transform.orientation );
+
+        // Update attached light positions.
+        for ( auto& light : _lights ) {
+            light->_position.x = _transform.world[3][0];
+            light->_position.y = _transform.world[3][1];
+        }
+
         _transform.dirty = false;
     }
 

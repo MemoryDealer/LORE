@@ -49,6 +49,7 @@ namespace Lore {
         using ChildNodeIterator = NodeMap::Iterator;
         using ConstChildNodeIterator = NodeMap::ConstIterator;
         using RenderableList = std::unordered_map<string, RenderablePtr>;
+        using LightList = std::vector<LightPtr>;
 
         struct Transform
         {
@@ -201,6 +202,8 @@ namespace Lore {
 
         NodePtr _parent;
         NodeMap _childNodes;
+
+        LightList _lights;
 
     };
 

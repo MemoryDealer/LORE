@@ -28,12 +28,14 @@
 #include <LORE2D/Math/Math.h>
 #include <LORE2D/Memory/Alloc.h>
 #include <LORE2D/Resource/Color.h>
+#include <LORE2D/Resource/Renderable/Renderable.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-    class Light final : public Alloc<Light>
+    class Light final : public Renderable,
+                        public Alloc<Light>
     {
 
         LORE_OBJECT_BODY()
@@ -85,11 +87,6 @@ namespace Lore {
         //
         // Setters.
 
-        inline void setPosition( const Vec2& pos )
-        {
-            _position = pos;
-        }
-
         inline void setColor( const Color& color )
         {
             _color = color;
@@ -119,6 +116,8 @@ namespace Lore {
     private:
 
         virtual void _reset() override;
+
+        friend class Node;
 
     private:
 

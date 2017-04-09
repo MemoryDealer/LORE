@@ -115,14 +115,13 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
     const Matrix4 projection = Math::OrthoRH( -aspectRatio, aspectRatio,
                                               -1.f, 1.f,
                                               100.f, -100.f );
-    const Matrix4 viewProjection = projection * rv.camera->getViewMatrix();
     
     // Iterate through all active render queues and render each object.
     for ( const auto& activeQueue : _activeQueues ) {
         RenderQueue& queue = activeQueue.second;
 
         // Render solids.
-        renderMaterialMap( rv.scene, queue.solids, viewProjection );
+        renderMaterialMap( rv.scene, queue.solids, rv.camera->getViewMatrix(), projection );
     }
 }
 
@@ -141,8 +140,11 @@ void GenericRenderer::activateQueue( const uint id, Lore::RenderQueue& rq )
 
 void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
                                          Lore::RenderQueue::MaterialMap& mm,
-                                         const Lore::Matrix4& viewProjection ) const
+                                         const Lore::Matrix4& view,
+                                         const Lore::Matrix4& projection ) const
 {
+    const Matrix4 viewProjection = view * projection;
+
     for ( auto& pair : mm ) {
         MaterialPtr material = pair.first;
         const RenderQueue::RenderableMap& rm = pair.second;
@@ -161,13 +163,13 @@ void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
             //
             // Set material lighting data.
 
-            program->setUniformVar( "diffuse", pass.diffuse );
+            program->setUniformVar( "material.ambient", pass.ambient );
+            program->setUniformVar( "material.diffuse", pass.diffuse );
 
             //
             // Set scene values.
 
-            program->setUniformVar( "ambient", scene->getAmbientLightColor() );
-
+            program->setUniformVar( "sceneAmbient", scene->getAmbientLightColor() );
             program->setUniformVar( "numLights", scene->getLightCount() );
 
             auto lights = scene->getLightIterator();

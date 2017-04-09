@@ -90,7 +90,7 @@ Lore::GPUProgramPtr StockResourceController::createUberShader( const string& nam
 
     if ( lit ) {
         src += "uniform mat4 model;";
-        src += "out vec2 InPos;";
+        src += "out vec2 FragPos;";
     }
 
     //
@@ -109,7 +109,7 @@ Lore::GPUProgramPtr StockResourceController::createUberShader( const string& nam
     }
 
     if ( lit ) {
-        src += "InPos = (model * vec4(vertex, 0.0, 1.0)).xy;";
+        src += "FragPos = (model * vec4(vertex, 0.0, 1.0)).xy;";
     }
 
     src += "}";
@@ -145,6 +145,10 @@ Lore::GPUProgramPtr StockResourceController::createUberShader( const string& nam
         src += "in vec2 TexCoord;";
     }
 
+    // Final pixel output color.
+    src += "out vec4 pixel;";
+
+    // Lighting.
     if ( lit ) {
         src += "struct Light {";
         src += "vec2 pos;";
@@ -155,17 +159,36 @@ Lore::GPUProgramPtr StockResourceController::createUberShader( const string& nam
         src += "float intensity;";
         src += "};";
 
+        src += "struct Material {";
+        src += "vec3 ambient;";
+        src += "vec3 diffuse;";
+        src += "};";
+
         src += "uniform Light lights[" + std::to_string( params.maxLights ) + "];";
-        //src += "uniform int numLights;";
+        src += "uniform int numLights;";
 
-        src += "uniform vec3 ambient;";
-        src += "uniform vec3 diffuse;";
+        src += "uniform Material material;";
 
-        src += "in vec2 InPos;";
+        src += "uniform vec3 sceneAmbient;";
+
+        src += "in vec2 FragPos;";
+
+        //
+        // Light functions.
+
+        // Point light.
+        src += "vec3 CalcPointLight(Light l){";
+
+        src += "const float d = length(l.pos - FragPos);";
+        src += "const float att = l.intensity / (l.constant + l.linear * d + l.quadratic * pow(d, 2.0));";
+
+        src += "const vec3 lDiffuse = l.color * material.diffuse * att;";
+        src += "const vec3 lAmbient = material.ambient * sceneAmbient;";
+
+        src += "return lDiffuse + lAmbient;";
+
+        src += "}";
     }
-
-    // Final pixel output color.
-    src += "out vec4 pixel;";
 
     //
     // main function.
@@ -174,13 +197,12 @@ Lore::GPUProgramPtr StockResourceController::createUberShader( const string& nam
 
     // Setup default values for calculating pixel.
     src += "vec4 texSample = vec4(1.0, 1.0, 1.0, 1.0);";
-    src += "vec3 diffuseLighting = vec3(1.0, 1.0, 1.0);";
     src += "vec3 pixelColor";
     if ( params.emissive ) {
         src += " = emissive;";
     }
     else {
-        src += " = vec3(1.0, 1.0, 1.0);";
+        src += " = vec3(0.0, 0.0, 0.0);";
     }
 
     if ( textured ) {
@@ -188,26 +210,17 @@ Lore::GPUProgramPtr StockResourceController::createUberShader( const string& nam
     }
 
     if ( lit ) {
-        /*src += "for(int i=0; i<numLights; ++i){";
-        src += "Light l = lights[i];";
-        src += "const float d = distance(vec3(l.pos, 0.0), vec3(InPos, 0.0));";
-        src += "const float att = l.intensity / (l.constant + l.linear * d + l.quadratic * pow(d, 2.0));";
-        src += "diffuseLighting *= l.color * diffuse * att;";
-        src += "}";*/
+        src += "vec3 lighting = vec3(0.0, 0.0, 0.0);";
 
-        src += "Light l = lights[0];";
-        src += "const float d = distance(vec3(l.pos, 0.0), vec3(InPos, 0.0));";
-        src += "const float att = l.intensity / (l.constant + l.linear * d + l.quadratic * pow(d, 2.0));";
-        src += "diffuseLighting = l.color * diffuse * att;";
-    }
-    //src += "diffuseLighting = vec3(0.0, 0.0, 1.0);";
-    src += "texSample *= vec4(diffuseLighting, 1.0);";
+        src += "for(int i=0; i<numLights; ++i){";
+        src += "lighting += CalcPointLight(lights[i]);";
+        src += "}";
 
-    if ( lit ) {
-        src += "texSample += vec4(ambient, 0.0);";
+        src += "texSample *= vec4(lighting, 1.0);";
     }
 
-    src += "pixel = texSample * vec4(pixelColor, 1.0);";
+    // Final pixel.
+    src += "pixel = texSample += vec4(pixelColor, 1.0);";
 
     src += "}";
     auto fsptr = _controller->createFragmentShader( name + "_FS" );
@@ -240,9 +253,10 @@ Lore::GPUProgramPtr StockResourceController::createUberShader( const string& nam
 
     if ( lit ) {
         program->addUniformVar( "model" );
-        program->addUniformVar( "ambient" );
-        program->addUniformVar( "diffuse" );
-        //program->addUniformVar( "numLights" );
+        program->addUniformVar( "material.ambient" );
+        program->addUniformVar( "material.diffuse" );
+        program->addUniformVar( "numLights" );
+        program->addUniformVar( "sceneAmbient" );
     }
 
     if ( params.emissive ) {
