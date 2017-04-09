@@ -45,8 +45,17 @@ namespace Lore {
 
         // :::::: //
 
-        using MatrixList = std::vector<Matrix4*>;
-        using RenderableMap = std::map<RenderablePtr, MatrixList>;
+        // An instance of a type of Renderable (e.g., Texture).
+        struct RenderableInstance
+        {
+            Matrix4* model;
+        };
+        using RenderableInstanceList = std::vector<RenderableInstance>;
+
+        // Each registered Renderable stores a list of instances.
+        using RenderableMap = std::map<RenderablePtr, RenderableInstanceList>;
+
+        // Every Material keeps a map of Renderable instances.
         using MaterialMap = std::map<MaterialPtr, RenderableMap>;
 
         MaterialMap solids;

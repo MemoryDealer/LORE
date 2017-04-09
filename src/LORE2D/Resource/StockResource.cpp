@@ -64,31 +64,58 @@ void StockResourceController::createStockResources()
     //
     // Load stock programs.
 
-    UberShaderParameters params;
+    // Lit programs.
+    {
+        UberShaderParameters params;
 
-    // StandardTexturedQuad:
-    createUberShader( "StandardTexturedQuad", params );
+        createUberShader( "StandardTexturedQuad", params );
 
-    params.numTextures = 0;
-    params.maxLights = 0;
-    createUberShader( "StandardQuad", params );
+        params.numTextures = 0;
+        createUberShader( "StandardQuad", params );
+    }
+    
+    // Unlit programs.
+    {
+        UberShaderParameters params;
+        params.maxLights = 0;
+
+        createUberShader( "UnlitTexturedQuad", params );
+
+        params.numTextures = 0;
+        createUberShader( "UnlitStandardQuad", params );
+    }
 
     //
     // Load stock materials.
 
-    // StandardTexturedQuad
+    // Lit materials.
     {
         auto material = _controller->createMaterial( "StandardTexturedQuad" );
-        Material::Pass& pass = material->getPass( 0 );
+        Material::Pass& pass = material->getPass();
         pass.lighting = true;
         pass.program = _controller->getGPUProgram( "StandardTexturedQuad" );
     }
 
     {
-        auto material = _controller->createMaterial( "BaseWhiteNoLighting" );
-        Material::Pass& pass = material->getPass( 0 );
-        pass.lighting = false;
+        auto material = _controller->createMaterial( "StandardQuad" );
+        Material::Pass& pass = material->getPass();
+        pass.lighting = true;
         pass.program = _controller->getGPUProgram( "StandardQuad" );
+    }
+
+    // Unlit materials.
+    {
+        auto material = _controller->createMaterial( "UnlitTexturedQuad" );
+        Material::Pass& pass = material->getPass();
+        pass.lighting = false;
+        pass.program = _controller->getGPUProgram( "UnlitTexturedQuad" );
+    }
+
+    {
+        auto material = _controller->createMaterial( "UnlitStandardQuad" );
+        Material::Pass& pass = material->getPass();
+        pass.lighting = false;
+        pass.program = _controller->getGPUProgram( "UnlitStandardQuad" );
     }
 }
 

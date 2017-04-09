@@ -74,9 +74,12 @@ Lore::RenderQueue::Entry GenericRenderer::addRenderable( RenderablePtr r, Lore::
     MaterialPtr mat = r->getMaterial();
     RenderQueue::RenderableMap& rm = queue.solids[mat];
 
-    // Add this model matrix to the list for this renderable.
-    RenderQueue::MatrixList& matrixList = rm[r];
-    matrixList.push_back( &model );
+    // Create a RenderableInstance for this renderable.
+    RenderQueue::RenderableInstance ri;
+    ri.model = &model;
+
+    RenderQueue::RenderableInstanceList& riList = rm[r];
+    riList.push_back( ri );
 
     // Store iterators in entry record for quick removal.
     //entry.matrixIt = matrixList.cend();
@@ -156,8 +159,6 @@ void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
         VertexBufferPtr vb = program->getVertexBuffer();
         program->use();
 
-        program->setUniformVar( "emissive", pass.emissive );
-
         // Setup per-material uniform values.
         if ( pass.lighting ) {
             //
@@ -188,20 +189,20 @@ void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
         // For each renderable, iterate over its matrix entries and render.
         for ( auto& renderablePair : rm ) {
             RenderablePtr renderable = renderablePair.first;
-            const RenderQueue::MatrixList& matrices = renderablePair.second;
+            const RenderQueue::RenderableInstanceList& riList = renderablePair.second;
 
             // Setup this renderable for rendering all of its instances.
             renderable->bind();
 
-            for ( const auto model : matrices ) {
+            for ( const auto ri : riList ) {
                 // Calculate model-view-projection matrix for this object.
-                Matrix4 mvp = viewProjection * *model;
+                Matrix4 mvp = viewProjection * *ri.model;
 
                 // Update the MVP value in the shader.
                 program->setTransformVar( mvp );
 
                 if ( pass.lighting ) {
-                    program->setUniformVar( "model", *model );
+                    program->setUniformVar( "model", *ri.model );
                 }
 
                 // Draw the renderable.

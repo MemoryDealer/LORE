@@ -86,23 +86,22 @@ int main( int argc, char** argv )
     //
     node->attachObject( tex );
 
-    // TODO: This change should propagate to renderer.
-    
     node->scale( Lore::Vec2( 12.f, 12.0f ) );
 
-    /*tex->setMaterial( context->getStockResourceController()->getMaterial( "BaseWhiteNoLighting" ) );
-    node->getChild( "AChild" )->scale( Lore::Vec2( 0.5f, 1.f ) );
+    // TODO: This change should propagate to renderer.
+    tex->setMaterial( context->getStockResourceController()->getMaterial( "UnlitStandardQuad" ) );
+    //node->getChild( "AChild" )->scale( Lore::Vec2( 0.5f, 1.f ) );
 
-    node->getChild( "AChild" )->attachObject( tex );
-    node->getChild( "AChild" )->setPosition( Lore::Vec2( -0.25f, 0.25f ) );
+    //node->getChild( "AChild" )->attachObject( tex );
+    //node->getChild( "AChild" )->setPosition( Lore::Vec2( -0.25f, 0.25f ) );
 
-    auto n2 = scene->createNode( "n2" );
-    n2->attachObject( tex );
-    n2->scale( Lore::Vec2( 4.2f, 0.65f ) );
-    n2->translate( 0.25f, 0.35f );*/
+    //auto n2 = scene->createNode( "n2" );
+    //n2->attachObject( tex );
+    //n2->scale( Lore::Vec2( 4.2f, 0.65f ) );
+    //n2->translate( 0.25f, 0.35f );
 
     auto light = scene->createLight( "l1" );
-    light->setColor( Lore::Color( 0.2f, 1.f, 0.2f ) );
+    light->setColor( Lore::Color( 1.f, .6f, 0.f ) );
     //light->setAttenuation( 3250.f, 1.f, 0.0014f, 0.000007f );
 
     node->attachObject( light );
@@ -111,12 +110,12 @@ int main( int argc, char** argv )
 
     float f = 0.f;
     while ( context->active() ) { 
-        node->translate( 0.05f * std::sinf( f ), 0.05f * std::cosf( f ) );
+        node->translate( 0.01f * std::sinf( f ), 0.01f * std::cosf( f ) );
         f += 0.05f;
         //node->scale( 0.025f * std::sinf( f ) );
 
         // TODO: Repro case where both quads appeared to be scaling with only rotations being done.
-        node->rotate( Lore::Degree( 0.5f ) );
+        node->rotate( Lore::Degree( 0.05f ) );
         ////node->getChild( "AChild" )->rotate( Lore::Degree( -.1f ) );
 
         //n2->rotate( Lore::Degree( 0.025f ) );
