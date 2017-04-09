@@ -48,7 +48,8 @@ namespace Lore {
         using NodeMap = Registry<std::map, Node>;
         using ChildNodeIterator = NodeMap::Iterator;
         using ConstChildNodeIterator = NodeMap::ConstIterator;
-        using RenderableList = std::unordered_map<string, RenderablePtr>;
+        using RenderableList = Registry<std::map, Renderable>;
+        using RenderableListConstIterator = RenderableList::ConstIterator;
         using LightList = std::vector<LightPtr>;
 
         struct Transform
@@ -98,6 +99,13 @@ namespace Lore {
         // Renderable attachments.
 
         void attachObject( RenderablePtr r );
+
+        void attachObject( LightPtr l );
+
+        inline RenderableListConstIterator getRenderableConstIterator() const
+        {
+            return _renderables.getConstIterator();
+        }
 
         //
         // Modifiers.

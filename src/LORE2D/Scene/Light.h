@@ -34,8 +34,7 @@
 
 namespace Lore {
 
-    class Light final : public Renderable,
-                        public Alloc<Light>
+    class Light final : public Alloc<Light>
     {
 
         LORE_OBJECT_BODY()
