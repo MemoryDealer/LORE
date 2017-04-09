@@ -50,9 +50,6 @@ GenericRenderer::GenericRenderer()
 {
     // Initialize all available queues.
     _queues.resize( DefaultRenderQueueCount );
-
-    // Active default queues.
-    activateQueue( RenderQueue::General, _queues.at( RenderQueue::General ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -63,12 +60,11 @@ GenericRenderer::~GenericRenderer()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::RenderQueue::Entry GenericRenderer::addRenderable( RenderablePtr r, Lore::Matrix4& model )
+void GenericRenderer::addRenderable( RenderablePtr r, Lore::Matrix4& model )
 {
     const uint queueId = r->getRenderQueue();
 
     RenderQueue& queue = _queues.at( queueId );
-    RenderQueue::Entry entry;
 
     // Get the right RenderableMap for this material.
     MaterialPtr mat = r->getMaterial();
@@ -76,19 +72,13 @@ Lore::RenderQueue::Entry GenericRenderer::addRenderable( RenderablePtr r, Lore::
 
     // Create a RenderableInstance for this renderable.
     RenderQueue::RenderableInstance ri;
-    ri.model = &model;
+    ri.model = model;
 
     RenderQueue::RenderableInstanceList& riList = rm[r];
     riList.push_back( ri );
 
-    // Store iterators in entry record for quick removal.
-    //entry.matrixIt = matrixList.cend();
-    //entry.renderableIt = rm.find( r );
-
     // Add this queue to the active queue list if not already there.
     activateQueue( queueId, _queues[queueId] );
-
-    return entry;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -97,7 +87,7 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
 {
     // Traverse the scene graph and update object transforms.
     Lore::SceneGraphVisitor sgv( rv.scene->getRootNode() );
-    sgv.visit();
+    sgv.visit( *this );
 
     // TODO: Cache which scenes have been visited and check before doing it again.
     // [OR] move visitor to context?
@@ -126,6 +116,21 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
         // Render solids.
         renderMaterialMap( rv.scene, queue.solids, rv.camera->getViewMatrix(), projection );
     }
+
+    _clearRenderQueues();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GenericRenderer::_clearRenderQueues()
+{
+    // Remove all data from each queue.
+    for ( auto& queue : _queues ) {
+        queue.solids.clear();
+    }
+
+    // Erase all queues from the active queue list.
+    _activeQueues.clear();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -196,13 +201,13 @@ void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
 
             for ( const auto ri : riList ) {
                 // Calculate model-view-projection matrix for this object.
-                Matrix4 mvp = viewProjection * *ri.model;
+                Matrix4 mvp = viewProjection * ri.model;
 
                 // Update the MVP value in the shader.
                 program->setTransformVar( mvp );
 
                 if ( pass.lighting ) {
-                    program->setUniformVar( "model", *ri.model );
+                    program->setUniformVar( "model", ri.model );
                 }
 
                 // Draw the renderable.

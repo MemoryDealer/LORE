@@ -44,8 +44,6 @@ namespace Lore {
         enum class Type
         {
             Unknown,
-            Camera,
-            Light,
             Texture,
             Sprite
         };

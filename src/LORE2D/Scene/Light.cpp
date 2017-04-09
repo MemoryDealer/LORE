@@ -41,7 +41,6 @@ Light::Light()
 , _quadratic( 1.8f )
 , _intensity( 1.f )
 {
-    _type = Renderable::Type::Light;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

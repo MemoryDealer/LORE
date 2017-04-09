@@ -129,17 +129,18 @@ void Node::attachObject( RenderablePtr r )
         break;
 
     case Renderable::Type::Texture:
-        _renderables.insert( { r->getName(), r } );
-        _scene->getRenderer()->addRenderable( r, _transform.world );
+        _renderables.insert( r->getName(), r );
         r->_notifyAttached();
         break;
 
-    case Renderable::Type::Light:
-        _renderables.insert( { r->getName(), r } );
-        _lights.push_back( static_cast<LightPtr>( r ) );
-        r->_notifyAttached();
-        break;
     }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Node::attachObject( LightPtr l )
+{
+    _lights.push_back( l );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -254,7 +255,7 @@ void Node::_reset()
     _renderables.clear();
     _scene = nullptr;
     _parent = nullptr;
-    //_childNodes.clear();
+    _childNodes.clear();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

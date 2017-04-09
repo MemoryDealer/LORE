@@ -74,6 +74,11 @@ namespace Lore {
             _container.erase( id_ );
         }
 
+        void clear()
+        {
+            _container.clear();
+        }
+
         T* get( const id& id_ ) const
         {
             auto lookup = _container.find( id_ );
