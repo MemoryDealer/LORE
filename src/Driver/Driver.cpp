@@ -93,10 +93,12 @@ int main( int argc, char** argv )
     node->getChild( "AChild" )->scale( Lore::Vec2( 0.5f, 1.f ) );
 
     node->getChild( "AChild" )->attachObject( tex );
+    node->getChild( "AChild" )->setZOrder( 40 );
     node->getChild( "AChild" )->setPosition( Lore::Vec2( -0.25f, 0.25f ) );
 
     auto n2 = scene->createNode( "n2" );
     n2->attachObject( tex );
+    n2->setZOrder( 60 );
     n2->scale( Lore::Vec2( 4.2f, 0.65f ) );
     n2->translate( 0.25f, 0.35f );
 

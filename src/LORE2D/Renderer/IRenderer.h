@@ -50,10 +50,18 @@ namespace Lore {
         {
             Matrix4 model;
         };
-        using RenderableInstanceList = std::vector<RenderableInstance>;
+        using RIList = std::vector<RenderableInstance>;
+
+        // Maps a Node's ZOrder to render data.
+        struct RIL
+        {
+            std::map<uint, RIList> map;
+        };
+
+        //using RILMap = std::map<uint, RIList>;
 
         // Each registered Renderable stores a list of instances.
-        using RenderableMap = std::map<RenderablePtr, RenderableInstanceList>;
+        using RenderableMap = std::map<RenderablePtr, RIL>;
 
         // Every Material keeps a map of Renderable instances.
         using MaterialMap = std::map<MaterialPtr, RenderableMap>;
@@ -80,7 +88,7 @@ namespace Lore {
         /// \brief Registers a Renderable object for rendering. This should be
         ///     called when a Renderable is attached to a Node.
         virtual void addRenderable( RenderablePtr r,
-                                    Matrix4& model ) = 0;
+                                    NodePtr node ) = 0;
 
         ///
         /// \brief Uses internal Renderable lists to create a frame buffer using

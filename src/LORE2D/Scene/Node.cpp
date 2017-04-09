@@ -26,7 +26,6 @@
 
 #include "Node.h"
 
-#include <LORE2D/Renderer/IRenderer.h>
 #include <LORE2D/Resource/Renderable/Renderable.h>
 #include <LORE2D/Scene/Scene.h>
 
@@ -38,6 +37,7 @@ using namespace Lore;
 
 Node::Node()
 : _transform()
+, _zOrder( 50 )
 , _renderables()
 , _scene( nullptr )
 , _parent( nullptr )
@@ -290,13 +290,6 @@ Matrix4 Node::_getLocalTransform()
     }
 
     return _transform.local;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-Matrix4 Node::_getWorldTransform() const
-{
-    return _transform.world;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

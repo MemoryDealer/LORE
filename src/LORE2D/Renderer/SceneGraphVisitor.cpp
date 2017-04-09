@@ -73,7 +73,7 @@ void SceneGraphVisitor::visit( IRenderer& renderer, bool parentDirty )
     auto it = _node->getRenderableConstIterator();
     while ( it.hasMore() ) {
         RenderablePtr r = it.getNext();
-        renderer.addRenderable( r, _node->_transform.world );
+        renderer.addRenderable( r, _node );
     }
 
     // Recurse over children.

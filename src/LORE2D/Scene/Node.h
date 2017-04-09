@@ -132,6 +132,11 @@ namespace Lore {
 
         void scale( const real s );
 
+        inline void setZOrder( const uint zOrder )
+        {
+            _zOrder = zOrder;
+        }
+
         //
         // Getters.
 
@@ -143,6 +148,11 @@ namespace Lore {
         inline Vec2 getPosition() const
         {
             return _transform.position;
+        }
+
+        inline Matrix4 getFullTransform() const
+        {
+            return _transform.world;
         }
 
         inline Vec2 getScale() const
@@ -158,6 +168,11 @@ namespace Lore {
         inline bool hasChildNodes() const
         {
             return !( _childNodes.empty() );
+        }
+
+        inline uint getZOrder() const
+        {
+            return _zOrder;
         }
 
         //
@@ -193,8 +208,6 @@ namespace Lore {
 
         Matrix4 _getLocalTransform();
 
-        Matrix4 _getWorldTransform() const;
-
         void _updateWorldTransform( const Matrix4& m );
 
         void _updateChildrenScale();
@@ -202,6 +215,8 @@ namespace Lore {
     private:
 
         Transform _transform;
+
+        uint _zOrder;
 
         RenderableList _renderables;
 

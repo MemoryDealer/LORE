@@ -60,7 +60,7 @@ GenericRenderer::~GenericRenderer()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GenericRenderer::addRenderable( RenderablePtr r, Lore::Matrix4& model )
+void GenericRenderer::addRenderable( RenderablePtr r, NodePtr node )
 {
     const uint queueId = r->getRenderQueue();
 
@@ -72,10 +72,10 @@ void GenericRenderer::addRenderable( RenderablePtr r, Lore::Matrix4& model )
 
     // Create a RenderableInstance for this renderable.
     RenderQueue::RenderableInstance ri;
-    ri.model = model;
+    ri.model = node->getFullTransform();
 
-    RenderQueue::RenderableInstanceList& riList = rm[r];
-    riList.push_back( ri );
+    RenderQueue::RIL& riList = rm[r];
+    riList.map[node->getZOrder()].push_back( ri );
 
     // Add this queue to the active queue list if not already there.
     activateQueue( queueId, _queues[queueId] );
@@ -191,27 +191,30 @@ void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
 
         vb->bind();
         
-        // For each renderable, iterate over its matrix entries and render.
-        for ( auto& renderablePair : rm ) {
-            RenderablePtr renderable = renderablePair.first;
-            const RenderQueue::RenderableInstanceList& riList = renderablePair.second;
+        // For each Renderable, get the map of ZOrder --> RenderableInstanceList.
+        for ( auto& riListMap : rm ) {
+            RenderablePtr renderable = riListMap.first;
 
-            // Setup this renderable for rendering all of its instances.
+            // Bind this renderable for rendering all of its instances.
             renderable->bind();
 
-            for ( const auto ri : riList ) {
-                // Calculate model-view-projection matrix for this object.
-                Matrix4 mvp = viewProjection * ri.model;
+            // Iterate the RenderableInstanceMap in order, to handle ZOrder.
+            for ( auto& riList : riListMap.second.map ) {
 
-                // Update the MVP value in the shader.
-                program->setTransformVar( mvp );
+                for ( const RenderQueue::RenderableInstance& ri : riList.second ) {
+                    // Calculate model-view-projection matrix for this object.
+                    Matrix4 mvp = viewProjection * ri.model;
 
-                if ( pass.lighting ) {
-                    program->setUniformVar( "model", ri.model );
+                    // Update the MVP value in the shader.
+                    program->setTransformVar( mvp );
+
+                    if ( pass.lighting ) {
+                        program->setUniformVar( "model", ri.model );
+                    }
+
+                    // Draw the renderable.
+                    vb->draw();
                 }
-
-                // Draw the renderable.
-                vb->draw();
             }
         }
 
