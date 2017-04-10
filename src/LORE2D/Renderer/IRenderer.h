@@ -49,18 +49,13 @@ namespace Lore {
         struct RenderableInstance
         {
             Matrix4 model;
+            int depth;
             Color colorModifier;
         };
         using RIList = std::vector<RenderableInstance>;
 
-        // Maps a Node's ZOrder to render data.
-        struct RIL
-        {
-            std::map<uint, RIList> map;
-        };
-
         // Each registered Renderable stores a list of instances.
-        using RenderableMap = std::map<RenderablePtr, RIL>;
+        using RenderableMap = std::map<RenderablePtr, RIList>;
 
         // Every Material keeps a map of Renderable instances.
         using MaterialMap = std::map<MaterialPtr, RenderableMap>;

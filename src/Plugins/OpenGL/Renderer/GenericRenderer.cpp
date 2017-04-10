@@ -73,10 +73,11 @@ void GenericRenderer::addRenderable( RenderablePtr r, NodePtr node )
     // Create a RenderableInstance for this renderable.
     RenderQueue::RenderableInstance ri;
     ri.model = node->getFullTransform();
+    ri.depth = node->getDepth();
     ri.colorModifier = node->getColorModifier();
 
-    RenderQueue::RIL& riList = rm[r];
-    riList.map[node->getZOrder()].push_back( ri );
+    RenderQueue::RIList& riList = rm[r];
+    riList.push_back( ri );
 
     // Add this queue to the active queue list if not already there.
     activateQueue( queueId, _queues[queueId] );
@@ -94,6 +95,9 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
     // [OR] move visitor to context?
     // ...
 
+    glEnable( GL_DEPTH_TEST );
+    glDepthFunc( GL_LESS );
+
     glViewport( rv.gl_viewport.x,
                 rv.gl_viewport.y,
                 rv.gl_viewport.width,
@@ -108,7 +112,7 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
     const float aspectRatio = window->getAspectRatio();
     const Matrix4 projection = Math::OrthoRH( -aspectRatio, aspectRatio,
                                               -1.f, 1.f,
-                                              100.f, -100.f );
+                                              -100.f, 100.f );
 
     const Matrix4 viewProjection = rv.camera->getViewMatrix() * projection;
     
@@ -198,27 +202,29 @@ void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
             // Bind this renderable for rendering all of its instances.
             renderable->bind();
 
-            // Iterate the RenderableInstanceMap in order, to handle ZOrder.
-            for ( auto& riList : riListMap.second.map ) {
+            for ( const RenderQueue::RenderableInstance& ri : riListMap.second ) {
 
-                for ( const RenderQueue::RenderableInstance& ri : riList.second ) {
-                    // Calculate model-view-projection matrix for this object.
-                    Matrix4 mvp = viewProjection * ri.model;
+                // Apply depth to z-value of the model matrix (overwrite SceneGraphVisitor transformations).
+                // This is necessary for depth values on nodes to work correctly.
+                Matrix4 model = ri.model;
+                model[3][2] = static_cast< real >( ri.depth );
 
-                    // Update the MVP value in the shader.
-                    program->setTransformVar( mvp );
+                // Calculate model-view-projection matrix for this object.
+                Matrix4 mvp = viewProjection * model;
 
-                    if ( pass.lighting ) {
-                        program->setUniformVar( "model", ri.model );
-                    }
+                // Update the MVP value in the shader.
+                program->setTransformVar( mvp );
 
-                    if ( pass.colorMod ) {
-                        program->setUniformVar( "colorMod", ri.colorModifier );
-                    }
-
-                    // Draw the renderable.
-                    vb->draw();
+                if ( pass.lighting ) {
+                    program->setUniformVar( "model", ri.model );
                 }
+
+                if ( pass.colorMod ) {
+                    program->setUniformVar( "colorMod", ri.colorModifier );
+                }
+
+                // Draw the renderable.
+                vb->draw();
             }
         }
 

@@ -98,7 +98,7 @@ Lore::GPUProgramPtr StockResourceController::createUberShader( const string& nam
 
     src += "void main(){";
 
-    src += "gl_Position = transform * vec4(vertex, 0.0f, 1.0f);";
+    src += "gl_Position = transform * vec4(vertex, 1.0, 1.0);";
     if ( textured ) {
         if ( params.texYCoordinateFlipped ) {
             src += "TexCoord = vec2(texCoord.x, 1.0 - texCoord.y);";

@@ -72,6 +72,7 @@ int main( int argc, char** argv )
     window->addRenderView( rv );
 
     Lore::NodePtr node = scene->createNode( "A" );
+    node->setDepth( 0 );
     node = node->createChildNode( "AChild" );
     node = scene->createNode( "B " );
     node = node->createChildNode( "BChild" );
@@ -92,27 +93,33 @@ int main( int argc, char** argv )
     node->getChild( "AChild" )->scale( Lore::Vec2( 0.5f, 1.f ) );
 
     node->getChild( "AChild" )->attachObject( tex );
-    node->getChild( "AChild" )->setZOrder( 40 );
+    node->getChild( "AChild" )->setDepth( -66 );
+    node->getChild( "AChild" )->setColorModifier( Lore::StockColor::Red );
     node->getChild( "AChild" )->setPosition( Lore::Vec2( -0.25f, 0.25f ) );
 
     auto n2 = scene->createNode( "n2" );
     n2->attachObject( tex );
-    n2->setZOrder( 60 );
     n2->scale( Lore::Vec2( 4.2f, 0.65f ) );
-    n2->translate( 0.25f, 0.35f );
+    n2->translate( 0.25f, 0.25f );
+    n2->setDepth( -25 );
 
     auto light = scene->createLight( "l1" );
     light->setColor( Lore::Color( 1.f, .6f, 0.f ) );
     //light->setAttenuation( 3250.f, 1.f, 0.0014f, 0.000007f );
-
     node->attachObject( light );
+
+    auto l2 = scene->createLight( "l2" );
+    l2->setColor( Lore::Color( 0.1f, 1.f, 0.2f ) );
+    n2->attachObject( l2 );
+
+   
 
     scene->setAmbientLightColor( Lore::Color( 0.12f, 0.12f, 0.12f ) );
 
     for ( int i = 0; i < 80; ++i ) {
         auto n = node->createChildNode( "a" + std::to_string( i ) );
         n->translate( 0.5f * static_cast<float>( i + 1 ), 0.f );
-        n->attachObject( Lore::StockResource::GetTexture( "UnlitWhite" ) );
+        n->attachObject( Lore::StockResource::GetTexture( "White" ) );
 
         n->setColorModifier( Lore::Color( 1.f - static_cast< Lore::real >( i * .1f ), 1.f, 1.f ) );
     }

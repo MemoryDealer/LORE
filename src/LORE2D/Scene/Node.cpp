@@ -37,7 +37,7 @@ using namespace Lore;
 
 Node::Node()
 : _transform()
-, _zOrder( 50 )
+, _depth( 0 )
 , _renderables()
 , _scene( nullptr )
 , _parent( nullptr )
@@ -45,6 +45,7 @@ Node::Node()
 , _colorModifier( StockColor::White )
 , _lights()
 {
+    _getLocalTransform();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -142,6 +143,9 @@ void Node::attachObject( RenderablePtr r )
 void Node::attachObject( LightPtr l )
 {
     _lights.push_back( l );
+
+    l->_position.x = _transform.world[3][0];
+    l->_position.y = _transform.world[3][1];
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

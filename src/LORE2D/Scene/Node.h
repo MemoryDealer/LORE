@@ -133,9 +133,11 @@ namespace Lore {
 
         void scale( const real s );
 
-        inline void setZOrder( const uint zOrder )
+        inline void setDepth( const int depth )
         {
-            _zOrder = zOrder;
+            // Depth has a range of [-100, 100].
+            assert( depth >= -100 && depth <= 100 );
+            _depth = depth;
         }
 
         inline void setColorModifier( const Color& c )
@@ -176,9 +178,9 @@ namespace Lore {
             return !( _childNodes.empty() );
         }
 
-        inline uint getZOrder() const
+        inline int getDepth() const
         {
-            return _zOrder;
+            return _depth;
         }
 
         inline Color getColorModifier() const
@@ -227,7 +229,7 @@ namespace Lore {
 
         Transform _transform;
 
-        uint _zOrder;
+        int _depth;
 
         RenderableList _renderables;
 
