@@ -26,11 +26,21 @@
 
 #include "ResourceController.h"
 
+#include <LORE2D/Core/Context.h>
 #include <LORE2D/Resource/StockResource.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 using namespace Lore;
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+namespace LocalNS {
+
+    static ContextPtr ActiveContext = nullptr;
+
+}
+using namespace LocalNS;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -114,6 +124,13 @@ MaterialPtr ResourceController::getMaterial( const string& name, const string& g
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+TexturePtr ResourceController::getTexture( const string& name, const string& groupName )
+{
+    return _getGroup( groupName )->textures.get( name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 ResourceGroupPtr ResourceController::_getGroup( const string& groupName )
@@ -125,6 +142,106 @@ ResourceGroupPtr ResourceController::_getGroup( const string& groupName )
 
     log_warning( "Resource group " + groupName + " not found, using default resource group" );
     return _defaultGroup;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+TexturePtr Resource::LoadTexture( const string& name, const string& file, const string& groupName )
+{
+    return ActiveContext->getResourceController()->loadTexture( name, file, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+GPUProgramPtr Resource::CreateGPUProgram( const string& name, const string& groupName )
+{
+    return ActiveContext->getResourceController()->createGPUProgram( name, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+ShaderPtr Resource::CreateVertexShader( const string& name, const string& groupName )
+{
+    return ActiveContext->getResourceController()->createVertexShader( name, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+ShaderPtr Resource::CreateFragmentShader( const string& name, const string& groupName )
+{
+    return ActiveContext->getResourceController()->createFragmentShader( name, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+VertexBufferPtr Resource::CreateVertexBuffer( const string& name, const VertexBuffer::Type& type, const string& groupName )
+{
+    return ActiveContext->getResourceController()->createVertexBuffer( name, type, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+MaterialPtr Resource::CreateMaterial( const string& name, const string& groupName )
+{
+    return ActiveContext->getResourceController()->createMaterial( name, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+TexturePtr Resource::CreateTexture( const string& name, const string& groupName )
+{
+    return ActiveContext->getResourceController()->createTexture( name, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+CameraPtr Resource::CreateCamera( const string& name, const string& groupName )
+{
+    return ActiveContext->getResourceController()->createCamera( name, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+GPUProgramPtr Resource::GetGPUProgram( const string& name, const string& groupName )
+{
+    return ActiveContext->getResourceController()->getGPUProgram( name, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+MaterialPtr Resource::GetMaterial( const string& name, const string& groupName )
+{
+    return ActiveContext->getResourceController()->getMaterial( name, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+TexturePtr Resource::GetTexture( const string& name, const string& groupName )
+{
+    return ActiveContext->getResourceController()->getTexture( name, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Resource::DestroyTexture( TexturePtr texture )
+{
+    return ActiveContext->getResourceController()->destroyTexture( texture );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Resource::DestroyTexture( const string& name, const string& groupName )
+{
+    return ActiveContext->getResourceController()->destroyTexture( name, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Resource::AssignContext( ContextPtr context )
+{
+    ActiveContext = context;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

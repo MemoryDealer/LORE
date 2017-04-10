@@ -49,6 +49,7 @@ namespace Lore {
         struct RenderableInstance
         {
             Matrix4 model;
+            Color colorModifier;
         };
         using RIList = std::vector<RenderableInstance>;
 
@@ -57,8 +58,6 @@ namespace Lore {
         {
             std::map<uint, RIList> map;
         };
-
-        //using RILMap = std::map<uint, RIList>;
 
         // Each registered Renderable stores a list of instances.
         using RenderableMap = std::map<RenderablePtr, RIL>;

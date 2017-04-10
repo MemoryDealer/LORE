@@ -198,6 +198,7 @@ std::unique_ptr<Context> Context::Create( const RenderPlugin& renderer )
     // Load the context class from the plugin.
     auto context = __rpl->createContext();
 
+    Resource::AssignContext( context.get() );
     StockResource::AssignContext( context.get() );
     MemoryAccess::_SetPrimaryPoolCluster( &context->_poolCluster );
     _activeContextPtr = context.get();
@@ -213,6 +214,7 @@ std::unique_ptr<Context> Context::Create( const RenderPlugin& renderer )
 void Context::Destroy( std::unique_ptr<Context> context )
 {
     context.reset();
+    Resource::AssignContext( nullptr );
     StockResource::AssignContext( nullptr );
     MemoryAccess::_SetPrimaryPoolCluster( nullptr );
     Log::DeleteLogger();

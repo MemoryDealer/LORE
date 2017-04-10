@@ -73,6 +73,7 @@ void GenericRenderer::addRenderable( RenderablePtr r, NodePtr node )
     // Create a RenderableInstance for this renderable.
     RenderQueue::RenderableInstance ri;
     ri.model = node->getFullTransform();
+    ri.colorModifier = node->getColorModifier();
 
     RenderQueue::RIL& riList = rm[r];
     riList.map[node->getZOrder()].push_back( ri );
@@ -108,13 +109,15 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
     const Matrix4 projection = Math::OrthoRH( -aspectRatio, aspectRatio,
                                               -1.f, 1.f,
                                               100.f, -100.f );
+
+    const Matrix4 viewProjection = rv.camera->getViewMatrix() * projection;
     
     // Iterate through all active render queues and render each object.
     for ( const auto& activeQueue : _activeQueues ) {
         RenderQueue& queue = activeQueue.second;
 
         // Render solids.
-        renderMaterialMap( rv.scene, queue.solids, rv.camera->getViewMatrix(), projection );
+        renderMaterialMap( rv.scene, queue.solids, viewProjection );
     }
 
     _clearRenderQueues();
@@ -148,11 +151,8 @@ void GenericRenderer::activateQueue( const uint id, Lore::RenderQueue& rq )
 
 void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
                                          Lore::RenderQueue::MaterialMap& mm,
-                                         const Lore::Matrix4& view,
-                                         const Lore::Matrix4& projection ) const
+                                         const Lore::Matrix4& viewProjection ) const
 {
-    const Matrix4 viewProjection = view * projection;
-
     for ( auto& pair : mm ) {
         MaterialPtr material = pair.first;
         const RenderQueue::RenderableMap& rm = pair.second;
@@ -210,6 +210,10 @@ void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
 
                     if ( pass.lighting ) {
                         program->setUniformVar( "model", ri.model );
+                    }
+
+                    if ( pass.colorMod ) {
+                        program->setUniformVar( "colorMod", ri.colorModifier );
                     }
 
                     // Draw the renderable.

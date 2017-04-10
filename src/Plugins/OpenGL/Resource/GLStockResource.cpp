@@ -137,8 +137,8 @@ Lore::GPUProgramPtr StockResourceController::createUberShader( const string& nam
     }
 
     // Color and lighting.
-    if ( params.emissive ) {
-        src += "uniform vec3 emissive;";
+    if ( params.colorMod ) {
+        src += "uniform vec3 colorMod;";
     }
 
     if ( textured ) {
@@ -197,13 +197,6 @@ Lore::GPUProgramPtr StockResourceController::createUberShader( const string& nam
 
     // Setup default values for calculating pixel.
     src += "vec4 texSample = vec4(1.0, 1.0, 1.0, 1.0);";
-    src += "vec3 pixelColor";
-    if ( params.emissive ) {
-        src += " = emissive;";
-    }
-    else {
-        src += " = vec3(0.0, 0.0, 0.0);";
-    }
 
     if ( textured ) {
         src += "texSample = texture(tex, TexCoord);";
@@ -220,7 +213,12 @@ Lore::GPUProgramPtr StockResourceController::createUberShader( const string& nam
     }
 
     // Final pixel.
-    src += "pixel = texSample += vec4(pixelColor, 1.0);";
+    if ( params.colorMod ) {
+        src += "pixel = texSample * vec4(colorMod, 1.0);";
+    }
+    else {
+        src += "pixel = texSample";
+    }
 
     src += "}";
     auto fsptr = _controller->createFragmentShader( name + "_FS" );
@@ -259,8 +257,8 @@ Lore::GPUProgramPtr StockResourceController::createUberShader( const string& nam
         program->addUniformVar( "sceneAmbient" );
     }
 
-    if ( params.emissive ) {
-        program->addUniformVar( "emissive" );
+    if ( params.colorMod ) {
+        program->addUniformVar( "colorMod" );
     }
 
     return program;

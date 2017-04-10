@@ -71,6 +71,7 @@ void StockResourceController::createStockResources()
         createUberShader( "StandardTexturedQuad", params );
 
         params.numTextures = 0;
+        params.vbType = VertexBuffer::Type::Quad;
         createUberShader( "StandardQuad", params );
     }
     
@@ -82,6 +83,7 @@ void StockResourceController::createStockResources()
         createUberShader( "UnlitTexturedQuad", params );
 
         params.numTextures = 0;
+        params.vbType = VertexBuffer::Type::Quad;
         createUberShader( "UnlitStandardQuad", params );
     }
 
@@ -117,6 +119,21 @@ void StockResourceController::createStockResources()
         pass.lighting = false;
         pass.program = _controller->getGPUProgram( "UnlitStandardQuad" );
     }
+
+    //
+    // Create stock textures.
+
+    // Lit textures.
+    {
+        auto texture = _controller->createTexture( "White" );
+        texture->setMaterial( getMaterial( "StandardQuad" ) );
+    }
+
+    // Unlit textures.
+    {
+        auto texture = _controller->createTexture( "UnlitWhite" );
+        texture->setMaterial( getMaterial( "UnlitStandardQuad" ) );
+    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -134,6 +151,13 @@ MaterialPtr StockResourceController::getMaterial( const string& name )
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+TexturePtr StockResourceController::getTexture( const string& name )
+{
+    return _controller->getTexture( name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -147,6 +171,13 @@ GPUProgramPtr StockResource::GetGPUProgram( const string& name )
 MaterialPtr StockResource::GetMaterial( const string& name )
 {
     return ActiveContext->getStockResourceController()->getMaterial( name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+TexturePtr StockResource::GetTexture( const string& name )
+{
+    return ActiveContext->getStockResourceController()->getTexture( name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

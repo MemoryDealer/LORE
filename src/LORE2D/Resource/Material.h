@@ -51,13 +51,15 @@ namespace Lore {
         struct Pass final
         {
 
+            bool colorMod;
             bool lighting;
             Color ambient;
             Color diffuse;
             GPUProgramPtr program;
 
             inline Pass()
-            : lighting( true )
+            : colorMod( true )
+            , lighting( true )
             , ambient( StockColor::White )
             , diffuse( StockColor::White )
             , program( nullptr )

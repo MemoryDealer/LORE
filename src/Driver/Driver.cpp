@@ -61,13 +61,12 @@ int main( int argc, char** argv )
     */
 
     //context->createWindow( "Test2", 720, 640 );
-    Lore::ResourceController& loader = *context->getResourceController();
 
     Lore::ScenePtr scene = context->createScene( "Default" );
     scene->setBackgroundColor( Lore::StockColor::Black );
 
     Lore::Viewport vp( 0.f, 0.f, 1.f, 1.f );
-    Lore::CameraPtr camera = loader.createCamera( "cam1" );
+    Lore::CameraPtr camera = Lore::Resource::CreateCamera( "cam1" );
     Lore::RenderView rv( "main", scene, vp );
     rv.camera = camera;
     window->addRenderView( rv );
@@ -79,14 +78,14 @@ int main( int argc, char** argv )
     node = node->createChildNode( "BChildChild" );
 
     // Textures.
-    Lore::TexturePtr tex = loader.loadTexture( "tex1", "C:\\doggo.png" );
+    Lore::TexturePtr tex = Lore::Resource::LoadTexture( "tex1", "C:\\doggo.png" );
 
     node = scene->getNode( "A" );
     //tex->getMaterial()->getPass().emissive = Lore::Color( 0.f, 0.2f, 0.f );
     //
     node->attachObject( tex );
 
-    node->scale( Lore::Vec2( 12.f, 12.0f ) );
+    node->scale( Lore::Vec2( 2.f, 2.0f ) );
 
     // TODO: This change should propagate to renderer.
     //tex->setMaterial( context->getStockResourceController()->getMaterial( "UnlitStandardQuad" ) );
@@ -110,14 +109,22 @@ int main( int argc, char** argv )
 
     scene->setAmbientLightColor( Lore::Color( 0.12f, 0.12f, 0.12f ) );
 
+    for ( int i = 0; i < 80; ++i ) {
+        auto n = node->createChildNode( "a" + std::to_string( i ) );
+        n->translate( 0.5f * static_cast<float>( i + 1 ), 0.f );
+        n->attachObject( Lore::StockResource::GetTexture( "UnlitWhite" ) );
+
+        n->setColorModifier( Lore::Color( 1.f - static_cast< Lore::real >( i * .1f ), 1.f, 1.f ) );
+    }
+
     float f = 0.f;
     while ( context->active() ) { 
-        node->translate( 0.01f * std::sinf( f ), 0.01f * std::cosf( f ) );
+        //node->translate( 0.01f * std::sinf( f ), 0.01f * std::cosf( f ) );
         f += 0.05f;
         //node->scale( 0.025f * std::sinf( f ) );
 
         // TODO: Repro case where both quads appeared to be scaling with only rotations being done.
-        node->rotate( Lore::Degree( 0.05f ) );
+        node->rotate( Lore::Degree( 0.5f ) );
         ////node->getChild( "AChild" )->rotate( Lore::Degree( -.1f ) );
 
         //n2->rotate( Lore::Degree( 0.025f ) );
@@ -146,7 +153,7 @@ int main( int argc, char** argv )
         if ( GetAsyncKeyState( VK_F8 ) ) {
             static bool destroyed = false;
             if ( !destroyed ) {
-                loader.destroyTexture( tex );
+                Lore::Resource::DestroyTexture( tex );
                 destroyed = true;
             }
         }

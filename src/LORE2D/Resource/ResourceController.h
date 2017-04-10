@@ -148,6 +148,8 @@ namespace Lore {
 
         virtual MaterialPtr createMaterial( const string& name, const string& groupName = DefaultGroupName ) = 0;
 
+        virtual TexturePtr createTexture( const string& name, const string& groupName = DefaultGroupName ) = 0;
+
         virtual CameraPtr createCamera( const string& name, const string& groupName = DefaultGroupName ) = 0;
 
         //
@@ -156,6 +158,8 @@ namespace Lore {
         GPUProgramPtr getGPUProgram( const string& name, const string& groupName = DefaultGroupName );
 
         MaterialPtr getMaterial( const string& name, const string& groupName = DefaultGroupName );
+
+        TexturePtr getTexture( const string& name, const string& groupName = DefaultGroupName );
 
         //
         // Destruction.
@@ -177,6 +181,61 @@ namespace Lore {
         ResourceGroupMap _groups;
         ResourceGroupPtr _defaultGroup;
         std::unique_ptr<ResourceIndexer> _indexer;
+
+    };
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    class LORE_EXPORT Resource final
+    {
+
+    public:
+
+        //
+        // Loading.
+
+        static TexturePtr LoadTexture( const string& name, const string& file, const string& groupName = ResourceController::DefaultGroupName );
+
+        //
+        // Factory functions.
+
+        static GPUProgramPtr CreateGPUProgram( const string& name, const string& groupName = ResourceController::DefaultGroupName );
+
+        static ShaderPtr CreateVertexShader( const string& name, const string& groupName = ResourceController::DefaultGroupName );
+
+        static ShaderPtr CreateFragmentShader( const string& name, const string& groupName = ResourceController::DefaultGroupName );
+
+        static VertexBufferPtr CreateVertexBuffer( const string& name, const VertexBuffer::Type& type, const string& groupName = ResourceController::DefaultGroupName );
+
+        static MaterialPtr CreateMaterial( const string& name, const string& groupName = ResourceController::DefaultGroupName );
+
+        static TexturePtr CreateTexture( const string& name, const string& groupName = ResourceController::DefaultGroupName );
+
+        static CameraPtr CreateCamera( const string& name, const string& groupName = ResourceController::DefaultGroupName );
+
+        //
+        // Getters.
+
+        static GPUProgramPtr GetGPUProgram( const string& name, const string& groupName = ResourceController::DefaultGroupName );
+
+        static MaterialPtr GetMaterial( const string& name, const string& groupName = ResourceController::DefaultGroupName );
+
+        static TexturePtr GetTexture( const string& name, const string& groupName = ResourceController::DefaultGroupName );
+
+        //
+        // Destruction.
+
+        static void DestroyTexture( TexturePtr texture );
+
+        static void DestroyTexture( const string& name, const string& groupName = ResourceController::DefaultGroupName );
+
+    private:
+
+        friend class Context;
+
+    private:
+
+        static void AssignContext( ContextPtr context );
 
     };
 

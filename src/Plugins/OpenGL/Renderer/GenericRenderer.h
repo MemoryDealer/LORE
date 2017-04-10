@@ -63,8 +63,7 @@ namespace Lore { namespace OpenGL {
 
         void renderMaterialMap( const Lore::ScenePtr scene,
                                 RenderQueue::MaterialMap& mm,
-                                const Matrix4& view,
-                                const Matrix4& projection ) const;
+                                const Matrix4& viewProjection ) const;
 
     private:
 

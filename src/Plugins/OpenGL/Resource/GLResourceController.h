@@ -52,6 +52,8 @@ namespace Lore { namespace OpenGL {
 
         virtual MaterialPtr createMaterial( const string& name, const string& groupName = DefaultGroupName ) override;
 
+        virtual TexturePtr createTexture( const string& name, const string& groupName = DefaultGroupName ) override;
+
         virtual CameraPtr createCamera( const string& name, const string& groupName = DefaultGroupName ) override;
 
         //

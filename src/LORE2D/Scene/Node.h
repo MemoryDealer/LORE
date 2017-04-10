@@ -28,6 +28,7 @@
 #include <LORE2D/Core/Iterator.h>
 #include <LORE2D/Math/Math.h>
 #include <LORE2D/Memory/Alloc.h>
+#include <LORE2D/Resource/Color.h>
 #include <LORE2D/Resource/Registry.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -137,6 +138,11 @@ namespace Lore {
             _zOrder = zOrder;
         }
 
+        inline void setColorModifier( const Color& c )
+        {
+            _colorModifier = c;
+        }
+
         //
         // Getters.
 
@@ -173,6 +179,11 @@ namespace Lore {
         inline uint getZOrder() const
         {
             return _zOrder;
+        }
+
+        inline Color getColorModifier() const
+        {
+            return _colorModifier;
         }
 
         //
@@ -226,6 +237,7 @@ namespace Lore {
         NodePtr _parent;
         NodeMap _childNodes;
 
+        Color _colorModifier;
         LightList _lights;
 
     };

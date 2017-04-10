@@ -42,6 +42,7 @@ Node::Node()
 , _scene( nullptr )
 , _parent( nullptr )
 , _childNodes()
+, _colorModifier( StockColor::White )
 , _lights()
 {
 }
