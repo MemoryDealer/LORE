@@ -26,7 +26,6 @@
 
 #include "Node.h"
 
-#include <LORE2D/Renderer/IRenderer.h>
 #include <LORE2D/Resource/Renderable/Renderable.h>
 #include <LORE2D/Scene/Scene.h>
 
@@ -38,11 +37,15 @@ using namespace Lore;
 
 Node::Node()
 : _transform()
+, _depth( 0 )
 , _renderables()
 , _scene( nullptr )
 , _parent( nullptr )
 , _childNodes()
+, _colorModifier( StockColor::White )
+, _lights()
 {
+    _getLocalTransform();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -128,11 +131,21 @@ void Node::attachObject( RenderablePtr r )
         break;
 
     case Renderable::Type::Texture:
-        _renderables.insert( { r->getName(), r } );
-        _scene->getRenderer()->addRenderable( r, _transform.world );
+        _renderables.insert( r->getName(), r );
         r->_notifyAttached();
         break;
+
     }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Node::attachObject( LightPtr l )
+{
+    _lights.push_back( l );
+
+    l->_position.x = _transform.world[3][0];
+    l->_position.y = _transform.world[3][1];
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -247,7 +260,7 @@ void Node::_reset()
     _renderables.clear();
     _scene = nullptr;
     _parent = nullptr;
-    //_childNodes.clear();
+    _childNodes.clear();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -271,17 +284,17 @@ Matrix4 Node::_getLocalTransform()
     if ( _transform.dirty ) {
         _transform.local = Math::CreateTransformationMatrix( _transform.position,
                                                              _transform.orientation );
+
+        // Update attached light positions.
+        for ( auto& light : _lights ) {
+            light->_position.x = _transform.world[3][0];
+            light->_position.y = _transform.world[3][1];
+        }
+
         _transform.dirty = false;
     }
 
     return _transform.local;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-Matrix4 Node::_getWorldTransform() const
-{
-    return _transform.world;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

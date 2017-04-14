@@ -27,6 +27,7 @@
 
 #include <LORE2D/Memory/Alloc.h>
 #include <LORE2D/Resource/Color.h>
+#include <LORE2D/Shader/GPUProgram.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -49,17 +50,24 @@ namespace Lore {
         /// \brief A single vertex and pixel shader pass.
         struct Pass final
         {
+
+            bool colorMod;
             bool lighting;
             Color ambient;
             Color diffuse;
             GPUProgramPtr program;
 
-            Pass()
-            : lighting( true )
+            inline Pass()
+            : colorMod( true )
+            , lighting( true )
             , ambient( StockColor::White )
             , diffuse( StockColor::White )
             , program( nullptr )
             { }
+
+            inline ~Pass()
+            { }
+
         };
 
     public:

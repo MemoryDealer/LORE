@@ -30,6 +30,8 @@
 #include <LORE2D/Renderer/SceneGraphVisitor.h>
 #include <LORE2D/Resource/Renderable/Renderable.h>
 #include <LORE2D/Scene/Camera.h>
+#include <LORE2D/Scene/Light.h>
+#include <LORE2D/Scene/Scene.h>
 #include <LORE2D/Shader/GPUProgram.h>
 
 #include <Plugins/OpenGL/Math/MathConverter.h>
@@ -48,9 +50,6 @@ GenericRenderer::GenericRenderer()
 {
     // Initialize all available queues.
     _queues.resize( DefaultRenderQueueCount );
-
-    // Active default queues.
-    activateQueue( RenderQueue::General, _queues.at( RenderQueue::General ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -61,29 +60,27 @@ GenericRenderer::~GenericRenderer()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::RenderQueue::Entry GenericRenderer::addRenderable( RenderablePtr r, Lore::Matrix4& model )
+void GenericRenderer::addRenderable( RenderablePtr r, NodePtr node )
 {
     const uint queueId = r->getRenderQueue();
 
     RenderQueue& queue = _queues.at( queueId );
-    RenderQueue::Entry entry;
 
     // Get the right RenderableMap for this material.
     MaterialPtr mat = r->getMaterial();
     RenderQueue::RenderableMap& rm = queue.solids[mat];
 
-    // Add this model matrix to the list for this renderable.
-    RenderQueue::MatrixList& matrixList = rm[r];
-    matrixList.push_back( &model );
+    // Create a RenderableInstance for this renderable.
+    RenderQueue::RenderableInstance ri;
+    ri.model = node->getFullTransform();
+    ri.depth = node->getDepth();
+    ri.colorModifier = node->getColorModifier();
 
-    // Store iterators in entry record for quick removal.
-    //entry.matrixIt = matrixList.cend();
-    //entry.renderableIt = rm.find( r );
+    RenderQueue::RIList& riList = rm[r];
+    riList.push_back( ri );
 
     // Add this queue to the active queue list if not already there.
     activateQueue( queueId, _queues[queueId] );
-
-    return entry;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -92,11 +89,14 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
 {
     // Traverse the scene graph and update object transforms.
     Lore::SceneGraphVisitor sgv( rv.scene->getRootNode() );
-    sgv.visit();
+    sgv.visit( *this );
 
     // TODO: Cache which scenes have been visited and check before doing it again.
     // [OR] move visitor to context?
     // ...
+
+    glEnable( GL_DEPTH_TEST );
+    glDepthFunc( GL_LESS );
 
     glViewport( rv.gl_viewport.x,
                 rv.gl_viewport.y,
@@ -104,7 +104,7 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
                 rv.gl_viewport.height );
 
     Color bg = rv.scene->getBackgroundColor();
-    glClearColor( bg.r, bg.g, bg.b, bg.a );
+    glClearColor( bg.r, bg.g, bg.b, 0.f );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     // Setup view-projection matrix.
@@ -112,16 +112,32 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
     const float aspectRatio = window->getAspectRatio();
     const Matrix4 projection = Math::OrthoRH( -aspectRatio, aspectRatio,
                                               -1.f, 1.f,
-                                              100.f, -100.f );
-    const Matrix4 viewProjection = projection * rv.camera->getViewMatrix();
+                                              -100.f, 100.f );
+
+    const Matrix4 viewProjection = rv.camera->getViewMatrix() * projection;
     
     // Iterate through all active render queues and render each object.
     for ( const auto& activeQueue : _activeQueues ) {
         RenderQueue& queue = activeQueue.second;
 
         // Render solids.
-        renderMaterialMap( queue.solids, viewProjection );
+        renderMaterialMap( rv.scene, queue.solids, viewProjection );
     }
+
+    _clearRenderQueues();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GenericRenderer::_clearRenderQueues()
+{
+    // Remove all data from each queue.
+    for ( auto& queue : _queues ) {
+        queue.solids.clear();
+    }
+
+    // Erase all queues from the active queue list.
+    _activeQueues.clear();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -137,7 +153,8 @@ void GenericRenderer::activateQueue( const uint id, Lore::RenderQueue& rq )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GenericRenderer::renderMaterialMap( const Lore::RenderQueue::MaterialMap& mm,
+void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
+                                         Lore::RenderQueue::MaterialMap& mm,
                                          const Lore::Matrix4& viewProjection ) const
 {
     for ( auto& pair : mm ) {
@@ -147,24 +164,64 @@ void GenericRenderer::renderMaterialMap( const Lore::RenderQueue::MaterialMap& m
         // Setup material settings.
         // TODO: Multi-pass rendering.
         Lore::Material::Pass& pass = material->getPass( 0 );
-        VertexBufferPtr vb = pass.program->getVertexBuffer();
-        pass.program->use();
+        Lore::GPUProgramPtr program = pass.program;
+        VertexBufferPtr vb = program->getVertexBuffer();
+        program->use();
+
+        // Setup per-material uniform values.
+        if ( pass.lighting ) {
+            //
+            // Set material lighting data.
+
+            program->setUniformVar( "material.ambient", pass.ambient );
+            program->setUniformVar( "material.diffuse", pass.diffuse );
+
+            //
+            // Set scene values.
+
+            program->setUniformVar( "sceneAmbient", scene->getAmbientLightColor() );
+            program->setUniformVar( "numLights", scene->getLightCount() );
+
+            auto lights = scene->getLightIterator();
+            std::vector<LightPtr> lightArray;
+            while ( lights.hasMore() ) {
+                auto light = lights.getNext();
+                lightArray.push_back( light );
+            }
+
+            program->updateLights( lightArray );
+
+        }
+
         vb->bind();
         
-        // For each renderable, iterate over its matrix entries and render.
-        for ( auto& renderablePair : rm ) {
-            RenderablePtr renderable = renderablePair.first;
-            const RenderQueue::MatrixList& matrices = renderablePair.second;
+        // For each Renderable, get the map of ZOrder --> RenderableInstanceList.
+        for ( auto& riListMap : rm ) {
+            RenderablePtr renderable = riListMap.first;
 
-            // Setup this renderable for rendering all of its instances.
+            // Bind this renderable for rendering all of its instances.
             renderable->bind();
 
-            for ( const auto model : matrices ) {
+            for ( const RenderQueue::RenderableInstance& ri : riListMap.second ) {
+
+                // Apply depth to z-value of the model matrix (overwrite SceneGraphVisitor transformations).
+                // This is necessary for depth values on nodes to work correctly.
+                Matrix4 model = ri.model;
+                model[3][2] = static_cast< real >( ri.depth );
+
                 // Calculate model-view-projection matrix for this object.
-                Matrix4 mvp = viewProjection * *model;
+                Matrix4 mvp = viewProjection * model;
 
                 // Update the MVP value in the shader.
-                pass.program->setTransformVar( mvp );
+                program->setTransformVar( mvp );
+
+                if ( pass.lighting ) {
+                    program->setUniformVar( "model", ri.model );
+                }
+
+                if ( pass.colorMod ) {
+                    program->setUniformVar( "colorMod", ri.colorModifier );
+                }
 
                 // Draw the renderable.
                 vb->draw();

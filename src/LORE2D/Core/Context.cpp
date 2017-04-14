@@ -71,6 +71,7 @@ void Context::initConfiguration()
 {
     // Setup default memory pool settings.
     _poolCluster.registerPool<Camera>( 32 );
+    _poolCluster.registerPool<Light>( 64 );
     _poolCluster.registerPool<Material>( 32 );
     _poolCluster.registerPool<Node>( 1024 );
     _poolCluster.registerPool<Scene>( 32 );
@@ -197,6 +198,7 @@ std::unique_ptr<Context> Context::Create( const RenderPlugin& renderer )
     // Load the context class from the plugin.
     auto context = __rpl->createContext();
 
+    Resource::AssignContext( context.get() );
     StockResource::AssignContext( context.get() );
     MemoryAccess::_SetPrimaryPoolCluster( &context->_poolCluster );
     _activeContextPtr = context.get();
@@ -212,6 +214,7 @@ std::unique_ptr<Context> Context::Create( const RenderPlugin& renderer )
 void Context::Destroy( std::unique_ptr<Context> context )
 {
     context.reset();
+    Resource::AssignContext( nullptr );
     StockResource::AssignContext( nullptr );
     MemoryAccess::_SetPrimaryPoolCluster( nullptr );
     Log::DeleteLogger();

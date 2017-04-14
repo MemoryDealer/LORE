@@ -25,85 +25,110 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Math/Math.h>
 #include <LORE2D/Memory/Alloc.h>
+#include <LORE2D/Resource/Color.h>
+#include <LORE2D/Resource/Renderable/Renderable.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-    ///
-    /// \class Renderable
-    /// \brief The base class of anything that can be attached to a node.
-    class LORE_EXPORT Renderable
+    class Light final : public Alloc<Light>
     {
 
         LORE_OBJECT_BODY()
 
     public:
 
-        enum class Type
-        {
-            Unknown,
-            Texture,
-            Sprite
-        };
+        Light();
 
-    public:
-
-        Renderable();
-
-        virtual ~Renderable();
-
-        virtual void bind() { }
+        virtual ~Light() override;
 
         //
         // Getters.
 
-        inline Type getType() const
+        inline Vec2 getPosition() const
         {
-            return _type;
+            return _position;
         }
 
-        inline MaterialPtr getMaterial() const
+        inline Color getColor() const
         {
-            return _material;
+            return _color;
         }
 
-        inline uint getRenderQueue() const
+        inline real getRange() const
         {
-            return _renderQueue;
+            return _range;
         }
 
-        inline bool isAttached() const
+        inline real getConstant() const
         {
-            return _attached;
+            return _constant;
+        }
+
+        inline real getLinear() const
+        {
+            return _linear;
+        }
+
+        inline real getQuadratic() const
+        {
+            return _quadratic;
+        }
+
+        inline real getIntensity() const
+        {
+            return _intensity;
         }
 
         //
         // Setters.
 
-        inline void setMaterial( MaterialPtr mat )
+        inline void setColor( const Color& color )
         {
-            _material = mat;
+            _color = color;
         }
 
-        inline void setRenderQueue( const uint id )
+        inline void setAttenuation( const real range,
+                                    const real constant,
+                                    const real linear,
+                                    const real quadratic )
         {
-            _renderQueue = id;
+            _range = range;
+            _constant = constant;
+            _linear = linear;
+            _quadratic = quadratic;
         }
 
-    protected:
+        inline void setRange( const real range )
+        {
+            _range = range;
+        }
 
-        MaterialPtr _material;
-        uint _renderQueue;
-        bool _attached;
-        Type _type;
+        inline void setIntensity( const real intensity )
+        {
+            _intensity = intensity;
+        }
 
     private:
 
-        void _notifyAttached();
+        virtual void _reset() override;
 
         friend class Node;
+
+    private:
+
+        Vec2 _position;
+        Color _color;
+
+        // Attenuation.
+        real _range;
+        real _constant;
+        real _linear;
+        real _quadratic;
+        real _intensity;
 
     };
 

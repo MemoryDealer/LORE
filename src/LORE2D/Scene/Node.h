@@ -28,6 +28,7 @@
 #include <LORE2D/Core/Iterator.h>
 #include <LORE2D/Math/Math.h>
 #include <LORE2D/Memory/Alloc.h>
+#include <LORE2D/Resource/Color.h>
 #include <LORE2D/Resource/Registry.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -48,7 +49,9 @@ namespace Lore {
         using NodeMap = Registry<std::map, Node>;
         using ChildNodeIterator = NodeMap::Iterator;
         using ConstChildNodeIterator = NodeMap::ConstIterator;
-        using RenderableList = std::unordered_map<string, RenderablePtr>;
+        using RenderableList = Registry<std::map, Renderable>;
+        using RenderableListConstIterator = RenderableList::ConstIterator;
+        using LightList = std::vector<LightPtr>;
 
         struct Transform
         {
@@ -98,6 +101,13 @@ namespace Lore {
 
         void attachObject( RenderablePtr r );
 
+        void attachObject( LightPtr l );
+
+        inline RenderableListConstIterator getRenderableConstIterator() const
+        {
+            return _renderables.getConstIterator();
+        }
+
         //
         // Modifiers.
 
@@ -123,6 +133,18 @@ namespace Lore {
 
         void scale( const real s );
 
+        inline void setDepth( const int depth )
+        {
+            // Depth has a range of [-100, 100].
+            assert( depth >= -100 && depth <= 100 );
+            _depth = depth;
+        }
+
+        inline void setColorModifier( const Color& c )
+        {
+            _colorModifier = c;
+        }
+
         //
         // Getters.
 
@@ -134,6 +156,11 @@ namespace Lore {
         inline Vec2 getPosition() const
         {
             return _transform.position;
+        }
+
+        inline Matrix4 getFullTransform() const
+        {
+            return _transform.world;
         }
 
         inline Vec2 getScale() const
@@ -149,6 +176,16 @@ namespace Lore {
         inline bool hasChildNodes() const
         {
             return !( _childNodes.empty() );
+        }
+
+        inline int getDepth() const
+        {
+            return _depth;
+        }
+
+        inline Color getColorModifier() const
+        {
+            return _colorModifier;
         }
 
         //
@@ -184,8 +221,6 @@ namespace Lore {
 
         Matrix4 _getLocalTransform();
 
-        Matrix4 _getWorldTransform() const;
-
         void _updateWorldTransform( const Matrix4& m );
 
         void _updateChildrenScale();
@@ -194,6 +229,8 @@ namespace Lore {
 
         Transform _transform;
 
+        int _depth;
+
         RenderableList _renderables;
 
         // The creator of this node.
@@ -201,6 +238,9 @@ namespace Lore {
 
         NodePtr _parent;
         NodeMap _childNodes;
+
+        Color _colorModifier;
+        LightList _lights;
 
     };
 

@@ -35,10 +35,10 @@ namespace Lore {
 
     struct UberShaderParameters
     {
-        unsigned int maxLights { 0 };
-        unsigned int numTextures { 0 };
+        unsigned int maxLights { 4 };
+        unsigned int numTextures { 1 };
         bool texYCoordinateFlipped { true };
-        bool colour { false }; // Modulate final output by color.
+        bool colorMod { true }; // Modulate final output by color, regardless of scene lighting.
         VertexBuffer::Type vbType { VertexBuffer::Type::TexturedQuad };
     };
 
@@ -75,6 +75,8 @@ namespace Lore {
 
         MaterialPtr getMaterial( const string& name );
 
+        TexturePtr getTexture( const string& name );
+
     protected:
 
         std::unique_ptr<ResourceController> _controller;
@@ -83,7 +85,7 @@ namespace Lore {
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    class LORE_EXPORT StockResource
+    class LORE_EXPORT StockResource final
     {
 
     public:
@@ -91,6 +93,8 @@ namespace Lore {
         static GPUProgramPtr GetGPUProgram( const string& name );
 
         static MaterialPtr GetMaterial( const string& name );
+
+        static TexturePtr GetTexture( const string& name );
 
     private:
 

@@ -62,6 +62,12 @@ namespace Lore { namespace OpenGL {
 
         virtual void setUniformVar( const string& id, const Matrix4& m ) override;
 
+        virtual void setUniformVar( const string& id, const Vec3& v ) override;
+
+        virtual void setUniformVar( const string& id, const int i ) override;
+
+        virtual void updateLights( const std::vector<LightPtr>& lights ) override;
+
         void setUniformVar( const string& id, const glm::mat4x4& m );
 
     private:
@@ -69,6 +75,8 @@ namespace Lore { namespace OpenGL {
         using UniformMap = std::unordered_map<string, GLint>;
 
     private:
+
+        GLuint _getUniform( const string& id );
 
         void _updateUniform( const GLint id, const Lore::Matrix4& m );
 

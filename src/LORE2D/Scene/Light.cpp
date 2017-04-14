@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,58 +24,42 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Renderer/IRenderer.h>
-
-#include <LORE2D/Resource/Material.h>
+#include "Light.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore { namespace OpenGL {
+using namespace Lore;
 
-    ///
-    /// \class GenericRenderer
-    /// \brief Renders a scene normally, without any special behavior.
-    class GenericRenderer : public Lore::IRenderer
-    {
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    public:
+Light::Light()
+: _position()
+, _color( StockColor::Black )
+, _range( 7.f )
+, _constant( 1.f )
+, _linear( 0.7f )
+, _quadratic( 1.8f )
+, _intensity( 1.f )
+{
+}
 
-        const size_t DefaultRenderQueueCount = 100;
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    public:
+Light::~Light()
+{
+}
 
-        GenericRenderer();
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        virtual ~GenericRenderer() override;
-
-        virtual void addRenderable( Lore::RenderablePtr r,
-                                    NodePtr node ) override;
-
-        virtual void present( const Lore::RenderView& rv,
-                              const WindowPtr window ) override;
-
-    private:
-
-        virtual void _clearRenderQueues() override;
-
-        void activateQueue( const uint id, Lore::RenderQueue& rq );
-
-        void renderMaterialMap( const Lore::ScenePtr scene,
-                                RenderQueue::MaterialMap& mm,
-                                const Matrix4& viewProjection ) const;
-
-    private:
-
-        using RenderQueueList = std::vector<RenderQueue>;
-        using ActiveRenderQueueList = std::map<uint, RenderQueue&>;
-
-    private:
-
-        RenderQueueList _queues;
-        ActiveRenderQueueList _activeQueues;
-
-    };
-
-}}
+void Light::_reset()
+{
+    _position = Vec2();
+    _color = StockColor::Black;
+    _range = 7.f;
+    _constant = 1.f;
+    _linear = 0.7f;
+    _quadratic = 1.8f;
+    _intensity = 1.f;
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

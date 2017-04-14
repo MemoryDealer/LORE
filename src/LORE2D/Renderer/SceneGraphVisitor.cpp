@@ -26,6 +26,7 @@
 
 #include "SceneGraphVisitor.h"
 
+#include <LORE2D/Renderer/IRenderer.h>
 #include <LORE2D/Scene/Node.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -55,7 +56,7 @@ SceneGraphVisitor::~SceneGraphVisitor()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void SceneGraphVisitor::visit( bool parentDirty )
+void SceneGraphVisitor::visit( IRenderer& renderer, bool parentDirty )
 {
     const bool transformDirty = _node->_transformDirty();
     const Matrix4 transform = _node->_getLocalTransform();
@@ -68,6 +69,13 @@ void SceneGraphVisitor::visit( bool parentDirty )
         parentDirty = true;
     }
 
+    // Add any Renderables attached to this node to the Renderer.
+    auto it = _node->getRenderableConstIterator();
+    while ( it.hasMore() ) {
+        RenderablePtr r = it.getNext();
+        renderer.addRenderable( r, _node );
+    }
+
     // Recurse over children.
     if ( _node->hasChildNodes() ) {
         // Push this node's transform onto the stack, so the next call can
@@ -77,7 +85,7 @@ void SceneGraphVisitor::visit( bool parentDirty )
         Node::ChildNodeIterator it = _node->getChildNodeIterator();
         while ( it.hasMore() ) {
             _node = it.getNext();
-            visit( parentDirty );
+            visit( renderer, parentDirty );
         }
 
         // Recursion on this node's children is done, we can pop off the transform.

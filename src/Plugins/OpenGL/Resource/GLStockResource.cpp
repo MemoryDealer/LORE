@@ -60,6 +60,7 @@ void StockResourceController::createStockResources()
 Lore::GPUProgramPtr StockResourceController::createUberShader( const string& name, const Lore::UberShaderParameters& params )
 {
     const bool textured = ( params.numTextures > 0 );
+    const bool lit = ( params.maxLights > 0 );
     const string header = "#version " +
         std::to_string( APIVersion::GetMajor() ) + std::to_string( APIVersion::GetMinor() ) + "0" +
         " core\n";
@@ -87,12 +88,17 @@ Lore::GPUProgramPtr StockResourceController::createUberShader( const string& nam
         src += "out vec2 TexCoord;";
     }
 
+    if ( lit ) {
+        src += "uniform mat4 model;";
+        src += "out vec2 FragPos;";
+    }
+
     //
     // main function.
 
     src += "void main(){";
 
-    src += "gl_Position = transform * vec4(vertex, 0.0f, 1.0f);";
+    src += "gl_Position = transform * vec4(vertex, 1.0, 1.0);";
     if ( textured ) {
         if ( params.texYCoordinateFlipped ) {
             src += "TexCoord = vec2(texCoord.x, 1.0 - texCoord.y);";
@@ -100,6 +106,10 @@ Lore::GPUProgramPtr StockResourceController::createUberShader( const string& nam
         else {
             src += "TexCoord = texCoord;";
         }
+    }
+
+    if ( lit ) {
+        src += "FragPos = (model * vec4(vertex, 0.0, 1.0)).xy;";
     }
 
     src += "}";
@@ -126,7 +136,10 @@ Lore::GPUProgramPtr StockResourceController::createUberShader( const string& nam
         src += "uniform sampler2D tex;";
     }
 
-    // ...
+    // Color and lighting.
+    if ( params.colorMod ) {
+        src += "uniform vec3 colorMod;";
+    }
 
     if ( textured ) {
         src += "in vec2 TexCoord;";
@@ -135,13 +148,76 @@ Lore::GPUProgramPtr StockResourceController::createUberShader( const string& nam
     // Final pixel output color.
     src += "out vec4 pixel;";
 
+    // Lighting.
+    if ( lit ) {
+        src += "struct Light {";
+        src += "vec2 pos;";
+        src += "vec3 color;";
+        src += "float constant;";
+        src += "float linear;";
+        src += "float quadratic;";
+        src += "float intensity;";
+        src += "};";
+
+        src += "struct Material {";
+        src += "vec3 ambient;";
+        src += "vec3 diffuse;";
+        src += "};";
+
+        src += "uniform Light lights[" + std::to_string( params.maxLights ) + "];";
+        src += "uniform int numLights;";
+
+        src += "uniform Material material;";
+
+        src += "uniform vec3 sceneAmbient;";
+
+        src += "in vec2 FragPos;";
+
+        //
+        // Light functions.
+
+        // Point light.
+        src += "vec3 CalcPointLight(Light l){";
+
+        src += "const float d = length(l.pos - FragPos);";
+        src += "const float att = l.intensity / (l.constant + l.linear * d + l.quadratic * pow(d, 2.0));";
+
+        src += "const vec3 lDiffuse = l.color * material.diffuse * att;";
+        src += "const vec3 lAmbient = material.ambient * sceneAmbient;";
+
+        src += "return lDiffuse + lAmbient;";
+
+        src += "}";
+    }
+
     //
     // main function.
 
     src += "void main(){";
 
+    // Setup default values for calculating pixel.
+    src += "vec4 texSample = vec4(1.0, 1.0, 1.0, 1.0);";
+
     if ( textured ) {
-        src += "pixel = texture(tex, TexCoord);";
+        src += "texSample = texture(tex, TexCoord);";
+    }
+
+    if ( lit ) {
+        src += "vec3 lighting = vec3(0.0, 0.0, 0.0);";
+
+        src += "for(int i=0; i<numLights; ++i){";
+        src += "lighting += CalcPointLight(lights[i]);";
+        src += "}";
+
+        src += "texSample *= vec4(lighting, 1.0);";
+    }
+
+    // Final pixel.
+    if ( params.colorMod ) {
+        src += "pixel = texSample * vec4(colorMod, 1.0);";
+    }
+    else {
+        src += "pixel = texSample";
     }
 
     src += "}";
@@ -168,7 +244,22 @@ Lore::GPUProgramPtr StockResourceController::createUberShader( const string& nam
         throw Lore::Exception( "Failed to link GPUProgram " + name );
     }
 
+    //
+    // Add uniforms.
+
     program->addTransformVar( "transform" );
+
+    if ( lit ) {
+        program->addUniformVar( "model" );
+        program->addUniformVar( "material.ambient" );
+        program->addUniformVar( "material.diffuse" );
+        program->addUniformVar( "numLights" );
+        program->addUniformVar( "sceneAmbient" );
+    }
+
+    if ( params.colorMod ) {
+        program->addUniformVar( "colorMod" );
+    }
 
     return program;
 }

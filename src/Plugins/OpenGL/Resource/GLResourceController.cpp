@@ -56,7 +56,7 @@ ResourceController::~ResourceController()
 
 Lore::TexturePtr ResourceController::loadTexture( const string& name, const string& file, const string& groupName )
 {
-    auto texture = MemoryAccess::GetPrimaryPoolCluster()->create<Lore::Texture, GLTexture>();
+    auto texture = MemoryAccess::GetPrimaryPoolCluster()->create<Texture, GLTexture>();
     texture->setName( name );
     texture->setResourceGroupName( groupName );
     texture->setMaterial( StockResource::GetMaterial( "StandardTexturedQuad" ) );
@@ -128,6 +128,17 @@ Lore::MaterialPtr ResourceController::createMaterial( const string& name, const 
 
     _getGroup( groupName )->materials.insert( name, mat );
     return mat;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Lore::TexturePtr ResourceController::createTexture( const string& name, const string& groupName )
+{
+    auto texture = MemoryAccess::GetPrimaryPoolCluster()->create<Texture, GLTexture>();
+    texture->setName( name );
+
+    _getGroup( groupName )->textures.insert( name, texture );
+    return texture;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

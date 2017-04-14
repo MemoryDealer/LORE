@@ -74,6 +74,11 @@ namespace Lore {
             _container.erase( id_ );
         }
 
+        void clear()
+        {
+            _container.clear();
+        }
+
         T* get( const id& id_ ) const
         {
             auto lookup = _container.find( id_ );
@@ -99,7 +104,7 @@ namespace Lore {
             return Iterator( std::begin( _container ), std::end( _container ) );
         }
 
-        ConstIterator getConstIterator()
+        ConstIterator getConstIterator() const
         {
             return ConstIterator( std::begin( _container ), std::end( _container ) );
         }

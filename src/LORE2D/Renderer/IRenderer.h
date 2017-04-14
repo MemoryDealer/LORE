@@ -45,18 +45,22 @@ namespace Lore {
 
         // :::::: //
 
-        using MatrixList = std::vector<Matrix4*>;
-        using RenderableMap = std::map<RenderablePtr, MatrixList>;
+        // An instance of a type of Renderable (e.g., Texture).
+        struct RenderableInstance
+        {
+            Matrix4 model;
+            int depth;
+            Color colorModifier;
+        };
+        using RIList = std::vector<RenderableInstance>;
+
+        // Each registered Renderable stores a list of instances.
+        using RenderableMap = std::map<RenderablePtr, RIList>;
+
+        // Every Material keeps a map of Renderable instances.
         using MaterialMap = std::map<MaterialPtr, RenderableMap>;
 
         MaterialMap solids;
-
-        // TODO: Structure this so renderable entries can be removed.
-        struct Entry
-        {
-            //MatrixList::const_iterator matrixIt;
-            //RenderableMap::const_iterator renderableIt;
-        };
 
     };
 
@@ -77,14 +81,18 @@ namespace Lore {
         ///
         /// \brief Registers a Renderable object for rendering. This should be
         ///     called when a Renderable is attached to a Node.
-        virtual RenderQueue::Entry addRenderable( RenderablePtr r,
-                                                  Matrix4& model ) = 0;
+        virtual void addRenderable( RenderablePtr r,
+                                    NodePtr node ) = 0;
 
         ///
         /// \brief Uses internal Renderable lists to create a frame buffer using
         ///     the provided RenderView.
         virtual void present( const RenderView& rv,
                               const WindowPtr window ) = 0;
+
+    private:
+
+        virtual void _clearRenderQueues() = 0;
 
     };
 
