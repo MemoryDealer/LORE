@@ -71,7 +71,7 @@ int main( int argc, char** argv )
     window->addRenderView( rv );
 
     Lore::NodePtr node = scene->createNode( "A" );
-    node->setDepth( 0 );
+    node->setDepth( 50 );
     node = node->createChildNode( "AChild" );
     node = scene->createNode( "B " );
     node = node->createChildNode( "BChild" );
@@ -94,7 +94,8 @@ int main( int argc, char** argv )
     node->getChild( "AChild" )->scale( Lore::Vec2( 0.5f, 1.f ) );
 
     node->getChild( "AChild" )->attachObject( entity );
-    node->getChild( "AChild" )->setDepth( -66 );
+    auto achild = node->getChild( "AChild" );
+    achild->setDepth( -50 );
     node->getChild( "AChild" )->setColorModifier( Lore::StockColor::Red );
     node->getChild( "AChild" )->setPosition( Lore::Vec2( -0.25f, 0.25f ) );
 
@@ -102,7 +103,7 @@ int main( int argc, char** argv )
     n2->attachObject( entity );
     n2->scale( Lore::Vec2( 4.2f, 0.65f ) );
     n2->translate( 0.25f, 0.25f );
-    n2->setDepth( -25 );
+    //n2->setDepth( -25 );
 
     auto light = scene->createLight( "l1" );
     light->setColor( Lore::Color( 1.f, .6f, 0.f ) );

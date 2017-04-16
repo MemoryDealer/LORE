@@ -94,7 +94,7 @@ void SceneGraphVisitor::visit( IRenderer& renderer, bool parentDirty )
 
     // Manually update depth value (z) in world transformation matrix after
     // traversing all children.
-    _node->_updateDepthValue();
+    //_node->_updateDepthValue();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -133,7 +133,7 @@ namespace Lore {
 
         void scale( const real s );
 
-        inline void setDepth( const int depth )
+        void setDepth( const int depth )
         {
             // Depth has a range of [-100, 100].
             assert( depth >= -100 && depth <= 100 );

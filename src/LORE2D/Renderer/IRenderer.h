@@ -50,7 +50,6 @@ namespace Lore {
         struct RenderData
         {
             Matrix4 model;
-            int depth;
             Color colorModifier;
         };
         using RenderDataList = std::vector<RenderData>;

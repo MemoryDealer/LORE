@@ -83,7 +83,7 @@ void GenericRenderer::addRenderData( Lore::EntityPtr e,
     // Fill out the render data and add it to the list.
     RenderQueue::RenderData rd;
     rd.model = node->getFullTransform();
-    rd.depth = node->getDepth();
+    rd.model[3][2] = static_cast< real >( node->getDepth() );
     rd.colorModifier = node->getColorModifier();
 
     renderData.push_back( rd );
