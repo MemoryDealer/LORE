@@ -158,10 +158,12 @@ void GLGPUProgram::setUniformVar( const string& id, const int i )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLGPUProgram::updateLights( const std::vector<Lore::LightPtr>& lights )
+void GLGPUProgram::updateLights( Lore::Scene::LightMap::ConstIterator it )
 {
     int i = 0;
-    for ( const auto& l : lights ) {
+    while( it.hasMore() ) {
+
+        auto l = it.getNext();
         const string idx( "lights[" + std::to_string( i ) + "]" );
 
         //
@@ -182,6 +184,7 @@ void GLGPUProgram::updateLights( const std::vector<Lore::LightPtr>& lights )
         glUniform1f( intensityID, l->getIntensity() );
         
         ++i;
+
     }
 }
 

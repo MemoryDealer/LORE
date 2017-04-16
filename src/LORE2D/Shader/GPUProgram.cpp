@@ -34,7 +34,6 @@ using namespace Lore;
 
 GPUProgram::GPUProgram()
 : _shaders()
-, _vertexBuffer( nullptr )
 {
 }
 
@@ -63,13 +62,6 @@ ShaderPtr GPUProgram::getAttachedShader( const Shader::Type& type )
     }
 
     throw Lore::Exception( "Attached shader type not in GPUProgram " );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void GPUProgram::setVertexBuffer( VertexBufferPtr vb )
-{
-    _vertexBuffer = vb;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

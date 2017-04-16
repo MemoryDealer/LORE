@@ -26,6 +26,7 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 #include <LORE2D/Window/RenderView.h>
+#include <LORE2D/Resource/Material.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -46,21 +47,29 @@ namespace Lore {
         // :::::: //
 
         // An instance of a type of Renderable (e.g., Texture).
-        struct RenderableInstance
+        struct RenderData
         {
             Matrix4 model;
             int depth;
             Color colorModifier;
         };
-        using RIList = std::vector<RenderableInstance>;
+        using RenderDataList = std::vector<RenderData>;
 
-        // Each registered Renderable stores a list of instances.
-        using RenderableMap = std::map<RenderablePtr, RIList>;
+        struct EntityData
+        {
+            MaterialPtr material;
+            VertexBufferPtr vertexBuffer;
 
-        // Every Material keeps a map of Renderable instances.
-        using MaterialMap = std::map<MaterialPtr, RenderableMap>;
+            bool operator < ( const EntityData& r ) const
+            {
+                return ( material->getName() < r.material->getName() );
+            }
+        };
 
-        MaterialMap solids;
+        // Every Material maps to a list of RenderData.
+        using EntityDataMap = std::map<EntityData, RenderDataList>;
+
+        EntityDataMap solids;
 
     };
 
@@ -81,8 +90,8 @@ namespace Lore {
         ///
         /// \brief Registers a Renderable object for rendering. This should be
         ///     called when a Renderable is attached to a Node.
-        virtual void addRenderable( RenderablePtr r,
-                                    NodePtr node ) = 0;
+        virtual void addRenderData( Lore::EntityPtr e,
+                                    Lore::NodePtr node ) = 0;
 
         ///
         /// \brief Uses internal Renderable lists to create a frame buffer using

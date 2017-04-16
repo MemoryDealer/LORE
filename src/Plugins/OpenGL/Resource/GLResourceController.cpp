@@ -59,7 +59,6 @@ Lore::TexturePtr ResourceController::loadTexture( const string& name, const stri
     auto texture = MemoryAccess::GetPrimaryPoolCluster()->create<Texture, GLTexture>();
     texture->setName( name );
     texture->setResourceGroupName( groupName );
-    texture->setMaterial( StockResource::GetMaterial( "StandardTexturedQuad" ) );
     texture->loadFromFile( file );
 
     _getGroup( groupName )->textures.insert( name, texture );
@@ -107,7 +106,7 @@ Lore::ShaderPtr ResourceController::createFragmentShader( const string& name, co
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::VertexBufferPtr ResourceController::createVertexBuffer( const string& name, const Lore::VertexBuffer::Type& type, const string& groupName )
+Lore::VertexBufferPtr ResourceController::createVertexBuffer( const string& name, const Lore::MeshType& type, const string& groupName )
 {
     auto vb = MemoryAccess::GetPrimaryPoolCluster()->create<VertexBuffer, GLVertexBuffer>();
     vb->setName( name );
@@ -115,6 +114,21 @@ Lore::VertexBufferPtr ResourceController::createVertexBuffer( const string& name
     vb->init( type );
 
     _getGroup( groupName )->vertexBuffers.insert( name, vb );
+
+    // If this vertex buffer is a stock type, index it in the hash table.
+    // TODO: Clean this up, stock resources should not mix in here.
+    switch ( type ) {
+
+    default:
+        break;
+
+    case MeshType::Quad:
+    case MeshType::TexturedQuad:
+        _vertexBufferTable.insert( { type, vb } );
+        break;
+
+    }
+
     return vb;
 }
 

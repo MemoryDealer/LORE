@@ -29,6 +29,7 @@
 #include <LORE2D/Core/APIVersion.h>
 #include <LORE2D/Core/NotificationCenter.h>
 #include <LORE2D/Core/Timestamp.h>
+#include <LORE2D/Resource/Entity.h>
 #include <LORE2D/Resource/StockResource.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -71,8 +72,10 @@ void Context::initConfiguration()
 {
     // Setup default memory pool settings.
     _poolCluster.registerPool<Camera>( 32 );
+    _poolCluster.registerPool<Entity>( 32 );
     _poolCluster.registerPool<Light>( 64 );
     _poolCluster.registerPool<Material>( 32 );
+    _poolCluster.registerPool<Mesh>( 32 );
     _poolCluster.registerPool<Node>( 1024 );
     _poolCluster.registerPool<Scene>( 32 );
 

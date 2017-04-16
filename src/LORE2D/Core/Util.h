@@ -25,21 +25,28 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Types.h>
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-namespace Lore { namespace OpenGL {
+namespace Lore { namespace Util {
 
     //
-    // Basic types.
+    // Provide unordered_map that supports strongly typed enums as a key.
 
-    using real = Lore::real;
-    using uint = Lore::uint;
-    using string = Lore::string;
+    // Hash function for strongly typed enums.
+    struct EnumClassHash
+    {
+        template<typename T>
+        std::size_t operator()( T t ) const
+        {
+            return static_cast< std::size_t >( t );
+        }
+    };
 
-    //
-    // LORE.
+    // Use custom hash function for enums, or default hash function for the rest.
+    template<typename Key>
+    using HashType = typename std::conditional<std::is_enum<Key>::value, EnumClassHash, std::hash<Key>>::type;
+
+    // The hash table type.
+    template<typename Key, typename T, typename ... ExtraParams>
+    using HashTable = std::unordered_map<Key, T, HashType<Key>, ExtraParams ...>;
 
 }}
 

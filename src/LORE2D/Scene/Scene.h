@@ -46,7 +46,7 @@ namespace Lore {
 
         LORE_OBJECT_BODY()
 
-    private:
+    public:
 
         using NodeMap = Registry<std::unordered_map, Node>;
         using LightMap = Registry<std::unordered_map, Light>;
@@ -115,7 +115,7 @@ namespace Lore {
             return static_cast< int >( _lights.size() );
         }
 
-        LightMap::ConstIterator getLightIterator() const
+        LightMap::ConstIterator getLightConstIterator() const
         {
             return _lights.getConstIterator();
         }

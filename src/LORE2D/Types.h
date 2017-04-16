@@ -36,10 +36,12 @@ namespace Lore {
 
     class Camera;
     class Context;
+    class Entity;
     class GPUProgram;
     class IRenderer;
     class Material;
     class Light;
+    class Mesh;
     class Node;
     class PostProcessor;
     class Renderable;
@@ -57,9 +59,11 @@ namespace Lore {
 
     using CameraPtr = Camera*;
     using ContextPtr = Context*;
+    using EntityPtr = Entity*;
     using GPUProgramPtr = GPUProgram*;
     using LightPtr = Light*;
     using MaterialPtr = Material*;
+    using MeshPtr = Mesh*;
     using NodePtr = Node*;
     using RendererPtr = IRenderer*;
     using PostProcessorPtr = PostProcessor*;

@@ -26,7 +26,6 @@
 
 #include <memory>
 #include <LORE2D/Lore.h>
-#include <LORE2D/Resource/Material.h>
 #include <LORE2D/Resource/Renderable/Texture.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -80,11 +79,13 @@ int main( int argc, char** argv )
 
     // Textures.
     Lore::TexturePtr tex = Lore::Resource::LoadTexture( "tex1", "C:\\doggo.png" );
+    auto entity = Lore::Resource::CreateEntity( "e1", Lore::MeshType::TexturedQuad );
+    entity->getMaterial()->getPass().texture = tex;
 
     node = scene->getNode( "A" );
     //tex->getMaterial()->getPass().emissive = Lore::Color( 0.f, 0.2f, 0.f );
     //
-    node->attachObject( tex );
+    node->attachObject( entity );
 
     node->scale( Lore::Vec2( 2.f, 2.0f ) );
 
@@ -92,13 +93,13 @@ int main( int argc, char** argv )
     //tex->setMaterial( context->getStockResourceController()->getMaterial( "UnlitStandardQuad" ) );
     node->getChild( "AChild" )->scale( Lore::Vec2( 0.5f, 1.f ) );
 
-    node->getChild( "AChild" )->attachObject( tex );
+    node->getChild( "AChild" )->attachObject( entity );
     node->getChild( "AChild" )->setDepth( -66 );
     node->getChild( "AChild" )->setColorModifier( Lore::StockColor::Red );
     node->getChild( "AChild" )->setPosition( Lore::Vec2( -0.25f, 0.25f ) );
 
     auto n2 = scene->createNode( "n2" );
-    n2->attachObject( tex );
+    n2->attachObject( entity );
     n2->scale( Lore::Vec2( 4.2f, 0.65f ) );
     n2->translate( 0.25f, 0.25f );
     n2->setDepth( -25 );
@@ -116,13 +117,13 @@ int main( int argc, char** argv )
 
     scene->setAmbientLightColor( Lore::Color( 0.12f, 0.12f, 0.12f ) );
 
-    for ( int i = 0; i < 80; ++i ) {
+    /*for ( int i = 0; i < 80; ++i ) {
         auto n = node->createChildNode( "a" + std::to_string( i ) );
         n->translate( 0.5f * static_cast<float>( i + 1 ), 0.f );
-        n->attachObject( Lore::StockResource::GetTexture( "White" ) );
+        n->attachObject( entity );
 
         n->setColorModifier( Lore::Color( 1.f - static_cast< Lore::real >( i * .1f ), 1.f, 1.f ) );
-    }
+    }*/
 
     float f = 0.f;
     while ( context->active() ) { 

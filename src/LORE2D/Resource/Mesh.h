@@ -25,46 +25,50 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Resource/ResourceController.h>
+#include <LORE2D/Memory/Alloc.h>
+#include <LORE2D/Resource/MeshType.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore { namespace OpenGL {
+namespace Lore {
 
-    class ResourceController : public Lore::ResourceController
+    class Mesh final : public Alloc<Mesh>
     {
+
+        LORE_OBJECT_BODY()
 
     public:
 
-        ResourceController();
+        Mesh();
 
-        virtual ~ResourceController() override;
-
-        virtual TexturePtr loadTexture( const string& name, const string& file, const string& groupName = DefaultGroupName ) override;
-
-        virtual GPUProgramPtr createGPUProgram( const string& name, const string& groupName = DefaultGroupName ) override;
-
-        virtual ShaderPtr createVertexShader( const string& name, const string& groupName = DefaultGroupName ) override;
-
-        virtual ShaderPtr createFragmentShader( const string& name, const string& groupName = DefaultGroupName ) override;
-
-        virtual VertexBufferPtr createVertexBuffer( const string& name, const MeshType& type, const string& groupName = DefaultGroupName ) override;
-
-        virtual MaterialPtr createMaterial( const string& name, const string& groupName = DefaultGroupName ) override;
-
-        virtual TexturePtr createTexture( const string& name, const string& groupName = DefaultGroupName ) override;
-
-        virtual CameraPtr createCamera( const string& name, const string& groupName = DefaultGroupName ) override;
+        ~Mesh();
 
         //
-        // Destruction.
+        // Getters.
 
-        virtual void destroyTexture( TexturePtr texture ) override;
+        inline VertexBufferPtr getVertexBuffer() const
+        {
+            return _vertexBuffer;
+        }
 
-        virtual void destroyTexture( const string& name, const string& groupName = DefaultGroupName ) override;
+        //
+        // Setters.
+
+        inline void setVertexBuffer( VertexBufferPtr vbptr )
+        {
+            _vertexBuffer = vbptr;
+        }
+
+    private:
+
+        virtual void _reset() override;
+
+    private:
+
+        VertexBufferPtr _vertexBuffer;
 
     };
 
-}}
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

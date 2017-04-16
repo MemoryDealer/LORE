@@ -60,27 +60,33 @@ GenericRenderer::~GenericRenderer()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GenericRenderer::addRenderable( RenderablePtr r, NodePtr node )
+void GenericRenderer::addRenderData( Lore::EntityPtr e,
+                                     Lore::NodePtr node )
 {
-    const uint queueId = r->getRenderQueue();
-
-    RenderQueue& queue = _queues.at( queueId );
-
-    // Get the right RenderableMap for this material.
-    MaterialPtr mat = r->getMaterial();
-    RenderQueue::RenderableMap& rm = queue.solids[mat];
-
-    // Create a RenderableInstance for this renderable.
-    RenderQueue::RenderableInstance ri;
-    ri.model = node->getFullTransform();
-    ri.depth = node->getDepth();
-    ri.colorModifier = node->getColorModifier();
-
-    RenderQueue::RIList& riList = rm[r];
-    riList.push_back( ri );
+    const uint queueId = e->getRenderQueue();
 
     // Add this queue to the active queue list if not already there.
     activateQueue( queueId, _queues[queueId] );
+
+    //
+    // Add render data for this entity at the node's position to the queue.
+
+    RenderQueue& queue = _queues.at( queueId );
+
+    // Acquire the render data list for this material/vb (or create one).
+    RenderQueue::EntityData entityData;
+    entityData.material = e->getMaterial();
+    entityData.vertexBuffer = e->getMesh()->getVertexBuffer();
+
+    RenderQueue::RenderDataList& renderData = queue.solids[entityData];
+
+    // Fill out the render data and add it to the list.
+    RenderQueue::RenderData rd;
+    rd.model = node->getFullTransform();
+    rd.depth = node->getDepth();
+    rd.colorModifier = node->getColorModifier();
+
+    renderData.push_back( rd );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -154,81 +160,70 @@ void GenericRenderer::activateQueue( const uint id, Lore::RenderQueue& rq )
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
-                                         Lore::RenderQueue::MaterialMap& mm,
+                                         Lore::RenderQueue::EntityDataMap& mm,
                                          const Lore::Matrix4& viewProjection ) const
 {
+    // Iterate over render data lists for each material.
+
     for ( auto& pair : mm ) {
-        MaterialPtr material = pair.first;
-        const RenderQueue::RenderableMap& rm = pair.second;
 
-        // Setup material settings.
-        // TODO: Multi-pass rendering.
-        Lore::Material::Pass& pass = material->getPass( 0 );
-        Lore::GPUProgramPtr program = pass.program;
-        VertexBufferPtr vb = program->getVertexBuffer();
+        const RenderQueue::EntityData& entityData = pair.first;
+        const RenderQueue::RenderDataList& renderDataList = pair.second;
+
+        //
+        // Bind material settings to GPU.
+
+        // TODO: Multi-pass.
+        Material::Pass& pass = entityData.material->getPass();
+        GPUProgramPtr program = pass.program;
+        VertexBufferPtr vertexBuffer = entityData.vertexBuffer;
+        TexturePtr texture = pass.texture;
+
         program->use();
+        if ( texture ) {
+            texture->bind();
+        }
 
-        // Setup per-material uniform values.
+        // Upload lighting data.
         if ( pass.lighting ) {
-            //
-            // Set material lighting data.
 
+            // Material.
             program->setUniformVar( "material.ambient", pass.ambient );
             program->setUniformVar( "material.diffuse", pass.diffuse );
 
-            //
-            // Set scene values.
-
+            // Scene.
             program->setUniformVar( "sceneAmbient", scene->getAmbientLightColor() );
             program->setUniformVar( "numLights", scene->getLightCount() );
 
-            auto lights = scene->getLightIterator();
-            std::vector<LightPtr> lightArray;
-            while ( lights.hasMore() ) {
-                auto light = lights.getNext();
-                lightArray.push_back( light );
-            }
-
-            program->updateLights( lightArray );
+            program->updateLights( scene->getLightConstIterator() );
 
         }
 
-        vb->bind();
-        
-        // For each Renderable, get the map of ZOrder --> RenderableInstanceList.
-        for ( auto& riListMap : rm ) {
-            RenderablePtr renderable = riListMap.first;
+        vertexBuffer->bind();
 
-            // Bind this renderable for rendering all of its instances.
-            renderable->bind();
+        // Render each node associated with this entity data.
+        for ( const RenderQueue::RenderData& rd : renderDataList ) {
 
-            for ( const RenderQueue::RenderableInstance& ri : riListMap.second ) {
+            // Calculate model-view-projection matrix for this object.
+            Matrix4 mvp = viewProjection * rd.model;
 
-                // Apply depth to z-value of the model matrix (overwrite SceneGraphVisitor transformations).
-                // This is necessary for depth values on nodes to work correctly.
-                Matrix4 model = ri.model;
-                model[3][2] = static_cast< real >( ri.depth );
+            program->setTransformVar( mvp );
 
-                // Calculate model-view-projection matrix for this object.
-                Matrix4 mvp = viewProjection * model;
-
-                // Update the MVP value in the shader.
-                program->setTransformVar( mvp );
-
-                if ( pass.lighting ) {
-                    program->setUniformVar( "model", ri.model );
-                }
-
-                if ( pass.colorMod ) {
-                    program->setUniformVar( "colorMod", ri.colorModifier );
-                }
-
-                // Draw the renderable.
-                vb->draw();
+            if ( pass.lighting ) {
+                program->setUniformVar( "model", rd.model );
             }
+
+            if ( pass.colorMod ) {
+                program->setUniformVar( "colorMod", rd.colorModifier );
+            }
+
+            // Draw the entity.
+            vertexBuffer->draw();
+
         }
 
-        vb->unbind();
+        vertexBuffer->unbind();
+
     }
 }
 

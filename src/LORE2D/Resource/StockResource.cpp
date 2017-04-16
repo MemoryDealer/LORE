@@ -68,11 +68,10 @@ void StockResourceController::createStockResources()
     {
         UberShaderParameters params;
 
-        createUberShader( "StandardTexturedQuad", params );
+        createUberShader( "StandardTextured", params );
 
         params.numTextures = 0;
-        params.vbType = VertexBuffer::Type::Quad;
-        createUberShader( "StandardQuad", params );
+        createUberShader( "Standard", params );
     }
     
     // Unlit programs.
@@ -80,11 +79,18 @@ void StockResourceController::createStockResources()
         UberShaderParameters params;
         params.maxLights = 0;
 
-        createUberShader( "UnlitTexturedQuad", params );
+        createUberShader( "UnlitTextured", params );
 
         params.numTextures = 0;
-        params.vbType = VertexBuffer::Type::Quad;
-        createUberShader( "UnlitStandardQuad", params );
+        createUberShader( "UnlitStandard", params );
+    }
+
+    //
+    // Create stock textures.
+
+    {
+        auto texture = _controller->createTexture( "White" );
+        texture->create( 64, 64, StockColor::White );
     }
 
     //
@@ -92,48 +98,62 @@ void StockResourceController::createStockResources()
 
     // Lit materials.
     {
-        auto material = _controller->createMaterial( "StandardTexturedQuad" );
+        auto material = _controller->createMaterial( "StandardTextured" );
         Material::Pass& pass = material->getPass();
         pass.lighting = true;
-        pass.program = _controller->getGPUProgram( "StandardTexturedQuad" );
+        pass.texture = _controller->getTexture( "White" );
+        pass.program = _controller->getGPUProgram( "StandardTextured" );
     }
 
     {
-        auto material = _controller->createMaterial( "StandardQuad" );
+        auto material = _controller->createMaterial( "Standard" );
         Material::Pass& pass = material->getPass();
         pass.lighting = true;
-        pass.program = _controller->getGPUProgram( "StandardQuad" );
+        pass.program = _controller->getGPUProgram( "Standard" );
     }
 
     // Unlit materials.
     {
-        auto material = _controller->createMaterial( "UnlitTexturedQuad" );
+        auto material = _controller->createMaterial( "UnlitTextured" );
         Material::Pass& pass = material->getPass();
         pass.lighting = false;
-        pass.program = _controller->getGPUProgram( "UnlitTexturedQuad" );
+        pass.texture = _controller->getTexture( "White" );
+        pass.program = _controller->getGPUProgram( "UnlitTextured" );
     }
 
     {
-        auto material = _controller->createMaterial( "UnlitStandardQuad" );
+        auto material = _controller->createMaterial( "UnlitStandard" );
         Material::Pass& pass = material->getPass();
         pass.lighting = false;
-        pass.program = _controller->getGPUProgram( "UnlitStandardQuad" );
+        pass.program = _controller->getGPUProgram( "UnlitStandard" );
     }
 
     //
-    // Create stock textures.
+    // Create stock vertex buffers.
 
-    // Lit textures.
     {
-        auto texture = _controller->createTexture( "White" );
-        texture->setMaterial( getMaterial( "StandardQuad" ) );
+        auto vb = _controller->createVertexBuffer( "TexturedQuad", MeshType::TexturedQuad );
+        vb->build();
     }
 
-    // Unlit textures.
     {
-        auto texture = _controller->createTexture( "UnlitWhite" );
-        texture->setMaterial( getMaterial( "UnlitStandardQuad" ) );
+        auto vb = _controller->createVertexBuffer( "Quad", MeshType::Quad );
+        vb->build();
     }
+
+    //
+    // Create stock meshes (uses previously created vertex buffers).
+
+    {
+        auto mesh = _controller->createMesh( "TexturedQuad", MeshType::TexturedQuad );
+        _meshTable.insert( { MeshType::TexturedQuad, mesh } );
+    }
+
+    {
+        auto mesh = _controller->createMesh( "Quad", MeshType::Quad );
+        _meshTable.insert( { MeshType::Quad, mesh } );
+    }
+
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -148,6 +168,13 @@ GPUProgramPtr StockResourceController::getGPUProgram( const string& name )
 MaterialPtr StockResourceController::getMaterial( const string& name )
 {
     return _controller->getMaterial( name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+MeshPtr StockResourceController::getMesh( const MeshType& type )
+{
+    return _meshTable.at( type );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -171,6 +198,13 @@ GPUProgramPtr StockResource::GetGPUProgram( const string& name )
 MaterialPtr StockResource::GetMaterial( const string& name )
 {
     return ActiveContext->getStockResourceController()->getMaterial( name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+MeshPtr StockResource::GetMesh( const MeshType& type )
+{
+    return ActiveContext->getStockResourceController()->getMesh( type );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

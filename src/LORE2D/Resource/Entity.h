@@ -25,46 +25,73 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Resource/ResourceController.h>
+#include <LORE2D/Memory/Alloc.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore { namespace OpenGL {
+namespace Lore {
 
-    class ResourceController : public Lore::ResourceController
+    class LORE_EXPORT Entity final : public Alloc<Entity>
     {
+
+        LORE_OBJECT_BODY()
 
     public:
 
-        ResourceController();
+        Entity();
 
-        virtual ~ResourceController() override;
-
-        virtual TexturePtr loadTexture( const string& name, const string& file, const string& groupName = DefaultGroupName ) override;
-
-        virtual GPUProgramPtr createGPUProgram( const string& name, const string& groupName = DefaultGroupName ) override;
-
-        virtual ShaderPtr createVertexShader( const string& name, const string& groupName = DefaultGroupName ) override;
-
-        virtual ShaderPtr createFragmentShader( const string& name, const string& groupName = DefaultGroupName ) override;
-
-        virtual VertexBufferPtr createVertexBuffer( const string& name, const MeshType& type, const string& groupName = DefaultGroupName ) override;
-
-        virtual MaterialPtr createMaterial( const string& name, const string& groupName = DefaultGroupName ) override;
-
-        virtual TexturePtr createTexture( const string& name, const string& groupName = DefaultGroupName ) override;
-
-        virtual CameraPtr createCamera( const string& name, const string& groupName = DefaultGroupName ) override;
+        ~Entity();
 
         //
-        // Destruction.
+        // Getters.
 
-        virtual void destroyTexture( TexturePtr texture ) override;
+        inline MaterialPtr getMaterial() const
+        {
+            return _material;
+        }
 
-        virtual void destroyTexture( const string& name, const string& groupName = DefaultGroupName ) override;
+        inline MeshPtr getMesh() const
+        {
+            return _mesh;
+        }
+
+        inline uint getRenderQueue() const
+        {
+            return _renderQueue;
+        }
+
+        //
+        // Setters.
+
+        inline void setMaterial( MaterialPtr material )
+        {
+            _material = material;
+        }
+
+        inline void setMesh( MeshPtr mesh )
+        {
+            _mesh = mesh;
+        }
+
+    private:
+
+        friend class Node;
+
+    private:
+
+        virtual void _reset() override;
+
+        void _notifyAttached();
+
+    private:
+
+        MaterialPtr _material;
+        MeshPtr _mesh;
+
+        uint _renderQueue;
 
     };
 
-}}
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

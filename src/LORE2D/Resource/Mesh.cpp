@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,46 +24,32 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Resource/ResourceController.h>
+#include "Mesh.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore { namespace OpenGL {
+using namespace Lore;
 
-    class ResourceController : public Lore::ResourceController
-    {
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    public:
+Mesh::Mesh()
+: _vertexBuffer( nullptr )
+{
 
-        ResourceController();
+}
 
-        virtual ~ResourceController() override;
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        virtual TexturePtr loadTexture( const string& name, const string& file, const string& groupName = DefaultGroupName ) override;
+Mesh::~Mesh()
+{
 
-        virtual GPUProgramPtr createGPUProgram( const string& name, const string& groupName = DefaultGroupName ) override;
+}
 
-        virtual ShaderPtr createVertexShader( const string& name, const string& groupName = DefaultGroupName ) override;
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        virtual ShaderPtr createFragmentShader( const string& name, const string& groupName = DefaultGroupName ) override;
+void Mesh::_reset()
+{
 
-        virtual VertexBufferPtr createVertexBuffer( const string& name, const MeshType& type, const string& groupName = DefaultGroupName ) override;
-
-        virtual MaterialPtr createMaterial( const string& name, const string& groupName = DefaultGroupName ) override;
-
-        virtual TexturePtr createTexture( const string& name, const string& groupName = DefaultGroupName ) override;
-
-        virtual CameraPtr createCamera( const string& name, const string& groupName = DefaultGroupName ) override;
-
-        //
-        // Destruction.
-
-        virtual void destroyTexture( TexturePtr texture ) override;
-
-        virtual void destroyTexture( const string& name, const string& groupName = DefaultGroupName ) override;
-
-    };
-
-}}
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

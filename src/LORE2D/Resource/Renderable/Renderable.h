@@ -25,15 +25,8 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Memory/Alloc.h>
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 namespace Lore {
 
-    ///
-    /// \class Renderable
-    /// \brief The base class of anything that can be attached to a node.
     class LORE_EXPORT Renderable
     {
 
@@ -50,60 +43,22 @@ namespace Lore {
 
     public:
 
-        Renderable();
+        inline Renderable()
+        : _type( Type::Unknown )
+        { }
 
-        virtual ~Renderable();
+        inline virtual ~Renderable() { }
 
-        virtual void bind() { }
-
-        //
-        // Getters.
+        virtual void bind() = 0;
 
         inline Type getType() const
         {
             return _type;
         }
 
-        inline MaterialPtr getMaterial() const
-        {
-            return _material;
-        }
-
-        inline uint getRenderQueue() const
-        {
-            return _renderQueue;
-        }
-
-        inline bool isAttached() const
-        {
-            return _attached;
-        }
-
-        //
-        // Setters.
-
-        inline void setMaterial( MaterialPtr mat )
-        {
-            _material = mat;
-        }
-
-        inline void setRenderQueue( const uint id )
-        {
-            _renderQueue = id;
-        }
-
     protected:
 
-        MaterialPtr _material;
-        uint _renderQueue;
-        bool _attached;
         Type _type;
-
-    private:
-
-        void _notifyAttached();
-
-        friend class Node;
 
     };
 

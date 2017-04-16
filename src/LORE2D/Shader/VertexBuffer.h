@@ -26,6 +26,7 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 #include <LORE2D/Memory/Alloc.h>
+#include <LORE2D/Resource/MeshType.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -37,14 +38,6 @@ namespace Lore {
         LORE_OBJECT_BODY()
 
     public:
-
-        enum class Type
-        {
-            Custom,
-            Quad,
-            TexturedQuad,
-            Triangle
-        };
 
         enum class AttributeType
         {
@@ -78,7 +71,7 @@ namespace Lore {
 
     protected:
 
-        Type _type;
+        MeshType _type;
         std::vector<Attribute> _attributes;
 
     };

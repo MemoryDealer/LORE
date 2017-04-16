@@ -30,19 +30,6 @@
 
 using namespace Lore::OpenGL;
 
-GLfloat quad_vertices [] = {
-    // Positions          // Colors           // Texture Coords
-    0.1f,  0.1f,
-    0.1f, -0.1f,
-    -0.1f, -0.1f,
-    -0.1f,  0.1f
-};
-
-GLuint quad_indices [] = {
-    //0, 1, 2, 3
-    1, 0, 2, 3
-};
-
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 GLVertexBuffer::GLVertexBuffer()
@@ -65,21 +52,18 @@ GLVertexBuffer::~GLVertexBuffer()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
+void GLVertexBuffer::init( const Lore::MeshType& type )
 {
     _type = type;
     switch ( _type ) {
+
     default:
-    case Type::Custom:
+    case MeshType::Custom:
         _mode = GL_TRIANGLES;
         break;
 
-    case Type::Quad:
+    case MeshType::Quad:
         _mode = GL_TRIANGLE_STRIP;
-        break;
-
-    case Type::Triangle:
-        _mode = GL_TRIANGLES;
         break;
 
     }
@@ -94,7 +78,7 @@ void GLVertexBuffer::build()
     default:
         throw Lore::Exception( "Unknown vertex buffer type" );
 
-    case VertexBuffer::Type::Quad:
+    case MeshType::Quad:
         _vertices = { 0.1f, 0.1f,
                       0.1f, -0.1f,
                      -0.1f, -0.1f,
@@ -104,7 +88,7 @@ void GLVertexBuffer::build()
         addAttribute( AttributeType::Float, 2 );
         break;
 
-    case VertexBuffer::Type::TexturedQuad:
+    case MeshType::TexturedQuad:
         _vertices = { 0.1f, 0.1f,      1.f, 1.f,
                       0.1f, -0.1f,     1.f, 0.f,
                      -0.1f, -0.1f,     0.f, 0.f,
@@ -169,9 +153,7 @@ void GLVertexBuffer::build()
 
     glBindVertexArray( 0 );
 
-    _attributes.clear(); // No longer needed.
-
-    //Lore::VertexBuffer::build(); // Why was this here?
+    _attributes.clear(); // Attributes no longer needed.
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

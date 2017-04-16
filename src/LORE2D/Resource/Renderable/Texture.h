@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Resource/Color.h>
 #include <LORE2D/Resource/Renderable/Renderable.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -39,17 +40,13 @@ namespace Lore {
 
     public:
 
-        enum class Shape {
-            Quad
-        };
-
-    public:
-
         Texture();
 
-        virtual ~Texture() override { }
+        virtual ~Texture() { }
 
         virtual void loadFromFile( const string& file ) = 0;
+
+        virtual void create( const int width, const int height, const Color& color ) = 0;
 
     };
 

@@ -25,8 +25,10 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Core/Util.h>
 #include <LORE2D/Memory/Alloc.h>
 #include <LORE2D/Resource/Material.h>
+#include <LORE2D/Resource/Mesh.h>
 #include <LORE2D/Resource/Registry.h>
 #include <LORE2D/Resource/Renderable/Texture.h>
 #include <LORE2D/Resource/ResourceIndexer.h>
@@ -39,15 +41,15 @@
 
 namespace Lore {
 
-    enum class ResourceType
-    {
-        Texture,
-        Shader,
-        GPUProgram
-    };
-
     struct LORE_EXPORT ResourceGroup
     {
+
+        enum class ResourceType
+        {
+            Texture,
+            Shader,
+            GPUProgram
+        };
 
         struct IndexedResource
         {
@@ -72,6 +74,7 @@ namespace Lore {
         , fragmentShaders()
         , vertexBuffers()
         , materials()
+        , entities()
         , cameras()
         { }
 
@@ -95,6 +98,14 @@ namespace Lore {
         // Materials.
 
         Registry<std::unordered_map, Material> materials;
+
+        // Meshes.
+
+        Registry<std::unordered_map, Mesh> meshes;
+
+        // Entities.
+
+        Registry<std::unordered_map, Entity> entities;
 
         // Scene.
 
@@ -144,13 +155,22 @@ namespace Lore {
 
         virtual ShaderPtr createFragmentShader( const string& name, const string& groupName = DefaultGroupName ) = 0;
 
-        virtual VertexBufferPtr createVertexBuffer( const string& name, const VertexBuffer::Type& type, const string& groupName = DefaultGroupName ) = 0;
+        virtual VertexBufferPtr createVertexBuffer( const string& name, const MeshType& type, const string& groupName = DefaultGroupName ) = 0;
 
         virtual MaterialPtr createMaterial( const string& name, const string& groupName = DefaultGroupName ) = 0;
 
         virtual TexturePtr createTexture( const string& name, const string& groupName = DefaultGroupName ) = 0;
 
         virtual CameraPtr createCamera( const string& name, const string& groupName = DefaultGroupName ) = 0;
+
+        //
+        // Entity.
+
+        EntityPtr createEntity( const string& name, const MeshType& meshType, const string& groupName = DefaultGroupName );
+
+        EntityPtr createEntity( const string& name, const string& groupName = DefaultGroupName );
+
+        MeshPtr createMesh( const string& name, const MeshType& meshType, const string& groupName = DefaultGroupName );
 
         //
         // Getters.
@@ -171,6 +191,7 @@ namespace Lore {
     protected:
 
         using ResourceGroupMap = std::unordered_map<std::string, std::unique_ptr<ResourceGroup>>;
+        using VertexBufferTable = Util::HashTable<MeshType, VertexBufferPtr>;
 
     protected:
 
@@ -181,6 +202,8 @@ namespace Lore {
         ResourceGroupMap _groups;
         ResourceGroupPtr _defaultGroup;
         std::unique_ptr<ResourceIndexer> _indexer;
+
+        VertexBufferTable _vertexBufferTable;
 
     };
 
@@ -205,13 +228,20 @@ namespace Lore {
 
         static ShaderPtr CreateFragmentShader( const string& name, const string& groupName = ResourceController::DefaultGroupName );
 
-        static VertexBufferPtr CreateVertexBuffer( const string& name, const VertexBuffer::Type& type, const string& groupName = ResourceController::DefaultGroupName );
-
         static MaterialPtr CreateMaterial( const string& name, const string& groupName = ResourceController::DefaultGroupName );
+
+        static MeshPtr CreateMesh( const string& name, const MeshType& meshType, const string& groupName = ResourceController::DefaultGroupName );
 
         static TexturePtr CreateTexture( const string& name, const string& groupName = ResourceController::DefaultGroupName );
 
         static CameraPtr CreateCamera( const string& name, const string& groupName = ResourceController::DefaultGroupName );
+
+        //
+        // Entity.
+
+        static EntityPtr CreateEntity( const string& name, const MeshType& meshType, const string& groupName = ResourceController::DefaultGroupName );
+
+        static EntityPtr CreateEntity( const string& name, const string& groupName = ResourceController::DefaultGroupName );
 
         //
         // Getters.

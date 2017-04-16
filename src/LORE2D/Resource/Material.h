@@ -55,6 +55,7 @@ namespace Lore {
             bool lighting;
             Color ambient;
             Color diffuse;
+            TexturePtr texture;
             GPUProgramPtr program;
 
             inline Pass()
@@ -62,6 +63,7 @@ namespace Lore {
             , lighting( true )
             , ambient( StockColor::White )
             , diffuse( StockColor::White )
+            , texture( nullptr )
             , program( nullptr )
             { }
 

@@ -228,15 +228,10 @@ Lore::GPUProgramPtr StockResourceController::createUberShader( const string& nam
 
     // ::::::::::::::::::::::::::::::::: //
 
-    // Attach a vertex buffer.
-    auto vbptr = _controller->createVertexBuffer( name + "_VB", params.vbType );
-    vbptr->build();
-
     //
     // GPU program.
 
     auto program = _controller->createGPUProgram( name );
-    program->setVertexBuffer( vbptr );
     program->attachShader( vsptr );
     program->attachShader( fsptr );
 

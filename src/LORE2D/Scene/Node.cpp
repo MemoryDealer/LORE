@@ -26,6 +26,7 @@
 
 #include "Node.h"
 
+#include <LORE2D/Resource/Entity.h>
 #include <LORE2D/Resource/Renderable/Renderable.h>
 #include <LORE2D/Scene/Scene.h>
 
@@ -38,7 +39,7 @@ using namespace Lore;
 Node::Node()
 : _transform()
 , _depth( 0 )
-, _renderables()
+, _entities()
 , _scene( nullptr )
 , _parent( nullptr )
 , _childNodes()
@@ -122,20 +123,9 @@ void Node::detachFromParent()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Node::attachObject( RenderablePtr r )
+void Node::attachObject( EntityPtr e )
 {
-    switch ( r->getType() ) {
-    default:
-    case Renderable::Type::Unknown:
-        log_error( "Attempted to attach unknown renderable " + r->getName() );
-        break;
-
-    case Renderable::Type::Texture:
-        _renderables.insert( r->getName(), r );
-        r->_notifyAttached();
-        break;
-
-    }
+    _entities.insert( e->getName(), e );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -257,7 +247,7 @@ void Node::scale( const real s )
 void Node::_reset()
 {
     _transform = Transform();
-    _renderables.clear();
+    _entities.clear();
     _scene = nullptr;
     _parent = nullptr;
     _childNodes.clear();
@@ -326,6 +316,15 @@ void Node::_updateChildrenScale()
         // Recurse on all children.
         node->_updateChildrenScale();
     }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Node::_updateDepthValue()
+{
+    // Apply depth to z-value of the model matrix (overwrite SceneGraphVisitor transformations).
+    // This is necessary for depth values on nodes to work correctly.
+    _transform.world[3][2] = static_cast< real >( _depth );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
