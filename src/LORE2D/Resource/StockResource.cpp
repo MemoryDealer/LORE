@@ -90,7 +90,7 @@ void StockResourceController::createStockResources()
 
     {
         auto texture = _controller->createTexture( "White" );
-        texture->create( 64, 64, StockColor::White );
+        texture->create( 128, 128, StockColor::White );
     }
 
     //

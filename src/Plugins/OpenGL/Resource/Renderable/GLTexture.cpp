@@ -66,11 +66,33 @@ void GLTexture::loadFromFile( const string& file )
 
 void GLTexture::create( const int width, const int height, const Lore::Color& color )
 {
-    const auto size = width * height * sizeof( unsigned char );
+    const auto size = width * height * 4;
     unsigned char* pixels = new unsigned char[size];
 
+    const unsigned char ccolor[3] = {
+        static_cast<unsigned char>( color.r * 255.f ),
+        static_cast<unsigned char>( color.g * 255.f ),
+        static_cast<unsigned char>( color.b * 255.f )
+    };
+
     for ( int i = 0; i < size; ++i ) {
-        pixels[i] = 255; // ???
+        switch ( i % 4 ) {
+        case 0:
+            pixels[i] = ccolor[0];
+            break;
+
+        case 1:
+            pixels[i] = ccolor[1];
+            break;
+
+        case 2:
+            pixels[i] = ccolor[2];
+            break;
+
+        case 3:
+            pixels[i] = 255;
+            break;
+        }
     }
 
     _createGLTexture( pixels, width, height );

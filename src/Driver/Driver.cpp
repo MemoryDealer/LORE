@@ -80,7 +80,8 @@ int main( int argc, char** argv )
     // Textures.
     Lore::TexturePtr tex = Lore::Resource::LoadTexture( "tex1", "C:\\doggo.png" );
     auto entity = Lore::Resource::CreateEntity( "e1", Lore::MeshType::TexturedQuad );
-    entity->getMaterial()->getPass().texture = tex;
+    //entity->getMaterial()->getPass().texture = Lore::StockResource::GetTexture("White");
+    //entity->getMaterial()->getPass().texture = tex;
 
     node = scene->getNode( "A" );
     //tex->getMaterial()->getPass().emissive = Lore::Color( 0.f, 0.2f, 0.f );
@@ -103,7 +104,7 @@ int main( int argc, char** argv )
     n2->attachObject( entity );
     n2->scale( Lore::Vec2( 4.2f, 0.65f ) );
     n2->translate( 0.25f, 0.25f );
-    //n2->setDepth( -25 );
+    n2->setDepth( -25 );
 
     auto light = scene->createLight( "l1" );
     light->setColor( Lore::Color( 1.f, .6f, 0.f ) );
@@ -133,10 +134,10 @@ int main( int argc, char** argv )
         //node->scale( 0.025f * std::sinf( f ) );
 
         // TODO: Repro case where both quads appeared to be scaling with only rotations being done.
-        node->rotate( Lore::Degree( 0.5f ) );
+        //node->rotate( Lore::Degree( 0.5f ) );
         ////node->getChild( "AChild" )->rotate( Lore::Degree( -.1f ) );
 
-        //n2->rotate( Lore::Degree( 0.025f ) );
+        n2->rotate( Lore::Degree( 0.025f ) );
 
         if ( GetAsyncKeyState( VK_F1 ) ) {
             //camera->translate( -0.01f, 0.f );
