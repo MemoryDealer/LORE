@@ -37,16 +37,16 @@ using namespace Lore;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Node::Node()
-: _transform()
-, _depth( 0 )
-, _entities()
-, _scene( nullptr )
-, _parent( nullptr )
-, _childNodes()
-, _colorModifier( StockColor::White )
-, _lights()
+  : _transform()
+  , _depth( 0 )
+  , _entities()
+  , _scene( nullptr )
+  , _parent( nullptr )
+  , _childNodes()
+  , _colorModifier( StockColor::White )
+  , _lights()
 {
-    _getLocalTransform();
+  _getLocalTransform();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -59,186 +59,187 @@ Node::~Node()
 
 NodePtr Node::createChildNode( const string& name )
 {
-    auto node = MemoryAccess::GetPrimaryPoolCluster()->create<Node>();
-    node->setName( name );
-    node->_scene = _scene;
-    node->_parent = this;
-    
-    _scene->_nodes.insert( name, node );
-    _childNodes.insert( name, node );
+  auto node = MemoryAccess::GetPrimaryPoolCluster()->create<Node>();
+  node->setName( name );
+  node->_scene = _scene;
+  node->_parent = this;
 
-    return node;
+  _scene->_nodes.insert( name, node );
+  _childNodes.insert( name, node );
+
+  return node;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Node::attachChildNode( NodePtr node )
 {
-    if ( node->_parent ) {
-        throw Lore::Exception( "Node " + node->getName() +
-                               " is already a child of " + node->getParent()->getName() );
-    }
+  if ( node->_parent ) {
+    throw Lore::Exception( "Node " + node->getName() +
+                           " is already a child of " + node->getParent()->getName() );
+  }
 
-    _childNodes.insert( node->getName(), node );
+  _childNodes.insert( node->getName(), node );
 
-    node->_parent = this;
+  node->_parent = this;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Node::removeChildNode( NodePtr node )
 {
-    _childNodes.remove( node->getName() );
+  _childNodes.remove( node->getName() );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 NodePtr Node::getChild( const string& name )
 {
-    return _childNodes.get( name );
+  return _childNodes.get( name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Node::ChildNodeIterator Node::getChildNodeIterator()
 {
-    return _childNodes.getIterator();
+  return _childNodes.getIterator();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Node::ConstChildNodeIterator Node::getConstChildNodeIterator()
 {
-    return _childNodes.getConstIterator();
+  return _childNodes.getConstIterator();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Node::detachFromParent()
 {
-    if ( _parent ) {
-        _parent->removeChildNode( this );
-    }
+  if ( _parent ) {
+    _parent->removeChildNode( this );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Node::attachObject( EntityPtr e )
 {
-    _entities.insert( e->getName(), e );
+  _entities.insert( e->getName(), e );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Node::attachObject( LightPtr l )
 {
-    _lights.push_back( l );
+  _lights.push_back( l );
 
-    l->_position.x = _transform.world[3][0];
-    l->_position.y = _transform.world[3][1];
+  l->_position.x = _transform.world[3][0];
+  l->_position.y = _transform.world[3][1];
+  _scene->_addActiveLight( l );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Node::setPosition( const Vec2& position )
 {
-    _transform.position = position;
-    _dirty();
+  _transform.position = position;
+  _dirty();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Node::translate( const Vec2& offset )
 {
-    _transform.position += offset;
-    _dirty();
+  _transform.position += offset;
+  _dirty();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Node::translate( const real xOffset, const real yOffset )
 {
-    _transform.position.x += xOffset;
-    _transform.position.y += yOffset;
-    _dirty();
+  _transform.position.x += xOffset;
+  _transform.position.y += yOffset;
+  _dirty();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Node::rotate( const Radian& angle, const TransformSpace& ts )
 {
-    rotate( Math::POSITIVE_Z_AXIS, angle, ts );
+  rotate( Math::POSITIVE_Z_AXIS, angle, ts );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Node::rotate( const Degree& angle, const TransformSpace& ts )
 {
-    rotate( Math::POSITIVE_Z_AXIS, angle, ts );
+  rotate( Math::POSITIVE_Z_AXIS, angle, ts );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Node::rotate( const Vec3& axis, const Radian& angle, const TransformSpace& ts )
 {
-    Quaternion q = Math::CreateQuaternion( axis, angle );
-    rotate( q, ts );
+  Quaternion q = Math::CreateQuaternion( axis, angle );
+  rotate( q, ts );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Node::rotate( const Vec3& axis, const Degree& angle, const TransformSpace& ts )
 {
-    Quaternion q = Math::CreateQuaternion( axis, angle );
-    rotate( q, ts );
+  Quaternion q = Math::CreateQuaternion( axis, angle );
+  rotate( q, ts );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Node::rotate( const Quaternion& q, const TransformSpace& ts )
 {
-    Quaternion qnorm = q;
-    qnorm.normalize();
+  Quaternion qnorm = q;
+  qnorm.normalize();
 
-    switch ( ts ) {
-    case TransformSpace::Local:
-        _transform.orientation = _transform.orientation * qnorm;
-        break;
+  switch ( ts ) {
+  case TransformSpace::Local:
+    _transform.orientation = _transform.orientation * qnorm;
+    break;
 
-    case TransformSpace::Parent:
-        _transform.orientation = qnorm * _transform.orientation;
-        break;
+  case TransformSpace::Parent:
+    _transform.orientation = qnorm * _transform.orientation;
+    break;
 
-    case TransformSpace::World:
-        // ...
-        break;
-    }
+  case TransformSpace::World:
+    // ...
+    break;
+  }
 
-    _dirty();
+  _dirty();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Node::setScale( const Vec2& scale )
 {
-    _transform.scale = scale;
-    _dirty();
+  _transform.scale = scale;
+  _dirty();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Node::scale( const Vec2& s )
 {
-    _transform.scale *= s;
-    _dirty();
+  _transform.scale *= s;
+  _dirty();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Node::scale( const real s )
 {
-    Vec2 ss( s, s );
-    scale( ss );
+  Vec2 ss( s, s );
+  scale( ss );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -246,85 +247,85 @@ void Node::scale( const real s )
 
 void Node::_reset()
 {
-    _transform = Transform();
-    _entities.clear();
-    _scene = nullptr;
-    _parent = nullptr;
-    _childNodes.clear();
+  _transform = Transform();
+  _entities.clear();
+  _scene = nullptr;
+  _parent = nullptr;
+  _childNodes.clear();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Node::_dirty()
 {
-    _transform.dirty = true;
+  _transform.dirty = true;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 bool Node::_transformDirty() const
 {
-    return _transform.dirty;
+  return _transform.dirty;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Matrix4 Node::_getLocalTransform()
 {
-    if ( _transform.dirty ) {
-        _transform.local = Math::CreateTransformationMatrix( _transform.position,
-                                                             _transform.orientation );
+  if ( _transform.dirty ) {
+    _transform.local = Math::CreateTransformationMatrix( _transform.position,
+                                                         _transform.orientation );
 
-        // Update attached light positions.
-        for ( auto& light : _lights ) {
-            light->_position.x = _transform.world[3][0];
-            light->_position.y = _transform.world[3][1];
-        }
-
-        _transform.dirty = false;
+    // Update attached light positions.
+    for ( auto& light : _lights ) {
+      light->_position.x = _transform.world[3][0];
+      light->_position.y = _transform.world[3][1];
     }
 
-    return _transform.local;
+    _transform.dirty = false;
+  }
+
+  return _transform.local;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Node::_updateWorldTransform( const Matrix4& m )
 {
-    // Apply scaling to final world transform.
-    Matrix4 s;
-    s[0][0] = _transform.derivedScale.x;
-    s[1][1] = _transform.derivedScale.y;
+  // Apply scaling to final world transform.
+  Matrix4 s;
+  s[0][0] = _transform.derivedScale.x;
+  s[1][1] = _transform.derivedScale.y;
 
-    _transform.world = m * s;
+  _transform.world = m * s;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Node::_updateChildrenScale()
 {
-    if ( _parent && _parent->getName() == "root" ) {
-        _transform.derivedScale = _transform.scale;
-    }
+  if ( _parent && _parent->getName() == "root" ) {
+    _transform.derivedScale = _transform.scale;
+  }
 
-    auto it = getChildNodeIterator();
-    while ( it.hasMore() ) {
-        auto node = it.getNext();
-        auto scale = node->getScale();
-        node->_transform.derivedScale = _transform.derivedScale * scale;
+  auto it = getChildNodeIterator();
+  while ( it.hasMore() ) {
+    auto node = it.getNext();
+    auto scale = node->getScale();
+    node->_transform.derivedScale = _transform.derivedScale * scale;
 
-        // Recurse on all children.
-        node->_updateChildrenScale();
-    }
+    // Recurse on all children.
+    node->_updateChildrenScale();
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Node::_updateDepthValue()
 {
-    // Apply depth to z-value of the model matrix (overwrite SceneGraphVisitor transformations).
-    // This is necessary for depth values on nodes to work correctly.
-    _transform.world[3][2] = static_cast< real >( _depth );
+  // Apply depth to z-value of the model matrix (overwrite SceneGraphVisitor transformations).
+  // This is necessary for depth values on nodes to work correctly.
+  _transform.world[3][2] = static_cast< real >( _depth );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

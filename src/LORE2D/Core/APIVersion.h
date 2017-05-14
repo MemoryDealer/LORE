@@ -27,40 +27,40 @@
 
 namespace Lore {
 
+  ///
+  /// \class APIVersion
+  /// \brief Provides static methods for getting the active rendering API version
+  ///     (e.g., if the OpenGL plugin is used, it will return the OpenGL version).
+  /// This is dependent on what the user has installed on their machine.
+  class LORE_EXPORT APIVersion
+  {
+
+  public:
+
     ///
-    /// \class APIVersion
-    /// \brief Provides static methods for getting the active rendering API version
-    ///     (e.g., if the OpenGL plugin is used, it will return the OpenGL version).
-    /// This is dependent on what the user has installed on their machine.
-    class LORE_EXPORT APIVersion
-    {
+    /// \brief Returns major version as integer value.
+    static int GetMajor();
 
-    public:
+    ///
+    /// \brief Returns minor version as integer value.
+    static int GetMinor();
 
-        ///
-        /// \brief Returns major version as integer value.
-        static int GetMajor();
+    ///
+    /// \brief Returns major and minor version as string
+    ///     (e.g., "4.3", for example).
+    static string GetString();
 
-        ///
-        /// \brief Returns minor version as integer value.
-        static int GetMinor();
+  private:
 
-        ///
-        /// \brief Returns major and minor version as string
-        ///     (e.g., "4.3", for example).
-        static string GetString();
+    // Provide Context access to internal method Set(), so render plugin
+    // Context objects can set the API version.
+    friend class Context;
 
-    private:
+  private:
 
-        // Provide Context access to internal method Set(), so render plugin
-        // Context objects can set the API version.
-        friend class Context;
+    static void Set( const int major, const int minor );
 
-    private:
-
-        static void Set( const int major, const int minor );
-
-    };
+  };
 
 }
 

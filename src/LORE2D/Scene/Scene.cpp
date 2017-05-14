@@ -33,15 +33,16 @@ using namespace Lore;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Scene::Scene()
-: _bgColor( StockColor::Black )
-, _renderer( nullptr )
-, _root()
-, _nodes()
-, _ambientLightColor( StockColor::Black )
-, _lights()
+  : _bgColor( StockColor::Black )
+  , _renderer( nullptr )
+  , _root()
+  , _nodes()
+  , _ambientLightColor( StockColor::Black )
+  , _lights()
+  , _activeLights()
 {
-    _root.setName( "root" );
-    _root._scene = this;
+  _root.setName( "root" );
+  _root._scene = this;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -54,84 +55,91 @@ Scene::~Scene()
 
 NodePtr Scene::createNode( const string& name )
 {
-    // Note: Not using make_unique here because Node's new operator is private.
-    auto node = MemoryAccess::GetPrimaryPoolCluster()->create<Node>();
-    node->setName( name );
-    node->_scene = this;
+  // Note: Not using make_unique here because Node's new operator is private.
+  auto node = MemoryAccess::GetPrimaryPoolCluster()->create<Node>();
+  node->setName( name );
+  node->_scene = this;
 
-    _nodes.insert( name, node );
-    _root.attachChildNode( node );
+  _nodes.insert( name, node );
+  _root.attachChildNode( node );
 
-    return node;
+  return node;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Scene::destroyNode( NodePtr node )
 {
-    destroyNode( node->getName() );
+  destroyNode( node->getName() );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Scene::destroyNode( const string& name )
 {
-    auto node = _nodes.get( name );
+  auto node = _nodes.get( name );
 
-    if ( node ) {
-        // Detach node from parent before destroying.
-        node->detachFromParent();
-        _nodes.remove( name );
-    }
+  if ( node ) {
+    // Detach node from parent before destroying.
+    node->detachFromParent();
+    _nodes.remove( name );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 NodePtr Scene::getNode( const string& name )
 {
-    return _nodes.get( name );
+  return _nodes.get( name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 LightPtr Scene::createLight( const string& name )
 {
-    auto light = MemoryAccess::GetPrimaryPoolCluster()->create<Light>();
-    light->setName( name );
+  auto light = MemoryAccess::GetPrimaryPoolCluster()->create<Light>();
+  light->setName( name );
 
-    _lights.insert( name, light );
+  _lights.insert( name, light );
 
-    return light;
+  return light;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Scene::destroyLight( LightPtr light )
 {
-    destroyLight( light->getName() );
+  destroyLight( light->getName() );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Scene::destroyLight( const string& name )
 {
-    auto light = _lights.get( name );
+  auto light = _lights.get( name );
 
-    if ( light ) {
-        destroyLight( light );
-        _lights.remove( name );
-    }
+  if ( light ) {
+    destroyLight( light );
+    _lights.remove( name );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void Scene::_addActiveLight( LightPtr light )
+{
+  _activeLights.insert( light->getName(), light );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void Scene::_reset()
 {
-    _bgColor = StockColor::Black;
-    _renderer = nullptr;
-    //_root
-    //_nodes.clear();
+  _bgColor = StockColor::Black;
+  _renderer = nullptr;
+  //_root
+  //_nodes.clear();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

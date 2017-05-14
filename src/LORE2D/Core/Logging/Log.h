@@ -35,122 +35,124 @@
 
 namespace Lore {
 
-    enum class LogLevel {
-        Critical,       // Program must terminate.
-        Error,          // Something failed, which may or may not be fatal.
-        Warning,        // A possible concern.
-        Information,    // Similar to warning, however this reports general information.
-        Debug,          // Extended information.
-        Trace           // For tracing entry/exit of routines or blocks.
+  enum class LogLevel
+  {
+    Critical,       // Program must terminate.
+    Error,          // Something failed, which may or may not be fatal.
+    Warning,        // A possible concern.
+    Information,    // Similar to warning, however this reports general information.
+    Debug,          // Extended information.
+    Trace           // For tracing entry/exit of routines or blocks.
+  };
+
+  ///
+  /// \class Logger
+  /// \brief Writes log messages to Lore.log file in same directory as executable.
+  /// \details All logging should be done through the static methods of the helper
+  ///     class Log.
+  class Logger final
+  {
+
+  private:
+
+    LogLevel _level;
+
+    struct Message
+    {
+      LogLevel lvl;
+      string text;
     };
+
+    std::ofstream _stream;
+    std::queue<Message> _messageQueue;
+
+    //
+    // Provide thread materials, as the actual output to the log file is done
+    // on a separate thread, which must be woken up when log messages are available.
+
+    std::thread _thread;
+    std::mutex _mutex;
+    std::condition_variable _cv;
+    std::atomic<bool> _active;
+
+  private:
+
+    void __logger();
+
+  public:
+
+    explicit Logger( const string& filename );
+
+    ~Logger();
+
+    //
+    // Logging functions.
 
     ///
-    /// \class Logger
-    /// \brief Writes log messages to Lore.log file in same directory as executable.
-    /// \details All logging should be done through the static methods of the helper
-    ///     class Log.
-    class Logger final
-    {
-
-    private:
-
-        LogLevel _level;
-
-        struct Message {
-            LogLevel lvl;
-            string text;
-        };
-
-        std::ofstream _stream;
-        std::queue<Message> _messageQueue;
-
-        //
-        // Provide thread materials, as the actual output to the log file is done
-        // on a separate thread, which must be woken up when log messages are available.
-
-        std::thread _thread;
-        std::mutex _mutex;
-        std::condition_variable _cv;
-        std::atomic<bool> _active;
-
-    private:
-
-        void __logger();
-
-    public:
-
-        explicit Logger( const string& filename );
-
-        ~Logger();
-
-        //
-        // Logging functions.
-
-        ///
-        /// \brief Writes log message with timestamp at information level.
-        void write( const string& text );
-
-        ///
-        /// \brief Writes log message with timestamp at specified level.
-        void write( const LogLevel& lvl, const string& text );
-
-        ///
-        /// \brief Wakes up the logger thread and joins.
-        void flush();
-
-        //
-        // Setters.
-
-        inline void setLevel( const LogLevel& lvl )
-        {
-            _level = lvl;
-        }
-
-        inline void setActive( const bool active )
-        {
-            _active = active;
-        }
-
-        //
-        // Getters.
-
-        inline LogLevel getLevel() const
-        {
-            return _level;
-        }
-
-    };
+    /// \brief Writes log message with timestamp at information level.
+    void write( const string& text );
 
     ///
-    /// \class Log
-    /// \brief Contains only static methods for logging
-    class LORE_EXPORT Log final
+    /// \brief Writes log message with timestamp at specified level.
+    void write( const LogLevel& lvl, const string& text );
+
+    ///
+    /// \brief Wakes up the logger thread and joins.
+    void flush();
+
+    //
+    // Setters.
+
+    inline void setLevel( const LogLevel& lvl )
     {
+      _level=lvl;
+    }
 
-    public:
-        
-        ///
-        /// \brief Writes message with timestamp to log file at information level.
-        static void Write( const string& text );
+    inline void setActive( const bool active )
+    {
+      _active=active;
+    }
 
-        ///
-        /// \brief Writes message with timestamp to log file at specified level.
-        static void Write( const LogLevel& lvl, const string& text );
+    //
+    // Getters.
 
-    private:
+    inline LogLevel getLevel() const
+    {
+      return _level;
+    }
 
-        // Provide Context access so only it can create a logger.
-        friend class Context;
+  };
 
-    private:
+  ///
+  /// \class Log
+  /// \brief Contains only static methods for logging
+  class LORE_EXPORT Log final
+  {
 
-        static void AllocateLogger();
+  public:
 
-        static void DeleteLogger();
+    ///
+    /// \brief Writes message with timestamp to log file at information level.
+    static void Write( const string& text );
 
-    };
+    ///
+    /// \brief Writes message with timestamp to log file at specified level.
+    static void Write( const LogLevel& lvl, const string& text );
 
-    // Helper macros.
+  private:
+
+    // Provide Context access so only it can create a logger.
+    friend class Context;
+
+  private:
+
+    static void AllocateLogger();
+
+    static void DeleteLogger();
+
+  };
+
+  // Helper macros.
 #define log_critical( text )    Log::Write( LogLevel::Critical, text )
 #define log_error( text )       Log::Write( LogLevel::Error, text )
 #define log_warning( text )     Log::Write( LogLevel::Warning, text )

@@ -31,66 +31,71 @@
 
 namespace Lore {
 
-    class LORE_EXPORT Entity final : public Alloc<Entity>
+  class LORE_EXPORT Entity final : public Alloc<Entity>
+  {
+
+    LORE_OBJECT_BODY()
+
+  public:
+
+    Entity();
+
+    ~Entity();
+
+    //
+    // Getters.
+
+    inline MaterialPtr getMaterial() const
     {
+      return _material;
+    }
 
-        LORE_OBJECT_BODY()
+    inline MeshPtr getMesh() const
+    {
+      return _mesh;
+    }
 
-    public:
+    inline uint getRenderQueue() const
+    {
+      return _renderQueue;
+    }
 
-        Entity();
+    //
+    // Setters.
 
-        ~Entity();
+    inline void setMaterial( MaterialPtr material )
+    {
+      _material=material;
+    }
 
-        //
-        // Getters.
+    inline void setMesh( MeshPtr mesh )
+    {
+      _mesh=mesh;
+    }
 
-        inline MaterialPtr getMaterial() const
-        {
-            return _material;
-        }
+    //
+    // Helper functions.
 
-        inline MeshPtr getMesh() const
-        {
-            return _mesh;
-        }
+    void setTexture( TexturePtr texture );
 
-        inline uint getRenderQueue() const
-        {
-            return _renderQueue;
-        }
+  private:
 
-        //
-        // Setters.
+    friend class Node;
 
-        inline void setMaterial( MaterialPtr material )
-        {
-            _material = material;
-        }
+  private:
 
-        inline void setMesh( MeshPtr mesh )
-        {
-            _mesh = mesh;
-        }
+    virtual void _reset() override;
 
-    private:
+    void _notifyAttached();
 
-        friend class Node;
+  private:
 
-    private:
+    MaterialPtr _material;
+    MeshPtr _mesh;
 
-        virtual void _reset() override;
+    uint _renderQueue;
 
-        void _notifyAttached();
-
-    private:
-
-        MaterialPtr _material;
-        MeshPtr _mesh;
-
-        uint _renderQueue;
-
-    };
+  };
 
 }
 

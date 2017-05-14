@@ -35,119 +35,123 @@
 
 namespace Lore {
 
-    ///
-    /// \class Scene
-    /// \brief Contains all information to render a scene to an area in a window,
-    ///     or to a texture.
-    /// \details A Scene contains a collection of Nodes, all of which inherit from
-    ///     the Scene's root Node.
-    class LORE_EXPORT Scene final : public Alloc<Scene>
+  ///
+  /// \class Scene
+  /// \brief Contains all information to render a scene to an area in a window,
+  ///     or to a texture.
+  /// \details A Scene contains a collection of Nodes, all of which inherit from
+  ///     the Scene's root Node.
+  class LORE_EXPORT Scene final : public Alloc<Scene>
+  {
+
+    LORE_OBJECT_BODY()
+
+  public:
+
+    using NodeMap = Registry<std::unordered_map, Node>;
+    using LightMap = Registry<std::unordered_map, Light>;
+
+  public:
+
+    Scene();
+
+    ~Scene();
+
+    NodePtr createNode( const string& name );
+
+    void destroyNode( NodePtr node );
+    void destroyNode( const string& name );
+
+    NodePtr getNode( const string& name );
+
+    LightPtr createLight( const string& name );
+
+    void destroyLight( LightPtr light );
+    void destroyLight( const string& name );
+
+    //
+    // Setters.
+
+    inline void setRenderer( RendererPtr renderer )
     {
+      _renderer = renderer;
+    }
 
-        LORE_OBJECT_BODY()
+    inline void setBackgroundColor( const Color& color )
+    {
+      _bgColor = color;
+    }
 
-    public:
+    inline void setAmbientLightColor( const Color& color )
+    {
+      _ambientLightColor = color;
+    }
 
-        using NodeMap = Registry<std::unordered_map, Node>;
-        using LightMap = Registry<std::unordered_map, Light>;
+    //
+    // Getters.
 
-    public:
+    inline NodePtr getRootNode()
+    {
+      return &_root;
+    }
 
-        Scene();
+    inline RendererPtr getRenderer() const
+    {
+      return _renderer;
+    }
 
-        ~Scene();
+    inline Color getBackgroundColor() const
+    {
+      return _bgColor;
+    }
 
-        NodePtr createNode( const string& name );
+    Color getAmbientLightColor() const
+    {
+      return _ambientLightColor;
+    }
 
-        void destroyNode( NodePtr node );
-        void destroyNode( const string& name );
+    inline int getLightCount() const
+    {
+      return static_cast< int >( _activeLights.size() );
+    }
 
-        NodePtr getNode( const string& name );
+    LightMap::ConstIterator getLightConstIterator() const
+    {
+      return _activeLights.getConstIterator();
+    }
 
-        LightPtr createLight( const string& name );
+  private:
 
-        void destroyLight( LightPtr light );
-        void destroyLight( const string& name );
+    virtual void _reset() override;
 
-        //
-        // Setters.
+    void _addActiveLight( LightPtr light );
 
-        inline void setRenderer( RendererPtr renderer )
-        {
-            _renderer = renderer;
-        }
+    friend class Node;
 
-        inline void setBackgroundColor( const Color& color )
-        {
-            _bgColor = color;
-        }
+  private:
 
-        inline void setAmbientLightColor( const Color& color )
-        {
-            _ambientLightColor = color;
-        }
+    Color _bgColor;
 
-        //
-        // Getters.
+    // The type of renderer this scene uses.
+    RendererPtr _renderer;
 
-        inline NodePtr getRootNode()
-        {
-            return &_root;
-        }
+    // The scene's root node.
+    Node _root;
 
-        inline RendererPtr getRenderer() const
-        {
-            return _renderer;
-        }
+    // Convenient hash map of all nodes for quick lookup.
+    NodeMap _nodes;
 
-        inline Color getBackgroundColor() const
-        {
-            return _bgColor;
-        }
+    //
+    // Lighting.
 
-        Color getAmbientLightColor() const
-        {
-            return _ambientLightColor;
-        }
+    Color _ambientLightColor;
 
-        inline int getLightCount() const
-        {
-            return static_cast< int >( _lights.size() );
-        }
+    LightMap _lights;
 
-        LightMap::ConstIterator getLightConstIterator() const
-        {
-            return _lights.getConstIterator();
-        }
+    // Lights that are attached to a node.
+    LightMap _activeLights;
 
-    private:
-
-        virtual void _reset() override;
-
-        friend class Node;
-
-    private:
-
-        Color _bgColor;
-
-        // The type of renderer this scene uses.
-        RendererPtr _renderer;
-
-        // The scene's root node.
-        Node _root;
-
-        // Convenient hash map of all nodes for quick lookup.
-        // This is the owner of all nodes; they are stored as unique_ptrs.
-        NodeMap _nodes;
-
-        //
-        // Lighting.
-
-        Color _ambientLightColor;
-
-        LightMap _lights;
-
-    };
+  };
 
 }
 

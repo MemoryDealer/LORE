@@ -34,11 +34,20 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+namespace LocalNS {
+
+  constexpr real ZoomLimit = 0.1f;
+
+}
+using namespace LocalNS;
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 Camera::Camera()
-: _position()
-, _scale( 1.f, 1.f )
-, _view()
-, _dirty( true )
+  : _position()
+  , _view()
+  , _zoom( 1.f )
+  , _dirty( true )
 {
 }
 
@@ -52,104 +61,101 @@ Camera::~Camera()
 
 void Camera::setPosition( const Vec2& pos )
 {
-    _position = pos;
-    dirty();
+  _position = pos;
+  dirty();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Camera::setPosition( const real x, const real y )
 {
-    _position.x = x;
-    _position.y = y;
-    dirty();
+  _position.x = x;
+  _position.y = y;
+  dirty();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Camera::translate( const Vec2& offset )
 {
-    _position += offset;
-    dirty();
+  _position += offset;
+  dirty();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Camera::translate( const real xOffset, const real yOffset )
 {
-    _position.x += xOffset;
-    _position.y += yOffset;
-    dirty();
+  _position.x += xOffset / _zoom;
+  _position.y += yOffset / _zoom;
+  dirty();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Camera::zoom( const real amount )
 {
-    _scale.x += amount;
-    _scale.y += amount;
-    dirty();
+  _zoom += amount * _zoom; // Scale zooming speed as it goes farther.
+  if ( _zoom < ZoomLimit ) {
+    _zoom = ZoomLimit;
+  }
+
+  dirty();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Camera::setZoom( const real amount )
 {
-    _scale.x = _scale.y = amount;
-    dirty();
+  _zoom = amount;
+  if ( _zoom < ZoomLimit ) {
+    _zoom = ZoomLimit;
+  }
+  
+  dirty();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Camera::dirty()
 {
-    _dirty = true;
+  _dirty = true;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Camera::_reset()
 {
-    _position = Vec2();
-    _scale = Vec2( 1.f, 1.f );
-    _view = Matrix4();
-    _dirty = true;
+  _position = Vec2();
+  _view = Matrix4();
+  _zoom = 1.f;
+  _dirty = true;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Matrix4 Camera::getViewMatrix()
 {
-    if ( _dirty ) {
-        _updateViewMatrix();
-    }
+  if ( _dirty ) {
+    _updateViewMatrix();
+  }
 
-    return _view;
+  return _view;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Camera::_updateViewMatrix()
 {
-    /*_view[3] = _view[0] * _position.x + _view[1] * _position.y + _view[3];
-    _position.x = 0.f;
-    _position.y = 0.f;*/
+  Vec2 scale( _zoom, _zoom );
+  _view = Math::CreateTransformationMatrix( _position,
+                                            Quaternion(),
+                                            scale );
 
-    /*Vec4 zoom( _scale.x, _scale.y, 1.f, 1.f );
-    _view[0] *= zoom;
-    _view[1] *= zoom;
-    _view[2] *= zoom;
-    _scale.x = _scale.y = 1.f;
+  _view[3][0] *= _zoom;
+  _view[3][1] *= _zoom;
 
-    _view[3].x = _position.x;
-    _view[3].y = _position.y;*/
-
-    // TODO: Handle zooming properly.
-    _view = Math::CreateTransformationMatrix( _position,
-                                              Quaternion(),
-                                              _scale );
-
-    _dirty = false;
+  _dirty = false;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

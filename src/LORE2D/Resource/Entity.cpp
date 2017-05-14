@@ -35,9 +35,9 @@ using namespace Lore;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Entity::Entity()
-: _material( nullptr )
-, _mesh( nullptr )
-, _renderQueue( RenderQueue::General )
+  : _material( nullptr )
+  , _mesh( nullptr )
+  , _renderQueue( RenderQueue::General )
 {
 }
 
@@ -47,13 +47,18 @@ Entity::~Entity()
 {
 }
 
+void Entity::setTexture( TexturePtr texture )
+{
+  _material->getPass().texture=texture;
+}
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Entity::_reset()
 {
-    _material = nullptr;
-    _mesh = nullptr;
+  _material=nullptr;
+  _mesh=nullptr;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

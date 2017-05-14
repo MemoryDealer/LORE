@@ -36,7 +36,7 @@ using namespace Lore;
 
 namespace Local {
 
-    std::unique_ptr<Logger> __log;
+  std::unique_ptr<Logger> __log;
 
 }
 using namespace Local;
@@ -45,142 +45,142 @@ using namespace Local;
 
 void Logger::__logger()
 {
-    std::unordered_map<LogLevel, string> logLevelStrings;
-    logLevelStrings[LogLevel::Critical] = " Critical";
-    logLevelStrings[LogLevel::Error] = " Error";
-    logLevelStrings[LogLevel::Warning] = " Warning";
-    logLevelStrings[LogLevel::Information] = "";
-    logLevelStrings[LogLevel::Debug] = " Debug";
-    logLevelStrings[LogLevel::Trace] = " Trace";
+  std::unordered_map<LogLevel, string> logLevelStrings;
+  logLevelStrings[LogLevel::Critical]=" Critical";
+  logLevelStrings[LogLevel::Error]=" Error";
+  logLevelStrings[LogLevel::Warning]=" Warning";
+  logLevelStrings[LogLevel::Information]="";
+  logLevelStrings[LogLevel::Debug]=" Debug";
+  logLevelStrings[LogLevel::Trace]=" Trace";
 
-    while ( _active ) {
+  while ( _active ) {
 
-        // Wait for incoming messages.
-        std::unique_lock<std::mutex> lock( _mutex );
-        _cv.wait( lock );
+    // Wait for incoming messages.
+    std::unique_lock<std::mutex> lock( _mutex );
+    _cv.wait( lock );
 
-        auto timestamp = GenerateTimestamp();
+    auto timestamp=GenerateTimestamp();
 
-        while ( !_messageQueue.empty() ) {
-            Message msg = _messageQueue.front();
+    while ( !_messageQueue.empty() ) {
+      Message msg=_messageQueue.front();
 
-            // Build the log string.
-            string out = "[" + timestamp + "]";
-            out.append( logLevelStrings[msg.lvl] + ": " );
-            out.append( msg.text );
+      // Build the log string.
+      string out="[" + timestamp + "]";
+      out.append( logLevelStrings[msg.lvl] + ": " );
+      out.append( msg.text );
 
-            // Output the string to both the console and log file.
-            printf( "%s\n", out.c_str() );
-            _stream << out << std::endl;
+      // Output the string to both the console and log file.
+      printf( "%s\n", out.c_str() );
+      _stream << out << std::endl;
 
-            _messageQueue.pop();
-        }
-
-        _stream.flush();
-
+      _messageQueue.pop();
     }
+
+    _stream.flush();
+
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Logger::Logger( const string& filename )
-: _level( LogLevel::Information )
-, _stream()
-, _messageQueue()
-, _thread()
-, _mutex()
-, _cv()
-, _active( true )
+  : _level( LogLevel::Information )
+  , _stream()
+  , _messageQueue()
+  , _thread()
+  , _mutex()
+  , _cv()
+  , _active( true )
 {
-    // Open log file.
-    _stream.open( filename.c_str(), std::ofstream::out );
-    if ( !_stream.is_open() ) {
-        throw Lore::Exception( "Unable to create log file " + filename );
-    }
+  // Open log file.
+  _stream.open( filename.c_str(), std::ofstream::out );
+  if ( !_stream.is_open() ) {
+    throw Lore::Exception( "Unable to create log file " + filename );
+  }
 
-    _stream << "..::| LORE2D Log Started |::.." << std::endl;
+  _stream << "..::| LORE2D Log Started |::.." << std::endl;
 
-    _thread = std::thread( &Logger::__logger, this );
+  _thread=std::thread( &Logger::__logger, this );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Logger::~Logger()
 {
-    flush();
-    if ( _stream.is_open() ) {
-        _stream.close();
-    }
+  flush();
+  if ( _stream.is_open() ) {
+    _stream.close();
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Logger::write( const string& text )
 {
-    write( LogLevel::Information, text );
+  write( LogLevel::Information, text );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Logger::write( const LogLevel& lvl, const string& text )
 {
-    Message msg;
-    msg.lvl = lvl;
-    msg.text = text;
+  Message msg;
+  msg.lvl=lvl;
+  msg.text=text;
 
-    // Enqueue message and wake up logger thread.
-    std::unique_lock<std::mutex> lock( _mutex );
-    _messageQueue.push( msg );
-    _cv.notify_one();
+  // Enqueue message and wake up logger thread.
+  std::unique_lock<std::mutex> lock( _mutex );
+  _messageQueue.push( msg );
+  _cv.notify_one();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Logger::flush()
 {
-    if ( _thread.joinable() ) {
-        _cv.notify_one();
-        _thread.join();
-    }
+  if ( _thread.joinable() ) {
+    _cv.notify_one();
+    _thread.join();
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Log::Write( const string& msg )
 {
-    if ( LogLevel::Information <= __log->getLevel() ) {
-        __log->write( msg );
-    }
+  if ( LogLevel::Information <= __log->getLevel() ) {
+    __log->write( msg );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Log::Write( const LogLevel& lvl, const string& msg )
 {
-    if ( lvl <= __log->getLevel() ) {
-        __log->write( lvl, msg );
-    }
+  if ( lvl <= __log->getLevel() ) {
+    __log->write( lvl, msg );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Log::AllocateLogger()
 {
-    if ( !__log.get() ) {
-        __log = std::make_unique<Logger>( "Lore.log" );
-    }
-    CreateTimestamper();
+  if ( !__log.get() ) {
+    __log=std::make_unique<Logger>( "Lore.log" );
+  }
+  CreateTimestamper();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Log::DeleteLogger()
 {
-    if ( __log.get() ) {
-        __log->setActive( false );
-        __log->flush();
-        __log.reset();
-    }
+  if ( __log.get() ) {
+    __log->setActive( false );
+    __log->flush();
+    __log.reset();
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -32,58 +32,58 @@
 
 namespace Lore {
 
-    class LORE_EXPORT Camera final : public Alloc<Camera>
-    {
+  class LORE_EXPORT Camera final : public Alloc<Camera>
+  {
 
-        LORE_OBJECT_BODY()
+    LORE_OBJECT_BODY()
 
-    public:
+  public:
 
-        Camera();
+    Camera();
 
-        ~Camera();
+    ~Camera();
 
-        //
-        // Modifiers.
+    //
+    // Modifiers.
 
-        void setPosition( const Vec2& pos );
+    void setPosition( const Vec2& pos );
 
-        void setPosition( const real x, const real y );
+    void setPosition( const real x, const real y );
 
-        void translate( const Vec2& offset );
+    void translate( const Vec2& offset );
 
-        void translate( const real xOffset, const real yOffset );
+    void translate( const real xOffset, const real yOffset );
 
-        void zoom( const real amount );
+    void zoom( const real amount );
 
-        void setZoom( const real amount );
+    void setZoom( const real amount );
 
-        // TODO: Set projection mode (Ortho/Persp).
+    // TODO: Set projection mode (Ortho/Persp).
 
-        //
-        // Getters.
+    //
+    // Getters.
 
-        Matrix4 getViewMatrix();
+    Matrix4 getViewMatrix();
 
-        void dirty();
+    void dirty();
 
-    protected:
+  protected:
 
-        virtual void _reset() override;
+    virtual void _reset() override;
 
-    private:
+  private:
 
-        void _updateViewMatrix();
+    void _updateViewMatrix();
 
-    private:
+  private:
 
-        Vec2 _position;
-        Vec2 _scale;
-        Matrix4 _view;
+    Vec2 _position;
+    Matrix4 _view;
+    real _zoom;
 
-        bool _dirty;
+    bool _dirty;
 
-    };
+  };
 
 }
 
