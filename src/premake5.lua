@@ -38,8 +38,7 @@ project "LORE2D"
     language "C++"
     defines { "__Lore_Exports__" }
     pchheader "_pch.h"
-    pchsource "_pch.cpp"
-    buildoptions { "/Yc_pch.h" }
+    pchsource "LORE2D/_pch.cpp"
     forceincludes { "_pch.h" }
     files {
         "LORE2D/**.h", "LORE2D/**.cpp"
@@ -52,8 +51,7 @@ project "Plugin_OpenGL"
     libdirs { "../bin/%{cfg.buildcfg}/Run" } -- Location of LORE2D.lib after build.
     defines { "__LoreOpenGL_Exports__" }
     pchheader "_pch.h"
-    pchsource "_pch.cpp"
-    buildoptions { "/Yc_pch.h" }
+    pchsource "Plugins/OpenGL/_pch.cpp"
     forceincludes { "_pch.h" }
     files {
         "Plugins/OpenGL/**.h", "Plugins/OpenGL/**.cpp",

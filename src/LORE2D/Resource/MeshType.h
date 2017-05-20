@@ -25,22 +25,15 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Types.h>
+namespace Lore {
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    enum class MeshType
+    {
+        Custom,
+        Quad,
+        TexturedQuad
+    };
 
-namespace Lore { namespace OpenGL {
-
-    //
-    // Basic types.
-
-    using real = Lore::real;
-    using uint = Lore::uint;
-    using string = Lore::string;
-
-    //
-    // LORE.
-
-}}
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

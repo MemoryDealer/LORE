@@ -25,46 +25,60 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Resource/ResourceController.h>
+#include <LORE2D/Renderer/FrameListener/FrameListener.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore { namespace OpenGL {
+namespace Lore {
 
-    class ResourceController : public Lore::ResourceController
-    {
+  ///
+  /// \class FrameListenerController
+  /// \brief Handles per-frame callbacks for FrameListeners and registered individual callback
+  ///   functors.
+  class LORE_EXPORT FrameListenerController final
+  {
 
-    public:
+  public:
 
-        ResourceController();
+    using FrameStartedCallback = std::function<void( const FrameListener::FrameEvent& e )>;
+    using FrameEndedCallback = std::function<void( const FrameListener::FrameEvent& e )>;
 
-        virtual ~ResourceController() override;
+  private:
 
-        virtual TexturePtr loadTexture( const string& name, const string& file, const string& groupName = DefaultGroupName ) override;
+    using FrameListenerList = std::vector<FrameListener*>;
+    using FrameStartedCallbackList = std::vector<FrameStartedCallback>;
+    using FrameEndedCallbackList = std::vector<FrameEndedCallback>;
 
-        virtual GPUProgramPtr createGPUProgram( const string& name, const string& groupName = DefaultGroupName ) override;
+  private:
 
-        virtual ShaderPtr createVertexShader( const string& name, const string& groupName = DefaultGroupName ) override;
+    FrameListenerList _frameListeners {};
+    FrameStartedCallbackList _frameStartedCallbacks {};
+    FrameEndedCallbackList _frameEndedCallbacks {};
 
-        virtual ShaderPtr createFragmentShader( const string& name, const string& groupName = DefaultGroupName ) override;
+  public:
 
-        virtual VertexBufferPtr createVertexBuffer( const string& name, const MeshType& type, const string& groupName = DefaultGroupName ) override;
+    FrameListenerController() = default;
 
-        virtual MaterialPtr createMaterial( const string& name, const string& groupName = DefaultGroupName ) override;
+    ~FrameListenerController() = default;
 
-        virtual TexturePtr createTexture( const string& name, const string& groupName = DefaultGroupName ) override;
+    void frameStarted();
 
-        virtual CameraPtr createCamera( const string& name, const string& groupName = DefaultGroupName ) override;
+    void frameEnded();
 
-        //
-        // Destruction.
+    void registerFrameListener( FrameListener* listener );
 
-        virtual void destroyTexture( TexturePtr texture ) override;
+    void registerFrameStartedCallback( FrameStartedCallback callback );
 
-        virtual void destroyTexture( const string& name, const string& groupName = DefaultGroupName ) override;
+    void registerFrameEndedCallback( FrameEndedCallback callback );
 
-    };
+    void unregisterFrameListener( FrameListener* listener );
 
-}}
+    void unregisterFrameStartedCallback( FrameStartedCallback callback );
+
+    void unregisterFrameEndedCallback( FrameEndedCallback callback );
+
+  };
+
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

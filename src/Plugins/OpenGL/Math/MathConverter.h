@@ -51,6 +51,14 @@ namespace Lore { namespace OpenGL {
                                 m[3][0], m[3][1], m[3][2], m[3][3] );
         }
 
+        static inline glm::vec2 LoreToGLM( const Lore::Vec2& v )
+        {
+          glm::vec3 re;
+          re.x = v.x;
+          re.y = v.y;
+          return re;
+        }
+
         static inline glm::vec3 LoreToGLM( const Lore::Vec3& v )
         {
             glm::vec3 re;

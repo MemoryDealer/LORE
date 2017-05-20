@@ -70,10 +70,10 @@ void SceneGraphVisitor::visit( IRenderer& renderer, bool parentDirty )
     }
 
     // Add any Renderables attached to this node to the Renderer.
-    auto it = _node->getRenderableConstIterator();
+    auto it = _node->getEntityListConstIterator();
     while ( it.hasMore() ) {
-        RenderablePtr r = it.getNext();
-        renderer.addRenderable( r, _node );
+        EntityPtr entity = it.getNext();
+        renderer.addRenderData( entity, _node );
     }
 
     // Recurse over children.
@@ -91,6 +91,10 @@ void SceneGraphVisitor::visit( IRenderer& renderer, bool parentDirty )
         // Recursion on this node's children is done, we can pop off the transform.
         _stack.pop();
     }
+
+    // Manually update depth value (z) in world transformation matrix after
+    // traversing all children.
+    //_node->_updateDepthValue();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

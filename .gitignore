@@ -44,3 +44,9 @@ src/ipch
 *.ipch
 
 *.opensdf
+
+*.db
+
+*.db-shm
+
+*.db-wal

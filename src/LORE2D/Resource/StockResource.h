@@ -25,7 +25,9 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Core/Util.h>
 #include <LORE2D/Resource/Material.h>
+#include <LORE2D/Resource/Mesh.h>
 #include <LORE2D/Resource/Registry.h>
 #include <LORE2D/Shader/GPUProgram.h>
 
@@ -39,7 +41,6 @@ namespace Lore {
         unsigned int numTextures { 1 };
         bool texYCoordinateFlipped { true };
         bool colorMod { true }; // Modulate final output by color, regardless of scene lighting.
-        VertexBuffer::Type vbType { VertexBuffer::Type::TexturedQuad };
     };
 
     class LORE_EXPORT StockResourceController
@@ -75,11 +76,19 @@ namespace Lore {
 
         MaterialPtr getMaterial( const string& name );
 
+        MeshPtr getMesh( const MeshType& type );
+
         TexturePtr getTexture( const string& name );
 
     protected:
 
+        using MeshTable = Util::HashTable<MeshType, MeshPtr>;
+
+    protected:
+
         std::unique_ptr<ResourceController> _controller;
+
+        MeshTable _meshTable;
 
     };
 
@@ -93,6 +102,8 @@ namespace Lore {
         static GPUProgramPtr GetGPUProgram( const string& name );
 
         static MaterialPtr GetMaterial( const string& name );
+
+        static MeshPtr GetMesh( const MeshType& type );
 
         static TexturePtr GetTexture( const string& name );
 

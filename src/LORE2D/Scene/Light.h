@@ -34,103 +34,103 @@
 
 namespace Lore {
 
-    class Light final : public Alloc<Light>
+  class Light final : public Alloc<Light>
+  {
+
+    LORE_OBJECT_BODY()
+
+  public:
+
+    Light();
+
+    virtual ~Light() override;
+
+    //
+    // Getters.
+
+    inline Vec2 getPosition() const
     {
+      return _position;
+    }
 
-        LORE_OBJECT_BODY()
+    inline Color getColor() const
+    {
+      return _color;
+    }
 
-    public:
+    inline real getRange() const
+    {
+      return _range;
+    }
 
-        Light();
+    inline real getConstant() const
+    {
+      return _constant;
+    }
 
-        virtual ~Light() override;
+    inline real getLinear() const
+    {
+      return _linear;
+    }
 
-        //
-        // Getters.
+    inline real getQuadratic() const
+    {
+      return _quadratic;
+    }
 
-        inline Vec2 getPosition() const
-        {
-            return _position;
-        }
+    inline real getIntensity() const
+    {
+      return _intensity;
+    }
 
-        inline Color getColor() const
-        {
-            return _color;
-        }
+    //
+    // Setters.
 
-        inline real getRange() const
-        {
-            return _range;
-        }
+    inline void setColor( const Color& color )
+    {
+      _color=color;
+    }
 
-        inline real getConstant() const
-        {
-            return _constant;
-        }
+    inline void setAttenuation( const real range,
+                                const real constant,
+                                const real linear,
+                                const real quadratic )
+    {
+      _range=range;
+      _constant=constant;
+      _linear=linear;
+      _quadratic=quadratic;
+    }
 
-        inline real getLinear() const
-        {
-            return _linear;
-        }
+    inline void setRange( const real range )
+    {
+      _range=range;
+    }
 
-        inline real getQuadratic() const
-        {
-            return _quadratic;
-        }
+    inline void setIntensity( const real intensity )
+    {
+      _intensity=intensity;
+    }
 
-        inline real getIntensity() const
-        {
-            return _intensity;
-        }
+  private:
 
-        //
-        // Setters.
+    virtual void _reset() override;
 
-        inline void setColor( const Color& color )
-        {
-            _color = color;
-        }
+    friend class Node;
 
-        inline void setAttenuation( const real range,
-                                    const real constant,
-                                    const real linear,
-                                    const real quadratic )
-        {
-            _range = range;
-            _constant = constant;
-            _linear = linear;
-            _quadratic = quadratic;
-        }
+  private:
 
-        inline void setRange( const real range )
-        {
-            _range = range;
-        }
+    Vec2 _position;
+    Color _color;
 
-        inline void setIntensity( const real intensity )
-        {
-            _intensity = intensity;
-        }
+    // Attenuation.
+    real _range;
+    real _constant;
+    real _linear;
+    real _quadratic;
+    real _intensity;
 
-    private:
-
-        virtual void _reset() override;
-
-        friend class Node;
-
-    private:
-
-        Vec2 _position;
-        Color _color;
-
-        // Attenuation.
-        real _range;
-        real _constant;
-        real _linear;
-        real _quadratic;
-        real _intensity;
-
-    };
+  };
 
 }
 

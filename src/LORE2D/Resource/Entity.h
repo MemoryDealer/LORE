@@ -25,46 +25,78 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Resource/ResourceController.h>
+#include <LORE2D/Memory/Alloc.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore { namespace OpenGL {
+namespace Lore {
 
-    class ResourceController : public Lore::ResourceController
+  class LORE_EXPORT Entity final : public Alloc<Entity>
+  {
+
+    LORE_OBJECT_BODY()
+
+  public:
+
+    Entity();
+
+    ~Entity();
+
+    //
+    // Getters.
+
+    inline MaterialPtr getMaterial() const
     {
+      return _material;
+    }
 
-    public:
+    inline MeshPtr getMesh() const
+    {
+      return _mesh;
+    }
 
-        ResourceController();
+    inline uint getRenderQueue() const
+    {
+      return _renderQueue;
+    }
 
-        virtual ~ResourceController() override;
+    //
+    // Setters.
 
-        virtual TexturePtr loadTexture( const string& name, const string& file, const string& groupName = DefaultGroupName ) override;
+    inline void setMaterial( MaterialPtr material )
+    {
+      _material = material;
+    }
 
-        virtual GPUProgramPtr createGPUProgram( const string& name, const string& groupName = DefaultGroupName ) override;
+    inline void setMesh( MeshPtr mesh )
+    {
+      _mesh = mesh;
+    }
 
-        virtual ShaderPtr createVertexShader( const string& name, const string& groupName = DefaultGroupName ) override;
+    //
+    // Helper functions.
 
-        virtual ShaderPtr createFragmentShader( const string& name, const string& groupName = DefaultGroupName ) override;
+    void setTexture( TexturePtr texture );
 
-        virtual VertexBufferPtr createVertexBuffer( const string& name, const MeshType& type, const string& groupName = DefaultGroupName ) override;
+  private:
 
-        virtual MaterialPtr createMaterial( const string& name, const string& groupName = DefaultGroupName ) override;
+    friend class Node;
 
-        virtual TexturePtr createTexture( const string& name, const string& groupName = DefaultGroupName ) override;
+  private:
 
-        virtual CameraPtr createCamera( const string& name, const string& groupName = DefaultGroupName ) override;
+    virtual void _reset() override;
 
-        //
-        // Destruction.
+    void _notifyAttached();
 
-        virtual void destroyTexture( TexturePtr texture ) override;
+  private:
 
-        virtual void destroyTexture( const string& name, const string& groupName = DefaultGroupName ) override;
+    MaterialPtr _material;
+    MeshPtr _mesh;
 
-    };
+    uint _renderQueue;
 
-}}
+  };
+
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

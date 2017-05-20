@@ -1,3 +1,4 @@
+#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -24,40 +25,28 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Renderable.h"
+namespace Lore {
 
-#include <LORE2D/Renderer/IRenderer.h>
-#include <LORE2D/Resource/Material.h>
-#include <LORE2D/Resource/StockResource.h>
+  class FrameListener
+  {
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+  public:
 
-using namespace Lore;
+    struct FrameEvent
+    {
+      uint32_t placeholder;
+    };
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+  public:
 
-Renderable::Renderable()
-: _material()
-, _renderQueue( RenderQueue::General )
-, _attached( false )
-, _type( Type::Unknown )
-{
-    // TODO: Get default stock material.
-    
-}
+    virtual ~FrameListener() { }
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    virtual void frameStarted( const FrameEvent& e ) { }
 
-Renderable::~Renderable()
-{
-}
+    virtual void frameEnded( const FrameEvent& e ) { }
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+  };
 
-void Renderable::_notifyAttached()
-{
-    _attached = true;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

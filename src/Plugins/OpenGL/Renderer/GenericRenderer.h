@@ -49,8 +49,8 @@ namespace Lore { namespace OpenGL {
 
         virtual ~GenericRenderer() override;
 
-        virtual void addRenderable( Lore::RenderablePtr r,
-                                    NodePtr node ) override;
+        virtual void addRenderData( Lore::EntityPtr e,
+                                    Lore::NodePtr node ) override;
 
         virtual void present( const Lore::RenderView& rv,
                               const WindowPtr window ) override;
@@ -62,7 +62,7 @@ namespace Lore { namespace OpenGL {
         void activateQueue( const uint id, Lore::RenderQueue& rq );
 
         void renderMaterialMap( const Lore::ScenePtr scene,
-                                RenderQueue::MaterialMap& mm,
+                                RenderQueue::EntityDataMap& mm,
                                 const Matrix4& viewProjection ) const;
 
     private:

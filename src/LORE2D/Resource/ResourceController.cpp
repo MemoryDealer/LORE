@@ -27,6 +27,7 @@
 #include "ResourceController.h"
 
 #include <LORE2D/Core/Context.h>
+#include <LORE2D/Resource/Entity.h>
 #include <LORE2D/Resource/StockResource.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -111,6 +112,68 @@ void ResourceController::unloadGroup( const string& name )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+EntityPtr ResourceController::createEntity( const string& name, const MeshType& type, const string& groupName )
+{
+    auto group = _getGroup( groupName );
+    if ( group->entities.exists( name ) ) {
+        return group->entities.get( name );
+    }
+
+    auto entity = MemoryAccess::GetPrimaryPoolCluster()->create<Entity>();
+    entity->setName( name );
+    entity->setResourceGroupName( groupName );
+
+    // Lookup stock mesh and assign it.
+    entity->setMesh( StockResource::GetMesh( type ) );
+
+    // Set default material.
+    switch ( type ) {
+
+    default:
+        break;
+
+    case MeshType::Quad:
+        entity->setMaterial( StockResource::GetMaterial( "Standard" ) );
+        break;
+
+    case MeshType::TexturedQuad:
+        entity->setMaterial( StockResource::GetMaterial( "StandardTextured" ) );
+        break;
+
+    }
+
+    // Register entity and return it.
+    group->entities.insert( name, entity );
+    return entity;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+EntityPtr ResourceController::createEntity( const string& name, const string& groupName )
+{
+    return createEntity( name, MeshType::Custom, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+MeshPtr ResourceController::createMesh( const string& name, const MeshType& meshType, const string& groupName )
+{
+    auto mesh = MemoryAccess::GetPrimaryPoolCluster()->create<Mesh>();
+    mesh->setName( name );
+    mesh->setResourceGroupName( groupName );
+
+    // If this mesh type is a stock type, assign the corresponding vertex buffer.
+    if ( MeshType::Custom != meshType ) {
+        auto vb = _vertexBufferTable.at( meshType );
+        mesh->setVertexBuffer( vb );
+    }
+
+    _getGroup( groupName )->meshes.insert( name, mesh );
+    return mesh;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 GPUProgramPtr ResourceController::getGPUProgram( const string& name, const string& groupName )
 {
     return _getGroup( groupName )->programs.get( name );
@@ -176,16 +239,16 @@ ShaderPtr Resource::CreateFragmentShader( const string& name, const string& grou
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-VertexBufferPtr Resource::CreateVertexBuffer( const string& name, const VertexBuffer::Type& type, const string& groupName )
+MaterialPtr Resource::CreateMaterial( const string& name, const string& groupName )
 {
-    return ActiveContext->getResourceController()->createVertexBuffer( name, type, groupName );
+    return ActiveContext->getResourceController()->createMaterial( name, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-MaterialPtr Resource::CreateMaterial( const string& name, const string& groupName )
+MeshPtr Resource::CreateMesh( const string& name, const MeshType& meshType, const string& groupName )
 {
-    return ActiveContext->getResourceController()->createMaterial( name, groupName );
+    return ActiveContext->getResourceController()->createMesh( name, meshType, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -200,6 +263,20 @@ TexturePtr Resource::CreateTexture( const string& name, const string& groupName 
 CameraPtr Resource::CreateCamera( const string& name, const string& groupName )
 {
     return ActiveContext->getResourceController()->createCamera( name, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+EntityPtr Resource::CreateEntity( const string& name, const MeshType& meshType, const string& groupName )
+{
+    return ActiveContext->getResourceController()->createEntity( name, meshType, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+EntityPtr Resource::CreateEntity( const string& name, const string& groupName )
+{
+    return ActiveContext->getResourceController()->createEntity( name, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

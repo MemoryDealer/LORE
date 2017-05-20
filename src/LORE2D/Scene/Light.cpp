@@ -33,13 +33,13 @@ using namespace Lore;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Light::Light()
-: _position()
-, _color( StockColor::Black )
-, _range( 7.f )
-, _constant( 1.f )
-, _linear( 0.7f )
-, _quadratic( 1.8f )
-, _intensity( 1.f )
+  : _position()
+  , _color( StockColor::Black )
+  , _range( 7.f )
+  , _constant( 1.f )
+  , _linear( 0.7f )
+  , _quadratic( 1.8f )
+  , _intensity( 1.f )
 {
 }
 
@@ -53,13 +53,13 @@ Light::~Light()
 
 void Light::_reset()
 {
-    _position = Vec2();
-    _color = StockColor::Black;
-    _range = 7.f;
-    _constant = 1.f;
-    _linear = 0.7f;
-    _quadratic = 1.8f;
-    _intensity = 1.f;
+  _position = Vec2();
+  _color = StockColor::Black;
+  _range = 7.f;
+  _constant = 1.f;
+  _linear = 0.7f;
+  _quadratic = 1.8f;
+  _intensity = 1.f;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

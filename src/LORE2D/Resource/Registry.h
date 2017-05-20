@@ -79,14 +79,19 @@ namespace Lore {
             _container.clear();
         }
 
-        T* get( const id& id_ ) const
+        T* get( const id& id ) const
         {
-            auto lookup = _container.find( id_ );
+            auto lookup = _container.find( id );
             if ( _container.end() == lookup ) {
-                throw Lore::ItemIdentityException( "Resource with id " + id_ + " does not exist" );
+                throw Lore::ItemIdentityException( "Resource with id " + id + " does not exist" );
             }
 
             return lookup->second;
+        }
+
+        bool exists( const id& id ) const
+        {
+            return ( _container.find( id ) != _container.end() );
         }
 
         size_t size() const

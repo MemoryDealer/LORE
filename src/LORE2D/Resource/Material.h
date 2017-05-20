@@ -26,6 +26,7 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 #include <LORE2D/Memory/Alloc.h>
+#include <LORE2D/Renderer/FrameListener/FrameListenerController.h>
 #include <LORE2D/Resource/Color.h>
 #include <LORE2D/Shader/GPUProgram.h>
 
@@ -33,74 +34,83 @@
 
 namespace Lore {
 
+  ///
+  /// \class Material
+  /// \brief Contains data on how to render an object, including lighting, colors,
+  ///     and shader effects.
+  /// \details Can have N number of passes.
+  class LORE_EXPORT Material final : public Alloc<Material>
+  {
+
+    LORE_OBJECT_BODY()
+
+  public:
+
     ///
-    /// \class Material
-    /// \brief Contains data on how to render an object, including lighting, colors,
-    ///     and shader effects.
-    /// \details Can have N number of passes.
-    class LORE_EXPORT Material final : public Alloc<Material>
+    /// \class Material::Pass
+    /// \brief A single vertex and pixel shader pass.
+    class LORE_EXPORT Pass final
     {
 
-        LORE_OBJECT_BODY()
+      Vec2 _texCoordScrollSpeed { };
+      Vec2 _texCoordOffset { };
+      FrameListenerController::FrameStartedCallback _texCoordCallback { nullptr };
 
     public:
 
-        ///
-        /// \class Material::Pass
-        /// \brief A single vertex and pixel shader pass.
-        struct Pass final
-        {
-
-            bool colorMod;
-            bool lighting;
-            Color ambient;
-            Color diffuse;
-            GPUProgramPtr program;
-
-            inline Pass()
-            : colorMod( true )
-            , lighting( true )
-            , ambient( StockColor::White )
-            , diffuse( StockColor::White )
-            , program( nullptr )
-            { }
-
-            inline ~Pass()
-            { }
-
-        };
+      bool colorMod;
+      bool lighting;
+      Color ambient;
+      Color diffuse;
+      TexturePtr texture;
+      GPUProgramPtr program;
 
     public:
 
-        Material();
+      Pass();
 
-        virtual ~Material() override;
+      ~Pass();
 
-        //
-        // Getters.
+      void setTextureScrollSpeed( const Vec2& scroll );
 
-        ///
-        /// \brief Returns reference to Pass at specified index. All Materials have
-        ///     at least one pass.
-        Pass& getPass( const size_t idx = 0 )
-        {
-            assert( idx <= _passes.size() );
-            return _passes[idx];
-        }
-
-    private:
-
-        using PassList = std::vector<Pass>;
-
-    private:
-
-        virtual void _reset() override;
-
-    private:
-
-        PassList _passes;
+      inline Vec2 getTexCoordOffset() const
+      {
+        return _texCoordOffset;
+      }
 
     };
+
+  public:
+
+    Material();
+
+    virtual ~Material() override;
+
+    //
+    // Getters.
+
+    ///
+    /// \brief Returns reference to Pass at specified index. All Materials have
+    ///     at least one pass.
+    Pass& getPass( const size_t idx = 0 )
+    {
+      assert( idx <= _passes.size() );
+      return _passes[idx];
+    }
+
+  private:
+
+    using PassList = std::vector<Pass>;
+
+  private:
+
+    virtual void _reset() override;
+
+  private:
+
+    PassList _passes;
+
+  };
 
 }
 

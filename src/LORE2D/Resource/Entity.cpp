@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,22 +24,48 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Types.h>
+#include "Entity.h"
+
+#include <LORE2D/Renderer/IRenderer.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore { namespace OpenGL {
+using namespace Lore;
 
-    //
-    // Basic types.
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    using real = Lore::real;
-    using uint = Lore::uint;
-    using string = Lore::string;
+Entity::Entity()
+  : _material( nullptr )
+  , _mesh( nullptr )
+  , _renderQueue( RenderQueue::General )
+{
+}
 
-    //
-    // LORE.
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-}}
+Entity::~Entity()
+{
+}
+
+void Entity::setTexture( TexturePtr texture )
+{
+  _material->getPass().texture=texture;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Entity::_reset()
+{
+  _material=nullptr;
+  _mesh=nullptr;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Entity::_notifyAttached()
+{
+
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

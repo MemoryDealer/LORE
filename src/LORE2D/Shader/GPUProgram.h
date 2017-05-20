@@ -27,6 +27,7 @@
 
 #include <LORE2D/Math/Math.h>
 #include <LORE2D/Memory/Alloc.h>
+#include <LORE2D/Scene/Scene.h>
 #include <LORE2D/Shader/Shader.h>
 #include <LORE2D/Shader/VertexBuffer.h>
 
@@ -49,8 +50,6 @@ namespace Lore {
 
         virtual ShaderPtr getAttachedShader( const Shader::Type& type );
 
-        void setVertexBuffer( VertexBufferPtr vb );
-
         virtual bool link() = 0;
 
         virtual void use() = 0;
@@ -63,10 +62,6 @@ namespace Lore {
         //
         // Getters.
 
-        inline VertexBufferPtr getVertexBuffer() const
-        {
-            return _vertexBuffer;
-        }
 
         //
         // Uniform value updating.
@@ -79,11 +74,13 @@ namespace Lore {
 
         virtual void setUniformVar( const string& id, const Matrix4& m ) = 0;
 
+        virtual void setUniformVar( const string& id, const Vec2& v ) = 0;
+
         virtual void setUniformVar( const string& id, const Vec3& v ) = 0;
 
         virtual void setUniformVar( const string& id, const int i ) = 0;
 
-        virtual void updateLights( const std::vector<LightPtr>& lights ) = 0;
+        virtual void updateLights( Scene::LightMap::ConstIterator it ) = 0;
 
     protected:
 
@@ -92,8 +89,6 @@ namespace Lore {
     protected:
 
         ShaderMap _shaders;
-        
-        VertexBufferPtr _vertexBuffer;
 
     };
 

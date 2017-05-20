@@ -49,8 +49,8 @@ namespace Lore {
         using NodeMap = Registry<std::map, Node>;
         using ChildNodeIterator = NodeMap::Iterator;
         using ConstChildNodeIterator = NodeMap::ConstIterator;
-        using RenderableList = Registry<std::map, Renderable>;
-        using RenderableListConstIterator = RenderableList::ConstIterator;
+        using EntityList = Registry<std::map, Entity>;
+        using EntityListConstIterator = EntityList::ConstIterator;
         using LightList = std::vector<LightPtr>;
 
         struct Transform
@@ -99,13 +99,13 @@ namespace Lore {
         //
         // Renderable attachments.
 
-        void attachObject( RenderablePtr r );
+        void attachObject( EntityPtr e );
 
         void attachObject( LightPtr l );
 
-        inline RenderableListConstIterator getRenderableConstIterator() const
+        inline EntityListConstIterator getEntityListConstIterator() const
         {
-            return _renderables.getConstIterator();
+            return _entities.getConstIterator();
         }
 
         //
@@ -133,7 +133,7 @@ namespace Lore {
 
         void scale( const real s );
 
-        inline void setDepth( const int depth )
+        void setDepth( const int depth )
         {
             // Depth has a range of [-100, 100].
             assert( depth >= -100 && depth <= 100 );
@@ -225,13 +225,15 @@ namespace Lore {
 
         void _updateChildrenScale();
 
+        void _updateDepthValue();
+
     private:
 
         Transform _transform;
 
         int _depth;
 
-        RenderableList _renderables;
+        EntityList _entities;
 
         // The creator of this node.
         ScenePtr _scene;

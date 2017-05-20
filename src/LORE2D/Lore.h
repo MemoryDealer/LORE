@@ -38,6 +38,8 @@
 #include <LORE2D/Math/Math.h>
 
 // Resource.
+#include <LORE2D/Resource/Entity.h>
+#include <LORE2D/Resource/Material.h>
 #include <LORE2D/Resource/StockResource.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

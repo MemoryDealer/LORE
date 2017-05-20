@@ -55,22 +55,50 @@ void GLTexture::loadFromFile( const string& file )
     unsigned char* pixels = stbi_load( file.c_str(), &width, &height, &n, STBI_rgb_alpha );
     if ( pixels ) {
 
-        glGenTextures( 1, &_id );
-        glBindTexture( GL_TEXTURE_2D, _id );
-
-        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-
-        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-        glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-
-        // Create the OpenGL texture.
-        glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
-        glGenerateMipmap( GL_TEXTURE_2D );
+        _createGLTexture( pixels, width, height );
 
         stbi_image_free( pixels );
         glBindTexture( GL_TEXTURE_2D, 0 );
     }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLTexture::create( const int width, const int height, const Lore::Color& color )
+{
+    const auto size = width * height * 4;
+    unsigned char* pixels = new unsigned char[size];
+
+    const unsigned char ccolor[3] = {
+        static_cast<unsigned char>( color.r * 255.f ),
+        static_cast<unsigned char>( color.g * 255.f ),
+        static_cast<unsigned char>( color.b * 255.f )
+    };
+
+    for ( int i = 0; i < size; ++i ) {
+        switch ( i % 4 ) {
+        case 0:
+            pixels[i] = ccolor[0];
+            break;
+
+        case 1:
+            pixels[i] = ccolor[1];
+            break;
+
+        case 2:
+            pixels[i] = ccolor[2];
+            break;
+
+        case 3:
+            pixels[i] = 255;
+            break;
+        }
+    }
+
+    _createGLTexture( pixels, width, height );
+
+    delete [] pixels;
+    glBindTexture( GL_TEXTURE_2D, 0 );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -81,6 +109,24 @@ void GLTexture::bind()
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLTexture::_createGLTexture( const unsigned char* pixels, const int width, const int height )
+{
+    glGenTextures( 1, &_id );
+    glBindTexture( GL_TEXTURE_2D, _id );
+
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+
+    // Create the OpenGL texture.
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
+    glGenerateMipmap( GL_TEXTURE_2D );
+}
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void GLTexture::_reset()
