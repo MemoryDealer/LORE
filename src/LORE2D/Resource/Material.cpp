@@ -70,16 +70,24 @@ Material::Pass::Pass()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+Material::Pass::~Pass()
+{
+  if ( _texCoordCallback ) {
+    Context::UnregisterFrameStartedCallback( _texCoordCallback );
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void Material::Pass::setTextureScrollSpeed( const Vec2& scroll )
 {
-  if ( !_textureScrollCallback ) {
+  if ( !_texCoordCallback ) {
     // Register a callback to update the texture coordinates per frame.
-    auto UpdateTexCoordOffset = [this] ( const FrameListener::FrameEvent& e ) {
+    _texCoordCallback = [this] ( const FrameListener::FrameEvent& e ) {
       _texCoordOffset += _texCoordScrollSpeed;
     };
 
-    Context::RegisterFrameStartedCallback( UpdateTexCoordOffset );
-    _textureScrollCallback = true;
+    Context::RegisterFrameStartedCallback( _texCoordCallback );
   }
   _texCoordScrollSpeed = scroll;
 }

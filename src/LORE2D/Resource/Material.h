@@ -26,6 +26,7 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 #include <LORE2D/Memory/Alloc.h>
+#include <LORE2D/Renderer/FrameListener/FrameListenerController.h>
 #include <LORE2D/Resource/Color.h>
 #include <LORE2D/Shader/GPUProgram.h>
 
@@ -53,7 +54,7 @@ namespace Lore {
 
       Vec2 _texCoordScrollSpeed { };
       Vec2 _texCoordOffset { };
-      bool _textureScrollCallback { false };
+      FrameListenerController::FrameStartedCallback _texCoordCallback { nullptr };
 
     public:
 
@@ -68,7 +69,7 @@ namespace Lore {
 
       Pass();
 
-      ~Pass() = default;
+      ~Pass();
 
       void setTextureScrollSpeed( const Vec2& scroll );
 

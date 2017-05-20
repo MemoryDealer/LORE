@@ -65,12 +65,12 @@ namespace Lore {
 
     inline void setMaterial( MaterialPtr material )
     {
-      _material=material;
+      _material = material;
     }
 
     inline void setMesh( MeshPtr mesh )
     {
-      _mesh=mesh;
+      _mesh = mesh;
     }
 
     //
