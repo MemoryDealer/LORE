@@ -26,6 +26,8 @@
 
 #include "Material.h"
 
+#include <LORE2D/Core/Context.h>
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 using namespace Lore;
@@ -33,11 +35,11 @@ using namespace Lore;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Material::Material()
-: _name()
-, _passes()
+  : _name()
+  , _passes()
 {
-    // By default a material should have at least one pass.
-    _passes.push_back( Pass() );
+  // By default a material should have at least one pass.
+  _passes.push_back( Pass() );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -51,7 +53,35 @@ Material::~Material()
 
 void Material::_reset()
 {
-    _passes.clear();
+  _passes.clear();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Material::Pass::Pass()
+  : colorMod( true )
+  , lighting( true )
+  , ambient( StockColor::White )
+  , diffuse( StockColor::White )
+  , texture( nullptr )
+  , program( nullptr )
+{
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Material::Pass::setTextureScrollSpeed( const Vec2& scroll )
+{
+  if ( !_textureScrollCallback ) {
+    // Register a callback to update the texture coordinates per frame.
+    auto UpdateTexCoordOffset = [this] ( const FrameListener::FrameEvent& e ) {
+      _texCoordOffset += _texCoordScrollSpeed;
+    };
+
+    Context::RegisterFrameStartedCallback( UpdateTexCoordOffset );
+    _textureScrollCallback = true;
+  }
+  _texCoordScrollSpeed = scroll;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

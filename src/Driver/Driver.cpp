@@ -81,6 +81,7 @@ int main( int argc, char** argv )
   Lore::TexturePtr tex = Lore::Resource::LoadTexture( "tex1", "C:\\doggo.png" );
   auto entity = Lore::Resource::CreateEntity( "e1", Lore::MeshType::TexturedQuad );
   //entity->getMaterial()->getPass().texture = Lore::StockResource::GetTexture("White");
+  entity->getMaterial()->getPass().setTextureScrollSpeed( Lore::Vec2( 0.01f, 0.f ) );
   entity->setTexture( tex );
 
   node = scene->getNode( "A" );

@@ -48,6 +48,18 @@ namespace Lore { namespace Util {
     template<typename Key, typename T, typename ... ExtraParams>
     using HashTable = std::unordered_map<Key, T, HashType<Key>, ExtraParams ...>;
 
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    ///
+    /// \brief Returns the address of the function encapsulated in a std::function object.
+    template<typename T>
+    size_t GetFPAddress( std::function<void( T& )> function )
+    {
+      using fType = void( T& );
+      fType** fp = function.template target<fType*>();
+      return reinterpret_cast< size_t >( fp );
+    }
+
 }}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

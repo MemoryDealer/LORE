@@ -62,6 +62,8 @@ namespace Lore { namespace OpenGL {
 
         virtual void setUniformVar( const string& id, const Matrix4& m ) override;
 
+        virtual void setUniformVar( const string& id, const Vec2& v ) override;
+
         virtual void setUniformVar( const string& id, const Vec3& v ) override;
 
         virtual void setUniformVar( const string& id, const int i ) override;

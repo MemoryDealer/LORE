@@ -182,6 +182,7 @@ void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
     program->use();
     if ( texture ) {
       texture->bind();
+      program->setUniformVar( "texSampleOffset", pass.getTexCoordOffset() );
     }
 
     // Upload lighting data.

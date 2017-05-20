@@ -25,62 +25,57 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Math/Math.h>
-#include <LORE2D/Memory/Alloc.h>
+#include <LORE2D/Renderer/FrameListener/FrameListener.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-  class LORE_EXPORT Camera final : public Alloc<Camera>
+  ///
+  /// \class FrameListenerController
+  /// \brief Handles per-frame callbacks for FrameListeners and registered individual callback
+  ///   functors.
+  class LORE_EXPORT FrameListenerController final
   {
-
-    LORE_OBJECT_BODY()
 
   public:
 
-    Camera();
-
-    ~Camera();
-
-    //
-    // Modifiers.
-
-    void setPosition( const Vec2& pos );
-
-    void setPosition( const real x, const real y );
-
-    void translate( const Vec2& offset );
-
-    void translate( const real xOffset, const real yOffset );
-
-    void zoom( const real amount );
-
-    void setZoom( const real amount );
-
-    // TODO: Set projection mode (Ortho/Persp).
-
-    //
-    // Getters.
-
-    Matrix4 getViewMatrix();
-
-  protected:
-
-    virtual void _reset() override;
+    using FrameStartedCallback = std::function<void( const FrameListener::FrameEvent& e )>;
+    using FrameEndedCallback = std::function<void( const FrameListener::FrameEvent& e )>;
 
   private:
 
-    void _dirty();
-    void _updateViewMatrix();
+    using FrameListenerList = std::vector<FrameListener*>;
+    using FrameStartedCallbackList = std::vector<FrameStartedCallback>;
+    using FrameEndedCallbackList = std::vector<FrameEndedCallback>;
 
   private:
 
-    Vec2 _position;
-    Matrix4 _view;
-    real _zoom;
+    FrameListenerList _frameListeners {};
+    FrameStartedCallbackList _frameStartedCallbacks {};
+    FrameEndedCallbackList _frameEndedCallbacks {};
 
-    bool _viewMatrixDirty;
+  public:
+
+    FrameListenerController() = default;
+
+    ~FrameListenerController() = default;
+
+    void frameStarted();
+
+    void frameEnded();
+
+    void registerFrameListener( FrameListener* listener );
+
+    void registerFrameStartedCallback( FrameStartedCallback callback );
+
+    void registerFrameEndedCallback( FrameEndedCallback callback );
+
+    void unregisterFrameListener( FrameListener* listener );
+
+    void unregisterFrameStartedCallback( FrameStartedCallback callback );
+
+    void unregisterFrameEndedCallback( FrameEndedCallback callback );
 
   };
 

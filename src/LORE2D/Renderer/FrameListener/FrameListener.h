@@ -25,62 +25,25 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Math/Math.h>
-#include <LORE2D/Memory/Alloc.h>
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 namespace Lore {
 
-  class LORE_EXPORT Camera final : public Alloc<Camera>
+  class FrameListener
   {
-
-    LORE_OBJECT_BODY()
 
   public:
 
-    Camera();
+    struct FrameEvent
+    {
+      uint32_t placeholder;
+    };
 
-    ~Camera();
+  public:
 
-    //
-    // Modifiers.
+    virtual ~FrameListener() { }
 
-    void setPosition( const Vec2& pos );
+    virtual void frameStarted( const FrameEvent& e ) { }
 
-    void setPosition( const real x, const real y );
-
-    void translate( const Vec2& offset );
-
-    void translate( const real xOffset, const real yOffset );
-
-    void zoom( const real amount );
-
-    void setZoom( const real amount );
-
-    // TODO: Set projection mode (Ortho/Persp).
-
-    //
-    // Getters.
-
-    Matrix4 getViewMatrix();
-
-  protected:
-
-    virtual void _reset() override;
-
-  private:
-
-    void _dirty();
-    void _updateViewMatrix();
-
-  private:
-
-    Vec2 _position;
-    Matrix4 _view;
-    real _zoom;
-
-    bool _viewMatrixDirty;
+    virtual void frameEnded( const FrameEvent& e ) { }
 
   };
 

@@ -24,9 +24,9 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Camera.h"
+#include "FrameListenerController.h"
 
-#include <LORE2D/Math/Math.h>
+#include <LORE2D/Core/Util.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -34,127 +34,96 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace LocalNS {
-
-  constexpr real ZoomLimit = 0.1f;
-
-}
-using namespace LocalNS;
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-Camera::Camera()
-  : _position()
-  , _view()
-  , _zoom( 1.f )
-  , _viewMatrixDirty( true )
+void FrameListenerController::frameStarted()
 {
-}
+  FrameListener::FrameEvent e;
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-Camera::~Camera()
-{
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Camera::setPosition( const Vec2& pos )
-{
-  _position = pos;
-  _dirty();
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Camera::setPosition( const real x, const real y )
-{
-  _position.x = x;
-  _position.y = y;
-  _dirty();
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Camera::translate( const Vec2& offset )
-{
-  _position += offset;
-  _dirty();
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Camera::translate( const real xOffset, const real yOffset )
-{
-  _position.x += xOffset / _zoom;
-  _position.y += yOffset / _zoom;
-  _dirty();
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Camera::zoom( const real amount )
-{
-  _zoom += amount * _zoom; // Scale zooming speed as it goes farther.
-  if ( _zoom < ZoomLimit ) {
-    _zoom = ZoomLimit;
+  // Update frame listeners.
+  for ( const auto& frameListener : _frameListeners ) {
+    frameListener->frameStarted( e );
   }
 
-  _dirty();
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Camera::setZoom( const real amount )
-{
-  _zoom = amount;
-  if ( _zoom < ZoomLimit ) {
-    _zoom = ZoomLimit;
+  // Update bound functors.
+  for ( const auto& callback : _frameStartedCallbacks ) {
+    callback( e );
   }
-  
-  _dirty();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Matrix4 Camera::getViewMatrix()
+void FrameListenerController::frameEnded()
 {
-  if ( _viewMatrixDirty ) {
-    _updateViewMatrix();
+  FrameListener::FrameEvent e;
+
+  // Update frame listeners.
+  for ( const auto& frameListener : _frameListeners ) {
+    frameListener->frameEnded( e );
   }
 
-  return _view;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Camera::_dirty()
-{
-  _viewMatrixDirty = true;
+  // Update bound functors.
+  for ( const auto& callback : _frameEndedCallbacks ) {
+    callback( e );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Camera::_reset()
+void FrameListenerController::registerFrameListener( FrameListener* listener )
 {
-  _position = Vec2();
-  _view = Matrix4();
-  _zoom = 1.f;
-  _viewMatrixDirty = true;
+  _frameListeners.push_back( listener );
 }
 
-void Camera::_updateViewMatrix()
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void FrameListenerController::registerFrameStartedCallback( FrameStartedCallback callback )
 {
-  Vec2 scale( _zoom, _zoom );
-  _view = Math::CreateTransformationMatrix( _position,
-                                            Quaternion(),
-                                            scale );
+  _frameStartedCallbacks.push_back( callback );
+}
 
-  _view[3][0] *= _zoom;
-  _view[3][1] *= _zoom;
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-  _viewMatrixDirty = false;
+void FrameListenerController::registerFrameEndedCallback( FrameEndedCallback callback )
+{
+  _frameEndedCallbacks.push_back( callback );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void FrameListenerController::unregisterFrameListener( FrameListener* listener )
+{
+  for ( auto it = _frameListeners.begin(); it != _frameListeners.end(); ) {
+    FrameListener* currentListener = *it;
+    if ( currentListener == listener ) {
+      _frameListeners.erase( it );
+      break;
+    }
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void FrameListenerController::unregisterFrameStartedCallback( FrameStartedCallback callback )
+{
+  for ( auto it = _frameStartedCallbacks.begin(); it != _frameStartedCallbacks.end(); ) {
+    FrameStartedCallback currentCallback = *it;
+    if ( Util::GetFPAddress(currentCallback) == Util::GetFPAddress(callback) ) {
+      _frameStartedCallbacks.erase( it );
+      break;
+    }
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void FrameListenerController::unregisterFrameEndedCallback( FrameEndedCallback callback )
+{
+  for ( auto it = _frameStartedCallbacks.begin(); it != _frameStartedCallbacks.end(); ) {
+    FrameEndedCallback currentCallback = *it;
+    if ( Util::GetFPAddress( currentCallback ) == Util::GetFPAddress( callback ) ) {
+      _frameEndedCallbacks.erase( it );
+      break;
+    }
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

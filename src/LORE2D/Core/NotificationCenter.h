@@ -27,6 +27,7 @@
 
 #include <LORE2D/Core/Notification.h>
 #include <LORE2D/Core/Singleton.h>
+#include <LORE2D/Core/Util.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -83,7 +84,7 @@ namespace Lore {
                 // Iterate over handlers for this notification type.
                 for ( auto it = handlers.begin(); it != handlers.end(); ) {
                     NotificationHandler nh = *it;
-                    if ( GetFPAddress( nh ) == GetFPAddress( handler ) ) {
+                    if ( Util::GetFPAddress( nh ) == Util::GetFPAddress( handler ) ) {
                         it = handlers.erase( it );
                     }
                     else {
@@ -135,16 +136,6 @@ namespace Lore {
         static void Post( const Notification& n )
         {
             NotificationCenter::Get().post<T>( n );
-        }
-
-        ///
-        /// \brief Returns the address of the function encapsulated in a std::function object.
-        template<typename T>
-        size_t GetFPAddress( std::function<void ( T& )> function )
-        {
-            using fType = void( T& );
-            fType** fp = function.template target<fType*>();
-            return reinterpret_cast< size_t >( fp );
         }
 
         //

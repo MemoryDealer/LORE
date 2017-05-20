@@ -137,6 +137,17 @@ void GLGPUProgram::setUniformVar( const string& id, const Lore::Matrix4& m )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void GLGPUProgram::setUniformVar( const string& id, const Lore::Vec2& v )
+{
+  auto uniform = _getUniform( id );
+  if ( -1 != uniform ) {
+    glm::vec2 glmv = MathConverter::LoreToGLM( v );
+    glUniform2fv( uniform, 1, glm::value_ptr( glmv ) );
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void GLGPUProgram::setUniformVar( const string& id, const Lore::Vec3& v )
 {
   auto uniform = _getUniform( id );

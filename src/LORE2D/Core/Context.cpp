@@ -40,9 +40,9 @@ using namespace Lore;
 
 namespace Local {
 
-    std::unique_ptr<IRenderPluginLoader> __rpl;
-    std::vector<Context::ErrorListener> __errorListeners;
-    Context* _activeContextPtr = nullptr;
+  std::unique_ptr<IRenderPluginLoader> __rpl;
+  std::vector<Context::ErrorListener> __errorListeners;
+  Context* _activeContextPtr = nullptr;
 
 }
 using namespace Local;
@@ -50,216 +50,258 @@ using namespace Local;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Context::Context() noexcept
-: _windowRegistry()
-, _sceneRegistry()
-, _activeWindow( nullptr )
-, _poolCluster( "Primary" )
-, _active( false )
+  : _windowRegistry()
+  , _sceneRegistry()
+  , _activeWindow( nullptr )
+  , _frameListenerController( std::make_unique<FrameListenerController>() )
+  , _poolCluster( "Primary" )
+  , _active( false )
 {
-    NotificationSubscribe( WindowEventNotification, &Context::onWindowEvent );
+  NotificationSubscribe( WindowEventNotification, &Context::onWindowEvent );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Context::~Context()
 {
-    NotificationUnsubscribe( WindowEventNotification, &Context::onWindowEvent );
+  NotificationUnsubscribe( WindowEventNotification, &Context::onWindowEvent );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Context::initConfiguration()
 {
-    // Setup default memory pool settings.
-    _poolCluster.registerPool<Camera>( 32 );
-    _poolCluster.registerPool<Entity>( 32 );
-    _poolCluster.registerPool<Light>( 64 );
-    _poolCluster.registerPool<Material>( 32 );
-    _poolCluster.registerPool<Mesh>( 32 );
-    _poolCluster.registerPool<Node>( 1024 );
-    _poolCluster.registerPool<Scene>( 32 );
+  // Setup default memory pool settings.
+  _poolCluster.registerPool<Camera>( 32 );
+  _poolCluster.registerPool<Entity>( 32 );
+  _poolCluster.registerPool<Light>( 64 );
+  _poolCluster.registerPool<Material>( 32 );
+  _poolCluster.registerPool<Mesh>( 32 );
+  _poolCluster.registerPool<Node>( 1024 );
+  _poolCluster.registerPool<Scene>( 32 );
 
-    // TODO: Parse pool settings from cfg file (Lua).
+  // TODO: Parse pool settings from cfg file (Lua).
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 ScenePtr Context::createScene( const string& name, const RendererType& rt )
 {
-    auto scene = _poolCluster.create<Scene>();
-    scene->setName( name );
-    _sceneRegistry.insert( name, scene );
+  auto scene = _poolCluster.create<Scene>();
+  scene->setName( name );
+  _sceneRegistry.insert( name, scene );
 
-    lore_log( "Scene " + name + " created successfully" );
+  lore_log( "Scene " + name + " created successfully" );
 
-    return scene;
+  return scene;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Context::destroyScene( const string& name )
 {
-    auto scene = _sceneRegistry.get( name );
-    _poolCluster.destroy<Scene>( scene );
-    _sceneRegistry.remove( name );
-    
-    lore_log( "Scene " + name + " destroyed successfully" );
+  auto scene = _sceneRegistry.get( name );
+  _poolCluster.destroy<Scene>( scene );
+  _sceneRegistry.remove( name );
+
+  lore_log( "Scene " + name + " destroyed successfully" );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Context::destroyScene( ScenePtr scene )
 {
-    destroyScene( scene->getName() );
+  destroyScene( scene->getName() );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Context::addErrorListener( ErrorListener listener )
 {
-    __errorListeners.push_back( listener );
+  __errorListeners.push_back( listener );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Context::removeErrorListener( ErrorListener listener )
 {
-    for ( auto it = __errorListeners.begin(); it != __errorListeners.end(); )
-    {
-        if ( ( *it ) == listener ) {
-            it = __errorListeners.erase( it );
-        }
-        else {
-            ++it;
-        }
+  for ( auto it = __errorListeners.begin(); it != __errorListeners.end(); ) {
+    if ( ( *it ) == listener ) {
+      it = __errorListeners.erase( it );
     }
+    else {
+      ++it;
+    }
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 ResourceControllerPtr Context::getResourceController() const
 {
-    return _activeWindow->getResourceController();
+  return _activeWindow->getResourceController();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 StockResourceControllerPtr Context::getStockResourceController() const
 {
-    return _activeWindow->getStockResourceController();
+  return _activeWindow->getStockResourceController();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Context::setActiveWindow( WindowPtr window )
 {
-    _activeWindow = window;
+  _activeWindow = window;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Context::setActiveWindow( const string& name )
 {
-    auto window = _windowRegistry.get( name );
-    setActiveWindow( window );
+  auto window = _windowRegistry.get( name );
+  setActiveWindow( window );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 std::unique_ptr<Context> Context::Create( const RenderPlugin& renderer )
 {
-    if ( _activeContextPtr ) {
-        throw Lore::Exception( "A Lore context already exists for this process!" );
-    }
+  if ( _activeContextPtr ) {
+    throw Lore::Exception( "A Lore context already exists for this process!" );
+  }
 
-    string file;
+  string file;
 
-    // Setup required Lore objects.
-    Log::AllocateLogger();
-    NotificationCenter::Initialize();
+  // Setup required Lore objects.
+  Log::AllocateLogger();
+  NotificationCenter::Initialize();
 
-    if ( __rpl.get() ) {
-        __rpl.reset();
-    }
+  if ( __rpl.get() ) {
+    __rpl.reset();
+  }
 
-    __rpl = CreateRenderPluginLoader();
+  __rpl = CreateRenderPluginLoader();
 
-    switch ( renderer ) {
-    default:
-        log_critical( "Unknown render plugin specified" );
-        return nullptr;
+  switch ( renderer ) {
+  default:
+    log_critical( "Unknown render plugin specified" );
+    return nullptr;
 
-    case RenderPlugin::OpenGL:
-        file = "Plugin_OpenGL";
-        break;
-    }
+  case RenderPlugin::OpenGL:
+    file = "Plugin_OpenGL";
+    break;
+  }
 
-    if ( !__rpl->load( file ) ) {
-        return nullptr;
-    }
+  if ( !__rpl->load( file ) ) {
+    return nullptr;
+  }
 
-    // Load the context class from the plugin.
-    auto context = __rpl->createContext();
+  // Load the context class from the plugin.
+  auto context = __rpl->createContext();
 
-    Resource::AssignContext( context.get() );
-    StockResource::AssignContext( context.get() );
-    MemoryAccess::_SetPrimaryPoolCluster( &context->_poolCluster );
-    _activeContextPtr = context.get();
+  Resource::AssignContext( context.get() );
+  StockResource::AssignContext( context.get() );
+  MemoryAccess::_SetPrimaryPoolCluster( &context->_poolCluster );
+  _activeContextPtr = context.get();
 
-    // Apply configuration settings or use defaults.
-    context->initConfiguration();
+  // Apply configuration settings or use defaults.
+  context->initConfiguration();
 
-    return std::move( context );
+  return std::move( context );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Context::Destroy( std::unique_ptr<Context> context )
 {
-    context.reset();
-    Resource::AssignContext( nullptr );
-    StockResource::AssignContext( nullptr );
-    MemoryAccess::_SetPrimaryPoolCluster( nullptr );
-    Log::DeleteLogger();
-    NotificationCenter::Destroy();
-    _activeContextPtr = nullptr;
+  context.reset();
+  Resource::AssignContext( nullptr );
+  StockResource::AssignContext( nullptr );
+  MemoryAccess::_SetPrimaryPoolCluster( nullptr );
+  Log::DeleteLogger();
+  NotificationCenter::Destroy();
+  _activeContextPtr = nullptr;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Context::RegisterFrameListener( FrameListener* listener )
+{
+  _activeContextPtr->_frameListenerController->registerFrameListener( listener );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Context::RegisterFrameStartedCallback( FrameListenerController::FrameStartedCallback callback )
+{
+  _activeContextPtr->_frameListenerController->registerFrameStartedCallback( callback );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Context::RegisterFrameEndedCallback( FrameListenerController::FrameEndedCallback callback )
+{
+  _activeContextPtr->_frameListenerController->registerFrameEndedCallback( callback );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Context::UnregisterFrameListener( FrameListener* listener )
+{
+  _activeContextPtr->_frameListenerController->unregisterFrameListener( listener );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Context::UnregisterFrameStartedCallback( FrameListenerController::FrameStartedCallback callback )
+{
+  _activeContextPtr->_frameListenerController->unregisterFrameStartedCallback( callback );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Context::UnregisterFrameEndedCallback( FrameListenerController::FrameEndedCallback callback )
+{
+  _activeContextPtr->_frameListenerController->unregisterFrameEndedCallback( callback );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Context::onWindowEvent( const Notification& n )
 {
-    const WindowEventNotification& wen = static_cast< const WindowEventNotification& >( n );
+  const WindowEventNotification& wen = static_cast< const WindowEventNotification& >( n );
 
-    switch ( wen.event ) {
+  switch ( wen.event ) {
 
-    default:
-        break;
+  default:
+    break;
 
-    case WindowEventNotification::Event::Closed:
-        destroyWindow( wen.window );
-        break;
+  case WindowEventNotification::Event::Closed:
+    destroyWindow( wen.window );
+    break;
 
-    }
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Context::setAPIVersion( const int major, const int minor )
 {
-    APIVersion::Set( major, minor );
+  APIVersion::Set( major, minor );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Context::ErrorCallback( int error, const char* desc )
 {
-    log_error( desc );
+  log_error( desc );
 
-    // Call all error listeners.
-    for ( const auto& listener : __errorListeners ) {
-        listener( error, desc );
-    }
+  // Call all error listeners.
+  for ( const auto& listener : __errorListeners ) {
+    listener( error, desc );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

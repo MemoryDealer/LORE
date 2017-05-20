@@ -128,12 +128,16 @@ void Context::renderFrame( const float lagMultiplier )
 {
     glfwPollEvents();
 
+    _frameListenerController->frameStarted();
+
     // Render all RenderViews for each window.
     WindowRegistry::ConstIterator it = _windowRegistry.getConstIterator();
     while ( it.hasMore() ) {
         WindowPtr window = it.getNext();
         window->renderFrame();
     }
+
+    _frameListenerController->frameEnded();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

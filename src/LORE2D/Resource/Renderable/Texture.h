@@ -32,23 +32,59 @@
 
 namespace Lore {
 
-    // TODO: How to handle multi-texturing? With current rendering pipeline, 
-    // it may be best to have a link to the next texture for each texture object.
-    // Then let the material inform the renderer to iterate the linked list.
-    class LORE_EXPORT Texture : public Renderable
+  // TODO: How to handle multi-texturing? With current rendering pipeline, 
+  // it may be best to have a link to the next texture for each texture object.
+  // Then let the material inform the renderer to iterate the linked list.
+  class LORE_EXPORT Texture : public Renderable
+  {
+
+  public:
+
+    Texture();
+
+    virtual ~Texture() {}
+
+    virtual void loadFromFile( const string& file ) = 0;
+
+    virtual void create( const int width, const int height, const Color& color ) = 0;
+
+    //
+    // Getters.
+
+    inline Vec2 getScrollSpeed() const
     {
+      return _scrollSpeed;
+    }
 
-    public:
+    inline Vec2 getScrollOffset() const
+    {
+      return _scrollOffset;
+    }
 
-        Texture();
+    //
+    // Setters.
 
-        virtual ~Texture() { }
+    inline void setScrollSpeed( const Vec2& speed )
+    {
+      _scrollSpeed = speed;
+    }
 
-        virtual void loadFromFile( const string& file ) = 0;
+    inline void setScrollSpeed( const real x, const real y )
+    {
+      _scrollSpeed = Vec2( x, y );
+    }
 
-        virtual void create( const int width, const int height, const Color& color ) = 0;
+    inline void setScrollOffset( const Vec2& offset )
+    {
+      _scrollOffset = offset;
+    }
 
-    };
+  private:
+
+    Vec2 _scrollOffset;
+    Vec2 _scrollSpeed;
+
+  };
 
 }
 
