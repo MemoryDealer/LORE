@@ -35,12 +35,17 @@
 
 namespace Lore {
 
-    struct UberShaderParameters
+    struct UberProgramParameters
     {
         unsigned int maxLights { 4 };
         unsigned int numTextures { 1 };
         bool texYCoordinateFlipped { true };
         bool colorMod { true }; // Modulate final output by color, regardless of scene lighting.
+    };
+
+    struct BackgroundProgramParameters
+    {
+      bool scrolling { true };
     };
 
     class LORE_EXPORT StockResourceController
@@ -67,7 +72,9 @@ namespace Lore {
 
         virtual void createStockResources();
 
-        virtual GPUProgramPtr createUberShader( const string& name, const UberShaderParameters& params ) = 0;
+        virtual GPUProgramPtr createUberProgram( const string& name, const UberProgramParameters& params ) = 0;
+
+        virtual GPUProgramPtr createBackgroundProgram( const string& name, const BackgroundProgramParameters& params ) = 0;
 
         //
         // Retrieval functions for each type of stock resource.
@@ -79,6 +86,8 @@ namespace Lore {
         MeshPtr getMesh( const MeshType& type );
 
         TexturePtr getTexture( const string& name );
+
+        VertexBufferPtr getVertexBuffer( const string& name );
 
     protected:
 
@@ -106,6 +115,8 @@ namespace Lore {
         static MeshPtr GetMesh( const MeshType& type );
 
         static TexturePtr GetTexture( const string& name );
+
+        static VertexBufferPtr GetVertexBuffer( const string& name );
 
     private:
 

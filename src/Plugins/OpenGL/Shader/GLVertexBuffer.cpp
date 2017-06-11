@@ -63,6 +63,8 @@ void GLVertexBuffer::init( const Lore::MeshType& type )
         break;
 
     case MeshType::Quad:
+    case MeshType::TexturedQuad:
+    case MeshType::Background:
         _mode = GL_TRIANGLE_STRIP;
         break;
 
@@ -98,6 +100,17 @@ void GLVertexBuffer::build()
         addAttribute( AttributeType::Float, 2 );
         addAttribute( AttributeType::Float, 2 );
         break;
+
+    case MeshType::Background:
+      _vertices = { 1.f, 1.f,       1.f, 1.f,
+                    1.f, -1.f,      1.f, 0.f,
+                   -1.f, -1.f,      0.f, 0.f,
+                   -1.f, 1.f,       0.f, 1.f };
+      _indices = { 1, 0, 2, 3 };
+      
+      addAttribute( AttributeType::Float, 2 );
+      addAttribute( AttributeType::Float, 2 );
+      break;
     }
 
     glGenVertexArrays( 1, &_vao );
@@ -174,7 +187,7 @@ void GLVertexBuffer::unbind()
 
 void GLVertexBuffer::draw()
 {
-    glDrawElements( GL_TRIANGLE_STRIP, static_cast<GLsizei>( _indices.size() ), GL_UNSIGNED_INT, 0 );
+    glDrawElements( _mode, static_cast<GLsizei>( _indices.size() ), GL_UNSIGNED_INT, 0 );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

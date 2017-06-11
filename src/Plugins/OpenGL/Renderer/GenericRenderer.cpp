@@ -45,8 +45,6 @@ using namespace Lore::OpenGL;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 GenericRenderer::GenericRenderer()
-  : _queues()
-  , _activeQueues()
 {
   // Initialize all available queues.
   _queues.resize( DefaultRenderQueueCount );
@@ -101,7 +99,7 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
   // [OR] move visitor to context?
   // ...
 
-  glEnable( GL_DEPTH_TEST );
+  
   glDepthFunc( GL_LESS );
 
   glViewport( rv.gl_viewport.x,
@@ -121,6 +119,11 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
                                             -100.f, 100.f );
 
   const Matrix4 viewProjection = rv.camera->getViewMatrix() * projection;
+
+  // Render background before scene node entities.
+  glDisable( GL_DEPTH_TEST );
+  renderBackground( rv.scene, viewProjection );
+  glEnable( GL_DEPTH_TEST );
 
   // Iterate through all active render queues and render each object.
   for ( const auto& activeQueue : _activeQueues ) {
@@ -154,6 +157,29 @@ void GenericRenderer::activateQueue( const uint id, Lore::RenderQueue& rq )
   const auto lookup = _activeQueues.find( id );
   if ( _activeQueues.end() == lookup ) {
     _activeQueues.insert( { id, rq } );
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GenericRenderer::renderBackground( const Lore::ScenePtr scene, const Lore::Matrix4& viewProj )
+{
+  MaterialPtr mat = scene->getBackground();
+  Material::Pass& pass = mat->getPass();
+  GPUProgramPtr program = pass.program;
+  TexturePtr texture = pass.texture;
+  VertexBufferPtr vb = Lore::StockResource::GetVertexBuffer( "StandardBackground" );
+
+  if ( texture ) {
+    program->use();
+    texture->bind();
+    vb->bind();
+
+    program->setUniformVar( "texSampleOffset", pass.getTexCoordOffset() );
+
+    vb->draw();
+
+    vb->unbind();
   }
 }
 

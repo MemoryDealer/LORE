@@ -38,7 +38,7 @@ using namespace Lore;
 
 namespace LocalNS {
 
-    static ContextPtr ActiveContext = nullptr;
+  static ContextPtr ActiveContext = nullptr;
 
 }
 using namespace LocalNS;
@@ -50,16 +50,16 @@ const string ResourceController::DefaultGroupName = "Default";
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 ResourceController::ResourceController()
-: _groups()
-, _defaultGroup( nullptr )
-, _indexer( nullptr )
+  : _groups()
+  , _defaultGroup( nullptr )
+  , _indexer( nullptr )
 {
-    // Create default resource group.
-    auto rg = std::make_unique<ResourceGroup>( DefaultGroupName );
+  // Create default resource group.
+  auto rg = std::make_unique<ResourceGroup>( DefaultGroupName );
 
-    // Store and set to active group.
-    _groups.insert( { DefaultGroupName, std::move( rg ) } );
-    _defaultGroup = rg.get();
+  // Store and set to active group.
+  _groups.insert( { DefaultGroupName, std::move( rg ) } );
+  _defaultGroup = rg.get();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -72,28 +72,28 @@ ResourceController::~ResourceController()
 
 void ResourceController::createGroup( const string& name )
 {
-    auto rg = std::make_unique<ResourceGroup>( name );
+  auto rg = std::make_unique<ResourceGroup>( name );
 
-    _groups.insert( { name, std::move( rg ) } );
+  _groups.insert( { name, std::move( rg ) } );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void ResourceController::destroyGroup( const string& name )
 {
-    auto group = _getGroup( name );
-    if ( DefaultGroupName != group->name ) {
-        unloadGroup( name );
-        _groups.erase( _groups.find( name ) );
-    }
+  auto group = _getGroup( name );
+  if ( DefaultGroupName != group->name ) {
+    unloadGroup( name );
+    _groups.erase( _groups.find( name ) );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void ResourceController::addResourceLocation( const string& file, const bool recursive, const string& groupName )
 {
-    // Platform specific directory traversal.
-    // ...
+  // Platform specific directory traversal.
+  // ...
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -114,83 +114,90 @@ void ResourceController::unloadGroup( const string& name )
 
 EntityPtr ResourceController::createEntity( const string& name, const MeshType& type, const string& groupName )
 {
-    auto group = _getGroup( groupName );
-    if ( group->entities.exists( name ) ) {
-        return group->entities.get( name );
-    }
+  auto group = _getGroup( groupName );
+  if ( group->entities.exists( name ) ) {
+    return group->entities.get( name );
+  }
 
-    auto entity = MemoryAccess::GetPrimaryPoolCluster()->create<Entity>();
-    entity->setName( name );
-    entity->setResourceGroupName( groupName );
+  auto entity = MemoryAccess::GetPrimaryPoolCluster()->create<Entity>();
+  entity->setName( name );
+  entity->setResourceGroupName( groupName );
 
-    // Lookup stock mesh and assign it.
-    entity->setMesh( StockResource::GetMesh( type ) );
+  // Lookup stock mesh and assign it.
+  entity->setMesh( StockResource::GetMesh( type ) );
 
-    // Set default material.
-    switch ( type ) {
+  // Set default material.
+  switch ( type ) {
 
-    default:
-        break;
+  default:
+    break;
 
-    case MeshType::Quad:
-        entity->setMaterial( StockResource::GetMaterial( "Standard" ) );
-        break;
+  case MeshType::Quad:
+    entity->setMaterial( StockResource::GetMaterial( "Standard" ) );
+    break;
 
-    case MeshType::TexturedQuad:
-        entity->setMaterial( StockResource::GetMaterial( "StandardTextured" ) );
-        break;
+  case MeshType::TexturedQuad:
+    entity->setMaterial( StockResource::GetMaterial( "StandardTextured" ) );
+    break;
 
-    }
+  }
 
-    // Register entity and return it.
-    group->entities.insert( name, entity );
-    return entity;
+  // Register entity and return it.
+  group->entities.insert( name, entity );
+  return entity;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 EntityPtr ResourceController::createEntity( const string& name, const string& groupName )
 {
-    return createEntity( name, MeshType::Custom, groupName );
+  return createEntity( name, MeshType::Custom, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 MeshPtr ResourceController::createMesh( const string& name, const MeshType& meshType, const string& groupName )
 {
-    auto mesh = MemoryAccess::GetPrimaryPoolCluster()->create<Mesh>();
-    mesh->setName( name );
-    mesh->setResourceGroupName( groupName );
+  auto mesh = MemoryAccess::GetPrimaryPoolCluster()->create<Mesh>();
+  mesh->setName( name );
+  mesh->setResourceGroupName( groupName );
 
-    // If this mesh type is a stock type, assign the corresponding vertex buffer.
-    if ( MeshType::Custom != meshType ) {
-        auto vb = _vertexBufferTable.at( meshType );
-        mesh->setVertexBuffer( vb );
-    }
+  // If this mesh type is a stock type, assign the corresponding vertex buffer.
+  if ( MeshType::Custom != meshType ) {
+    auto vb = _vertexBufferTable.at( meshType );
+    mesh->setVertexBuffer( vb );
+  }
 
-    _getGroup( groupName )->meshes.insert( name, mesh );
-    return mesh;
+  _getGroup( groupName )->meshes.insert( name, mesh );
+  return mesh;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 GPUProgramPtr ResourceController::getGPUProgram( const string& name, const string& groupName )
 {
-    return _getGroup( groupName )->programs.get( name );
+  return _getGroup( groupName )->programs.get( name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 MaterialPtr ResourceController::getMaterial( const string& name, const string& groupName )
 {
-    return _getGroup( groupName )->materials.get( name );
+  return _getGroup( groupName )->materials.get( name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 TexturePtr ResourceController::getTexture( const string& name, const string& groupName )
 {
-    return _getGroup( groupName )->textures.get( name );
+  return _getGroup( groupName )->textures.get( name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+VertexBufferPtr ResourceController::getVertexBuffer( const string& name, const string& groupName )
+{
+  return _getGroup( groupName )->vertexBuffers.get( name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -198,13 +205,13 @@ TexturePtr ResourceController::getTexture( const string& name, const string& gro
 
 ResourceGroupPtr ResourceController::_getGroup( const string& groupName )
 {
-    auto lookup = _groups.find( groupName );
-    if ( _groups.end() != lookup ) {
-        return lookup->second.get();
-    }
+  auto lookup = _groups.find( groupName );
+  if ( _groups.end() != lookup ) {
+    return lookup->second.get();
+  }
 
-    log_warning( "Resource group " + groupName + " not found, using default resource group" );
-    return _defaultGroup;
+  log_warning( "Resource group " + groupName + " not found, using default resource group" );
+  return _defaultGroup;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -213,112 +220,119 @@ ResourceGroupPtr ResourceController::_getGroup( const string& groupName )
 
 TexturePtr Resource::LoadTexture( const string& name, const string& file, const string& groupName )
 {
-    return ActiveContext->getResourceController()->loadTexture( name, file, groupName );
+  return ActiveContext->getResourceController()->loadTexture( name, file, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 GPUProgramPtr Resource::CreateGPUProgram( const string& name, const string& groupName )
 {
-    return ActiveContext->getResourceController()->createGPUProgram( name, groupName );
+  return ActiveContext->getResourceController()->createGPUProgram( name, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 ShaderPtr Resource::CreateVertexShader( const string& name, const string& groupName )
 {
-    return ActiveContext->getResourceController()->createVertexShader( name, groupName );
+  return ActiveContext->getResourceController()->createVertexShader( name, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 ShaderPtr Resource::CreateFragmentShader( const string& name, const string& groupName )
 {
-    return ActiveContext->getResourceController()->createFragmentShader( name, groupName );
+  return ActiveContext->getResourceController()->createFragmentShader( name, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+VertexBufferPtr Resource::CreateVertexBuffer( const string& name, const MeshType& type, const string& groupName )
+{
+  return ActiveContext->getResourceController()->createVertexBuffer( name, type, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 MaterialPtr Resource::CreateMaterial( const string& name, const string& groupName )
 {
-    return ActiveContext->getResourceController()->createMaterial( name, groupName );
+  return ActiveContext->getResourceController()->createMaterial( name, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 MeshPtr Resource::CreateMesh( const string& name, const MeshType& meshType, const string& groupName )
 {
-    return ActiveContext->getResourceController()->createMesh( name, meshType, groupName );
+  return ActiveContext->getResourceController()->createMesh( name, meshType, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 TexturePtr Resource::CreateTexture( const string& name, const string& groupName )
 {
-    return ActiveContext->getResourceController()->createTexture( name, groupName );
+  return ActiveContext->getResourceController()->createTexture( name, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 CameraPtr Resource::CreateCamera( const string& name, const string& groupName )
 {
-    return ActiveContext->getResourceController()->createCamera( name, groupName );
+  return ActiveContext->getResourceController()->createCamera( name, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 EntityPtr Resource::CreateEntity( const string& name, const MeshType& meshType, const string& groupName )
 {
-    return ActiveContext->getResourceController()->createEntity( name, meshType, groupName );
+  return ActiveContext->getResourceController()->createEntity( name, meshType, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 EntityPtr Resource::CreateEntity( const string& name, const string& groupName )
 {
-    return ActiveContext->getResourceController()->createEntity( name, groupName );
+  return ActiveContext->getResourceController()->createEntity( name, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 GPUProgramPtr Resource::GetGPUProgram( const string& name, const string& groupName )
 {
-    return ActiveContext->getResourceController()->getGPUProgram( name, groupName );
+  return ActiveContext->getResourceController()->getGPUProgram( name, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 MaterialPtr Resource::GetMaterial( const string& name, const string& groupName )
 {
-    return ActiveContext->getResourceController()->getMaterial( name, groupName );
+  return ActiveContext->getResourceController()->getMaterial( name, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 TexturePtr Resource::GetTexture( const string& name, const string& groupName )
 {
-    return ActiveContext->getResourceController()->getTexture( name, groupName );
+  return ActiveContext->getResourceController()->getTexture( name, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Resource::DestroyTexture( TexturePtr texture )
 {
-    return ActiveContext->getResourceController()->destroyTexture( texture );
+  return ActiveContext->getResourceController()->destroyTexture( texture );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Resource::DestroyTexture( const string& name, const string& groupName )
 {
-    return ActiveContext->getResourceController()->destroyTexture( name, groupName );
+  return ActiveContext->getResourceController()->destroyTexture( name, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Resource::AssignContext( ContextPtr context )
 {
-    ActiveContext = context;
+  ActiveContext = context;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

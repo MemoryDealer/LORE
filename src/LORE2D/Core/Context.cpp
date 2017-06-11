@@ -89,6 +89,8 @@ ScenePtr Context::createScene( const string& name, const RendererType& rt )
 {
   auto scene = _poolCluster.create<Scene>();
   scene->setName( name );
+  TODO: Move to Background, Layer class
+  scene->setBackground( Lore::StockResource::GetMaterial( "StandardBackground" ) );
   _sceneRegistry.insert( name, scene );
 
   lore_log( "Scene " + name + " created successfully" );

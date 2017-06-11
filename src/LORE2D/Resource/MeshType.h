@@ -31,7 +31,8 @@ namespace Lore {
     {
         Custom,
         Quad,
-        TexturedQuad
+        TexturedQuad,
+        Background
     };
 
 }

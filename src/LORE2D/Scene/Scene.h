@@ -87,6 +87,15 @@ namespace Lore {
       _ambientLightColor = color;
     }
 
+    inline void setBackground( const MaterialPtr background )
+    {
+      _background = background;
+    }
+
+    ///
+    /// \brief Sets background texture.
+    void setBackground( const string& texture );
+
     //
     // Getters.
 
@@ -120,6 +129,11 @@ namespace Lore {
       return _activeLights.getConstIterator();
     }
 
+    inline MaterialPtr getBackground() const
+    {
+      return _background;
+    }
+
   private:
 
     virtual void _reset() override;
@@ -150,6 +164,9 @@ namespace Lore {
 
     // Lights that are attached to a node.
     LightMap _activeLights;
+
+    // Background (simply a material stretched to fit viewport).
+    MaterialPtr _background {};
 
   };
 

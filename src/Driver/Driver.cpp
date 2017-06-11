@@ -128,6 +128,9 @@ int main( int argc, char** argv )
   n->setColorModifier( Lore::Color( 1.f - static_cast< Lore::real >( i * .1f ), 1.f, 1.f ) );
   }*/
 
+  scene->setBackground( "C:\\clouds.jpg" );
+  scene->getBackground()->getPass().setTextureScrollSpeed( Lore::Vec2( 0.001f, 0.002f ) );
+
   float f = 0.f;
   while ( context->active() ) {
     //node->translate( 0.01f * std::sinf( f ), 0.01f * std::cosf( f ) );

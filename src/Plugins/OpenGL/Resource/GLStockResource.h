@@ -42,7 +42,9 @@ namespace Lore { namespace OpenGL {
 
         virtual void createStockResources() override;
 
-        virtual GPUProgramPtr createUberShader( const string& name, const Lore::UberShaderParameters& params ) override;
+        virtual GPUProgramPtr createUberProgram( const string& name, const Lore::UberProgramParameters& params ) override;
+
+        virtual GPUProgramPtr createBackgroundProgram( const string& name, const BackgroundProgramParameters& params ) override;
 
     };
 
