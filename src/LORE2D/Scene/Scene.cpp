@@ -48,6 +48,9 @@ Scene::Scene()
 {
   _root.setName( "root" );
   _root._scene = this;
+
+  // TODO: Get stock background
+  _background = MemoryAccess::GetPrimaryPoolCluster()->create<Background>();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -127,13 +130,6 @@ void Scene::destroyLight( const string& name )
     destroyLight( light );
     _lights.remove( name );
   }
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Scene::setBackground( const string& texture )
-{
-  _background->getPass().texture = Lore::Resource::LoadTexture( "bg_" + texture, texture );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

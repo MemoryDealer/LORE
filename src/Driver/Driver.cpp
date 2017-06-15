@@ -26,6 +26,7 @@
 
 #include <memory>
 #include <LORE2D/Lore.h>
+#include <LORE2D/Scene/Background.h>
 #include <LORE2D/Resource/Renderable/Texture.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -116,7 +117,10 @@ int main( int argc, char** argv )
   l2->setColor( Lore::Color( 0.1f, 1.f, 0.2f ) );
   //n2->attachObject( l2 );
 
-
+  Lore::BackgroundPtr bg = scene->getBackground();
+  bg->addLayer( "default" );
+  bg->getLayer("default").getMaterial()->getPass().texture = Lore::Resource::LoadTexture( "bg_default", "C:\\clouds.jpg" );
+  bg->getLayer( "default" ).getMaterial()->getPass().setTextureScrollSpeed( Lore::Vec2( 0.001f, 0.002f ) );
 
   scene->setAmbientLightColor( Lore::Color( 0.12f, 0.12f, 0.12f ) );
 
@@ -127,9 +131,6 @@ int main( int argc, char** argv )
 
   n->setColorModifier( Lore::Color( 1.f - static_cast< Lore::real >( i * .1f ), 1.f, 1.f ) );
   }*/
-
-  scene->setBackground( "C:\\clouds.jpg" );
-  scene->getBackground()->getPass().setTextureScrollSpeed( Lore::Vec2( 0.001f, 0.002f ) );
 
   float f = 0.f;
   while ( context->active() ) {

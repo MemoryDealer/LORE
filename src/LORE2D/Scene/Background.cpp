@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,67 +24,58 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <string> // TODO: Figure out nicer way for clients to include dependencies.
+#include "Background.h"
+
+#include <LORE2D/Core/Exception.h>
+#include <LORE2D/Resource/StockResource.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+using namespace Lore;
 
-  //
-  // Forward declarations.
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-  class Background;
-  class Camera;
-  class Context;
-  class Entity;
-  class GPUProgram;
-  class IRenderer;
-  class Material;
-  class Light;
-  class Mesh;
-  class Node;
-  class PostProcessor;
-  class Renderable;
-  class ResourceController;
-  struct ResourceGroup;
-  class Scene;
-  class Shader;
-  class StockResourceController;
-  class Texture;
-  class VertexBuffer;
-  class Window;
+Background::Background()
+{
+}
 
-  //
-  // Pointer types.
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-  using BackgroundPtr = Background*;
-  using CameraPtr = Camera*;
-  using ContextPtr = Context*;
-  using EntityPtr = Entity*;
-  using GPUProgramPtr = GPUProgram*;
-  using LightPtr = Light*;
-  using MaterialPtr = Material*;
-  using MeshPtr = Mesh*;
-  using NodePtr = Node*;
-  using RendererPtr = IRenderer*;
-  using PostProcessorPtr = PostProcessor*;
-  using RenderablePtr = Renderable*;
-  using ResourceControllerPtr = ResourceController*;
-  using ResourceGroupPtr = ResourceGroup*;
-  using ScenePtr = Scene*;
-  using ShaderPtr = Shader*;
-  using StockResourceControllerPtr = StockResourceController*;
-  using TexturePtr = Texture*;
-  using VertexBufferPtr = VertexBuffer*;
-  using WindowPtr = Window*;
+Background::Layer& Background::addLayer( const string& name )
+{
+  Layer layer( name );
+  layer.setMaterial( StockResource::GetMaterial( "StandardBackground" ) );
+  _layers[name] = layer;
 
-  //
-  // Types.
+  log_information( "Added layer " + name + " to background " + _name );
 
-  using real = float;
-  using uint = unsigned int;
-  using string = std::string;
+  return _layers[name];
+}
 
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Background::Layer& Background::getLayer( const string& name )
+{
+  auto lookup = _layers.find( name );
+  if ( _layers.end() == lookup ) {
+    throw Lore::ItemIdentityException( "Could not find background layer named " + name + " in background " + _name );
+  }
+
+  return lookup->second;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Background::removeLayer( const string& name )
+{
+  auto lookup = _layers.find( name );
+  if ( _layers.end() == lookup ) {
+    throw Lore::ItemIdentityException( "Could not find background layer named " + name + " in background " + _name );
+  }
+
+  _layers.erase( lookup );
+
+  log_information( "Remove layer " + name + " from background " + _name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

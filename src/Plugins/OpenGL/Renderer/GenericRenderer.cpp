@@ -164,22 +164,29 @@ void GenericRenderer::activateQueue( const uint id, Lore::RenderQueue& rq )
 
 void GenericRenderer::renderBackground( const Lore::ScenePtr scene, const Lore::Matrix4& viewProj )
 {
-  MaterialPtr mat = scene->getBackground();
-  Material::Pass& pass = mat->getPass();
-  GPUProgramPtr program = pass.program;
-  TexturePtr texture = pass.texture;
-  VertexBufferPtr vb = Lore::StockResource::GetVertexBuffer( "StandardBackground" );
+  BackgroundPtr background = scene->getBackground();
+  Background::LayerMap layers = background->getLayerMap();
 
-  if ( texture ) {
-    program->use();
-    texture->bind();
-    vb->bind();
+  for( const auto& pair : layers ){
+    const Background::Layer& layer = pair.second;
+    MaterialPtr mat = layer.getMaterial();
 
-    program->setUniformVar( "texSampleOffset", pass.getTexCoordOffset() );
+    Material::Pass& pass = mat->getPass();
+    GPUProgramPtr program = pass.program;
+    TexturePtr texture = pass.texture;
+    VertexBufferPtr vb = Lore::StockResource::GetVertexBuffer( "StandardBackground" );
 
-    vb->draw();
+    if ( texture ) {
+      program->use();
+      texture->bind();
+      vb->bind();
 
-    vb->unbind();
+      program->setUniformVar( "texSampleOffset", pass.getTexCoordOffset() );
+
+      vb->draw();
+
+      vb->unbind();
+    }
   }
 }
 
