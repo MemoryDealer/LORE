@@ -66,6 +66,8 @@ namespace Lore { namespace OpenGL {
 
         virtual void setUniformVar( const string& id, const Vec3& v ) override;
 
+        virtual void setUniformVar( const string& id, const real r ) override;
+
         virtual void setUniformVar( const string& id, const int i ) override;
 
         virtual void updateLights( Scene::LightMap::ConstIterator it ) override;

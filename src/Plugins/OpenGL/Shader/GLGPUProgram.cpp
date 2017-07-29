@@ -159,6 +159,16 @@ void GLGPUProgram::setUniformVar( const string& id, const Lore::Vec3& v )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void GLGPUProgram::setUniformVar( const string& id, const real r )
+{
+  auto uniform = _getUniform( id );
+  if ( -1 != uniform ) {
+    glUniform1f( uniform, static_cast< GLfloat >( r ) );
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void GLGPUProgram::setUniformVar( const string& id, const int i )
 {
   auto uniform = _getUniform( id );

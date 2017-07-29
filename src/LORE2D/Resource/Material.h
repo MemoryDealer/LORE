@@ -98,6 +98,15 @@ namespace Lore {
       return _passes[idx];
     }
 
+    //
+    // Operators.
+
+    Material& operator = ( const Material& rhs )
+    {
+      _passes = rhs._passes;
+      return *this;
+    }
+
   private:
 
     using PassList = std::vector<Pass>;

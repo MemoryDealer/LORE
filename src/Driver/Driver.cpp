@@ -72,22 +72,20 @@ int main( int argc, char** argv )
   window->addRenderView( rv );
 
   Lore::NodePtr node = scene->createNode( "A" );
-  node->setDepth( 50 );
+  node->setDepth( 0 );
   node = node->createChildNode( "AChild" );
   node = scene->createNode( "B " );
   node = node->createChildNode( "BChild" );
   node = node->createChildNode( "BChildChild" );
 
   // Textures.
-  Lore::TexturePtr tex = Lore::Resource::LoadTexture( "tex1", "C:\\doggo.png" );
+  Lore::TexturePtr tex = Lore::Resource::LoadTexture( "tex1", "C:\\doge.jpg" );
   auto entity = Lore::Resource::CreateEntity( "e1", Lore::MeshType::TexturedQuad );
   //entity->getMaterial()->getPass().texture = Lore::StockResource::GetTexture("White");
   entity->getMaterial()->getPass().setTextureScrollSpeed( Lore::Vec2( 0.01f, 0.f ) );
   entity->setTexture( tex );
 
   node = scene->getNode( "A" );
-  //tex->getMaterial()->getPass().emissive = Lore::Color( 0.f, 0.2f, 0.f );
-  //
   node->attachObject( entity );
 
   node->scale( Lore::Vec2( 2.f, 2.0f ) );
@@ -98,7 +96,7 @@ int main( int argc, char** argv )
 
   node->getChild( "AChild" )->attachObject( entity );
   auto achild = node->getChild( "AChild" );
-  achild->setDepth( -50 );
+  achild->setDepth( 50 );
   node->getChild( "AChild" )->setColorModifier( Lore::StockColor::Red );
   node->getChild( "AChild" )->setPosition( Lore::Vec2( -0.25f, 0.25f ) );
 
@@ -106,10 +104,10 @@ int main( int argc, char** argv )
   n2->attachObject( entity );
   n2->scale( Lore::Vec2( 4.2f, 0.65f ) );
   n2->translate( 0.25f, 0.25f );
-  n2->setDepth( -25 );
+  n2->setDepth( 25 );
 
   auto light = scene->createLight( "l1" );
-  light->setColor( Lore::Color( 1.f, .6f, 0.f ) );
+  light->setColor( Lore::Color( 0.f, .6f, 0.9f ) );
   //light->setAttenuation( 3250.f, 1.f, 0.0014f, 0.000007f );
   node->attachObject( light );
 
@@ -117,10 +115,34 @@ int main( int argc, char** argv )
   l2->setColor( Lore::Color( 0.1f, 1.f, 0.2f ) );
   //n2->attachObject( l2 );
 
+  Lore::Resource::LoadTexture( "bg_default", "C:\\clouds.jpg" );
   Lore::BackgroundPtr bg = scene->getBackground();
-  bg->addLayer( "default" );
-  bg->getLayer("default").getMaterial()->getPass().texture = Lore::Resource::LoadTexture( "bg_default", "C:\\clouds.jpg" );
-  bg->getLayer( "default" ).getMaterial()->getPass().setTextureScrollSpeed( Lore::Vec2( 0.001f, 0.002f ) );
+  Lore::Background::Layer& layer = bg->addLayer( "default" );
+  layer.setTexture( Lore::Resource::GetTexture( "bg_default" ) );
+  layer.setScrollSpeed( Lore::Vec2( 0.001f, 0.002f ) );
+  layer.setDepth( 950.f );
+
+  auto& layer2 = bg->addLayer( "face" );
+  layer2.setTexture( Lore::Resource::LoadTexture( "bg_face", "C:\\awesomeface.png" ) );
+  layer2.setScrollSpeed( Lore::Vec2( -0.002f, 0.001f ) );
+  layer2.setDepth( 500.f );
+
+  auto& layer3 = bg->addLayer( "face2" );
+  layer3.setTexture( Lore::Resource::GetTexture( "bg_face" ) );
+  layer3.setScrollSpeed( Lore::Vec2( 0.002f, -0.001f ) );
+  layer3.setDepth( 499.f );
+
+  auto& layer4 = bg->addLayer( "face3" );
+  layer4.setTexture( Lore::Resource::GetTexture( "bg_face" ) );
+  layer4.setScrollSpeed( Lore::Vec2( -0.001f, -0.001f ) );
+  layer4.setDepth( 498.f );
+
+  {
+    auto& layer4 = bg->addLayer( "face4" );
+    layer4.setTexture( Lore::Resource::GetTexture( "bg_face" ) );
+    layer4.setScrollSpeed( Lore::Vec2( -0.003f, 0.003f ) );
+    layer4.setDepth( 497.f );
+  }
 
   scene->setAmbientLightColor( Lore::Color( 0.12f, 0.12f, 0.12f ) );
 
@@ -139,26 +161,17 @@ int main( int argc, char** argv )
     //node->scale( 0.025f * std::sinf( f ) );
 
     // TODO: Repro case where both quads appeared to be scaling with only rotations being done.
-    //node->rotate( Lore::Degree( 0.5f ) );
     node->getChild( "AChild" )->rotate( Lore::Degree( -.1f ) );
 
     n2->rotate( Lore::Degree( 0.025f ) );
 
     if ( GetAsyncKeyState( VK_F1 ) ) {
-      //camera->translate( -0.01f, 0.f );
       node->translate( -0.01f, 0.f );
     }
     else if ( GetAsyncKeyState( VK_F2 ) ) {
-      //camera->translate( 0.01f, 0.f );
+
       node->translate( 0.01f, 0.f );
     }
-    else if ( GetAsyncKeyState( VK_F3 ) ) {
-      //camera->translate( 0.f, -0.01f );
-    }
-    else if ( GetAsyncKeyState( VK_F4 ) ) {
-      //camera->translate( 0.f, 0.01f );
-    }
-    
 
     const float speed = 0.01f;
     if ( GetAsyncKeyState( 0x57 ) ) {

@@ -89,6 +89,11 @@ namespace Lore {
 
         VertexBufferPtr getVertexBuffer( const string& name );
 
+        //
+        // Cloning functions.
+
+        MaterialPtr cloneMaterial( const string& name, const string& cloneName );
+
     protected:
 
         using MeshTable = Util::HashTable<MeshType, MeshPtr>;
@@ -117,6 +122,11 @@ namespace Lore {
         static TexturePtr GetTexture( const string& name );
 
         static VertexBufferPtr GetVertexBuffer( const string& name );
+
+        //
+        // Cloning.
+
+        static MaterialPtr CloneMaterial( const string& name, const string& cloneName );
 
     private:
 

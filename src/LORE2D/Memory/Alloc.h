@@ -32,48 +32,45 @@ class MemoryPool;
 
 namespace Lore {
 
+  ///
+  /// \class Alloc
+  /// \brief Base class for all objects managed in memory pools.
+  template<typename T>
+  class Alloc
+  {
+
+  public:
+
+    Alloc() = default;
+
+    virtual ~Alloc() = default;
+
     ///
-    /// \class Alloc
-    /// \brief Base class for all objects managed in memory pools.
-    template<typename T>
-    class Alloc
+    /// \brief Returns true if object has been requested for use in memory pool.
+    /// After it is destroyed in the memory pool, it is no longer in use.
+    bool getInUse() const
     {
+      return _inUse;
+    }
 
-    public:
+  private:
 
-        Alloc()
-        : _inUse( false )
-        , _next( nullptr )
-        { }
+    ///
+    /// \brief Must be implemented by child classes to reset all internal
+    ///     data to default. This is called when the object is "freed" in
+    ///     the memory pool.
+    inline virtual void _reset() = 0;
 
-        virtual ~Alloc() { }
+  private:
 
-        ///
-        /// \brief Returns true if object has been requested for use in memory pool.
-        /// After it is destroyed in the memory pool, it is no longer in use.
-        bool getInUse() const
-        {
-            return _inUse;
-        }
+    bool _inUse { false };
+    T* _next { nullptr };
 
-    private:
+  private:
 
-        ///
-        /// \brief Must be implemented by child classes to reset all internal
-        ///     data to default. This is called when the object is "freed" in
-        ///     the memory pool.
-        inline virtual void _reset() = 0;
+    friend class MemoryPool<T>;
 
-    private:
-
-        bool _inUse;
-        T* _next;
-
-    private:
-
-        friend class MemoryPool<T>;
-
-    };
+  };
 
 }
 

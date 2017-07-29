@@ -99,7 +99,7 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
   // [OR] move visitor to context?
   // ...
 
-  
+  glEnable( GL_DEPTH_TEST );
   glDepthFunc( GL_LESS );
 
   glViewport( rv.gl_viewport.x,
@@ -116,14 +116,12 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
   const float aspectRatio = window->getAspectRatio();
   const Matrix4 projection = Math::OrthoRH( -aspectRatio, aspectRatio,
                                             -1.f, 1.f,
-                                            -100.f, 100.f );
+                                            1000.f, -1000.f );
 
   const Matrix4 viewProjection = rv.camera->getViewMatrix() * projection;
 
   // Render background before scene node entities.
-  glDisable( GL_DEPTH_TEST );
-  renderBackground( rv.scene, viewProjection );
-  glEnable( GL_DEPTH_TEST );
+  renderBackground( rv.scene, projection );
 
   // Iterate through all active render queues and render each object.
   for ( const auto& activeQueue : _activeQueues ) {
@@ -167,6 +165,9 @@ void GenericRenderer::renderBackground( const Lore::ScenePtr scene, const Lore::
   BackgroundPtr background = scene->getBackground();
   Background::LayerMap layers = background->getLayerMap();
 
+  VertexBufferPtr vb = Lore::StockResource::GetVertexBuffer( "StandardBackground" );
+  vb->bind();
+
   for( const auto& pair : layers ){
     const Background::Layer& layer = pair.second;
     MaterialPtr mat = layer.getMaterial();
@@ -174,20 +175,34 @@ void GenericRenderer::renderBackground( const Lore::ScenePtr scene, const Lore::
     Material::Pass& pass = mat->getPass();
     GPUProgramPtr program = pass.program;
     TexturePtr texture = pass.texture;
-    VertexBufferPtr vb = Lore::StockResource::GetVertexBuffer( "StandardBackground" );
 
     if ( texture ) {
       program->use();
       texture->bind();
-      vb->bind();
 
       program->setUniformVar( "texSampleOffset", pass.getTexCoordOffset() );
 
-      vb->draw();
+      // Draw on left half of viewport.
+      {
+        Lore::Matrix4 transform = Math::CreateTransformationMatrix( Lore::Vec2( -1.f, 0.f ), Lore::Quaternion() );
+        transform[3][2] = layer.getDepth();
+        program->setTransformVar( viewProj * transform );
 
-      vb->unbind();
+        vb->draw();
+      }
+
+      // Draw on right half of viewport.
+      {
+        Lore::Matrix4 transform = Math::CreateTransformationMatrix( Lore::Vec2( 1.f, 0.f ), Lore::Quaternion() );
+        transform[3][2] = layer.getDepth();
+        program->setTransformVar( viewProj * transform );
+
+        vb->draw();
+      }
     }
   }
+
+  vb->unbind();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

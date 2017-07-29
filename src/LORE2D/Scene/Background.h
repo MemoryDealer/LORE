@@ -45,20 +45,13 @@ namespace Lore {
 
   public:
 
-    class Layer
+    // TODO: Put layer in memory pool?
+    class LORE_EXPORT Layer
     {
-
-      Vec2 _parallax { 1.f, 1.f };
-      int32_t _depth { -50 };
-      MaterialPtr _material { nullptr };
-      string _name;
 
     public:
 
-      Layer()
-      : _name()
-      {
-      }
+      Layer() = default;
 
       Layer( const string& name )
         : _name( name )
@@ -72,7 +65,7 @@ namespace Lore {
 
       inline Vec2 getParallax() const { return _parallax; }
 
-      inline int32_t getDepth() const { return _depth; }
+      inline real getDepth() const { return _depth; }
 
       inline MaterialPtr getMaterial() const { return _material; }
 
@@ -81,9 +74,21 @@ namespace Lore {
 
       inline void setParallax( const Vec2& parallax ) { _parallax = parallax; }
 
-      inline void setDepth( const int32_t depth ) { _depth = depth; }
+      inline void setDepth( const real depth ) { _depth = depth; }
 
       inline void setMaterial( MaterialPtr material ) { _material = material; }
+
+      void setTexture( TexturePtr texture );
+
+      void setScrollSpeed( const Vec2& speed );
+
+    private:
+
+      Vec2 _parallax { 1.f, 1.f };
+      real _depth { 750.f };
+      MaterialPtr _material { nullptr };
+      TexturePtr _texture { nullptr };
+      string _name {};
 
     };
 
@@ -92,14 +97,6 @@ namespace Lore {
   public:
 
     using LayerMap = std::map<string, Layer>;
-
-  private:
-
-    virtual void _reset() override { }
-
-  private:
-
-    LayerMap _layers {};
 
   public:
 
@@ -120,6 +117,14 @@ namespace Lore {
     {
       return _layers;
     }
+
+  private:
+
+    virtual void _reset() override { }
+
+  private:
+
+    LayerMap _layers { };
 
   };
 

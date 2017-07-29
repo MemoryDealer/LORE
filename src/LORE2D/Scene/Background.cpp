@@ -44,7 +44,7 @@ Background::Background()
 Background::Layer& Background::addLayer( const string& name )
 {
   Layer layer( name );
-  layer.setMaterial( StockResource::GetMaterial( "StandardBackground" ) );
+  layer.setMaterial( StockResource::CloneMaterial( "StandardBackground", "bg_layer_" + name ) );
   _layers[name] = layer;
 
   log_information( "Added layer " + name + " to background " + _name );
@@ -76,6 +76,24 @@ void Background::removeLayer( const string& name )
   _layers.erase( lookup );
 
   log_information( "Remove layer " + name + " from background " + _name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Background::Layer::setTexture( TexturePtr texture )
+{
+  if ( _material ) {
+    _material->getPass().texture = texture;
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Background::Layer::setScrollSpeed( const Vec2& speed )
+{
+  if ( _material ) {
+    _material->getPass().setTextureScrollSpeed( speed );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

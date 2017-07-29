@@ -285,6 +285,8 @@ Lore::GPUProgramPtr StockResourceController::createBackgroundProgram( const stri
   //
   // Uniforms and outs.
 
+  src += "uniform mat4 transform;";
+
   src += "out vec2 TexCoord;";
 
   //
@@ -292,7 +294,7 @@ Lore::GPUProgramPtr StockResourceController::createBackgroundProgram( const stri
 
   src += "void main(){";
 
-  src += "gl_Position = vec4(vertex.xy, 0.0, 1.0);";
+  src += "gl_Position = transform * vec4( vertex, 1.0, 1.0 );";
   src += "TexCoord = vec2(texCoord.x, 1.0 - texCoord.y);";
 
   src += "}";
@@ -324,6 +326,9 @@ Lore::GPUProgramPtr StockResourceController::createBackgroundProgram( const stri
   src += "void main(){";
 
   src += "pixel = texture(tex, TexCoord + texSampleOffset);";
+  src += "if ( pixel.a < 0.1 ) {";
+  src += "discard;";
+  src += "}";
 
   src += "}";
 
@@ -344,6 +349,8 @@ Lore::GPUProgramPtr StockResourceController::createBackgroundProgram( const stri
   if ( !program->link() ) {
     throw Lore::Exception( "Failed to link GPUProgram " + name );
   }
+
+  program->addTransformVar( "transform" );
 
   if ( params.scrolling ) {
     program->addUniformVar( "texSampleOffset" );

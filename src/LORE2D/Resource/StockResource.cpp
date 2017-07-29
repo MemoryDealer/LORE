@@ -215,6 +215,17 @@ VertexBufferPtr StockResourceController::getVertexBuffer( const string& name )
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+MaterialPtr StockResourceController::cloneMaterial( const string& name, const string& cloneName )
+{
+  auto mat = _controller->getMaterial( name );
+  auto clone = _controller->createMaterial( cloneName );
+
+  *clone = *mat;
+  return clone;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -249,6 +260,13 @@ TexturePtr StockResource::GetTexture( const string& name )
 VertexBufferPtr StockResource::GetVertexBuffer( const string& name )
 {
   return ActiveContext->getStockResourceController()->getVertexBuffer( name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+MaterialPtr StockResource::CloneMaterial( const string& name, const string& cloneName )
+{
+  return ActiveContext->getStockResourceController()->cloneMaterial( name, cloneName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
