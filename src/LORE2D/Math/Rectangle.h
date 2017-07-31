@@ -1,3 +1,4 @@
+#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -24,17 +25,31 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Texture.h"
+namespace Lore {
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+  struct Rectangle
+  {
 
-using namespace Lore;
+    real x { 0.f };
+    real y { 0.f };
+    real w { 0.f };
+    real h { 0.f };
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    Rectangle() = default;
+    Rectangle( const real x_,
+               const real y_,
+               const real w_,
+               const real h_ )
+      : x( x_ )
+      , y( y_ )
+      , w( w_ )
+      , h( h_ )
+    { }
 
-Texture::Texture()
-{
-    _type = Renderable::Type::Texture;
+  };
+
+  using Rect = Rectangle;
+
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

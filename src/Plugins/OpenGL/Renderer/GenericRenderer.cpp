@@ -160,7 +160,7 @@ void GenericRenderer::activateQueue( const uint id, Lore::RenderQueue& rq )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GenericRenderer::renderBackground( const Lore::ScenePtr scene, const Lore::Matrix4& viewProj )
+void GenericRenderer::renderBackground( const Lore::ScenePtr scene, const Lore::Matrix4& proj )
 {
   BackgroundPtr background = scene->getBackground();
   Background::LayerMap layers = background->getLayerMap();
@@ -182,11 +182,17 @@ void GenericRenderer::renderBackground( const Lore::ScenePtr scene, const Lore::
 
       program->setUniformVar( "texSampleOffset", pass.getTexCoordOffset() );
 
+      Lore::Rect sampleRegion = pass.getTexSampleRegion();
+      program->setUniformVar( "texSampleRegion.x", sampleRegion.x );
+      program->setUniformVar( "texSampleRegion.y", sampleRegion.y );
+      program->setUniformVar( "texSampleRegion.w", sampleRegion.w );
+      program->setUniformVar( "texSampleRegion.h", sampleRegion.h );
+
       // Draw on left half of viewport.
       {
         Lore::Matrix4 transform = Math::CreateTransformationMatrix( Lore::Vec2( -1.f, 0.f ), Lore::Quaternion() );
         transform[3][2] = layer.getDepth();
-        program->setTransformVar( viewProj * transform );
+        program->setTransformVar( proj * transform );
 
         vb->draw();
       }
@@ -195,7 +201,7 @@ void GenericRenderer::renderBackground( const Lore::ScenePtr scene, const Lore::
       {
         Lore::Matrix4 transform = Math::CreateTransformationMatrix( Lore::Vec2( 1.f, 0.f ), Lore::Quaternion() );
         transform[3][2] = layer.getDepth();
-        program->setTransformVar( viewProj * transform );
+        program->setTransformVar( proj * transform );
 
         vb->draw();
       }
@@ -229,8 +235,14 @@ void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
 
     program->use();
     if ( texture ) {
+      // TODO: Multi-texturing.
       texture->bind();
       program->setUniformVar( "texSampleOffset", pass.getTexCoordOffset() );
+      Lore::Rect sampleRegion = pass.getTexSampleRegion();
+      program->setUniformVar( "texSampleRegion.x", sampleRegion.x );
+      program->setUniformVar( "texSampleRegion.y", sampleRegion.y );
+      program->setUniformVar( "texSampleRegion.w", sampleRegion.w );
+      program->setUniformVar( "texSampleRegion.h", sampleRegion.h );
     }
 
     // Upload lighting data.

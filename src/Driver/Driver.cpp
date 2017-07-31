@@ -82,8 +82,10 @@ int main( int argc, char** argv )
   Lore::TexturePtr tex = Lore::Resource::LoadTexture( "tex1", "C:\\doge.jpg" );
   auto entity = Lore::Resource::CreateEntity( "e1", Lore::MeshType::TexturedQuad );
   //entity->getMaterial()->getPass().texture = Lore::StockResource::GetTexture("White");
-  entity->getMaterial()->getPass().setTextureScrollSpeed( Lore::Vec2( 0.01f, 0.f ) );
+  //entity->getMaterial()->getPass().setTextureScrollSpeed( Lore::Vec2( 0.01f, 0.f ) );
   entity->setTexture( tex );
+
+  entity->getMaterial()->getPass().setTextureSampleRegion( 0.f, 0.0f, .5f, .5f );
 
   node = scene->getNode( "A" );
   node->attachObject( entity );
@@ -136,6 +138,7 @@ int main( int argc, char** argv )
   layer4.setTexture( Lore::Resource::GetTexture( "bg_face" ) );
   layer4.setScrollSpeed( Lore::Vec2( -0.001f, -0.001f ) );
   layer4.setDepth( 498.f );
+  //layer4.getMaterial()->getPass().setTextureSampleRegion( 0.5f, 0.5f, 0.5f, 0.5f );
 
   {
     auto& layer4 = bg->addLayer( "face4" );

@@ -158,11 +158,14 @@ namespace Lore {
 
     virtual VertexBufferPtr createVertexBuffer( const string& name, const MeshType& type, const string& groupName = DefaultGroupName ) = 0;
 
-    virtual MaterialPtr createMaterial( const string& name, const string& groupName = DefaultGroupName ) = 0;
-
     virtual TexturePtr createTexture( const string& name, const string& groupName = DefaultGroupName ) = 0;
 
-    virtual CameraPtr createCamera( const string& name, const string& groupName = DefaultGroupName ) = 0;
+    //
+    // Factory functions (non-virtual).
+
+    MaterialPtr createMaterial( const string& name, const string& groupName = DefaultGroupName );
+
+    CameraPtr createCamera( const string& name, const string& groupName = DefaultGroupName );
 
     //
     // Entity.
@@ -172,6 +175,12 @@ namespace Lore {
     EntityPtr createEntity( const string& name, const string& groupName = DefaultGroupName );
 
     MeshPtr createMesh( const string& name, const MeshType& meshType, const string& groupName = DefaultGroupName );
+
+    //
+    // Cloning functions.
+
+    
+    MaterialPtr cloneMaterial( const string& name, const string& cloneName );
 
     //
     // Getters.
@@ -247,6 +256,15 @@ namespace Lore {
     static EntityPtr CreateEntity( const string& name, const MeshType& meshType, const string& groupName = ResourceController::DefaultGroupName );
 
     static EntityPtr CreateEntity( const string& name, const string& groupName = ResourceController::DefaultGroupName );
+
+    //
+    // Cloning functions.
+
+    ///
+    /// \brief Clones specified material and registers new material.
+    /// \param name Material to clone.
+    /// \param cloneName New name of the cloned material.
+    static MaterialPtr CloneMaterial( const string& name, const string& cloneName );
 
     //
     // Getters.

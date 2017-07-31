@@ -61,7 +61,7 @@ namespace Lore { namespace OpenGL {
 
         void activateQueue( const uint id, Lore::RenderQueue& rq );
 
-        void renderBackground( const Lore::ScenePtr scene, const Matrix4& viewProj );
+        void renderBackground( const Lore::ScenePtr scene, const Matrix4& proj );
 
         void renderMaterialMap( const Lore::ScenePtr scene,
                                 RenderQueue::EntityDataMap& mm,

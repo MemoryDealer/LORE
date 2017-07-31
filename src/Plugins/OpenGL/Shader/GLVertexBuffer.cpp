@@ -33,14 +33,14 @@ using namespace Lore::OpenGL;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 GLVertexBuffer::GLVertexBuffer()
-: Lore::VertexBuffer()
-, _vbo( 0 )
-, _vao( 0 )
-, _ebo( 0 )
-, _vertices()
-, _indices()
-, _mode( 0 )
-, _glType( GL_UNSIGNED_INT )
+  : Lore::VertexBuffer()
+  , _vbo( 0 )
+  , _vao( 0 )
+  , _ebo( 0 )
+  , _vertices()
+  , _indices()
+  , _mode( 0 )
+  , _glType( GL_UNSIGNED_INT )
 {
 }
 
@@ -54,140 +54,140 @@ GLVertexBuffer::~GLVertexBuffer()
 
 void GLVertexBuffer::init( const Lore::MeshType& type )
 {
-    _type = type;
-    switch ( _type ) {
+  _type = type;
+  switch ( _type ) {
 
-    default:
-    case MeshType::Custom:
-        _mode = GL_TRIANGLES;
-        break;
+  default:
+  case MeshType::Custom:
+    _mode = GL_TRIANGLES;
+    break;
 
-    case MeshType::Quad:
-    case MeshType::TexturedQuad:
-    case MeshType::Background:
-        _mode = GL_TRIANGLE_STRIP;
-        break;
+  case MeshType::Quad:
+  case MeshType::TexturedQuad:
+  case MeshType::Background:
+    _mode = GL_TRIANGLE_STRIP;
+    break;
 
-    }
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void GLVertexBuffer::build()
 {
-    // First generate vertices and indices.
-    switch ( _type ) {
+  // First generate vertices and indices.
+  switch ( _type ) {
+  default:
+    throw Lore::Exception( "Unknown vertex buffer type" );
+
+  case MeshType::Quad:
+    _vertices = { -0.1f, -0.1f,
+                  -0.1f, 0.1f,
+                  0.1f, -0.1f,
+                  0.1f, 0.1f };
+    _indices = { 0, 1, 2, 3 };
+
+    addAttribute( AttributeType::Float, 2 );
+    break;
+
+  case MeshType::TexturedQuad:
+    _vertices = { -0.1f, -0.1f,     0.f, 0.f,
+                  -0.1f, 0.1f,      0.f, 1.f,
+                  0.1f, -0.1f,      1.f, 0.f,
+                  0.1f, 0.1f,       1.f, 1.f };
+    _indices = { 0, 1, 2, 3 };
+
+    addAttribute( AttributeType::Float, 2 );
+    addAttribute( AttributeType::Float, 2 );
+    break;
+
+  case MeshType::Background:
+    _vertices = { -1.f, -1.f,     0.f, 0.f,
+                  -1.f, 1.f,      0.f, 1.f,
+                  1.f, -1.f,      1.f, 0.f,
+                  1.f, 1.f,       1.f, 1.f };
+    _indices = { 0, 1, 2, 3 };
+
+    addAttribute( AttributeType::Float, 2 );
+    addAttribute( AttributeType::Float, 2 );
+    break;
+  }
+
+  glGenVertexArrays( 1, &_vao );
+  glGenBuffers( 1, &_vbo );
+  glGenBuffers( 1, &_ebo );
+
+  glBindVertexArray( _vao );
+
+  glBindBuffer( GL_ARRAY_BUFFER, _vbo );
+  glBufferData( GL_ARRAY_BUFFER, sizeof( GLfloat ) * _vertices.size(), _vertices.data(), GL_STATIC_DRAW );
+
+  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, _ebo );
+  glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( GLuint ) * _indices.size(), _indices.data(), GL_STATIC_DRAW );
+
+  // Attributes.
+  GLsizei idx = 0;
+  GLsizei offset = 0;
+  GLsizei stride = 0;
+
+  // Get stride value from all attributes.
+  for ( const auto& attr : _attributes ) {
+    stride += attr.size;
+  }
+
+  // Build each attribute.
+  for ( const auto& attr : _attributes ) {
+    GLenum type = 0;
+    size_t typeSize = 0;
+    switch ( attr.type ) {
     default:
-        throw Lore::Exception( "Unknown vertex buffer type" );
-
-    case MeshType::Quad:
-        _vertices = { 0.1f, 0.1f,
-                      0.1f, -0.1f,
-                     -0.1f, -0.1f,
-                     -0.1f, 0.1f };
-        _indices = { 1, 0, 2, 3 };
-
-        addAttribute( AttributeType::Float, 2 );
-        break;
-
-    case MeshType::TexturedQuad:
-        _vertices = { 0.1f, 0.1f,      1.f, 1.f,
-                      0.1f, -0.1f,     1.f, 0.f,
-                     -0.1f, -0.1f,     0.f, 0.f,
-                     -0.1f, 0.1f,      0.f, 1.f };
-        _indices = { 1, 0, 2, 3 };
-
-        addAttribute( AttributeType::Float, 2 );
-        addAttribute( AttributeType::Float, 2 );
-        break;
-
-    case MeshType::Background:
-      _vertices = { 1.f, 1.f,       1.f, 1.f,
-                    1.f, -1.f,      1.f, 0.f,
-                   -1.f, -1.f,      0.f, 0.f,
-                   -1.f, 1.f,       0.f, 1.f };
-      _indices = { 1, 0, 2, 3 };
-      
-      addAttribute( AttributeType::Float, 2 );
-      addAttribute( AttributeType::Float, 2 );
+    case AttributeType::Float:
+      type = GL_FLOAT;
+      typeSize = sizeof( GLfloat );
       break;
+
+    case AttributeType::Int:
+      type = GL_INT;
+      typeSize = sizeof( GLint );
+      break;
+
     }
 
-    glGenVertexArrays( 1, &_vao );
-    glGenBuffers( 1, &_vbo );
-    glGenBuffers( 1, &_ebo );
+    glVertexAttribPointer( idx,
+                           attr.size,
+                           type,
+                           GL_FALSE,
+                           stride * static_cast< GLsizei >( typeSize ),
+                           reinterpret_cast< GLvoid* >( offset * typeSize ) );
+    glEnableVertexAttribArray( idx++ );
 
-    glBindVertexArray( _vao );
+    offset += attr.size;
+  }
 
-    glBindBuffer( GL_ARRAY_BUFFER, _vbo );
-    glBufferData( GL_ARRAY_BUFFER, sizeof( GLfloat ) * _vertices.size(), _vertices.data(), GL_STATIC_DRAW );
+  glBindVertexArray( 0 );
 
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, _ebo );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( GLuint ) * _indices.size(), _indices.data(), GL_STATIC_DRAW );
-
-    // Attributes.
-    GLsizei idx = 0;
-    GLsizei offset = 0;
-    GLsizei stride = 0;
-
-    // Get stride value from all attributes.
-    for ( const auto& attr : _attributes ) {
-        stride += attr.size;
-    }
-
-    // Build each attribute.
-    for ( const auto& attr : _attributes ) {
-        GLenum type = 0;
-        size_t typeSize = 0;
-        switch ( attr.type ) {
-        default:
-        case AttributeType::Float:
-            type = GL_FLOAT;
-            typeSize = sizeof( GLfloat );
-            break;
-
-        case AttributeType::Int:
-            type = GL_INT;
-            typeSize = sizeof( GLint );
-            break;
-
-        }
-
-        glVertexAttribPointer( idx,
-                               attr.size,
-                               type,
-                               GL_FALSE,
-                               stride * static_cast<GLsizei>( typeSize ),
-                               reinterpret_cast< GLvoid* >( offset * typeSize ) );
-        glEnableVertexAttribArray( idx++ );
-
-        offset += attr.size;
-    }
-
-    glBindVertexArray( 0 );
-
-    _attributes.clear(); // Attributes no longer needed.
+  _attributes.clear(); // Attributes no longer needed.
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void GLVertexBuffer::bind()
 {
-    glBindVertexArray( _vao );
+  glBindVertexArray( _vao );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void GLVertexBuffer::unbind()
 {
-    glBindVertexArray( 0 );
+  glBindVertexArray( 0 );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void GLVertexBuffer::draw()
 {
-    glDrawElements( _mode, static_cast<GLsizei>( _indices.size() ), GL_UNSIGNED_INT, 0 );
+  glDrawElements( _mode, static_cast< GLsizei >( _indices.size() ), GL_UNSIGNED_INT, 0 );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -195,7 +195,7 @@ void GLVertexBuffer::draw()
 
 void GLVertexBuffer::_reset()
 {
-    // TODO:
+  // TODO:
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

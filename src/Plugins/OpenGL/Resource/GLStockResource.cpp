@@ -80,9 +80,20 @@ Lore::GPUProgramPtr StockResourceController::createUberProgram( const string& na
   }
 
   //
+  // Structs.
+
+  src += "struct Rect {";
+  src += "float x;";
+  src += "float y;";
+  src += "float w;";
+  src += "float h;";
+  src += "};";
+
+  //
   // Uniforms and outs.
 
   src += "uniform mat4 transform;";
+  src += "uniform Rect texSampleRegion;";
 
   if ( textured ) {
     src += "out vec2 TexCoord;";
@@ -101,10 +112,10 @@ Lore::GPUProgramPtr StockResourceController::createUberProgram( const string& na
   src += "gl_Position = transform * vec4(vertex, 1.0, 1.0);";
   if ( textured ) {
     if ( params.texYCoordinateFlipped ) {
-      src += "TexCoord = vec2(texCoord.x, 1.0 - texCoord.y);";
+      src += "TexCoord = vec2(texCoord.x * texSampleRegion.w + texSampleRegion.x, (1.0 - texCoord.y) * texSampleRegion.h + texSampleRegion.y);";
     }
     else {
-      src += "TexCoord = texCoord;";
+      src += "TexCoord = vec2(texCoord.x * texSampleRegion.w + texSampleRegion.x, texCoord.y * texSampleRegion.h + texSampleRegion.y);";
     }
   }
 
@@ -258,6 +269,10 @@ Lore::GPUProgramPtr StockResourceController::createUberProgram( const string& na
 
   if ( textured ) {
     program->addUniformVar( "texSampleOffset" );
+    program->addUniformVar( "texSampleRegion.x" );
+    program->addUniformVar( "texSampleRegion.y" );
+    program->addUniformVar( "texSampleRegion.w" );
+    program->addUniformVar( "texSampleRegion.h" );
   }
 
   return program;
@@ -283,9 +298,20 @@ Lore::GPUProgramPtr StockResourceController::createBackgroundProgram( const stri
   src += "layout (location = 1) in vec2 texCoord;";
 
   //
+  // Structs.
+
+  src += "struct Rect {";
+  src += "float x;";
+  src += "float y;";
+  src += "float w;";
+  src += "float h;";
+  src += "};";
+
+  //
   // Uniforms and outs.
 
   src += "uniform mat4 transform;";
+  src += "uniform Rect texSampleRegion;";
 
   src += "out vec2 TexCoord;";
 
@@ -295,7 +321,7 @@ Lore::GPUProgramPtr StockResourceController::createBackgroundProgram( const stri
   src += "void main(){";
 
   src += "gl_Position = transform * vec4( vertex, 1.0, 1.0 );";
-  src += "TexCoord = vec2(texCoord.x, 1.0 - texCoord.y);";
+  src += "TexCoord = vec2(texCoord.x * texSampleRegion.w + texSampleRegion.x, (1.0 - texCoord.y) * texSampleRegion.h + texSampleRegion.y);";
 
   src += "}";
 
@@ -351,6 +377,11 @@ Lore::GPUProgramPtr StockResourceController::createBackgroundProgram( const stri
   }
 
   program->addTransformVar( "transform" );
+
+  program->addUniformVar( "texSampleRegion.x" );
+  program->addUniformVar( "texSampleRegion.y" );
+  program->addUniformVar( "texSampleRegion.w" );
+  program->addUniformVar( "texSampleRegion.h" );
 
   if ( params.scrolling ) {
     program->addUniformVar( "texSampleOffset" );

@@ -149,6 +149,29 @@ EntityPtr ResourceController::createEntity( const string& name, const MeshType& 
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+MaterialPtr ResourceController::createMaterial( const string& name, const string& groupName )
+{
+  auto mat = MemoryAccess::GetPrimaryPoolCluster()->create<Material>();
+  mat->setName( name );
+  mat->setResourceGroupName( groupName );
+
+  _getGroup( groupName )->materials.insert( name, mat );
+  return mat;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+CameraPtr ResourceController::createCamera( const string& name, const string& groupName )
+{
+  auto cam = MemoryAccess::GetPrimaryPoolCluster()->create<Camera>();
+  cam->setName( name );
+
+  _getGroup( groupName )->cameras.insert( name, cam );
+  return cam;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 EntityPtr ResourceController::createEntity( const string& name, const string& groupName )
 {
   return createEntity( name, MeshType::Custom, groupName );
@@ -170,6 +193,17 @@ MeshPtr ResourceController::createMesh( const string& name, const MeshType& mesh
 
   _getGroup( groupName )->meshes.insert( name, mesh );
   return mesh;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+MaterialPtr ResourceController::cloneMaterial( const string& name, const string& cloneName )
+{
+  auto material = getMaterial( name );
+  auto clone = createMaterial( cloneName );
+
+  *clone = *material;
+  return clone;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -291,6 +325,13 @@ EntityPtr Resource::CreateEntity( const string& name, const MeshType& meshType, 
 EntityPtr Resource::CreateEntity( const string& name, const string& groupName )
 {
   return ActiveContext->getResourceController()->createEntity( name, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+MaterialPtr Resource::CloneMaterial( const string& name, const string& cloneName )
+{
+  return ActiveContext->getResourceController()->cloneMaterial( name, cloneName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -218,11 +218,7 @@ VertexBufferPtr StockResourceController::getVertexBuffer( const string& name )
 
 MaterialPtr StockResourceController::cloneMaterial( const string& name, const string& cloneName )
 {
-  auto mat = _controller->getMaterial( name );
-  auto clone = _controller->createMaterial( cloneName );
-
-  *clone = *mat;
-  return clone;
+  return _controller->cloneMaterial( name, cloneName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

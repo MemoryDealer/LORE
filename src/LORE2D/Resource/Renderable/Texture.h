@@ -48,42 +48,6 @@ namespace Lore {
 
     virtual void create( const int width, const int height, const Color& color ) = 0;
 
-    //
-    // Getters.
-
-    inline Vec2 getScrollSpeed() const
-    {
-      return _scrollSpeed;
-    }
-
-    inline Vec2 getScrollOffset() const
-    {
-      return _scrollOffset;
-    }
-
-    //
-    // Setters.
-
-    inline void setScrollSpeed( const Vec2& speed )
-    {
-      _scrollSpeed = speed;
-    }
-
-    inline void setScrollSpeed( const real x, const real y )
-    {
-      _scrollSpeed = Vec2( x, y );
-    }
-
-    inline void setScrollOffset( const Vec2& offset )
-    {
-      _scrollOffset = offset;
-    }
-
-  private:
-
-    Vec2 _scrollOffset;
-    Vec2 _scrollSpeed;
-
   };
 
 }
