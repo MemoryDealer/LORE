@@ -117,35 +117,42 @@ int main( int argc, char** argv )
   l2->setColor( Lore::Color( 0.1f, 1.f, 0.2f ) );
   //n2->attachObject( l2 );
 
-  Lore::Resource::LoadTexture( "bg_default", "C:\\clouds.jpg" );
-  Lore::BackgroundPtr bg = scene->getBackground();
-  Lore::Background::Layer& layer = bg->addLayer( "default" );
-  layer.setTexture( Lore::Resource::GetTexture( "bg_default" ) );
-  layer.setScrollSpeed( Lore::Vec2( 0.001f, 0.002f ) );
-  layer.setDepth( 950.f );
+  Lore::Resource::LoadTexture( "bg_city", "C:\\city.jpg" );
+  auto bg = scene->getBackground();
+  auto& layer = bg->addLayer( "1" );
+  layer.setTexture( Lore::Resource::GetTexture( "bg_city" ) );
+  layer.setScrollSpeed( Lore::Vec2( 0.001f, 0.f ) );
+  layer.getMaterial()->getPass().setTextureSampleRegion( 0.35f, 0.25f, 0.08f, 0.08f );
 
-  auto& layer2 = bg->addLayer( "face" );
-  layer2.setTexture( Lore::Resource::LoadTexture( "bg_face", "C:\\awesomeface.png" ) );
-  layer2.setScrollSpeed( Lore::Vec2( -0.002f, 0.001f ) );
-  layer2.setDepth( 500.f );
+  //Lore::Resource::LoadTexture( "bg_default", "C:\\clouds.jpg" );
+  //Lore::BackgroundPtr bg = scene->getBackground();
+  //Lore::Background::Layer& layer = bg->addLayer( "default" );
+  //layer.setTexture( Lore::Resource::GetTexture( "bg_default" ) );
+  //layer.setScrollSpeed( Lore::Vec2( 0.001f, 0.002f ) );
+  //layer.setDepth( 950.f );
 
-  auto& layer3 = bg->addLayer( "face2" );
-  layer3.setTexture( Lore::Resource::GetTexture( "bg_face" ) );
-  layer3.setScrollSpeed( Lore::Vec2( 0.002f, -0.001f ) );
-  layer3.setDepth( 499.f );
+  //auto& layer2 = bg->addLayer( "face" );
+  //layer2.setTexture( Lore::Resource::LoadTexture( "bg_face", "C:\\awesomeface.png" ) );
+  //layer2.setScrollSpeed( Lore::Vec2( -0.002f, 0.001f ) );
+  //layer2.setDepth( 500.f );
 
-  auto& layer4 = bg->addLayer( "face3" );
-  layer4.setTexture( Lore::Resource::GetTexture( "bg_face" ) );
-  layer4.setScrollSpeed( Lore::Vec2( -0.001f, -0.001f ) );
-  layer4.setDepth( 498.f );
-  //layer4.getMaterial()->getPass().setTextureSampleRegion( 0.5f, 0.5f, 0.5f, 0.5f );
+  //auto& layer3 = bg->addLayer( "face2" );
+  //layer3.setTexture( Lore::Resource::GetTexture( "bg_face" ) );
+  //layer3.setScrollSpeed( Lore::Vec2( 0.002f, -0.001f ) );
+  //layer3.setDepth( 499.f );
 
-  {
-    auto& layer4 = bg->addLayer( "face4" );
-    layer4.setTexture( Lore::Resource::GetTexture( "bg_face" ) );
-    layer4.setScrollSpeed( Lore::Vec2( -0.003f, 0.003f ) );
-    layer4.setDepth( 497.f );
-  }
+  //auto& layer4 = bg->addLayer( "face3" );
+  //layer4.setTexture( Lore::Resource::GetTexture( "bg_face" ) );
+  //layer4.setScrollSpeed( Lore::Vec2( -0.001f, -0.001f ) );
+  //layer4.setDepth( 498.f );
+  ////layer4.getMaterial()->getPass().setTextureSampleRegion( 0.5f, 0.5f, 0.5f, 0.5f );
+
+  //{
+  //  auto& layer4 = bg->addLayer( "face4" );
+  //  layer4.setTexture( Lore::Resource::GetTexture( "bg_face" ) );
+  //  layer4.setScrollSpeed( Lore::Vec2( -0.003f, 0.003f ) );
+  //  layer4.setDepth( 497.f );
+  //}
 
   scene->setAmbientLightColor( Lore::Color( 0.12f, 0.12f, 0.12f ) );
 

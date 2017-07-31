@@ -163,10 +163,13 @@ void StockResourceController::createStockResources()
     BackgroundProgramParameters params;
 
     createBackgroundProgram( "StandardBackground", params );
+
+    params.fitViewport = true;
+    createBackgroundProgram( "FittedBackground", params );
   }
 
   {
-    auto material = _controller->createMaterial( "StandardBackground" );
+    auto material = _controller->createMaterial( "Background" );
     Material::Pass& pass = material->getPass();
     pass.lighting = false;
     pass.texture = _controller->getTexture( "White" );
@@ -174,7 +177,7 @@ void StockResourceController::createStockResources()
   }
 
   {
-    auto vb = _controller->createVertexBuffer( "StandardBackground", MeshType::Background );
+    auto vb = _controller->createVertexBuffer( "Background", MeshType::Background );
     vb->build();
   }
 }

@@ -42,6 +42,7 @@
 
 using namespace Lore::OpenGL;
 
+// TODO: Pull this class out of GL plugin and abstract away GL calls.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 GenericRenderer::GenericRenderer()
@@ -165,7 +166,7 @@ void GenericRenderer::renderBackground( const Lore::ScenePtr scene, const Lore::
   BackgroundPtr background = scene->getBackground();
   Background::LayerMap layers = background->getLayerMap();
 
-  VertexBufferPtr vb = Lore::StockResource::GetVertexBuffer( "StandardBackground" );
+  VertexBufferPtr vb = Lore::StockResource::GetVertexBuffer( "Background" );
   vb->bind();
 
   for( const auto& pair : layers ){
@@ -188,22 +189,37 @@ void GenericRenderer::renderBackground( const Lore::ScenePtr scene, const Lore::
       program->setUniformVar( "texSampleRegion.w", sampleRegion.w );
       program->setUniformVar( "texSampleRegion.h", sampleRegion.h );
 
-      // Draw on left half of viewport.
-      {
-        Lore::Matrix4 transform = Math::CreateTransformationMatrix( Lore::Vec2( -1.f, 0.f ), Lore::Quaternion() );
-        transform[3][2] = layer.getDepth();
-        program->setTransformVar( proj * transform );
+      switch ( background->getMode() ) {
+      default:
+      case Background::Mode::Square:
+        // Draw on left half of viewport.
+        {
+          Lore::Matrix4 transform = Math::CreateTransformationMatrix( Lore::Vec2( -1.f, 0.f ), Lore::Quaternion() );
+          transform[3][2] = layer.getDepth();
+          program->setTransformVar( proj * transform );
 
-        vb->draw();
-      }
+          vb->draw();
+        }
 
-      // Draw on right half of viewport.
-      {
-        Lore::Matrix4 transform = Math::CreateTransformationMatrix( Lore::Vec2( 1.f, 0.f ), Lore::Quaternion() );
-        transform[3][2] = layer.getDepth();
-        program->setTransformVar( proj * transform );
+        // Draw on right half of viewport.
+        {
+          Lore::Matrix4 transform = Math::CreateTransformationMatrix( Lore::Vec2( 1.f, 0.f ), Lore::Quaternion() );
+          transform[3][2] = layer.getDepth();
+          program->setTransformVar( proj * transform );
 
-        vb->draw();
+          vb->draw();
+        }
+        break;
+
+      case Background::Mode::FitViewport:
+        {
+          Lore::Matrix4 transform = Math::CreateTransformationMatrix( Lore::Vec2( 0.f, 0.f ), Lore::Quaternion() );
+          transform[3][2] = layer.getDepth();
+          program->setTransformVar( proj * transform );
+
+          vb->draw();
+        }
+        break;
       }
     }
   }
@@ -238,6 +254,7 @@ void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
       // TODO: Multi-texturing.
       texture->bind();
       program->setUniformVar( "texSampleOffset", pass.getTexCoordOffset() );
+
       Lore::Rect sampleRegion = pass.getTexSampleRegion();
       program->setUniformVar( "texSampleRegion.x", sampleRegion.x );
       program->setUniformVar( "texSampleRegion.y", sampleRegion.y );

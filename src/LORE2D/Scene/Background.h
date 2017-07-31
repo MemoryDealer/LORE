@@ -98,6 +98,12 @@ namespace Lore {
 
     using LayerMap = std::map<string, Layer>;
 
+    enum class Mode
+    {
+      Square,
+      FitViewport
+    };
+
   public:
 
     Background();
@@ -113,9 +119,22 @@ namespace Lore {
 
     void removeLayer( const string& name );
 
+    //
+    // Setters.
+
+    void setMode( const Mode& mode );
+
+    //
+    // Getters.
+
     inline const LayerMap& getLayerMap() const
     {
       return _layers;
+    }
+
+    inline Mode getMode() const
+    {
+      return _mode;
     }
 
   private:
@@ -125,6 +144,7 @@ namespace Lore {
   private:
 
     LayerMap _layers { };
+    Mode _mode { Mode::FitViewport };
 
   };
 

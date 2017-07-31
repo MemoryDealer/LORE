@@ -44,8 +44,20 @@ Background::Background()
 Background::Layer& Background::addLayer( const string& name )
 {
   Layer layer( name );
-  layer.setMaterial( StockResource::CloneMaterial( "StandardBackground", "bg_layer_" + name ) );
+  layer.setMaterial( StockResource::CloneMaterial( "Background", "bg_layer_" + name ) );
   _layers[name] = layer;
+
+  // Apply corresponding GPU program for background mode.
+  switch ( _mode ) {
+  default:
+  case Mode::Square:
+    layer.getMaterial()->getPass().program = Lore::StockResource::GetGPUProgram( "StandardBackground" );
+    break;
+
+  case Mode::FitViewport:
+    layer.getMaterial()->getPass().program = Lore::StockResource::GetGPUProgram( "FittedBackground" );
+    break;
+  }
 
   log_information( "Added layer " + name + " to background " + _name );
 
@@ -76,6 +88,27 @@ void Background::removeLayer( const string& name )
   _layers.erase( lookup );
 
   log_information( "Remove layer " + name + " from background " + _name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Background::setMode( const Mode& mode )
+{
+  _mode = mode;
+
+  for ( auto& pair : _layers ) {
+    Layer& layer = pair.second;
+    switch ( _mode ) {
+    default:
+    case Mode::Square:
+      layer.getMaterial()->getPass().program = Lore::StockResource::GetGPUProgram( "StandardBackground" );
+      break;
+
+    case Mode::FitViewport:
+      layer.getMaterial()->getPass().program = Lore::StockResource::GetGPUProgram( "FittedBackground" );
+      break;
+    }
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
