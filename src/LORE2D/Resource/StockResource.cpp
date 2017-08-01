@@ -162,10 +162,10 @@ void StockResourceController::createStockResources()
   {
     BackgroundProgramParameters params;
 
-    createBackgroundProgram( "StandardBackground", params );
+    createBackgroundProgram( "StaticBackground", params );
 
     params.fitViewport = true;
-    createBackgroundProgram( "FittedBackground", params );
+    createBackgroundProgram( "DynamicBackground", params );
   }
 
   {
@@ -173,7 +173,7 @@ void StockResourceController::createStockResources()
     Material::Pass& pass = material->getPass();
     pass.lighting = false;
     pass.texture = _controller->getTexture( "White" );
-    pass.program = _controller->getGPUProgram( "StandardBackground" );
+    pass.program = _controller->getGPUProgram( "StaticBackground" );
   }
 
   {

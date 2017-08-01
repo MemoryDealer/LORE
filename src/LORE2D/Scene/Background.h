@@ -51,6 +51,14 @@ namespace Lore {
 
     public:
 
+      enum class Mode
+      {
+        Static,
+        Dynamic
+      };
+
+    public:
+
       Layer() = default;
 
       Layer( const string& name )
@@ -63,6 +71,11 @@ namespace Lore {
       //
       // Getters.
 
+      inline Mode getMode() const
+      {
+        return _mode;
+      }
+
       inline Vec2 getParallax() const { return _parallax; }
 
       inline real getDepth() const { return _depth; }
@@ -71,6 +84,8 @@ namespace Lore {
 
       //
       // Setters.
+
+      void setMode( const Mode& mode );
 
       inline void setParallax( const Vec2& parallax ) { _parallax = parallax; }
 
@@ -84,6 +99,7 @@ namespace Lore {
 
     private:
 
+      Mode _mode { Mode::Dynamic };
       Vec2 _parallax { 1.f, 1.f };
       real _depth { 750.f };
       MaterialPtr _material { nullptr };
@@ -98,12 +114,6 @@ namespace Lore {
 
     using LayerMap = std::map<string, Layer>;
 
-    enum class Mode
-    {
-      Square,
-      FitViewport
-    };
-
   public:
 
     Background();
@@ -113,7 +123,7 @@ namespace Lore {
     //
     // Layers.
 
-    Layer& addLayer( const string& name );
+    Layer& addLayer( const string& name, const Layer::Mode& layerMode = Layer::Mode::Dynamic );
 
     Layer& getLayer( const string& name );
 
@@ -121,8 +131,6 @@ namespace Lore {
 
     //
     // Setters.
-
-    void setMode( const Mode& mode );
 
     //
     // Getters.
@@ -132,11 +140,6 @@ namespace Lore {
       return _layers;
     }
 
-    inline Mode getMode() const
-    {
-      return _mode;
-    }
-
   private:
 
     virtual void _reset() override { }
@@ -144,7 +147,6 @@ namespace Lore {
   private:
 
     LayerMap _layers { };
-    Mode _mode { Mode::FitViewport };
 
   };
 

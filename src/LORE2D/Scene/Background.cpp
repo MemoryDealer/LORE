@@ -41,27 +41,29 @@ Background::Background()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Background::Layer& Background::addLayer( const string& name )
+Background::Layer& Background::addLayer( const string& name, const Layer::Mode& layerMode )
 {
   Layer layer( name );
   layer.setMaterial( StockResource::CloneMaterial( "Background", "bg_layer_" + name ) );
-  _layers[name] = layer;
+
+  layer.setMode( layerMode );
 
   // Apply corresponding GPU program for background mode.
-  switch ( _mode ) {
+  switch ( layerMode ) {
   default:
-  case Mode::Square:
-    layer.getMaterial()->getPass().program = Lore::StockResource::GetGPUProgram( "StandardBackground" );
+  case Layer::Mode::Static:
+    layer.getMaterial()->getPass().program = Lore::StockResource::GetGPUProgram( "StaticBackground" );
     break;
 
-  case Mode::FitViewport:
-    layer.getMaterial()->getPass().program = Lore::StockResource::GetGPUProgram( "FittedBackground" );
+  case Layer::Mode::Dynamic:
+    layer.getMaterial()->getPass().program = Lore::StockResource::GetGPUProgram( "DynamicBackground" );
     break;
   }
 
   log_information( "Added layer " + name + " to background " + _name );
 
-  return _layers[name];
+  auto pair = _layers.insert( { name, layer } );
+  return pair.first->second;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -92,22 +94,19 @@ void Background::removeLayer( const string& name )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Background::setMode( const Mode& mode )
+void Background::Layer::setMode( const Mode& mode )
 {
   _mode = mode;
 
-  for ( auto& pair : _layers ) {
-    Layer& layer = pair.second;
-    switch ( _mode ) {
-    default:
-    case Mode::Square:
-      layer.getMaterial()->getPass().program = Lore::StockResource::GetGPUProgram( "StandardBackground" );
-      break;
+  switch ( _mode ) {
+  default:
+  case Layer::Mode::Static:
+    _material->getPass().program = Lore::StockResource::GetGPUProgram( "StaticBackground" );
+    break;
 
-    case Mode::FitViewport:
-      layer.getMaterial()->getPass().program = Lore::StockResource::GetGPUProgram( "FittedBackground" );
-      break;
-    }
+  case Layer::Mode::Dynamic:
+    _material->getPass().program = Lore::StockResource::GetGPUProgram( "DynamicBackground" );
+    break;
   }
 }
 

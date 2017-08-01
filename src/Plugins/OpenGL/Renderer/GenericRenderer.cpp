@@ -180,7 +180,6 @@ void GenericRenderer::renderBackground( const Lore::ScenePtr scene, const Lore::
     if ( texture ) {
       program->use();
       texture->bind();
-
       program->setUniformVar( "texSampleOffset", pass.getTexCoordOffset() );
 
       Lore::Rect sampleRegion = pass.getTexSampleRegion();
@@ -189,9 +188,9 @@ void GenericRenderer::renderBackground( const Lore::ScenePtr scene, const Lore::
       program->setUniformVar( "texSampleRegion.w", sampleRegion.w );
       program->setUniformVar( "texSampleRegion.h", sampleRegion.h );
 
-      switch ( background->getMode() ) {
+      switch ( layer.getMode() ) {
       default:
-      case Background::Mode::Square:
+      case Background::Layer::Mode::Static:
         // Draw on left half of viewport.
         {
           Lore::Matrix4 transform = Math::CreateTransformationMatrix( Lore::Vec2( -1.f, 0.f ), Lore::Quaternion() );
@@ -211,7 +210,7 @@ void GenericRenderer::renderBackground( const Lore::ScenePtr scene, const Lore::
         }
         break;
 
-      case Background::Mode::FitViewport:
+      case Background::Layer::Mode::Dynamic:
         {
           Lore::Matrix4 transform = Math::CreateTransformationMatrix( Lore::Vec2( 0.f, 0.f ), Lore::Quaternion() );
           transform[3][2] = layer.getDepth();

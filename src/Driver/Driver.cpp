@@ -117,12 +117,12 @@ int main( int argc, char** argv )
   l2->setColor( Lore::Color( 0.1f, 1.f, 0.2f ) );
   //n2->attachObject( l2 );
 
-  Lore::Resource::LoadTexture( "bg_city", "C:\\city.jpg" );
+  Lore::Resource::LoadTexture( "bg_city", "C:\\clouds.jpg" );
   auto bg = scene->getBackground();
-  auto& layer = bg->addLayer( "1" );
+  auto& layer = bg->addLayer( "1", Lore::Background::Layer::Mode::Static );
   layer.setTexture( Lore::Resource::GetTexture( "bg_city" ) );
   layer.setScrollSpeed( Lore::Vec2( 0.001f, 0.f ) );
-  layer.getMaterial()->getPass().setTextureSampleRegion( 0.35f, 0.25f, 0.08f, 0.08f );
+  //layer.getMaterial()->getPass().setTextureSampleRegion( 0.15f, 0.05f, 0.08f, 0.58f );
 
   //Lore::Resource::LoadTexture( "bg_default", "C:\\clouds.jpg" );
   //Lore::BackgroundPtr bg = scene->getBackground();
