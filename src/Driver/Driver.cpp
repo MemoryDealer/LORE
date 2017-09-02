@@ -71,57 +71,46 @@ int main( int argc, char** argv )
   rv.camera = camera;
   window->addRenderView( rv );
 
-  Lore::NodePtr node = scene->createNode( "A" );
-  node->setDepth( 0 );
-  node = node->createChildNode( "AChild" );
-  node = scene->createNode( "B " );
-  node = node->createChildNode( "BChild" );
-  node = node->createChildNode( "BChildChild" );
+  //
+  // Create sonic node and light.
 
-  // Textures.
-  Lore::TexturePtr tex = Lore::Resource::LoadTexture( "tex1", "C:\\doge.jpg" );
-  auto entity = Lore::Resource::CreateEntity( "e1", Lore::MeshType::TexturedQuad );
-  //entity->getMaterial()->getPass().texture = Lore::StockResource::GetTexture("White");
-  //entity->getMaterial()->getPass().setTextureScrollSpeed( Lore::Vec2( 0.01f, 0.f ) );
-  entity->setTexture( tex );
+  auto sonicNode = scene->createNode( "sonic" );
+  auto sonicEntity = Lore::Resource::CreateEntity( "sonic", Lore::MeshType::TexturedQuad );
+  auto sonicTexture = Lore::Resource::LoadTexture( "sonic-mobile", "H:\\sonic-mobile.png" );
+  sonicEntity->setTexture( sonicTexture );
+  sonicNode->attachObject( sonicEntity );
 
-  entity->getMaterial()->getPass().setTextureSampleRegion( 0.f, 0.0f, .5f, .5f );
+  auto sonicLight = scene->createLight( "sonic-light" );
+  sonicLight->setColor( Lore::StockColor::White );
+  sonicNode->attachObject( sonicLight );
 
-  node = scene->getNode( "A" );
-  node->attachObject( entity );
+  camera->trackNode( sonicNode );
 
-  node->scale( Lore::Vec2( 2.f, 2.0f ) );
+  //
+  // Create some doges.
 
-  // TODO: This change should propagate to renderer.
-  //tex->setMaterial( context->getStockResourceController()->getMaterial( "UnlitStandardQuad" ) );
-  node->getChild( "AChild" )->scale( Lore::Vec2( 0.5f, 1.f ) );
+  auto dogeEntity = Lore::Resource::CreateEntity( "doge", Lore::MeshType::TexturedQuad );
+  auto dogeTexture = Lore::Resource::LoadTexture( "doge", "C:\\doge.jpg" );
+  dogeEntity->setTexture( dogeTexture );
+  for ( int i = 0; i < 5; ++i ) {
+    auto node = scene->createNode( "doge" + std::to_string( i ) );
+    node->attachObject( dogeEntity );
+    node->setPosition( static_cast< float >( i ) / 2.f, 0.f );
+  }
 
-  node->getChild( "AChild" )->attachObject( entity );
-  auto achild = node->getChild( "AChild" );
-  achild->setDepth( 50 );
-  node->getChild( "AChild" )->setColorModifier( Lore::StockColor::Red );
-  node->getChild( "AChild" )->setPosition( Lore::Vec2( -0.25f, 0.25f ) );
-
-  auto n2 = scene->createNode( "n2" );
-  n2->attachObject( entity );
-  n2->scale( Lore::Vec2( 4.2f, 0.65f ) );
-  n2->translate( 0.25f, 0.25f );
-  n2->setDepth( 25 );
-
-  auto light = scene->createLight( "l1" );
-  light->setColor( Lore::Color( 0.f, .6f, 0.9f ) );
-  //light->setAttenuation( 3250.f, 1.f, 0.0014f, 0.000007f );
-  node->attachObject( light );
-
-  auto l2 = scene->createLight( "l2" );
-  l2->setColor( Lore::Color( 0.1f, 1.f, 0.2f ) );
-  //n2->attachObject( l2 );
+  //
+  // Create background.
 
   Lore::Resource::LoadTexture( "bg_city", "C:\\clouds.jpg" );
+  Lore::Resource::LoadTexture( "death-egg", "H:\\death-egg.png" );
   auto bg = scene->getBackground();
   auto& layer = bg->addLayer( "1", Lore::Background::Layer::Mode::Static );
   layer.setTexture( Lore::Resource::GetTexture( "bg_city" ) );
   layer.setScrollSpeed( Lore::Vec2( 0.001f, 0.f ) );
+  layer.setDepth( 800.f );
+
+  auto& layer2 = bg->addLayer( "2", Lore::Background::Layer::Mode::Dynamic );
+  layer2.setTexture( Lore::Resource::GetTexture( "death-egg" ) );
   //layer.getMaterial()->getPass().setTextureSampleRegion( 0.15f, 0.05f, 0.08f, 0.58f );
 
   //Lore::Resource::LoadTexture( "bg_default", "C:\\clouds.jpg" );
@@ -164,49 +153,43 @@ int main( int argc, char** argv )
   n->setColorModifier( Lore::Color( 1.f - static_cast< Lore::real >( i * .1f ), 1.f, 1.f ) );
   }*/
 
+
   float f = 0.f;
   while ( context->active() ) {
     //node->translate( 0.01f * std::sinf( f ), 0.01f * std::cosf( f ) );
     f += 0.05f;
-    //node->scale( 0.025f * std::sinf( f ) );
+    //sonicNode->scale( 0.25f * std::sinf( f ) );
 
     // TODO: Repro case where both quads appeared to be scaling with only rotations being done.
-    node->getChild( "AChild" )->rotate( Lore::Degree( -.1f ) );
+    //node->getChild( "AChild" )->rotate( Lore::Degree( -.1f ) );
 
-    n2->rotate( Lore::Degree( 0.025f ) );
-
-    if ( GetAsyncKeyState( VK_F1 ) ) {
-      node->translate( -0.01f, 0.f );
-    }
-    else if ( GetAsyncKeyState( VK_F2 ) ) {
-
-      node->translate( 0.01f, 0.f );
-    }
+    printf( "Node: %.2f, %.2f\n", sonicNode->getPosition().x, sonicNode->getPosition().y );
+    printf( "Cam:  %.2f, %.2f\n", camera->getPosition().x, camera->getPosition().y );
 
     const float speed = 0.01f;
-    if ( GetAsyncKeyState( 0x57 ) ) {
-      camera->translate( 0.f, -speed );
+    if ( GetAsyncKeyState( 0x57 ) ) { // W
+      sonicNode->translate( 0.f, speed );
     }
-    else if ( GetAsyncKeyState( 0x53 ) ) {
-      camera->translate( 0.f, speed );
+    else if ( GetAsyncKeyState( 0x53 ) ) { // S
+      sonicNode->translate( 0.f, -speed );
     }
-    if ( GetAsyncKeyState( 0x41 ) ) {
-      camera->translate( speed, 0.f );
+    if ( GetAsyncKeyState( 0x41 ) ) { // A
+      sonicNode->translate( -speed, 0 );
     }
-    else if ( GetAsyncKeyState( 0x44 ) ) {
-      camera->translate( -speed, 0.f );
+    else if ( GetAsyncKeyState( 0x44 ) ) { // D
+      sonicNode->translate( speed, 0 );
     }
-    if ( GetAsyncKeyState( 0x5A ) ) {
+    if ( GetAsyncKeyState( 0x5A ) ) { // Z
       camera->zoom( 0.01f );
     }
-    else if ( GetAsyncKeyState( 0x58 ) ) {
+    else if ( GetAsyncKeyState( 0x58 ) ) { // X
       camera->zoom( -0.01f );
     }
 
     if ( GetAsyncKeyState( VK_F8 ) ) {
       static bool destroyed = false;
       if ( !destroyed ) {
-        Lore::Resource::DestroyTexture( tex );
+        Lore::Resource::DestroyTexture( sonicTexture );
         destroyed = true;
       }
     }

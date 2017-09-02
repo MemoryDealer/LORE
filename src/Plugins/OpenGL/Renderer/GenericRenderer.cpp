@@ -82,7 +82,7 @@ void GenericRenderer::addRenderData( Lore::EntityPtr e,
   // Fill out the render data and add it to the list.
   RenderQueue::RenderData rd;
   rd.model = node->getFullTransform();
-  rd.model[3][2] = static_cast< real >( node->getDepth() );
+  rd.model[3][2] = node->getDepth();
   rd.colorModifier = node->getColorModifier();
 
   renderData.push_back( rd );
@@ -96,10 +96,14 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
   Lore::SceneGraphVisitor sgv( rv.scene->getRootNode() );
   sgv.visit( *this );
 
+  const float aspectRatio = window->getAspectRatio();
+  rv.camera->updateTracking(aspectRatio);
+
   // TODO: Cache which scenes have been visited and check before doing it again.
   // [OR] move visitor to context?
   // ...
 
+  // TODO: Abstract GL calls out of here and move to LORE2D lib.
   glEnable( GL_DEPTH_TEST );
   glDepthFunc( GL_LESS );
 
@@ -114,7 +118,6 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
 
   // Setup view-projection matrix.
   // TODO: Take viewport dimensions into account. Cache more things inside window.
-  const float aspectRatio = window->getAspectRatio();
   const Matrix4 projection = Math::OrthoRH( -aspectRatio, aspectRatio,
                                             -1.f, 1.f,
                                             1000.f, -1000.f );
@@ -191,6 +194,7 @@ void GenericRenderer::renderBackground( const Lore::ScenePtr scene, const Lore::
       switch ( layer.getMode() ) {
       default:
       case Background::Layer::Mode::Static:
+        // Have to draw two halves to avoid stretching...should probably add a setting for this.
         // Draw on left half of viewport.
         {
           Lore::Matrix4 transform = Math::CreateTransformationMatrix( Lore::Vec2( -1.f, 0.f ), Lore::Quaternion() );

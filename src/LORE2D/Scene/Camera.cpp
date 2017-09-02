@@ -27,6 +27,7 @@
 #include "Camera.h"
 
 #include <LORE2D/Math/Math.h>
+#include <LORE2D/Scene/Node.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -44,10 +45,6 @@ using namespace LocalNS;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Camera::Camera()
-  : _position()
-  , _view()
-  , _zoom( 1.f )
-  , _viewMatrixDirty( true )
 {
 }
 
@@ -69,8 +66,8 @@ void Camera::setPosition( const Vec2& pos )
 
 void Camera::setPosition( const real x, const real y )
 {
-  _position.x = x;
-  _position.y = y;
+  _position.x = x / _zoom;
+  _position.y = y / _zoom;
   _dirty();
 }
 
@@ -78,7 +75,7 @@ void Camera::setPosition( const real x, const real y )
 
 void Camera::translate( const Vec2& offset )
 {
-  _position += offset;
+  _position += offset / _zoom;
   _dirty();
 }
 
@@ -117,6 +114,13 @@ void Camera::setZoom( const real amount )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+Vec2 Camera::getPosition() const
+{
+  return _position;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 Matrix4 Camera::getViewMatrix()
 {
   if ( _viewMatrixDirty ) {
@@ -124,6 +128,31 @@ Matrix4 Camera::getViewMatrix()
   }
 
   return _view;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Camera::trackNode( NodePtr node, const TrackingStyle& mode )
+{
+  _trackingNode = node;
+  _trackingStyle = mode;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Camera::updateTracking( const real aspectRatio )
+{
+  const Vec2 nodePos = _trackingNode->getPosition();
+
+  switch ( _trackingStyle ) {
+  default:
+  case TrackingStyle::Simple:
+    _position.x = nodePos.x / aspectRatio;
+    _position.y = nodePos.y;
+    break;
+  }
+
+  _dirty();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -144,6 +173,8 @@ void Camera::_reset()
   _viewMatrixDirty = true;
 }
 
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void Camera::_updateViewMatrix()
 {
   Vec2 scale( _zoom, _zoom );
@@ -151,8 +182,9 @@ void Camera::_updateViewMatrix()
                                             Quaternion(),
                                             scale );
 
-  _view[3][0] *= _zoom;
-  _view[3][1] *= _zoom;
+  // Wtf? Have to invert x/y values...not sure why at the moment.
+  _view[3][0] *= -_zoom;
+  _view[3][1] *= -_zoom;
 
   _viewMatrixDirty = false;
 }
