@@ -127,7 +127,7 @@ namespace Lore {
         //
         // Cloning.
 
-        static MaterialPtr CloneMaterial( const string& name, const string& cloneName );
+        static MaterialPtr CloneMaterial( const string& name, const string& newName );
 
     private:
 

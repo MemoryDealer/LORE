@@ -28,6 +28,7 @@
 
 #include <LORE2D/Resource/Entity.h>
 #include <LORE2D/Resource/Renderable/Renderable.h>
+#include <LORE2D/Scene/Camera.h>
 #include <LORE2D/Scene/Scene.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -37,14 +38,6 @@ using namespace Lore;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Node::Node()
-  : _transform()
-  , _depth( 0 )
-  , _entities()
-  , _scene( nullptr )
-  , _parent( nullptr )
-  , _childNodes()
-  , _colorModifier( StockColor::White )
-  , _lights()
 {
   _getLocalTransform();
 }
@@ -149,6 +142,13 @@ void Node::setPosition( const Vec2& position )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void Node::setPosition( const real x, const real y )
+{
+  setPosition( Vec2( x, y ) );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void Node::translate( const Vec2& offset )
 {
   _transform.position += offset;
@@ -159,9 +159,7 @@ void Node::translate( const Vec2& offset )
 
 void Node::translate( const real xOffset, const real yOffset )
 {
-  _transform.position.x += xOffset;
-  _transform.position.y += yOffset;
-  _dirty();
+  translate( Vec2( xOffset, yOffset ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

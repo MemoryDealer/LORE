@@ -35,216 +35,220 @@
 
 namespace Lore {
 
-    ///
-    /// \class Node
-    /// \brief A scene node in its scene graph. May contain any renderable or
-    ///     attachable objects.
-    class LORE_EXPORT Node : public Alloc<Node>
+  ///
+  /// \class Node
+  /// \brief A scene node in its scene graph. May contain any renderable or
+  ///     attachable objects.
+  class LORE_EXPORT Node : public Alloc<Node>
+  {
+
+    LORE_OBJECT_BODY()
+
+  public:
+
+    using NodeMap = Registry<std::map, Node>;
+    using ChildNodeIterator = NodeMap::Iterator;
+    using ConstChildNodeIterator = NodeMap::ConstIterator;
+    using EntityList = Registry<std::map, Entity>;
+    using EntityListConstIterator = EntityList::ConstIterator;
+    using LightList = std::vector<LightPtr>;
+    using CameraList = std::vector<CameraPtr>;
+
+    struct Transform
     {
 
-        LORE_OBJECT_BODY()
-
-    public:
-
-        using NodeMap = Registry<std::map, Node>;
-        using ChildNodeIterator = NodeMap::Iterator;
-        using ConstChildNodeIterator = NodeMap::ConstIterator;
-        using EntityList = Registry<std::map, Entity>;
-        using EntityListConstIterator = EntityList::ConstIterator;
-        using LightList = std::vector<LightPtr>;
-
-        struct Transform
-        {
-
-            Vec2 position;
-            Quaternion orientation;
-            Vec2 scale;
-            Vec2 derivedScale;
-
-            Matrix4 local; // Local transformation matrix.
-            bool dirty; // True if matrix needs update.
-
-            Matrix4 world; // Derived transformation in scene graph.
-
-            Transform()
-            : position()
-            , orientation()
-            , scale( 1.f, 1.f )
-            , derivedScale( 1.f, 1.f )
-            , local()
-            , dirty( true )
-            , world()
-            { }
-
-        };
-
-    public:
-
-        ~Node();
-
-        NodePtr createChildNode( const string& name );
-
-        void attachChildNode( NodePtr child );
-
-        void removeChildNode( NodePtr child );
-
-        NodePtr getChild( const string& name );
-
-        ChildNodeIterator getChildNodeIterator();
-
-        ConstChildNodeIterator getConstChildNodeIterator();
-
-        void detachFromParent();
-
-        //
-        // Renderable attachments.
-
-        void attachObject( EntityPtr e );
-
-        void attachObject( LightPtr l );
-
-        inline EntityListConstIterator getEntityListConstIterator() const
-        {
-            return _entities.getConstIterator();
-        }
-
-        //
-        // Modifiers.
-
-        void setPosition( const Vec2& position );
-
-        void translate( const Vec2& offset );
-
-        void translate( const real xOffset, const real yOffset );
-
-        void rotate( const Radian& angle, const TransformSpace& ts = TransformSpace::Local );
-
-        void rotate( const Degree& angle, const TransformSpace& ts = TransformSpace::Local );
-
-        void rotate( const Vec3& axis, const Radian& angle, const TransformSpace& ts = TransformSpace::Local );
-
-        void rotate( const Vec3& axis, const Degree& angle, const TransformSpace& ts = TransformSpace::Local );
-
-        void rotate( const Quaternion& q, const TransformSpace& ts = TransformSpace::Local );
-
-        void setScale( const Vec2& scale );
-
-        void scale( const Vec2& s );
-
-        void scale( const real s );
-
-        void setDepth( const int depth )
-        {
-            // Depth has a range of [-100, 100].
-            assert( depth >= -100 && depth <= 100 );
-            _depth = depth;
-        }
-
-        inline void setColorModifier( const Color& c )
-        {
-            _colorModifier = c;
-        }
-
-        //
-        // Getters.
-
-        inline NodePtr getParent() const
-        {
-            return _parent;
-        }
-
-        inline Vec2 getPosition() const
-        {
-            return _transform.position;
-        }
-
-        inline Matrix4 getFullTransform() const
-        {
-            return _transform.world;
-        }
-
-        inline Vec2 getScale() const
-        {
-            return _transform.scale;
-        }
-
-        inline Vec2 getDerivedScale() const
-        {
-            return _transform.derivedScale;
-        }
-
-        inline bool hasChildNodes() const
-        {
-            return !( _childNodes.empty() );
-        }
-
-        inline int getDepth() const
-        {
-            return _depth;
-        }
-
-        inline Color getColorModifier() const
-        {
-            return _colorModifier;
-        }
-
-        //
-        // Deleted functions/operators.
-
-        Node( const Node& rhs ) = delete;
-        Node& operator = ( const Node& rhs ) = delete;
-
-    protected:
-
-        virtual void _reset() override;
-
-    private:
-
-        // Only scenes can construct nodes.
-        friend class Scene;
-        friend class SceneGraphVisitor;
-        friend class MemoryPool<Node>;
-
-    private:
-
-        Node();
-
-        //
-        // Scene graph operations.
-
-        ///
-        /// \brief Sets node's transformation matrix to dirty - it will be updated before
-        ///     next frame is rendered.
-        void _dirty();
-
-        bool _transformDirty() const;
-
-        Matrix4 _getLocalTransform();
-
-        void _updateWorldTransform( const Matrix4& m );
-
-        void _updateChildrenScale();
-
-        void _updateDepthValue();
-
-    private:
-
-        Transform _transform;
-
-        int _depth;
-
-        EntityList _entities;
-
-        // The creator of this node.
-        ScenePtr _scene;
-
-        NodePtr _parent;
-        NodeMap _childNodes;
-
-        Color _colorModifier;
-        LightList _lights;
+      Vec2 position;
+      Quaternion orientation;
+      Vec2 scale;
+      Vec2 derivedScale;
+
+      Matrix4 local; // Local transformation matrix.
+      bool dirty; // True if matrix needs update.
+
+      Matrix4 world; // Derived transformation in scene graph.
+
+      Transform()
+        : position()
+        , orientation()
+        , scale( 1.f, 1.f )
+        , derivedScale( 1.f, 1.f )
+        , local()
+        , dirty( true )
+        , world()
+      {
+      }
 
     };
+
+  public:
+
+    ~Node();
+
+    NodePtr createChildNode( const string& name );
+
+    void attachChildNode( NodePtr child );
+
+    void removeChildNode( NodePtr child );
+
+    NodePtr getChild( const string& name );
+
+    ChildNodeIterator getChildNodeIterator();
+
+    ConstChildNodeIterator getConstChildNodeIterator();
+
+    void detachFromParent();
+
+    //
+    // Renderable attachments.
+
+    void attachObject( EntityPtr e );
+
+    void attachObject( LightPtr l );
+
+    inline EntityListConstIterator getEntityListConstIterator() const
+    {
+      return _entities.getConstIterator();
+    }
+
+    //
+    // Modifiers.
+
+    void setPosition( const Vec2& position );
+
+    void setPosition( const real x, const real y );
+
+    void translate( const Vec2& offset );
+
+    void translate( const real xOffset, const real yOffset );
+
+    void rotate( const Radian& angle, const TransformSpace& ts = TransformSpace::Local );
+
+    void rotate( const Degree& angle, const TransformSpace& ts = TransformSpace::Local );
+
+    void rotate( const Vec3& axis, const Radian& angle, const TransformSpace& ts = TransformSpace::Local );
+
+    void rotate( const Vec3& axis, const Degree& angle, const TransformSpace& ts = TransformSpace::Local );
+
+    void rotate( const Quaternion& q, const TransformSpace& ts = TransformSpace::Local );
+
+    void setScale( const Vec2& scale );
+
+    void scale( const Vec2& s );
+
+    void scale( const real s );
+
+    void setDepth( const real depth )
+    {
+      // Depth has a range of [-1000, 1000].
+      // TODO: Match these values with z-near and z-far in renderer.
+      assert( depth >= -1000.f && depth <= 1000.f );
+      _depth = depth;
+    }
+
+    inline void setColorModifier( const Color& c )
+    {
+      _colorModifier = c;
+    }
+
+    //
+    // Getters.
+
+    inline NodePtr getParent() const
+    {
+      return _parent;
+    }
+
+    inline Vec2 getPosition() const
+    {
+      return _transform.position;
+    }
+
+    inline Matrix4 getFullTransform() const
+    {
+      return _transform.world;
+    }
+
+    inline Vec2 getScale() const
+    {
+      return _transform.scale;
+    }
+
+    inline Vec2 getDerivedScale() const
+    {
+      return _transform.derivedScale;
+    }
+
+    inline bool hasChildNodes() const
+    {
+      return !( _childNodes.empty() );
+    }
+
+    inline real getDepth() const
+    {
+      return _depth;
+    }
+
+    inline Color getColorModifier() const
+    {
+      return _colorModifier;
+    }
+
+    //
+    // Deleted functions/operators.
+
+    Node( const Node& rhs ) = delete;
+    Node& operator = ( const Node& rhs ) = delete;
+
+  protected:
+
+    virtual void _reset() override;
+
+  private:
+
+    // Only scenes can construct nodes.
+    friend class Scene;
+    friend class SceneGraphVisitor;
+    friend class MemoryPool<Node>;
+
+  private:
+
+    Node();
+
+    //
+    // Scene graph operations.
+
+    ///
+    /// \brief Sets node's transformation matrix to dirty - it will be updated before
+    ///     next frame is rendered.
+    void _dirty();
+
+    bool _transformDirty() const;
+
+    Matrix4 _getLocalTransform();
+
+    void _updateWorldTransform( const Matrix4& m );
+
+    void _updateChildrenScale();
+
+    void _updateDepthValue();
+
+  private:
+
+    Transform _transform { };
+
+    real _depth { 0 };
+
+    EntityList _entities { };
+
+    // The creator of this node.
+    ScenePtr _scene { nullptr };
+
+    NodePtr _parent { nullptr };
+    NodeMap _childNodes { };
+
+    Color _colorModifier { StockColor::White };
+    LightList _lights { };
+  };
 
 }
 

@@ -263,9 +263,9 @@ VertexBufferPtr StockResource::GetVertexBuffer( const string& name )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-MaterialPtr StockResource::CloneMaterial( const string& name, const string& cloneName )
+MaterialPtr StockResource::CloneMaterial( const string& name, const string& newName )
 {
-  return ActiveContext->getStockResourceController()->cloneMaterial( name, cloneName );
+  return ActiveContext->getStockResourceController()->cloneMaterial( name, newName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
