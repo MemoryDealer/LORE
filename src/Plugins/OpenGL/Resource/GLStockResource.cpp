@@ -323,12 +323,7 @@ Lore::GPUProgramPtr StockResourceController::createBackgroundProgram( const stri
 
   src += "void main(){";
 
-  if ( params.fitViewport ) {
-    src += "gl_Position = vec4( vertex.xy, transform[3][2], 1.0 );";
-  }
-  else {
-    src += "gl_Position = transform * vec4( vertex, transform[3][2], 1.0);";
-  }
+  src += "gl_Position = transform * vec4(vertex, transform[3][2], 1.0);";
   src += "TexCoord = vec2(texCoord.x * texSampleRegion.w + texSampleRegion.x, (1.0 - texCoord.y) * texSampleRegion.h + texSampleRegion.y);";
 
   src += "}";

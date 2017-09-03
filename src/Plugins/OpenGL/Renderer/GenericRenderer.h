@@ -63,9 +63,9 @@ namespace Lore {
       void activateQueue( const uint id,
                           Lore::RenderQueue& rq );
 
-      void renderBackground( const Lore::ScenePtr scene,
-                             const Matrix4& proj,
-                             Lore::CameraPtr camera );
+      void renderBackground( const Lore::RenderView& rv,
+                             const real aspectRatio,
+                             const Matrix4& proj);
 
       void renderMaterialMap( const Lore::ScenePtr scene,
                               RenderQueue::EntityDataMap& mm,

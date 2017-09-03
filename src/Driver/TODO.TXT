@@ -1,3 +1,11 @@
 -Normal mapping
 -Blending: material settings; blend mode
--
+-Resource configuration files - materials, scenes, textures all loaded into group via .rsrc file.
+  Lua bindings for configuration and resource files
+  Later can be used for hooking up scripts to nodes etc.
+-Debug tools - view memory pools for each type, hover over to view details
+  Will need text rendering for this
+-Input: Mouse clicks hitting nodes
+-AABB drawing, basic collision support
+-Self-illumination for all lights
+-Particle systems

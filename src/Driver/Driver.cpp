@@ -105,12 +105,13 @@ int main( int argc, char** argv )
   Lore::Resource::LoadTexture( "bg_city", "C:\\clouds.jpg" );
   Lore::Resource::LoadTexture( "death-egg", "H:\\bg.png" );
   auto bg = scene->getBackground();
-  auto& layer = bg->addLayer( "1", Lore::Background::Layer::Mode::Static );
+  auto& layer = bg->addLayer( "1" );
   layer.setTexture( Lore::Resource::GetTexture( "bg_city" ) );
   layer.setScrollSpeed( Lore::Vec2( 0.0008f, 0.0004f ) );
+  layer.setParallax( Lore::Vec2( 0.05f, 0.05f ) );
   layer.setDepth( 800.f );
 
-  auto& layer2 = bg->addLayer( "2", Lore::Background::Layer::Mode::Dynamic );
+  auto& layer2 = bg->addLayer( "2" );
   layer2.setTexture( Lore::Resource::GetTexture( "death-egg" ) );
   layer2.setParallax( Lore::Vec2(0.1f, 0.1f) );
   layer2.getMaterial()->getPass().setTextureSampleRegion( Lore::Rect( 0.0f, 0.0f, 0.55f, 0.55f ) );

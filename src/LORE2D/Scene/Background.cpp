@@ -41,24 +41,11 @@ Background::Background()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Background::Layer& Background::addLayer( const string& name, const Layer::Mode& layerMode )
+Background::Layer& Background::addLayer( const string& name )
 {
   Layer layer( name );
   layer.setMaterial( StockResource::CloneMaterial( "Background", "bg_layer_" + name ) );
-
-  layer.setMode( layerMode );
-
-  // Apply corresponding GPU program for background mode.
-  switch ( layerMode ) {
-  default:
-  case Layer::Mode::Static:
-    layer.getMaterial()->getPass().program = Lore::StockResource::GetGPUProgram( "StaticBackground" );
-    break;
-
-  case Layer::Mode::Dynamic:
-    layer.getMaterial()->getPass().program = Lore::StockResource::GetGPUProgram( "DynamicBackground" );
-    break;
-  }
+  layer.getMaterial()->getPass().program = Lore::StockResource::GetGPUProgram( "Background" );
 
   log_information( "Added layer " + name + " to background " + _name );
 
@@ -90,24 +77,6 @@ void Background::removeLayer( const string& name )
   _layers.erase( lookup );
 
   log_information( "Remove layer " + name + " from background " + _name );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Background::Layer::setMode( const Mode& mode )
-{
-  _mode = mode;
-
-  switch ( _mode ) {
-  default:
-  case Layer::Mode::Static:
-    _material->getPass().program = Lore::StockResource::GetGPUProgram( "StaticBackground" );
-    break;
-
-  case Layer::Mode::Dynamic:
-    _material->getPass().program = Lore::StockResource::GetGPUProgram( "DynamicBackground" );
-    break;
-  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

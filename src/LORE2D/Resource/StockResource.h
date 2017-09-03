@@ -46,7 +46,6 @@ namespace Lore {
     struct BackgroundProgramParameters
     {
       bool scrolling { true };
-      bool fitViewport { false };
     };
 
     class LORE_EXPORT StockResourceController

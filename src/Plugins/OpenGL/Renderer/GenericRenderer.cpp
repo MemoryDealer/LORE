@@ -124,7 +124,7 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
   const Matrix4 viewProjection = rv.camera->getViewMatrix() * projection;
 
   // Render background before scene node entities.
-  renderBackground( rv.scene, projection, rv.camera );
+  renderBackground( rv, aspectRatio, projection );
 
   // Iterate through all active render queues and render each object.
   for ( const auto& activeQueue : _activeQueues ) {
@@ -163,17 +163,17 @@ void GenericRenderer::activateQueue( const uint id, Lore::RenderQueue& rq )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GenericRenderer::renderBackground( const Lore::ScenePtr scene,
-                                        const Lore::Matrix4& proj,
-                                        Lore::CameraPtr camera )
+void GenericRenderer::renderBackground( const Lore::RenderView& rv,
+                                        const real aspectRatio,
+                                        const Lore::Matrix4& proj)
 {
-  BackgroundPtr background = scene->getBackground();
+  BackgroundPtr background = rv.scene->getBackground();
   Background::LayerMap layers = background->getLayerMap();
 
   VertexBufferPtr vb = Lore::StockResource::GetVertexBuffer( "Background" );
   vb->bind();
 
-  const Vec2 camPos = camera->getPosition();
+  const Vec2 camPos = rv.camera->getPosition();
 
   for( const auto& pair : layers ){
     const Background::Layer& layer = pair.second;
@@ -193,45 +193,19 @@ void GenericRenderer::renderBackground( const Lore::ScenePtr scene,
       program->setUniformVar( "texSampleRegion.w", sampleRegion.w );
       program->setUniformVar( "texSampleRegion.h", sampleRegion.h );
 
-      switch ( layer.getMode() ) {
-      default:
-      case Background::Layer::Mode::Static:
-        program->setUniformVar( "texSampleOffset", pass.getTexCoordOffset() );
-        // Have to draw two halves to avoid stretching...should probably add a setting for this.
-        // Draw on left half of viewport.
-        {
-          Lore::Matrix4 transform = Math::CreateTransformationMatrix( Lore::Vec2( -1.f, 0.f ), Lore::Quaternion() );
-          transform[3][2] = layer.getDepth();
-          program->setTransformVar( proj * transform );
+      // Apply scrolling and parallax offsets.
+      Lore::Vec2 offset = pass.getTexCoordOffset();
+      offset.x += camPos.x * layer.getParallax().x;
+      offset.y -= camPos.y * layer.getParallax().y;
+      program->setUniformVar( "texSampleOffset", offset );
 
-          vb->draw();
-        }
+      Lore::Matrix4 transform = Math::CreateTransformationMatrix( Lore::Vec2( 0.f, 0.f ), Lore::Quaternion() );
+      transform[0][0] = aspectRatio;
+      transform[1][1] = aspectRatio;
+      transform[3][2] = layer.getDepth();
+      program->setTransformVar( proj * transform );
 
-        // Draw on right half of viewport.
-        {
-          Lore::Matrix4 transform = Math::CreateTransformationMatrix( Lore::Vec2( 1.f, 0.f ), Lore::Quaternion() );
-          transform[3][2] = layer.getDepth();
-          program->setTransformVar( proj * transform );
-
-          vb->draw();
-        }
-        break;
-
-      case Background::Layer::Mode::Dynamic:
-        {
-          Lore::Vec2 offset;
-          offset.x = camPos.x * layer.getParallax().x;
-          offset.y = -camPos.y * layer.getParallax().y;
-          program->setUniformVar( "texSampleOffset", offset );
-
-          Lore::Matrix4 transform = Math::CreateTransformationMatrix( Lore::Vec2( 0.f, 0.f ), Lore::Quaternion() );
-          transform[3][2] = layer.getDepth();
-          program->setTransformVar( proj * transform );
-
-          vb->draw();
-        }
-        break;
-      }
+      vb->draw();
     }
   }
 
