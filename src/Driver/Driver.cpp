@@ -75,6 +75,7 @@ int main( int argc, char** argv )
   // Create sonic node and light.
 
   auto sonicNode = scene->createNode( "sonic" );
+  sonicNode->setDepth( -50.f );
   auto sonicEntity = Lore::Resource::CreateEntity( "sonic", Lore::MeshType::TexturedQuad );
   auto sonicTexture = Lore::Resource::LoadTexture( "sonic-mobile", "H:\\sonic-mobile.png" );
   sonicEntity->setTexture( sonicTexture );
@@ -102,15 +103,17 @@ int main( int argc, char** argv )
   // Create background.
 
   Lore::Resource::LoadTexture( "bg_city", "C:\\clouds.jpg" );
-  Lore::Resource::LoadTexture( "death-egg", "H:\\death-egg.png" );
+  Lore::Resource::LoadTexture( "death-egg", "H:\\bg.png" );
   auto bg = scene->getBackground();
   auto& layer = bg->addLayer( "1", Lore::Background::Layer::Mode::Static );
   layer.setTexture( Lore::Resource::GetTexture( "bg_city" ) );
-  layer.setScrollSpeed( Lore::Vec2( 0.001f, 0.f ) );
+  layer.setScrollSpeed( Lore::Vec2( 0.0008f, 0.0004f ) );
   layer.setDepth( 800.f );
 
   auto& layer2 = bg->addLayer( "2", Lore::Background::Layer::Mode::Dynamic );
   layer2.setTexture( Lore::Resource::GetTexture( "death-egg" ) );
+  layer2.setParallax( Lore::Vec2(0.1f, 0.1f) );
+  layer2.getMaterial()->getPass().setTextureSampleRegion( Lore::Rect( 0.0f, 0.0f, 0.55f, 0.55f ) );
   //layer.getMaterial()->getPass().setTextureSampleRegion( 0.15f, 0.05f, 0.08f, 0.58f );
 
   //Lore::Resource::LoadTexture( "bg_default", "C:\\clouds.jpg" );
@@ -157,14 +160,11 @@ int main( int argc, char** argv )
   float f = 0.f;
   while ( context->active() ) {
     //node->translate( 0.01f * std::sinf( f ), 0.01f * std::cosf( f ) );
-    f += 0.05f;
-    //sonicNode->scale( 0.25f * std::sinf( f ) );
+    f += 0.0005f;
+    //sonicNode->scale( 10.05f * std::sinf( f ) );
 
     // TODO: Repro case where both quads appeared to be scaling with only rotations being done.
     //node->getChild( "AChild" )->rotate( Lore::Degree( -.1f ) );
-
-    printf( "Node: %.2f, %.2f\n", sonicNode->getPosition().x, sonicNode->getPosition().y );
-    printf( "Cam:  %.2f, %.2f\n", camera->getPosition().x, camera->getPosition().y );
 
     const float speed = 0.01f;
     if ( GetAsyncKeyState( 0x57 ) ) { // W

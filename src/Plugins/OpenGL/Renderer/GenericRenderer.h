@@ -31,7 +31,8 @@
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore { namespace OpenGL {
+namespace Lore {
+  namespace OpenGL {
 
     ///
     /// \class GenericRenderer
@@ -41,44 +42,48 @@ namespace Lore { namespace OpenGL {
 
     public:
 
-        const size_t DefaultRenderQueueCount = 100;
+      const size_t DefaultRenderQueueCount = 100;
 
     public:
 
-        GenericRenderer();
+      GenericRenderer();
 
-        virtual ~GenericRenderer() override;
+      virtual ~GenericRenderer() override;
 
-        virtual void addRenderData( Lore::EntityPtr e,
-                                    Lore::NodePtr node ) override;
+      virtual void addRenderData( Lore::EntityPtr e,
+                                  Lore::NodePtr node ) override;
 
-        virtual void present( const Lore::RenderView& rv,
-                              const WindowPtr window ) override;
-
-    private:
-
-        virtual void _clearRenderQueues() override;
-
-        void activateQueue( const uint id, Lore::RenderQueue& rq );
-
-        void renderBackground( const Lore::ScenePtr scene, const Matrix4& proj );
-
-        void renderMaterialMap( const Lore::ScenePtr scene,
-                                RenderQueue::EntityDataMap& mm,
-                                const Matrix4& viewProjection ) const;
+      virtual void present( const Lore::RenderView& rv,
+                            const WindowPtr window ) override;
 
     private:
 
-        using RenderQueueList = std::vector<RenderQueue>;
-        using ActiveRenderQueueList = std::map<uint, RenderQueue&>;
+      virtual void _clearRenderQueues() override;
+
+      void activateQueue( const uint id,
+                          Lore::RenderQueue& rq );
+
+      void renderBackground( const Lore::ScenePtr scene,
+                             const Matrix4& proj,
+                             Lore::CameraPtr camera );
+
+      void renderMaterialMap( const Lore::ScenePtr scene,
+                              RenderQueue::EntityDataMap& mm,
+                              const Matrix4& viewProjection ) const;
 
     private:
 
-        RenderQueueList _queues {};
-        ActiveRenderQueueList _activeQueues {};
+      using RenderQueueList = std::vector<RenderQueue>;
+      using ActiveRenderQueueList = std::map<uint, RenderQueue&>;
+
+    private:
+
+      RenderQueueList _queues { };
+      ActiveRenderQueueList _activeQueues { };
 
     };
 
-}}
+  }
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

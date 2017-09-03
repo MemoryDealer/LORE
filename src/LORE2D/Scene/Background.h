@@ -100,7 +100,7 @@ namespace Lore {
     private:
 
       Mode _mode { Mode::Dynamic };
-      Vec2 _parallax { 1.f, 1.f };
+      Vec2 _parallax { 0.f, 0.f };
       real _depth { 750.f };
       MaterialPtr _material { nullptr };
       TexturePtr _texture { nullptr };

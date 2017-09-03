@@ -42,7 +42,6 @@
 
 using namespace Lore::OpenGL;
 
-// TODO: Pull this class out of GL plugin and abstract away GL calls.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 GenericRenderer::GenericRenderer()
@@ -125,7 +124,7 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
   const Matrix4 viewProjection = rv.camera->getViewMatrix() * projection;
 
   // Render background before scene node entities.
-  renderBackground( rv.scene, projection );
+  renderBackground( rv.scene, projection, rv.camera );
 
   // Iterate through all active render queues and render each object.
   for ( const auto& activeQueue : _activeQueues ) {
@@ -164,13 +163,17 @@ void GenericRenderer::activateQueue( const uint id, Lore::RenderQueue& rq )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GenericRenderer::renderBackground( const Lore::ScenePtr scene, const Lore::Matrix4& proj )
+void GenericRenderer::renderBackground( const Lore::ScenePtr scene,
+                                        const Lore::Matrix4& proj,
+                                        Lore::CameraPtr camera )
 {
   BackgroundPtr background = scene->getBackground();
   Background::LayerMap layers = background->getLayerMap();
 
   VertexBufferPtr vb = Lore::StockResource::GetVertexBuffer( "Background" );
   vb->bind();
+
+  const Vec2 camPos = camera->getPosition();
 
   for( const auto& pair : layers ){
     const Background::Layer& layer = pair.second;
@@ -183,7 +186,6 @@ void GenericRenderer::renderBackground( const Lore::ScenePtr scene, const Lore::
     if ( texture ) {
       program->use();
       texture->bind();
-      program->setUniformVar( "texSampleOffset", pass.getTexCoordOffset() );
 
       Lore::Rect sampleRegion = pass.getTexSampleRegion();
       program->setUniformVar( "texSampleRegion.x", sampleRegion.x );
@@ -194,6 +196,7 @@ void GenericRenderer::renderBackground( const Lore::ScenePtr scene, const Lore::
       switch ( layer.getMode() ) {
       default:
       case Background::Layer::Mode::Static:
+        program->setUniformVar( "texSampleOffset", pass.getTexCoordOffset() );
         // Have to draw two halves to avoid stretching...should probably add a setting for this.
         // Draw on left half of viewport.
         {
@@ -216,6 +219,11 @@ void GenericRenderer::renderBackground( const Lore::ScenePtr scene, const Lore::
 
       case Background::Layer::Mode::Dynamic:
         {
+          Lore::Vec2 offset;
+          offset.x = camPos.x * layer.getParallax().x;
+          offset.y = -camPos.y * layer.getParallax().y;
+          program->setUniformVar( "texSampleOffset", offset );
+
           Lore::Matrix4 transform = Math::CreateTransformationMatrix( Lore::Vec2( 0.f, 0.f ), Lore::Quaternion() );
           transform[3][2] = layer.getDepth();
           program->setTransformVar( proj * transform );
