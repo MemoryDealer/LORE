@@ -25,65 +25,31 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Renderer/IRenderer.h>
-
-#include <LORE2D/Resource/Material.h>
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 namespace Lore {
-  namespace OpenGL {
 
-    ///
-    /// \class GenericRenderer
-    /// \brief Renders a scene normally, without any special behavior.
-    class GenericRenderer : public Lore::IRenderer
-    {
+  struct Rectangle
+  {
 
-    public:
+    real x { 0.f };
+    real y { 0.f };
+    real w { 0.f };
+    real h { 0.f };
 
-      const size_t DefaultRenderQueueCount = 100;
+    Rectangle() = default;
+    Rectangle( const real x_,
+               const real y_,
+               const real w_,
+               const real h_ )
+      : x( x_ )
+      , y( y_ )
+      , w( w_ )
+      , h( h_ )
+    { }
 
-    public:
+  };
 
-      GenericRenderer();
+  using Rect = Rectangle;
 
-      virtual ~GenericRenderer() override;
-
-      virtual void addRenderData( Lore::EntityPtr e,
-                                  Lore::NodePtr node ) override;
-
-      virtual void present( const Lore::RenderView& rv,
-                            const WindowPtr window ) override;
-
-    private:
-
-      virtual void _clearRenderQueues() override;
-
-      void activateQueue( const uint id,
-                          Lore::RenderQueue& rq );
-
-      void renderBackground( const Lore::RenderView& rv,
-                             const real aspectRatio,
-                             const Matrix4& proj);
-
-      void renderMaterialMap( const Lore::ScenePtr scene,
-                              RenderQueue::EntityDataMap& mm,
-                              const Matrix4& viewProjection ) const;
-
-    private:
-
-      using RenderQueueList = std::vector<RenderQueue>;
-      using ActiveRenderQueueList = std::map<uint, RenderQueue&>;
-
-    private:
-
-      RenderQueueList _queues { };
-      ActiveRenderQueueList _activeQueues { };
-
-    };
-
-  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

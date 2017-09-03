@@ -31,58 +31,60 @@
 
 namespace Lore {
 
-    //
-    // Forward declarations.
+  //
+  // Forward declarations.
 
-    class Camera;
-    class Context;
-    class Entity;
-    class GPUProgram;
-    class IRenderer;
-    class Material;
-    class Light;
-    class Mesh;
-    class Node;
-    class PostProcessor;
-    class Renderable;
-    class ResourceController;
-    struct ResourceGroup;
-    class Scene;
-    class Shader;
-    class StockResourceController;
-    class Texture;
-    class VertexBuffer;
-    class Window;
+  class Background;
+  class Camera;
+  class Context;
+  class Entity;
+  class GPUProgram;
+  class IRenderer;
+  class Material;
+  class Light;
+  class Mesh;
+  class Node;
+  class PostProcessor;
+  class Renderable;
+  class ResourceController;
+  struct ResourceGroup;
+  class Scene;
+  class Shader;
+  class StockResourceController;
+  class Texture;
+  class VertexBuffer;
+  class Window;
 
-    //
-    // Pointer types.
+  //
+  // Pointer types.
 
-    using CameraPtr = Camera*;
-    using ContextPtr = Context*;
-    using EntityPtr = Entity*;
-    using GPUProgramPtr = GPUProgram*;
-    using LightPtr = Light*;
-    using MaterialPtr = Material*;
-    using MeshPtr = Mesh*;
-    using NodePtr = Node*;
-    using RendererPtr = IRenderer*;
-    using PostProcessorPtr = PostProcessor*;
-    using RenderablePtr = Renderable*;
-    using ResourceControllerPtr = ResourceController*;
-    using ResourceGroupPtr = ResourceGroup*;
-    using ScenePtr = Scene*;
-    using ShaderPtr = Shader*;
-    using StockResourceControllerPtr = StockResourceController*;
-    using TexturePtr = Texture*;
-    using VertexBufferPtr = VertexBuffer*;
-    using WindowPtr = Window*;
+  using BackgroundPtr = Background*;
+  using CameraPtr = Camera*;
+  using ContextPtr = Context*;
+  using EntityPtr = Entity*;
+  using GPUProgramPtr = GPUProgram*;
+  using LightPtr = Light*;
+  using MaterialPtr = Material*;
+  using MeshPtr = Mesh*;
+  using NodePtr = Node*;
+  using RendererPtr = IRenderer*;
+  using PostProcessorPtr = PostProcessor*;
+  using RenderablePtr = Renderable*;
+  using ResourceControllerPtr = ResourceController*;
+  using ResourceGroupPtr = ResourceGroup*;
+  using ScenePtr = Scene*;
+  using ShaderPtr = Shader*;
+  using StockResourceControllerPtr = StockResourceController*;
+  using TexturePtr = Texture*;
+  using VertexBufferPtr = VertexBuffer*;
+  using WindowPtr = Window*;
 
-    //
-    // Types.
+  //
+  // Types.
 
-    using real = float;
-    using uint = unsigned int;
-    using string = std::string;
+  using real = float;
+  using uint = unsigned int;
+  using string = std::string;
 
 }
 

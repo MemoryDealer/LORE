@@ -45,8 +45,6 @@ using namespace Lore::OpenGL;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 GenericRenderer::GenericRenderer()
-  : _queues()
-  , _activeQueues()
 {
   // Initialize all available queues.
   _queues.resize( DefaultRenderQueueCount );
@@ -83,7 +81,7 @@ void GenericRenderer::addRenderData( Lore::EntityPtr e,
   // Fill out the render data and add it to the list.
   RenderQueue::RenderData rd;
   rd.model = node->getFullTransform();
-  rd.model[3][2] = static_cast< real >( node->getDepth() );
+  rd.model[3][2] = node->getDepth();
   rd.colorModifier = node->getColorModifier();
 
   renderData.push_back( rd );
@@ -97,10 +95,14 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
   Lore::SceneGraphVisitor sgv( rv.scene->getRootNode() );
   sgv.visit( *this );
 
+  const float aspectRatio = window->getAspectRatio();
+  rv.camera->updateTracking(aspectRatio);
+
   // TODO: Cache which scenes have been visited and check before doing it again.
   // [OR] move visitor to context?
   // ...
 
+  // TODO: Abstract GL calls out of here and move to LORE2D lib.
   glEnable( GL_DEPTH_TEST );
   glDepthFunc( GL_LESS );
 
@@ -115,12 +117,14 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
 
   // Setup view-projection matrix.
   // TODO: Take viewport dimensions into account. Cache more things inside window.
-  const float aspectRatio = window->getAspectRatio();
   const Matrix4 projection = Math::OrthoRH( -aspectRatio, aspectRatio,
                                             -1.f, 1.f,
-                                            -100.f, 100.f );
+                                            1000.f, -1000.f );
 
   const Matrix4 viewProjection = rv.camera->getViewMatrix() * projection;
+
+  // Render background before scene node entities.
+  renderBackground( rv, aspectRatio, projection );
 
   // Iterate through all active render queues and render each object.
   for ( const auto& activeQueue : _activeQueues ) {
@@ -159,6 +163,57 @@ void GenericRenderer::activateQueue( const uint id, Lore::RenderQueue& rq )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void GenericRenderer::renderBackground( const Lore::RenderView& rv,
+                                        const real aspectRatio,
+                                        const Lore::Matrix4& proj)
+{
+  BackgroundPtr background = rv.scene->getBackground();
+  Background::LayerMap layers = background->getLayerMap();
+
+  VertexBufferPtr vb = Lore::StockResource::GetVertexBuffer( "Background" );
+  vb->bind();
+
+  const Vec2 camPos = rv.camera->getPosition();
+
+  for( const auto& pair : layers ){
+    const Background::Layer& layer = pair.second;
+    MaterialPtr mat = layer.getMaterial();
+
+    Material::Pass& pass = mat->getPass();
+    GPUProgramPtr program = pass.program;
+    TexturePtr texture = pass.texture;
+
+    if ( texture ) {
+      program->use();
+      texture->bind();
+
+      Lore::Rect sampleRegion = pass.getTexSampleRegion();
+      program->setUniformVar( "texSampleRegion.x", sampleRegion.x );
+      program->setUniformVar( "texSampleRegion.y", sampleRegion.y );
+      program->setUniformVar( "texSampleRegion.w", sampleRegion.w );
+      program->setUniformVar( "texSampleRegion.h", sampleRegion.h );
+
+      // Apply scrolling and parallax offsets.
+      Lore::Vec2 offset = pass.getTexCoordOffset();
+      offset.x += camPos.x * layer.getParallax().x;
+      offset.y -= camPos.y * layer.getParallax().y;
+      program->setUniformVar( "texSampleOffset", offset );
+
+      Lore::Matrix4 transform = Math::CreateTransformationMatrix( Lore::Vec2( 0.f, 0.f ), Lore::Quaternion() );
+      transform[0][0] = aspectRatio;
+      transform[1][1] = aspectRatio;
+      transform[3][2] = layer.getDepth();
+      program->setTransformVar( proj * transform );
+
+      vb->draw();
+    }
+  }
+
+  vb->unbind();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
                                          Lore::RenderQueue::EntityDataMap& mm,
                                          const Lore::Matrix4& viewProjection ) const
@@ -181,8 +236,15 @@ void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
 
     program->use();
     if ( texture ) {
+      // TODO: Multi-texturing.
       texture->bind();
       program->setUniformVar( "texSampleOffset", pass.getTexCoordOffset() );
+
+      Lore::Rect sampleRegion = pass.getTexSampleRegion();
+      program->setUniformVar( "texSampleRegion.x", sampleRegion.x );
+      program->setUniformVar( "texSampleRegion.y", sampleRegion.y );
+      program->setUniformVar( "texSampleRegion.w", sampleRegion.w );
+      program->setUniformVar( "texSampleRegion.h", sampleRegion.h );
     }
 
     // Upload lighting data.

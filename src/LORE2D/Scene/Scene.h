@@ -28,6 +28,7 @@
 #include <LORE2D/Memory/Alloc.h>
 #include <LORE2D/Resource/Color.h>
 #include <LORE2D/Resource/Registry.h>
+#include <LORE2D/Scene/Background.h>
 #include <LORE2D/Scene/Light.h>
 #include <LORE2D/Scene/Node.h>
 
@@ -87,6 +88,15 @@ namespace Lore {
       _ambientLightColor = color;
     }
 
+    inline void setBackground( BackgroundPtr background )
+    {
+      _background = background;
+    }
+
+    ///
+    /// \brief Sets background texture.
+    void setBackground( const string& texture );
+
     //
     // Getters.
 
@@ -120,6 +130,11 @@ namespace Lore {
       return _activeLights.getConstIterator();
     }
 
+    inline BackgroundPtr getBackground() const
+    {
+      return _background;
+    }
+
   private:
 
     virtual void _reset() override;
@@ -150,6 +165,8 @@ namespace Lore {
 
     // Lights that are attached to a node.
     LightMap _activeLights;
+
+    BackgroundPtr _background { nullptr };
 
   };
 

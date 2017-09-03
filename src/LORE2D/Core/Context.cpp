@@ -72,6 +72,7 @@ Context::~Context()
 void Context::initConfiguration()
 {
   // Setup default memory pool settings.
+  _poolCluster.registerPool<Background>( 32 );
   _poolCluster.registerPool<Camera>( 32 );
   _poolCluster.registerPool<Entity>( 32 );
   _poolCluster.registerPool<Light>( 64 );

@@ -32,95 +32,95 @@
 
 namespace Lore {
 
-    ///
-    /// \class Viewport
-    /// \brief Viewport dimensions in float coordinates (0.0f to 1.0f).
-    struct Viewport final
+  ///
+  /// \class Viewport
+  /// \brief Viewport dimensions in float coordinates (0.0f to 1.0f).
+  struct Viewport final
+  {
+
+    float x { 0.f };
+    float y { 0.f };
+    float width { 1.f };
+    float height { 1.f };
+
+    Viewport() = default;
+
+    Viewport( const float x_,
+              const float y_,
+              const float width_,
+              const float height_ )
+      : x( x_ )
+      , y( y_ )
+      , width( width_ )
+      , height( height_ )
+    {
+    }
+
+    ~Viewport() = default;
+
+  };
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  ///
+  /// \class RenderView
+  /// \brief Contains the information needed to render a scene to a window.
+  /// \details ...
+  struct RenderView final
+  {
+
+    string name {};
+    ScenePtr scene { nullptr };
+    CameraPtr camera { nullptr };
+    //PostProcesser
+
+    Viewport viewport {};
+
+    // Viewports are stored in a union, so each render plugin can do the 
+    // conversion once, when the RenderView is added to a window.
+    union
     {
 
-        float x;
-        float y;
-        float width;
-        float height;
-
-        Viewport()
-        : x( 0.f )
-        , y( 0.f )
-        , width( 1.f )
-        , height( 1.f )
-        { }
-
-        Viewport( const float x_,
-                  const float y_,
-                  const float width_,
-                  const float height_ )
-        : x (x_)
-        , y( y_)
-        , width( width_ )
-        , height( height_ )
-        { }
+      struct
+      {
+        int x, y;
+        uint width, height;
+        real aspectRatio;
+      }  gl_viewport;
 
     };
 
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-    ///
-    /// \class RenderView
-    /// \brief Contains the information needed to render a scene to a window.
-    /// \details ...
-    struct RenderView final
+    RenderView( const string& name_ )
+      : name( name_ )
+      , scene( nullptr )
+      , camera( nullptr )
+      , viewport()
     {
+    }
 
-        string name;
-        ScenePtr scene;
-        CameraPtr camera;
-        //PostProcesser
+    RenderView( const string& name_, ScenePtr scene_ )
+      : name( name_ )
+      , scene( scene_ )
+      , camera( nullptr )
+      , viewport()
+    {
+    }
 
-        Viewport viewport;
+    RenderView( const string& name_, ScenePtr scene_, const Viewport& viewport_ )
+      : name( name_ )
+      , scene( scene_ )
+      , camera( nullptr )
+      , viewport( viewport_ )
+    {
+    }
 
-        // Viewports are stored in a union, so each render plugin can do the 
-        // conversion once, when the RenderView is added to a window.
-        union
-        {
+    bool operator == ( const RenderView& rhs ) const
+    {
+      // RenderView names are unique.
+      return ( name == rhs.name );
+    }
 
-            struct
-            {
-                int x, y;
-                uint width, height;
-                real aspectRatio;
-            }  gl_viewport;
-
-        };
-
-        RenderView( const string& name_ )
-        : name ( name_ )
-        , scene( nullptr )
-        , camera( nullptr )
-        , viewport()
-        { }
-
-        RenderView( const string& name_, Scene* scene_ )
-        : name( name_ )
-        , scene( scene_ )
-        , camera( nullptr )
-        , viewport( )
-        {
-        }
-
-        RenderView( const string& name_, Scene* scene_, const Viewport& viewport_ )
-        : name( name_ )
-        , scene( scene_ )
-        , camera( nullptr )
-        , viewport( viewport_ )
-        { }
-
-        bool operator == ( const RenderView& rhs ) const
-        {
-            // RenderView names are unique.
-            return ( name == rhs.name );
-        }
-
-    };
+  };
 
 }
 

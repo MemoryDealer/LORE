@@ -63,7 +63,20 @@ namespace Lore {
     //
     // Getters.
 
+    Vec2 getPosition() const;
+
     Matrix4 getViewMatrix();
+
+    // Tracking.
+
+    enum class TrackingStyle
+    {
+      Simple
+    };
+
+    void trackNode( NodePtr node, const TrackingStyle& mode = TrackingStyle::Simple );
+
+    void updateTracking(const real aspectRatio);
 
   protected:
 
@@ -76,11 +89,14 @@ namespace Lore {
 
   private:
 
-    Vec2 _position;
-    Matrix4 _view;
-    real _zoom;
+    Vec2 _position {};
+    Matrix4 _view {};
+    real _zoom { 1.f };
 
-    bool _viewMatrixDirty;
+    bool _viewMatrixDirty { true };
+
+    NodePtr _trackingNode { nullptr };
+    TrackingStyle _trackingStyle { TrackingStyle::Simple };
 
   };
 

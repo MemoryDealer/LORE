@@ -134,18 +134,6 @@ Lore::VertexBufferPtr ResourceController::createVertexBuffer( const string& name
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::MaterialPtr ResourceController::createMaterial( const string& name, const string& groupName )
-{
-    auto mat = MemoryAccess::GetPrimaryPoolCluster()->create<Material>();
-    mat->setName( name );
-    mat->setResourceGroupName( groupName );
-
-    _getGroup( groupName )->materials.insert( name, mat );
-    return mat;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 Lore::TexturePtr ResourceController::createTexture( const string& name, const string& groupName )
 {
     auto texture = MemoryAccess::GetPrimaryPoolCluster()->create<Texture, GLTexture>();
@@ -153,17 +141,6 @@ Lore::TexturePtr ResourceController::createTexture( const string& name, const st
 
     _getGroup( groupName )->textures.insert( name, texture );
     return texture;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-Lore::CameraPtr ResourceController::createCamera( const string& name, const string& groupName )
-{
-    auto cam = MemoryAccess::GetPrimaryPoolCluster()->create<Camera>();
-    cam->setName( name );
-
-    _getGroup( groupName )->cameras.insert( name, cam );
-    return cam;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

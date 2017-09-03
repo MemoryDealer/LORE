@@ -24,9 +24,10 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Material.h"
+#include "Background.h"
 
-#include <LORE2D/Core/Context.h>
+#include <LORE2D/Core/Exception.h>
+#include <LORE2D/Resource/StockResource.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -34,79 +35,66 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Material::Material()
-  : _name()
-  , _passes()
-{
-  // By default a material should have at least one pass.
-  _passes.push_back( Pass() );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-Material::~Material()
-{
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Material::_reset()
-{
-  _passes.clear();
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-Material::Pass::Pass()
-  : colorMod( true )
-  , lighting( true )
-  , ambient( StockColor::White )
-  , diffuse( StockColor::White )
-  , texture( nullptr )
-  , program( nullptr )
+Background::Background()
 {
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Material::Pass::~Pass()
+Background::Layer& Background::addLayer( const string& name )
 {
-  if ( _texCoordCallback ) {
-    Context::UnregisterFrameStartedCallback( _texCoordCallback );
+  Layer layer( name );
+  layer.setMaterial( StockResource::CloneMaterial( "Background", "bg_layer_" + name ) );
+  layer.getMaterial()->getPass().program = Lore::StockResource::GetGPUProgram( "Background" );
+
+  log_information( "Added layer " + name + " to background " + _name );
+
+  auto pair = _layers.insert( { name, layer } );
+  return pair.first->second;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Background::Layer& Background::getLayer( const string& name )
+{
+  auto lookup = _layers.find( name );
+  if ( _layers.end() == lookup ) {
+    throw Lore::ItemIdentityException( "Could not find background layer named " + name + " in background " + _name );
+  }
+
+  return lookup->second;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Background::removeLayer( const string& name )
+{
+  auto lookup = _layers.find( name );
+  if ( _layers.end() == lookup ) {
+    throw Lore::ItemIdentityException( "Could not find background layer named " + name + " in background " + _name );
+  }
+
+  _layers.erase( lookup );
+
+  log_information( "Remove layer " + name + " from background " + _name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Background::Layer::setTexture( TexturePtr texture )
+{
+  if ( _material ) {
+    _material->getPass().texture = texture;
   }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Material::Pass::setTextureScrollSpeed( const Vec2& scroll )
+void Background::Layer::setScrollSpeed( const Vec2& speed )
 {
-  if ( !_texCoordCallback ) {
-    // Register a callback to update the texture coordinates per frame.
-    _texCoordCallback = [this] ( const FrameListener::FrameEvent& e ) {
-      _texCoordOffset += ( _texCoordScrollSpeed );
-    };
-
-    Context::RegisterFrameStartedCallback( _texCoordCallback );
+  if ( _material ) {
+    _material->getPass().setTextureScrollSpeed( speed );
   }
-  _texCoordScrollSpeed = scroll;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Material::Pass::setTextureSampleRegion( const Rect& region )
-{
-  _texSampleRegion = region;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Material::Pass::setTextureSampleRegion( const real x,
-                                             const real y,
-                                             const real w,
-                                             const real h )
-{
-  setTextureSampleRegion( Rect( x, y, w, h ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

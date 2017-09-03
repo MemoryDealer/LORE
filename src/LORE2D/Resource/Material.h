@@ -52,10 +52,6 @@ namespace Lore {
     class LORE_EXPORT Pass final
     {
 
-      Vec2 _texCoordScrollSpeed { };
-      Vec2 _texCoordOffset { };
-      FrameListenerController::FrameStartedCallback _texCoordCallback { nullptr };
-
     public:
 
       bool colorMod;
@@ -71,12 +67,37 @@ namespace Lore {
 
       ~Pass();
 
+      //
+      // Setters.
+
       void setTextureScrollSpeed( const Vec2& scroll );
+
+      void setTextureSampleRegion( const Rect& region );
+
+      void setTextureSampleRegion( const real x,
+                                   const real y,
+                                   const real w,
+                                   const real h );
+
+      //
+      // Getters.
 
       inline Vec2 getTexCoordOffset() const
       {
         return _texCoordOffset;
       }
+
+      inline Rect getTexSampleRegion() const
+      {
+        return _texSampleRegion;
+      }
+
+    private:
+
+      Vec2 _texCoordScrollSpeed {};
+      Vec2 _texCoordOffset {};
+      Rect _texSampleRegion { 0.f, 0.f, 1.f, 1.f };
+      FrameListenerController::FrameStartedCallback _texCoordCallback { nullptr };
 
     };
 
@@ -96,6 +117,15 @@ namespace Lore {
     {
       assert( idx <= _passes.size() );
       return _passes[idx];
+    }
+
+    //
+    // Operators.
+
+    Material& operator = ( const Material& rhs )
+    {
+      _passes = rhs._passes;
+      return *this;
     }
 
   private:

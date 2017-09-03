@@ -26,6 +26,10 @@
 
 #include "Scene.h"
 
+#include <LORE2D/Resource/Material.h>
+#include <LORE2D/Resource/ResourceController.h>
+#include <LORE2D/Resource/StockResource.h>
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 using namespace Lore;
@@ -40,9 +44,13 @@ Scene::Scene()
   , _ambientLightColor( StockColor::Black )
   , _lights()
   , _activeLights()
+  , _background()
 {
   _root.setName( "root" );
   _root._scene = this;
+
+  // TODO: Get stock background
+  _background = MemoryAccess::GetPrimaryPoolCluster()->create<Background>();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

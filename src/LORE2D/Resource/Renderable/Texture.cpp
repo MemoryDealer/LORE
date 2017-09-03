@@ -33,8 +33,6 @@ using namespace Lore;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Texture::Texture()
-  : _scrollSpeed()
-  , _scrollOffset()
 {
     _type = Renderable::Type::Texture;
 }

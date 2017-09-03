@@ -60,6 +60,9 @@ void GLTexture::loadFromFile( const string& file )
         stbi_image_free( pixels );
         glBindTexture( GL_TEXTURE_2D, 0 );
     }
+    else {
+      throw Lore::Exception( "Unable to load texture at " + file );
+    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

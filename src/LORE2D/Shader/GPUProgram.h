@@ -78,6 +78,8 @@ namespace Lore {
 
         virtual void setUniformVar( const string& id, const Vec3& v ) = 0;
 
+        virtual void setUniformVar( const string& id, const real r ) = 0;
+
         virtual void setUniformVar( const string& id, const int i ) = 0;
 
         virtual void updateLights( Scene::LightMap::ConstIterator it ) = 0;
