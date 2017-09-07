@@ -46,6 +46,16 @@ namespace Lore {
 
   public:
 
+    enum class BlendFactor
+    {
+      None,
+      Zero,
+      One,
+      //
+      SrcAlpha,
+      OneMinusSrcAlpha
+    };
+
     ///
     /// \class Material::Pass
     /// \brief A single vertex and pixel shader pass.
@@ -54,12 +64,18 @@ namespace Lore {
 
     public:
 
-      bool colorMod;
-      bool lighting;
-      Color ambient;
-      Color diffuse;
-      TexturePtr texture;
-      GPUProgramPtr program;
+      bool lighting { true };
+      bool blending { false };
+      Color ambient { StockColor::White };
+      Color diffuse { StockColor::White };
+      TexturePtr texture { nullptr };
+      GPUProgramPtr program { nullptr };
+      
+      struct
+      {
+        BlendFactor srcFactor { BlendFactor::None };
+        BlendFactor dstFactor { BlendFactor::None };
+      } AlphaBlend;
 
     public:
 

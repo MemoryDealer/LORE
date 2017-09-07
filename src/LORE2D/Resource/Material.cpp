@@ -59,12 +59,6 @@ void Material::_reset()
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Material::Pass::Pass()
-  : colorMod( true )
-  , lighting( true )
-  , ambient( StockColor::White )
-  , diffuse( StockColor::White )
-  , texture( nullptr )
-  , program( nullptr )
 {
 }
 

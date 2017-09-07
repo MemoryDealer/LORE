@@ -46,11 +46,10 @@ namespace Lore {
 
         // :::::: //
 
-        // An instance of a type of Renderable (e.g., Texture).
+        // An instance of a type of Renderable attached to a node (e.g., Texture).
         struct RenderData
         {
             Matrix4 model;
-            Color colorModifier;
         };
         using RenderDataList = std::vector<RenderData>;
 
@@ -68,7 +67,8 @@ namespace Lore {
         // Every Material maps to a list of RenderData.
         using EntityDataMap = std::map<EntityData, RenderDataList>;
 
-        EntityDataMap solids;
+        EntityDataMap solids {};
+        EntityDataMap transparents {};
 
     };
 

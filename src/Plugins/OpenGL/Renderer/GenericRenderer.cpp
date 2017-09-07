@@ -82,7 +82,6 @@ void GenericRenderer::addRenderData( Lore::EntityPtr e,
   RenderQueue::RenderData rd;
   rd.model = node->getFullTransform();
   rd.model[3][2] = node->getDepth();
-  rd.colorModifier = node->getColorModifier();
 
   renderData.push_back( rd );
 }
@@ -132,6 +131,9 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
 
     // Render solids.
     renderMaterialMap( rv.scene, queue.solids, viewProjection );
+
+    // Render transparents.
+    renderMaterialMap( rv.scene, queue.transparents, viewProjection );
   }
 
   _clearRenderQueues();
@@ -274,10 +276,6 @@ void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
 
       if ( pass.lighting ) {
         program->setUniformVar( "model", rd.model );
-      }
-
-      if ( pass.colorMod ) {
-        program->setUniformVar( "colorMod", rd.colorModifier );
       }
 
       // Draw the entity.
