@@ -36,16 +36,16 @@ using namespace Lore;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 SceneGraphVisitor::SceneGraphVisitor( NodePtr root )
-: _stack()
-, _node( root )
+  : _stack()
+  , _node( root )
 {
-    if ( _node->_transformDirty() ) {
-        _node->_updateWorldTransform( _node->_getLocalTransform() );
-    }
+  if ( _node->_transformDirty() ) {
+    _node->_updateWorldTransform( _node->_getLocalTransform() );
+  }
 
-    // Recursively push down scale changes to child nodes. This must be done
-    // here because scales are not included in transform/rotation matrix updates.
-    _node->_updateChildrenScale();
+  // Recursively push down scale changes to child nodes. This must be done
+  // here because scales are not included in transform/rotation matrix updates.
+  _node->_updateChildrenScale();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -58,43 +58,43 @@ SceneGraphVisitor::~SceneGraphVisitor()
 
 void SceneGraphVisitor::visit( IRenderer& renderer, bool parentDirty )
 {
-    const bool transformDirty = _node->_transformDirty();
-    const Matrix4 transform = _node->_getLocalTransform();
+  const bool transformDirty = _node->_transformDirty();
+  const Matrix4 transform = _node->_getLocalTransform();
 
-    if ( parentDirty ) {
-        _node->_updateWorldTransform( _stack.top() * transform );
-    }
-    else if ( transformDirty ) {
-        _node->_updateWorldTransform( _stack.top() * transform );
-        parentDirty = true;
-    }
+  if ( parentDirty ) {
+    _node->_updateWorldTransform( _stack.top() * transform );
+  }
+  else if ( transformDirty ) {
+    _node->_updateWorldTransform( _stack.top() * transform );
+    parentDirty = true;
+  }
 
-    // Add any Renderables attached to this node to the Renderer.
-    auto it = _node->getEntityListConstIterator();
+  // Add any Renderables attached to this node to the Renderer.
+  auto it = _node->getEntityListConstIterator();
+  while ( it.hasMore() ) {
+    EntityPtr entity = it.getNext();
+    renderer.addRenderData( entity, _node );
+  }
+
+  // Recurse over children.
+  if ( _node->hasChildNodes() ) {
+    // Push this node's transform onto the stack, so the next call can
+    // use it to calculate its derived transform.
+    _stack.push( transform );
+
+    Node::ChildNodeIterator it = _node->getChildNodeIterator();
     while ( it.hasMore() ) {
-        EntityPtr entity = it.getNext();
-        renderer.addRenderData( entity, _node );
+      _node = it.getNext();
+      visit( renderer, parentDirty );
     }
 
-    // Recurse over children.
-    if ( _node->hasChildNodes() ) {
-        // Push this node's transform onto the stack, so the next call can
-        // use it to calculate its derived transform.
-        _stack.push( transform );
+    // Recursion on this node's children is done, we can pop off the transform.
+    _stack.pop();
+  }
 
-        Node::ChildNodeIterator it = _node->getChildNodeIterator();
-        while ( it.hasMore() ) {
-            _node = it.getNext();
-            visit( renderer, parentDirty );
-        }
-
-        // Recursion on this node's children is done, we can pop off the transform.
-        _stack.pop();
-    }
-
-    // Manually update depth value (z) in world transformation matrix after
-    // traversing all children.
-    //_node->_updateDepthValue();
+  // Manually update depth value (z) in world transformation matrix after
+  // traversing all children.
+  //_node->_updateDepthValue();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

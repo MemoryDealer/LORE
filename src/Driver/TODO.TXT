@@ -11,3 +11,5 @@
   Animation system for nodes with key frames
 -Self-illumination for all lights
 -Particle systems
+-Compositors: visualize depth buffer (https://learnopengl.com/#!Advanced-OpenGL/Depth-testing)
+-Modify memory pool to use raw uint8_t buffers, get rid of reset() functions; use default copy for each pool

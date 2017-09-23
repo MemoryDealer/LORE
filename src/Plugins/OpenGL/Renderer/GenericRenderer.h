@@ -71,6 +71,10 @@ namespace Lore {
                               RenderQueue::EntityDataMap& mm,
                               const Matrix4& viewProjection ) const;
 
+      void renderTransparents( const Lore::ScenePtr scene,
+                               RenderQueue::TransparentDataMap& tm,
+                               const Matrix4& viewProjection ) const;
+
     private:
 
       using RenderQueueList = std::vector<RenderQueue>;

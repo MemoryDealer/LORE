@@ -32,84 +32,93 @@
 
 namespace Lore {
 
-    ///
-    /// \struct RenderQueue
-    /// \brief Holds a list of Renderables for rendering. RenderQueues are organized
-    ///     and handled by the IRenderer implementation.
-    struct RenderQueue
+  ///
+  /// \struct RenderQueue
+  /// \brief Holds a list of Renderables for rendering. RenderQueues are organized
+  ///     and handled by the IRenderer implementation.
+  struct RenderQueue
+  {
+
+    // Lore supports 100 render queues, rendered in order from 0-99.
+    static const uint Background = 0;
+    static const uint General = 50;
+    static const uint Foreground = 99;
+
+    // :::::: //
+
+    // An instance of a type of Renderable attached to a node (e.g., Texture).
+    struct RenderData
     {
+      Matrix4 model;
+    };
+    using RenderDataList = std::vector<RenderData>;
 
-        // Lore supports 100 render queues, rendered in order from 0-99.
-        static const uint Background = 0;
-        static const uint General = 50;
-        static const uint Foreground = 99;
+    struct EntityData
+    {
+      MaterialPtr material { nullptr };
+      VertexBufferPtr vertexBuffer { nullptr };
 
-        // :::::: //
-
-        // An instance of a type of Renderable attached to a node (e.g., Texture).
-        struct RenderData
-        {
-            Matrix4 model;
-        };
-        using RenderDataList = std::vector<RenderData>;
-
-        struct EntityData
-        {
-            MaterialPtr material;
-            VertexBufferPtr vertexBuffer;
-
-            bool operator < ( const EntityData& r ) const
-            {
-                return ( material->getName() < r.material->getName() );
-            }
-        };
-
-        // Every Material maps to a list of RenderData.
-        using EntityDataMap = std::map<EntityData, RenderDataList>;
-
-        EntityDataMap solids {};
-        EntityDataMap transparents {};
-
+      bool operator < ( const EntityData& r ) const
+      {
+        return ( material->getName() < r.material->getName() );
+      }
     };
 
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    struct Transparent
+    {
+      MaterialPtr material { nullptr };
+      VertexBufferPtr vertexBuffer { nullptr };
+      Matrix4 model;
+    };
+
+    // Every Material maps to a list of RenderData.
+    using EntityDataMap = std::map<EntityData, RenderDataList>;
+    using TransparentDataMap = std::multimap<real, Transparent>;
+
+    EntityDataMap solids { };
+    TransparentDataMap transparents { };
+
+  };
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  ///
+  /// \class IRenderer
+  /// \brief Interface for Renderers - the object that knows how to interpret
+  ///     a RenderView and a Scene's scene graph and present an image to the 
+  ///     window. Render plugins shall define these implementations.
+  class IRenderer
+  {
+
+  public:
+
+    virtual ~IRenderer() { }
 
     ///
-    /// \class IRenderer
-    /// \brief Interface for Renderers - the object that knows how to interpret
-    ///     a RenderView and a Scene's scene graph and present an image to the 
-    ///     window. Render plugins shall define these implementations.
-    class IRenderer
-    {
+    /// \brief Registers a Renderable object for rendering. This should be
+    ///     called when a Renderable is attached to a Node.
+    virtual void addRenderData( Lore::EntityPtr e,
+                                Lore::NodePtr node ) = 0;
 
-    public:
+    ///
+    /// \brief Uses internal Renderable lists to create a frame buffer using
+    ///     the provided RenderView.
+    virtual void present( const RenderView& rv,
+                          const WindowPtr window ) = 0;
 
-        virtual ~IRenderer() { }
+  private:
 
-        ///
-        /// \brief Registers a Renderable object for rendering. This should be
-        ///     called when a Renderable is attached to a Node.
-        virtual void addRenderData( Lore::EntityPtr e,
-                                    Lore::NodePtr node ) = 0;
+    virtual void _clearRenderQueues() = 0;
 
-        ///
-        /// \brief Uses internal Renderable lists to create a frame buffer using
-        ///     the provided RenderView.
-        virtual void present( const RenderView& rv,
-                              const WindowPtr window ) = 0;
+  };
 
-    private:
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        virtual void _clearRenderQueues() = 0;
-
-    };
-
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-    // All built-in LORE renderer types.
-    enum class RendererType {
-        Generic
-    };
+  // All built-in LORE renderer types.
+  enum class RendererType
+  {
+    Generic
+  };
 
 }
 

@@ -79,6 +79,7 @@ int main( int argc, char** argv )
   auto sonicEntity = Lore::Resource::CreateEntity( "sonic", Lore::MeshType::TexturedQuad );
   auto sonicTexture = Lore::Resource::LoadTexture( "sonic-mobile", "H:\\sonic-mobile.png" );
   sonicEntity->setTexture( sonicTexture );
+  sonicEntity->getMaterial()->getPass().diffuse.a = 0.5f;
   sonicNode->attachObject( sonicEntity );
 
   auto sonicLight = scene->createLight( "sonic-light" );
@@ -97,6 +98,16 @@ int main( int argc, char** argv )
     auto node = scene->createNode( "doge" + std::to_string( i ) );
     node->attachObject( dogeEntity );
     node->setPosition( static_cast< float >( i ) / 2.f, 0.f );
+  }
+
+  // Create some blended boxes.
+
+  auto boxEntity = Lore::Resource::CreateEntity( "box", Lore::MeshType::Quad );
+  boxEntity->getMaterial()->getPass().diffuse = Lore::Color( 0.f, 0.1f, 0.9f, 0.75f );
+  for ( int i = 0; i < 5; ++i ) {
+    auto node = scene->createNode( "box" + std::to_string( i ) );
+    node->attachObject( boxEntity );
+    node->setPosition( -1.f - static_cast< float >( i ) / 2.f, 0.f );
   }
 
   //
@@ -147,7 +158,7 @@ int main( int argc, char** argv )
   //  layer4.setDepth( 497.f );
   //}
 
-  scene->setAmbientLightColor( Lore::Color( 0.12f, 0.12f, 0.12f ) );
+  scene->setAmbientLightColor( Lore::Color( 0.12f, 0.12f, 0.12f, 1.f ) );
 
   /*for ( int i = 0; i < 80; ++i ) {
   auto n = node->createChildNode( "a" + std::to_string( i ) );

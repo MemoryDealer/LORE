@@ -75,6 +75,7 @@ Material::Pass::~Pass()
 
 void Material::Pass::setTextureScrollSpeed( const Vec2& scroll )
 {
+  // TODO: Put all texture scrolling in a single function (e.g., pass ref to offset).
   if ( !_texCoordCallback ) {
     // Register a callback to update the texture coordinates per frame.
     _texCoordCallback = [this] ( const FrameListener::FrameEvent& e ) {

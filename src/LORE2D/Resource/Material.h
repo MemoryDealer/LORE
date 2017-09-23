@@ -65,7 +65,6 @@ namespace Lore {
     public:
 
       bool lighting { true };
-      bool blending { false };
       Color ambient { StockColor::White };
       Color diffuse { StockColor::White };
       TexturePtr texture { nullptr };
@@ -75,7 +74,7 @@ namespace Lore {
       {
         BlendFactor srcFactor { BlendFactor::None };
         BlendFactor dstFactor { BlendFactor::None };
-      } AlphaBlend;
+      } BlendingMode;
 
     public:
 

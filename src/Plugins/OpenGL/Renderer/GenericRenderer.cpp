@@ -62,6 +62,7 @@ void GenericRenderer::addRenderData( Lore::EntityPtr e,
                                      Lore::NodePtr node )
 {
   const uint queueId = e->getRenderQueue();
+  const bool transparent = ( e->getMaterial()->getPass().diffuse.a < 1.f );
 
   // Add this queue to the active queue list if not already there.
   activateQueue( queueId, _queues[queueId] );
@@ -71,19 +72,32 @@ void GenericRenderer::addRenderData( Lore::EntityPtr e,
 
   RenderQueue& queue = _queues.at( queueId );
 
-  // Acquire the render data list for this material/vb (or create one).
-  RenderQueue::EntityData entityData;
-  entityData.material = e->getMaterial();
-  entityData.vertexBuffer = e->getMesh()->getVertexBuffer();
+  if ( transparent ) {
+    RenderQueue::Transparent t;
+    t.material = e->getMaterial();
+    t.vertexBuffer = e->getMesh()->getVertexBuffer();
+    t.model = node->getFullTransform();
 
-  RenderQueue::RenderDataList& renderData = queue.solids[entityData];
+    const auto depth = node->getDepth();
+    t.model[3][2] = depth;
 
-  // Fill out the render data and add it to the list.
-  RenderQueue::RenderData rd;
-  rd.model = node->getFullTransform();
-  rd.model[3][2] = node->getDepth();
+    queue.transparents.insert( { depth, t } );
+  }
+  else {
+    // Acquire the render data list for this material/vb (or create one).
+    RenderQueue::EntityData entityData;
+    entityData.material = e->getMaterial();
+    entityData.vertexBuffer = e->getMesh()->getVertexBuffer();
 
-  renderData.push_back( rd );
+    RenderQueue::RenderDataList& renderData = queue.solids[entityData];
+
+    // Fill out the render data and add it to the list.
+    RenderQueue::RenderData rd;
+    rd.model = node->getFullTransform();
+    rd.model[3][2] = node->getDepth();
+
+    renderData.push_back( rd );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -133,7 +147,7 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
     renderMaterialMap( rv.scene, queue.solids, viewProjection );
 
     // Render transparents.
-    renderMaterialMap( rv.scene, queue.transparents, viewProjection );
+    renderTransparents( rv.scene, queue.transparents, viewProjection );
   }
 
   _clearRenderQueues();
@@ -146,6 +160,7 @@ void GenericRenderer::_clearRenderQueues()
   // Remove all data from each queue.
   for ( auto& queue : _queues ) {
     queue.solids.clear();
+    queue.transparents.clear();
   }
 
   // Erase all queues from the active queue list.
@@ -286,6 +301,77 @@ void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
     vertexBuffer->unbind();
 
   }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GenericRenderer::renderTransparents( const Lore::ScenePtr scene,
+                                          Lore::RenderQueue::TransparentDataMap& tm,
+                                          const Lore::Matrix4& viewProjection ) const
+{
+  glEnable( GL_BLEND );
+  glBlendFuncSeparate( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE );
+
+  // Render in reverse, so the farthest back is rendered first.
+  for ( auto it = tm.rbegin(); it != tm.rend(); ++it ) {
+
+    RenderQueue::Transparent& t = it->second;
+    Material::Pass& pass = t.material->getPass();
+    GPUProgramPtr program = pass.program;
+    VertexBufferPtr vertexBuffer = t.vertexBuffer;
+    TexturePtr texture = pass.texture;
+
+    // TODO: Use blend mode per material
+
+    program->use();
+    if ( texture ) {
+      // TODO: Multi-texturing.
+      texture->bind();
+      program->setUniformVar( "texSampleOffset", pass.getTexCoordOffset() );
+
+      Lore::Rect sampleRegion = pass.getTexSampleRegion();
+      program->setUniformVar( "texSampleRegion.x", sampleRegion.x );
+      program->setUniformVar( "texSampleRegion.y", sampleRegion.y );
+      program->setUniformVar( "texSampleRegion.w", sampleRegion.w );
+      program->setUniformVar( "texSampleRegion.h", sampleRegion.h );
+    }
+
+    // Upload lighting data.
+    if ( pass.lighting ) {
+
+      // Material.
+      program->setUniformVar( "material.ambient", pass.ambient );
+      program->setUniformVar( "material.diffuse", pass.diffuse );
+
+      // Scene.
+      program->setUniformVar( "sceneAmbient", scene->getAmbientLightColor() );
+      program->setUniformVar( "numLights", scene->getLightCount() );
+
+      program->updateLights( scene->getLightConstIterator() );
+
+    }
+
+    vertexBuffer->bind();
+
+    {
+      // Calculate model-view-projection matrix for this object.
+      Matrix4 mvp = viewProjection * t.model;
+
+      program->setTransformVar( mvp );
+
+      if ( pass.lighting ) {
+        program->setUniformVar( "model", t.model );
+      }
+
+      // Draw the entity.
+      vertexBuffer->draw();
+    }
+
+    vertexBuffer->unbind();
+
+  }
+
+  glDisable( GL_BLEND );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
