@@ -146,11 +146,6 @@ Lore::GPUProgramPtr StockResourceController::createUberProgram( const string& na
     src += "uniform sampler2D tex;";
   }
 
-  // Color and lighting.
-  if ( params.colorMod ) {
-    src += "uniform vec3 colorMod;";
-  }
-
   if ( textured ) {
     src += "in vec2 TexCoord;";
     src += "uniform vec2 texSampleOffset = vec2(1.0, 1.0);";
@@ -227,12 +222,7 @@ Lore::GPUProgramPtr StockResourceController::createUberProgram( const string& na
   }
 
   // Final pixel.
-  if ( params.colorMod ) {
-    src += "pixel = texSample * vec4(colorMod, 1.0);";
-  }
-  else {
-    src += "pixel = texSample";
-  }
+  src += "pixel = texSample;";
 
   src += "}";
   auto fsptr = _controller->createFragmentShader( name + "_FS" );
@@ -264,10 +254,6 @@ Lore::GPUProgramPtr StockResourceController::createUberProgram( const string& na
     program->addUniformVar( "material.diffuse" );
     program->addUniformVar( "numLights" );
     program->addUniformVar( "sceneAmbient" );
-  }
-
-  if ( params.colorMod ) {
-    program->addUniformVar( "colorMod" );
   }
 
   if ( textured ) {
