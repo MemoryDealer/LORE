@@ -106,7 +106,7 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
 {
   // Traverse the scene graph and update object transforms.
   Lore::SceneGraphVisitor sgv( rv.scene->getRootNode() );
-  sgv.visit( *this );
+  sgv.visit( *this ); // TODO: Fix this coupling.
 
   const float aspectRatio = window->getAspectRatio();
   rv.camera->updateTracking(aspectRatio);
@@ -312,8 +312,9 @@ void GenericRenderer::renderTransparents( const Lore::ScenePtr scene,
   glEnable( GL_BLEND );
   glBlendFuncSeparate( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE );
 
-  // Render in reverse, so the farthest back is rendered first.
-  for ( auto it = tm.rbegin(); it != tm.rend(); ++it ) {
+  // Render in forward order, so the farthest back is rendered first.
+  // (Depth values increase going farther back).
+  for ( auto it = tm.begin(); it != tm.end(); ++it ) {
 
     RenderQueue::Transparent& t = it->second;
     Material::Pass& pass = t.material->getPass();

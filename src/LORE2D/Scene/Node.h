@@ -226,7 +226,7 @@ namespace Lore {
 
     Transform _transform { };
 
-    real _depth { 0 };
+    real _depth { 0.f };
 
     EntityList _entities { };
 
