@@ -48,12 +48,18 @@ namespace Lore {
 
     enum class BlendFactor
     {
-      None,
       Zero,
       One,
-      //
+      SrcColor,
+      OneMinusSrcColor,
+      DstColor,
+      OneMinusDstColor,
       SrcAlpha,
-      OneMinusSrcAlpha
+      OneMinusSrcAlpha,
+      ConstantColor,
+      OneMinusConstantColor,
+      ConstantAlpha,
+      OneMinusConstantAlpha
     };
 
     ///
@@ -72,9 +78,10 @@ namespace Lore {
       
       struct
       {
-        BlendFactor srcFactor { BlendFactor::None };
-        BlendFactor dstFactor { BlendFactor::None };
-      } BlendingMode;
+        bool enabled { false };
+        BlendFactor srcFactor { BlendFactor::SrcAlpha };
+        BlendFactor dstFactor { BlendFactor::OneMinusSrcAlpha };
+      } blendingMode;
 
     public:
 

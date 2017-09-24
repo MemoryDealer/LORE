@@ -25,69 +25,71 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Renderer/IRenderer.h>
+#include <LORE2D/Renderer/Renderer.h>
 
 #include <LORE2D/Resource/Material.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
-  namespace OpenGL {
 
-    ///
-    /// \class GenericRenderer
-    /// \brief Renders a scene normally, without any special behavior.
-    class GenericRenderer : public Lore::IRenderer
-    {
+  class IRenderAPI;
 
-    public:
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-      const size_t DefaultRenderQueueCount = 100;
+  ///
+  /// \class GenericRenderer
+  /// \brief Renders a scene normally, without any special behavior.
+  class GenericRenderer : public Lore::Renderer
+  {
 
-    public:
+  public:
 
-      GenericRenderer();
+    const size_t DefaultRenderQueueCount = 100;
 
-      virtual ~GenericRenderer() override;
+  public:
 
-      virtual void addRenderData( Lore::EntityPtr e,
-                                  Lore::NodePtr node ) override;
+    GenericRenderer();
 
-      virtual void present( const Lore::RenderView& rv,
-                            const WindowPtr window ) override;
+    virtual ~GenericRenderer() override;
 
-    private:
+    virtual void addRenderData( Lore::EntityPtr e,
+                                Lore::NodePtr node ) override;
 
-      virtual void _clearRenderQueues() override;
+    virtual void present( const Lore::RenderView& rv,
+                          const WindowPtr window ) override;
 
-      void activateQueue( const uint id,
-                          Lore::RenderQueue& rq );
+  private:
 
-      void renderBackground( const Lore::RenderView& rv,
-                             const real aspectRatio,
-                             const Matrix4& proj);
+    virtual void _clearRenderQueues() override;
 
-      void renderMaterialMap( const Lore::ScenePtr scene,
-                              RenderQueue::EntityDataMap& mm,
+    void activateQueue( const uint id,
+                        Lore::RenderQueue& rq );
+
+    void renderBackground( const Lore::RenderView& rv,
+                            const real aspectRatio,
+                            const Matrix4& proj );
+
+    void renderMaterialMap( const Lore::ScenePtr scene,
+                            RenderQueue::EntityDataMap& mm,
+                            const Matrix4& viewProjection ) const;
+
+    void renderTransparents( const Lore::ScenePtr scene,
+                              RenderQueue::TransparentDataMap& tm,
                               const Matrix4& viewProjection ) const;
 
-      void renderTransparents( const Lore::ScenePtr scene,
-                               RenderQueue::TransparentDataMap& tm,
-                               const Matrix4& viewProjection ) const;
+  private:
 
-    private:
+    using RenderQueueList = std::vector<RenderQueue>;
+    using ActiveRenderQueueList = std::map<uint, RenderQueue&>;
 
-      using RenderQueueList = std::vector<RenderQueue>;
-      using ActiveRenderQueueList = std::map<uint, RenderQueue&>;
+  private:
 
-    private:
+    RenderQueueList _queues { };
+    ActiveRenderQueueList _activeQueues { };
 
-      RenderQueueList _queues { };
-      ActiveRenderQueueList _activeQueues { };
+  };
 
-    };
-
-  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

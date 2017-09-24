@@ -1,3 +1,4 @@
+#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -24,29 +25,24 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "RendererFactory.h"
-
-#include "GenericRenderer.h"
+#include <LORE2D/Renderer/Renderer.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-using namespace Lore::OpenGL;
+namespace Lore {
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+  ///
+  /// \class RendererFactory
+  /// \brief Allocates an IRenderer object of the specified type.
+  class RendererFactory final
+  {
 
-std::unique_ptr<Lore::IRenderer> RendererFactory::Create( const Lore::RendererType& rt )
-{
-    switch ( rt ) {
+  public:
 
-    default:
-        throw Lore::Exception( "Unknown renderer type in RendererFactory::createRenderer" );
-        break;
+    static LORE_EXPORT std::unique_ptr<Lore::Renderer> Create( const Lore::RendererType& rt );
 
-    case Lore::RendererType::Generic:
-        return std::make_unique<GenericRenderer>();
-        break;
+  };
 
-    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

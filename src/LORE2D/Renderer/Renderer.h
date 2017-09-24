@@ -32,6 +32,10 @@
 
 namespace Lore {
 
+  class IRenderAPI;
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
   ///
   /// \struct RenderQueue
   /// \brief Holds a list of Renderables for rendering. RenderQueues are organized
@@ -87,12 +91,12 @@ namespace Lore {
   /// \brief Interface for Renderers - the object that knows how to interpret
   ///     a RenderView and a Scene's scene graph and present an image to the 
   ///     window. Render plugins shall define these implementations.
-  class IRenderer
+  class Renderer
   {
 
   public:
 
-    virtual ~IRenderer() { }
+    virtual ~Renderer() { }
 
     ///
     /// \brief Registers a Renderable object for rendering. This should be
@@ -106,9 +110,18 @@ namespace Lore {
     virtual void present( const RenderView& rv,
                           const WindowPtr window ) = 0;
 
-  private:
+    void setRenderAPI( IRenderAPI* api )
+    {
+      _api = api;
+    }
+
+  protected:
 
     virtual void _clearRenderQueues() = 0;
+
+  protected:
+
+    IRenderAPI* _api { nullptr };
 
   };
 

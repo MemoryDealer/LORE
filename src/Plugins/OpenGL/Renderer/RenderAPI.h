@@ -25,23 +25,47 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Renderer/IRenderer.h>
+#include <LORE2D/Renderer/IRenderAPI.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore { namespace OpenGL {
 
-    ///
-    /// \class RendererFactory
-    /// \brief Allocates an IRenderer object of the specified type.
-    class RendererFactory final
-    {
+  class RenderAPI : public Lore::IRenderAPI
+  {
 
-    public:
+  public:
 
-        static std::unique_ptr<Lore::IRenderer> Create( const Lore::RendererType& rt );
+    virtual ~RenderAPI() override = default;
 
-    };
+    //
+    // Viewport.
+
+    virtual void clearColor( const real r,
+                             const real g,
+                             const real b,
+                             const real a ) override;
+
+    virtual void clear() override;
+
+    virtual void setViewport( const uint32_t x,
+                              const uint32_t y,
+                              const uint32_t width,
+                              const uint32_t height ) override;
+
+    //
+    // Depth testing.
+
+    virtual void setDepthTestEnabled( const bool enabled ) override;
+
+    //
+    // Blending.
+
+    virtual void setBlendingEnabled( const bool enabled ) override;
+
+    virtual void setBlendingFunc( const Material::BlendFactor& src, const Material::BlendFactor& dst ) override;
+
+  };
 
 }}
 

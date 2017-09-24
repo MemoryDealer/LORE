@@ -27,20 +27,25 @@
 #include "GenericRenderer.h"
 
 #include <LORE2D/Math/Math.h>
+#include <LORE2D/Resource/Entity.h>
+#include <LORE2D/Renderer/IRenderAPI.h>
+#include <LORE2D/Resource/Mesh.h>
+#include <LORE2D/Resource/Renderable/Texture.h>
+#include <LORE2D/Resource/StockResource.h>
 #include <LORE2D/Renderer/SceneGraphVisitor.h>
-#include <LORE2D/Resource/Renderable/Renderable.h>
 #include <LORE2D/Scene/Camera.h>
 #include <LORE2D/Scene/Light.h>
 #include <LORE2D/Scene/Scene.h>
 #include <LORE2D/Shader/GPUProgram.h>
+#include <LORE2D/Window/Window.h>
 
-#include <Plugins/OpenGL/Math/MathConverter.h>
-#include <Plugins/OpenGL/Shader/GLGPUProgram.h>
-#include <Plugins/OpenGL/Window/GLWindow.h>
+//#include <Plugins/OpenGL/Math/MathConverter.h>
+//#include <Plugins/OpenGL/Shader/GLGPUProgram.h>
+//#include <Plugins/OpenGL/Window/GLWindow.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-using namespace Lore::OpenGL;
+using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -62,7 +67,7 @@ void GenericRenderer::addRenderData( Lore::EntityPtr e,
                                      Lore::NodePtr node )
 {
   const uint queueId = e->getRenderQueue();
-  const bool transparent = ( e->getMaterial()->getPass().diffuse.a < 1.f );
+  const bool blended = e->getMaterial()->getPass().blendingMode.enabled;
 
   // Add this queue to the active queue list if not already there.
   activateQueue( queueId, _queues[queueId] );
@@ -72,7 +77,7 @@ void GenericRenderer::addRenderData( Lore::EntityPtr e,
 
   RenderQueue& queue = _queues.at( queueId );
 
-  if ( transparent ) {
+  if ( blended ) {
     RenderQueue::Transparent t;
     t.material = e->getMaterial();
     t.vertexBuffer = e->getMesh()->getVertexBuffer();
@@ -109,24 +114,22 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
   sgv.visit( *this ); // TODO: Fix this coupling.
 
   const float aspectRatio = window->getAspectRatio();
-  rv.camera->updateTracking(aspectRatio);
+  rv.camera->updateTracking( aspectRatio );
 
   // TODO: Cache which scenes have been visited and check before doing it again.
   // [OR] move visitor to context?
   // ...
 
-  // TODO: Abstract GL calls out of here and move to LORE2D lib.
-  glEnable( GL_DEPTH_TEST );
-  glDepthFunc( GL_LESS );
+  _api->setDepthTestEnabled( true );
 
-  glViewport( rv.gl_viewport.x,
-              rv.gl_viewport.y,
-              rv.gl_viewport.width,
-              rv.gl_viewport.height );
+  _api->setViewport( rv.gl_viewport.x,
+                     rv.gl_viewport.y,
+                     rv.gl_viewport.width,
+                     rv.gl_viewport.height );
 
   Color bg = rv.scene->getBackgroundColor();
-  glClearColor( bg.r, bg.g, bg.b, 0.f );
-  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+  _api->clear();
+  _api->clearColor( bg.r, bg.g, bg.b, 0.f );
 
   // Setup view-projection matrix.
   // TODO: Take viewport dimensions into account. Cache more things inside window.
@@ -182,17 +185,17 @@ void GenericRenderer::activateQueue( const uint id, Lore::RenderQueue& rq )
 
 void GenericRenderer::renderBackground( const Lore::RenderView& rv,
                                         const real aspectRatio,
-                                        const Lore::Matrix4& proj)
+                                        const Lore::Matrix4& proj )
 {
   BackgroundPtr background = rv.scene->getBackground();
   Background::LayerMap layers = background->getLayerMap();
 
-  VertexBufferPtr vb = Lore::StockResource::GetVertexBuffer( "Background" );
+  VertexBufferPtr vb = StockResource::GetVertexBuffer( "Background" );
   vb->bind();
 
   const Vec2 camPos = rv.camera->getPosition();
 
-  for( const auto& pair : layers ){
+  for ( const auto& pair : layers ) {
     const Background::Layer& layer = pair.second;
     MaterialPtr mat = layer.getMaterial();
 
@@ -309,8 +312,7 @@ void GenericRenderer::renderTransparents( const Lore::ScenePtr scene,
                                           Lore::RenderQueue::TransparentDataMap& tm,
                                           const Lore::Matrix4& viewProjection ) const
 {
-  glEnable( GL_BLEND );
-  glBlendFuncSeparate( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE );
+  _api->setBlendingEnabled( true );
 
   // Render in forward order, so the farthest back is rendered first.
   // (Depth values increase going farther back).
@@ -322,7 +324,8 @@ void GenericRenderer::renderTransparents( const Lore::ScenePtr scene,
     VertexBufferPtr vertexBuffer = t.vertexBuffer;
     TexturePtr texture = pass.texture;
 
-    // TODO: Use blend mode per material
+    // Set blending mode using pass settings.
+    _api->setBlendingFunc( pass.blendingMode.srcFactor, pass.blendingMode.dstFactor );
 
     program->use();
     if ( texture ) {
@@ -372,7 +375,7 @@ void GenericRenderer::renderTransparents( const Lore::ScenePtr scene,
 
   }
 
-  glDisable( GL_BLEND );
+  _api->setBlendingEnabled( false );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

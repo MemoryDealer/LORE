@@ -26,7 +26,7 @@
 
 #include "SceneGraphVisitor.h"
 
-#include <LORE2D/Renderer/IRenderer.h>
+#include <LORE2D/Renderer/Renderer.h>
 #include <LORE2D/Scene/Node.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -56,7 +56,7 @@ SceneGraphVisitor::~SceneGraphVisitor()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void SceneGraphVisitor::visit( IRenderer& renderer, bool parentDirty )
+void SceneGraphVisitor::visit( Renderer& renderer, bool parentDirty )
 {
   const bool transformDirty = _node->_transformDirty();
   const Matrix4 transform = _node->_getLocalTransform();

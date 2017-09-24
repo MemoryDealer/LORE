@@ -79,6 +79,7 @@ int main( int argc, char** argv )
   auto sonicEntity = Lore::Resource::CreateEntity( "sonic", Lore::MeshType::TexturedQuad );
   auto sonicTexture = Lore::Resource::LoadTexture( "sonic-mobile", "H:\\sonic-mobile.png" );
   sonicEntity->setTexture( sonicTexture );
+  //sonicEntity->getMaterial()->getPass().blendingMode.enabled = true;
   sonicEntity->getMaterial()->getPass().diffuse.a = 0.5f;
   sonicNode->attachObject( sonicEntity );
 
@@ -103,7 +104,8 @@ int main( int argc, char** argv )
   // Create some blended boxes.
 
   auto boxEntity = Lore::Resource::CreateEntity( "box", Lore::MeshType::Quad );
-  boxEntity->getMaterial()->getPass().diffuse = Lore::Color( 0.f, 0.1f, 0.9f, 0.75f );
+  boxEntity->getMaterial()->getPass().blendingMode.enabled = true;
+  boxEntity->getMaterial()->getPass().diffuse = Lore::Color( 0.1f, 0.4f, 0.8f, 0.95f );
   for ( int i = 0; i < 5; ++i ) {
     auto node = scene->createNode( "box" + std::to_string( i ) );
     node->attachObject( boxEntity );

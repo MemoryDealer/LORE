@@ -1,5 +1,5 @@
+-Sprites!
 -Normal mapping
--Blending: material settings; blend mode
 -Resource configuration files - materials, scenes, textures all loaded into group via .rsrc file.
   Lua bindings for configuration and resource files
   Later can be used for hooking up scripts to nodes etc.

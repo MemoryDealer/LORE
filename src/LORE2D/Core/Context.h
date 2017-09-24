@@ -30,7 +30,8 @@
 #include <LORE2D/Core/Plugin/RenderPluginLoader.h>
 #include <LORE2D/Memory/PoolCluster.h>
 #include <LORE2D/Renderer/FrameListener/FrameListenerController.h>
-#include <LORE2D/Renderer/IRenderer.h>
+#include <LORE2D/Renderer/Renderer.h>
+#include <LORE2D/Renderer/IRenderAPI.h>
 #include <LORE2D/Resource/Registry.h>
 #include <LORE2D/Resource/ResourceController.h>
 #include <LORE2D/Shader/GPUProgram.h>
@@ -246,15 +247,17 @@ namespace Lore {
 
   protected:
 
-    WindowRegistry _windowRegistry;
-    SceneRegistry _sceneRegistry;
+    WindowRegistry _windowRegistry {};
+    SceneRegistry _sceneRegistry {};
 
-    WindowPtr _activeWindow;
-    std::unique_ptr<FrameListenerController> _frameListenerController;
-    PoolCluster _poolCluster;
+    WindowPtr _activeWindow { nullptr };
+    std::unique_ptr<FrameListenerController> _frameListenerController { std::make_unique<FrameListenerController>() };
+    PoolCluster _poolCluster { "Primary" };
+
+    std::unique_ptr<IRenderAPI> _renderAPI { nullptr };
 
     // True if one or more Windows exist in Context.
-    bool _active;
+    bool _active { false };
 
   };
 

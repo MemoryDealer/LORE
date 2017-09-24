@@ -25,66 +25,60 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <string> // TODO: Figure out nicer way for clients to include dependencies.
+#include <LORE2D/Resource/Material.h>
+#include <LORE2D/Math/Rectangle.h>
+#include <LORE2D/Resource/Color.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-  //
-  // Forward declarations.
+  ///
+  /// \class IRenderAPI
+  /// \brief Interface to render APIs to be implemented by render plugins.
+  class IRenderAPI
+  {
 
-  class Background;
-  class Camera;
-  class Context;
-  class Entity;
-  class GPUProgram;
-  class Renderer;
-  class Material;
-  class Light;
-  class Mesh;
-  class Node;
-  class PostProcessor;
-  class Renderable;
-  class ResourceController;
-  struct ResourceGroup;
-  class Scene;
-  class Shader;
-  class StockResourceController;
-  class Texture;
-  class VertexBuffer;
-  class Window;
+  public:
 
-  //
-  // Pointer types.
+    enum ClearFlags
+    {
+      ColorBufferBit = 0,
+      DepthBufferBit
+    };
 
-  using BackgroundPtr = Background*;
-  using CameraPtr = Camera*;
-  using ContextPtr = Context*;
-  using EntityPtr = Entity*;
-  using GPUProgramPtr = GPUProgram*;
-  using LightPtr = Light*;
-  using MaterialPtr = Material*;
-  using MeshPtr = Mesh*;
-  using NodePtr = Node*;
-  using RendererPtr = Renderer*;
-  using PostProcessorPtr = PostProcessor*;
-  using RenderablePtr = Renderable*;
-  using ResourceControllerPtr = ResourceController*;
-  using ResourceGroupPtr = ResourceGroup*;
-  using ScenePtr = Scene*;
-  using ShaderPtr = Shader*;
-  using StockResourceControllerPtr = StockResourceController*;
-  using TexturePtr = Texture*;
-  using VertexBufferPtr = VertexBuffer*;
-  using WindowPtr = Window*;
+  public:
 
-  //
-  // Types.
+    virtual ~IRenderAPI() = default;
 
-  using real = float;
-  using uint = unsigned int;
-  using string = std::string;
+    //
+    // Viewport.
+
+    virtual void clearColor( const real r,
+                             const real g,
+                             const real b,
+                             const real a ) = 0;
+
+    virtual void clear() = 0;
+
+    virtual void setViewport( const uint32_t x,
+                              const uint32_t y,
+                              const uint32_t width,
+                              const uint32_t height ) = 0;
+
+    //
+    // Depth testing.
+
+    virtual void setDepthTestEnabled( const bool enabled ) = 0;
+
+    //
+    // Blending.
+
+    virtual void setBlendingEnabled( const bool enabled ) = 0;
+
+    virtual void setBlendingFunc( const Material::BlendFactor& src, const Material::BlendFactor& dst ) = 0;
+
+  };
 
 }
 

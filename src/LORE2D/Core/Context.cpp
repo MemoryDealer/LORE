@@ -50,12 +50,6 @@ using namespace Local;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Context::Context() noexcept
-  : _windowRegistry()
-  , _sceneRegistry()
-  , _activeWindow( nullptr )
-  , _frameListenerController( std::make_unique<FrameListenerController>() )
-  , _poolCluster( "Primary" )
-  , _active( false )
 {
   NotificationSubscribe( WindowEventNotification, &Context::onWindowEvent );
 }

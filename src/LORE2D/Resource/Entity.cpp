@@ -26,7 +26,7 @@
 
 #include "Entity.h"
 
-#include <LORE2D/Renderer/IRenderer.h>
+#include <LORE2D/Renderer/Renderer.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 

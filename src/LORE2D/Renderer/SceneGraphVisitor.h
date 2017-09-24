@@ -50,7 +50,7 @@ namespace Lore {
         ///
         /// \brief Recursive function which updates the transformation matrix
         ///     of all child nodes.
-        void visit( IRenderer& renderer, bool parentDirty = false );
+        void visit( Renderer& renderer, bool parentDirty = false );
 
     private:
 
