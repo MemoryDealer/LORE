@@ -38,10 +38,6 @@
 #include <LORE2D/Shader/GPUProgram.h>
 #include <LORE2D/Window/Window.h>
 
-//#include <Plugins/OpenGL/Math/MathConverter.h>
-//#include <Plugins/OpenGL/Shader/GLGPUProgram.h>
-//#include <Plugins/OpenGL/Window/GLWindow.h>
-
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 using namespace Lore;
@@ -108,15 +104,10 @@ void GenericRenderer::addRenderData( Lore::EntityPtr e,
 
 void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr window )
 {
-  const float aspectRatio = window->getAspectRatio();
+  const real aspectRatio = window->getAspectRatio();
   rv.camera->updateTracking( aspectRatio );
 
-  // TODO: Cache which scenes have been visited and check before doing it again.
-  // [OR] move visitor to context?
-  // ...
-
   _api->setDepthTestEnabled( true );
-
   _api->setViewport( rv.gl_viewport.x,
                      rv.gl_viewport.y,
                      rv.gl_viewport.width,
