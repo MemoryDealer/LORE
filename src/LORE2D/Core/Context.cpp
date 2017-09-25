@@ -29,6 +29,7 @@
 #include <LORE2D/Core/APIVersion.h>
 #include <LORE2D/Core/NotificationCenter.h>
 #include <LORE2D/Core/Timestamp.h>
+#include <LORE2D/Renderer/SceneGraphVisitor.h>
 #include <LORE2D/Resource/Entity.h>
 #include <LORE2D/Resource/StockResource.h>
 
@@ -76,6 +77,29 @@ void Context::initConfiguration()
   _poolCluster.registerPool<Scene>( 32 );
 
   // TODO: Parse pool settings from cfg file (Lua).
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Context::renderFrame( const real lagMultiplier )
+{
+  // Update all scenes for this frame.
+  auto sceneIt = _sceneRegistry.getIterator();
+  while ( sceneIt.hasMore() ) {
+    ScenePtr scene = sceneIt.getNext();
+    scene->updateSceneGraph();
+  }
+
+  _frameListenerController->frameStarted();
+
+  // Render all RenderViews for each window.
+  WindowRegistry::ConstIterator it = _windowRegistry.getConstIterator();
+  while ( it.hasMore() ) {
+    WindowPtr window = it.getNext();
+    window->renderFrame();
+  }
+
+  _frameListenerController->frameEnded();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

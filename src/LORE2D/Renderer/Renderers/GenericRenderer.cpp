@@ -32,7 +32,6 @@
 #include <LORE2D/Resource/Mesh.h>
 #include <LORE2D/Resource/Renderable/Texture.h>
 #include <LORE2D/Resource/StockResource.h>
-#include <LORE2D/Renderer/SceneGraphVisitor.h>
 #include <LORE2D/Scene/Camera.h>
 #include <LORE2D/Scene/Light.h>
 #include <LORE2D/Scene/Scene.h>
@@ -109,10 +108,6 @@ void GenericRenderer::addRenderData( Lore::EntityPtr e,
 
 void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr window )
 {
-  // Traverse the scene graph and update object transforms.
-  Lore::SceneGraphVisitor sgv( rv.scene->getRootNode() );
-  sgv.visit( *this ); // TODO: Fix this coupling.
-
   const float aspectRatio = window->getAspectRatio();
   rv.camera->updateTracking( aspectRatio );
 
@@ -221,7 +216,7 @@ void GenericRenderer::renderBackground( const Lore::RenderView& rv,
 
       Lore::Matrix4 transform = Math::CreateTransformationMatrix( Lore::Vec2( 0.f, 0.f ), Lore::Quaternion() );
       transform[0][0] = aspectRatio;
-      transform[1][1] = aspectRatio;
+      transform[1][1] = Math::Clamp( aspectRatio, 1.f, 90.f ); // HACK to prevent clipping background on aspect ratios < 1.0.
       transform[3][2] = layer.getDepth();
       program->setTransformVar( proj * transform );
 

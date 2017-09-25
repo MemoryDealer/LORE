@@ -56,7 +56,7 @@ SceneGraphVisitor::~SceneGraphVisitor()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void SceneGraphVisitor::visit( Renderer& renderer, bool parentDirty )
+void SceneGraphVisitor::visit( Renderer* renderer, bool parentDirty )
 {
   const bool transformDirty = _node->_transformDirty();
   const Matrix4 transform = _node->_getLocalTransform();
@@ -73,7 +73,7 @@ void SceneGraphVisitor::visit( Renderer& renderer, bool parentDirty )
   auto it = _node->getEntityListConstIterator();
   while ( it.hasMore() ) {
     EntityPtr entity = it.getNext();
-    renderer.addRenderData( entity, _node );
+    renderer->addRenderData( entity, _node );
   }
 
   // Recurse over children.

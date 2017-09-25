@@ -26,6 +26,7 @@
 
 #include "Scene.h"
 
+#include <LORE2D/Renderer/SceneGraphVisitor.h>
 #include <LORE2D/Resource/Material.h>
 #include <LORE2D/Resource/ResourceController.h>
 #include <LORE2D/Resource/StockResource.h>
@@ -37,14 +38,6 @@ using namespace Lore;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Scene::Scene()
-  : _bgColor( StockColor::Black )
-  , _renderer( nullptr )
-  , _root()
-  , _nodes()
-  , _ambientLightColor( StockColor::Black )
-  , _lights()
-  , _activeLights()
-  , _background()
 {
   _root.setName( "root" );
   _root._scene = this;
@@ -130,6 +123,15 @@ void Scene::destroyLight( const string& name )
     destroyLight( light );
     _lights.remove( name );
   }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Scene::updateSceneGraph()
+{
+  // Traverse the scene graph and update object transforms.
+  Lore::SceneGraphVisitor sgv( getRootNode() );
+  sgv.visit( _renderer );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

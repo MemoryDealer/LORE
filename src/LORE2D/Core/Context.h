@@ -67,7 +67,7 @@ namespace Lore {
 
     ///
     /// \brief Renders a single frame using configured Windows and Scenes.
-    virtual void renderFrame( const real lagMultiplier = 1.f ) = 0;
+    virtual void renderFrame( const real lagMultiplier = 1.f );
 
     //
     // Factory/Destruction functions.
