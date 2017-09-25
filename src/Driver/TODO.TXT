@@ -1,4 +1,5 @@
 -Sprites!
+-UI class; add elements in [0.0, 1.0] range. Text and boxes. Allow scrolling offsets to out of range. Can assign callback for mouse for debug UI.
 -RTT
 -Normal mapping
 -Resource configuration files - materials, scenes, textures all loaded into group via .rsrc file.
