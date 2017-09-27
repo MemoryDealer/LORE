@@ -79,6 +79,8 @@ int main( int argc, char** argv )
   auto sonicEntity = Lore::Resource::CreateEntity( "sonic", Lore::MeshType::TexturedQuad );
   auto sonicTexture = Lore::Resource::LoadTexture( "sonic-mobile", "H:\\sonic-mobile.png" );
   sonicEntity->setTexture( sonicTexture );
+  //sonicEntity->getMaterial()->getPass().blendingMode.enabled = true;
+  sonicEntity->getMaterial()->diffuse.a = 0.5f;
   sonicNode->attachObject( sonicEntity );
 
   auto sonicLight = scene->createLight( "sonic-light" );
@@ -92,11 +94,24 @@ int main( int argc, char** argv )
 
   auto dogeEntity = Lore::Resource::CreateEntity( "doge", Lore::MeshType::TexturedQuad );
   auto dogeTexture = Lore::Resource::LoadTexture( "doge", "C:\\doge.jpg" );
+  std::vector<Lore::NodePtr> doges;
   dogeEntity->setTexture( dogeTexture );
   for ( int i = 0; i < 5; ++i ) {
     auto node = scene->createNode( "doge" + std::to_string( i ) );
     node->attachObject( dogeEntity );
     node->setPosition( static_cast< float >( i ) / 2.f, 0.f );
+    doges.push_back( node );
+  }
+
+  // Create some blended boxes.
+
+  auto boxEntity = Lore::Resource::CreateEntity( "box", Lore::MeshType::Quad );
+  boxEntity->getMaterial()->blendingMode.enabled = true;
+  boxEntity->getMaterial()->diffuse = Lore::Color( 0.1f, 0.4f, 0.8f, 0.95f );
+  for ( int i = 0; i < 5; ++i ) {
+    auto node = scene->createNode( "box" + std::to_string( i ) );
+    node->attachObject( boxEntity );
+    node->setPosition( -1.f - static_cast< float >( i ) / 2.f, 0.f );
   }
 
   //
@@ -114,7 +129,9 @@ int main( int argc, char** argv )
   auto& layer2 = bg->addLayer( "2" );
   layer2.setTexture( Lore::Resource::GetTexture( "death-egg" ) );
   layer2.setParallax( Lore::Vec2(0.1f, 0.1f) );
-  layer2.getMaterial()->getPass().setTextureSampleRegion( Lore::Rect( 0.0f, 0.0f, 0.55f, 0.55f ) );
+  layer2.getMaterial()->blendingMode.enabled = true;
+  layer2.getMaterial()->diffuse.a = 0.75f;
+  layer2.getMaterial()->setTextureSampleRegion( Lore::Rect( 0.0f, 0.0f, 0.55f, 0.55f ) );
   //layer.getMaterial()->getPass().setTextureSampleRegion( 0.15f, 0.05f, 0.08f, 0.58f );
 
   //Lore::Resource::LoadTexture( "bg_default", "C:\\clouds.jpg" );
@@ -147,7 +164,7 @@ int main( int argc, char** argv )
   //  layer4.setDepth( 497.f );
   //}
 
-  scene->setAmbientLightColor( Lore::Color( 0.12f, 0.12f, 0.12f ) );
+  scene->setAmbientLightColor( Lore::Color( 0.12f, 0.12f, 0.12f, 1.f ) );
 
   /*for ( int i = 0; i < 80; ++i ) {
   auto n = node->createChildNode( "a" + std::to_string( i ) );
@@ -166,6 +183,10 @@ int main( int argc, char** argv )
 
     // TODO: Repro case where both quads appeared to be scaling with only rotations being done.
     //node->getChild( "AChild" )->rotate( Lore::Degree( -.1f ) );
+
+    for ( auto doge : doges ) {
+      doge->rotate( Lore::Degree( .1f ) );
+    }
 
     const float speed = 0.01f;
     if ( GetAsyncKeyState( 0x57 ) ) { // W

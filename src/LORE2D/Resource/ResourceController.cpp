@@ -137,7 +137,7 @@ EntityPtr ResourceController::createEntity( const string& name, const MeshType& 
     break;
 
   case MeshType::TexturedQuad:
-    entity->setMaterial( StockResource::CloneMaterial( "StandardTextured", "Standard_" + name ) );
+    entity->setMaterial( StockResource::CloneMaterial( "StandardTextured", "StandardTextured_" + name ) );
     break;
 
   }

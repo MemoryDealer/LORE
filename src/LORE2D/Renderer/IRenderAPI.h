@@ -1,3 +1,4 @@
+#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -24,29 +25,61 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "RendererFactory.h"
-
-#include "GenericRenderer.h"
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-using namespace Lore::OpenGL;
+#include <LORE2D/Resource/Material.h>
+#include <LORE2D/Math/Rectangle.h>
+#include <LORE2D/Resource/Color.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-std::unique_ptr<Lore::IRenderer> RendererFactory::Create( const Lore::RendererType& rt )
-{
-    switch ( rt ) {
+namespace Lore {
 
-    default:
-        throw Lore::Exception( "Unknown renderer type in RendererFactory::createRenderer" );
-        break;
+  ///
+  /// \class IRenderAPI
+  /// \brief Interface to render APIs to be implemented by render plugins.
+  class IRenderAPI
+  {
 
-    case Lore::RendererType::Generic:
-        return std::make_unique<GenericRenderer>();
-        break;
+  public:
 
-    }
+    enum ClearFlags
+    {
+      ColorBufferBit = 0,
+      DepthBufferBit
+    };
+
+  public:
+
+    virtual ~IRenderAPI() = default;
+
+    //
+    // Viewport.
+
+    virtual void clearColor( const real r,
+                             const real g,
+                             const real b,
+                             const real a ) = 0;
+
+    virtual void clear() = 0;
+
+    virtual void setViewport( const uint32_t x,
+                              const uint32_t y,
+                              const uint32_t width,
+                              const uint32_t height ) = 0;
+
+    //
+    // Depth testing.
+
+    virtual void setDepthTestEnabled( const bool enabled ) = 0;
+
+    //
+    // Blending.
+
+    virtual void setBlendingEnabled( const bool enabled ) = 0;
+
+    virtual void setBlendingFunc( const Material::BlendFactor& src, const Material::BlendFactor& dst ) = 0;
+
+  };
+
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

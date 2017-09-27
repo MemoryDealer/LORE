@@ -26,7 +26,7 @@
 
 #include "Entity.h"
 
-#include <LORE2D/Renderer/IRenderer.h>
+#include <LORE2D/Renderer/Renderer.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -49,7 +49,7 @@ Entity::~Entity()
 
 void Entity::setTexture( TexturePtr texture )
 {
-  _material->getPass().texture=texture;
+  _material->texture = texture;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

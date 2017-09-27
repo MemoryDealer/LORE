@@ -35,51 +35,61 @@
 
 namespace Lore { namespace OpenGL {
 
-    class MathConverter final
+  class MathConverter final
+  {
+
+  public:
+
+    //
+    // Lore -> GLM.
+
+    static inline glm::mat4x4 LoreToGLM( const Lore::Matrix4& m )
     {
+      return glm::mat4x4( m[0][0], m[0][1], m[0][2], m[0][3],
+                          m[1][0], m[1][1], m[1][2], m[1][3],
+                          m[2][0], m[2][1], m[2][2], m[2][3],
+                          m[3][0], m[3][1], m[3][2], m[3][3] );
+    }
 
-    public:
+    static inline glm::vec2 LoreToGLM( const Lore::Vec2& v )
+    {
+      glm::vec3 re;
+      re.x = v.x;
+      re.y = v.y;
+      return re;
+    }
 
-        //
-        // Lore -> GLM.
+    static inline glm::vec3 LoreToGLM( const Lore::Vec3& v )
+    {
+      glm::vec3 re;
+      re.x = v.x;
+      re.y = v.y;
+      re.z = v.z;
+      return re;
+    }
 
-        static inline glm::mat4x4 LoreToGLM( const Lore::Matrix4& m )
-        {
-            return glm::mat4x4( m[0][0], m[0][1], m[0][2], m[0][3],
-                                m[1][0], m[1][1], m[1][2], m[1][3],
-                                m[2][0], m[2][1], m[2][2], m[2][3],
-                                m[3][0], m[3][1], m[3][2], m[3][3] );
-        }
+    static inline glm::vec4 LoreToGLM( const Lore::Vec4& v )
+    {
+      glm::vec4 re;
+      re.x = v.x;
+      re.y = v.y;
+      re.z = v.z;
+      re.a = v.a;
+      return re;
+    }
 
-        static inline glm::vec2 LoreToGLM( const Lore::Vec2& v )
-        {
-          glm::vec3 re;
-          re.x = v.x;
-          re.y = v.y;
-          return re;
-        }
+    //
+    // GLM -> Lore.
 
-        static inline glm::vec3 LoreToGLM( const Lore::Vec3& v )
-        {
-            glm::vec3 re;
-            re.x = v.x;
-            re.y = v.y;
-            re.z = v.z;
-            return re;
-        }
+    static inline Lore::Matrix4 GLMToLore( const glm::mat4x4& m )
+    {
+      return Lore::Matrix4( m[0][0], m[0][1], m[0][2], m[0][3],
+                            m[1][0], m[1][1], m[1][2], m[1][3],
+                            m[2][0], m[2][1], m[2][2], m[2][3],
+                            m[3][0], m[3][1], m[3][2], m[3][3] );
+    }
 
-        //
-        // GLM -> Lore.
-
-        static inline Lore::Matrix4 GLMToLore( const glm::mat4x4& m )
-        {
-            return Lore::Matrix4( m[0][0], m[0][1], m[0][2], m[0][3],
-                                  m[1][0], m[1][1], m[1][2], m[1][3],
-                                  m[2][0], m[2][1], m[2][2], m[2][3],
-                                  m[3][0], m[3][1], m[3][2], m[3][3] );
-        }
-
-    };
+  };
 
 }}
 

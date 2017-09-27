@@ -45,7 +45,7 @@ Background::Layer& Background::addLayer( const string& name )
 {
   Layer layer( name );
   layer.setMaterial( StockResource::CloneMaterial( "Background", "bg_layer_" + name ) );
-  layer.getMaterial()->getPass().program = Lore::StockResource::GetGPUProgram( "Background" );
+  layer.getMaterial()->program = Lore::StockResource::GetGPUProgram( "Background" );
 
   log_information( "Added layer " + name + " to background " + _name );
 
@@ -84,7 +84,7 @@ void Background::removeLayer( const string& name )
 void Background::Layer::setTexture( TexturePtr texture )
 {
   if ( _material ) {
-    _material->getPass().texture = texture;
+    _material->texture = texture;
   }
 }
 
@@ -93,7 +93,7 @@ void Background::Layer::setTexture( TexturePtr texture )
 void Background::Layer::setScrollSpeed( const Vec2& speed )
 {
   if ( _material ) {
-    _material->getPass().setTextureScrollSpeed( speed );
+    _material->setTextureScrollSpeed( speed );
   }
 }
 

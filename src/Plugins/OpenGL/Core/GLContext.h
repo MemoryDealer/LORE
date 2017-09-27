@@ -75,7 +75,7 @@ namespace Lore { namespace OpenGL {
 
     private:
 
-        using RendererMap = std::unordered_map <Lore::RendererType, std::unique_ptr<Lore::IRenderer>>;
+        using RendererMap = std::unordered_map <Lore::RendererType, std::unique_ptr<Lore::Renderer>>;
 
     private:
 

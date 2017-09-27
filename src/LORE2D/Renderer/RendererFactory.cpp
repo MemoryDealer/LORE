@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,67 +24,29 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <string> // TODO: Figure out nicer way for clients to include dependencies.
+#include "RendererFactory.h"
+
+#include <LORE2D/Renderer/Renderers/GenericRenderer.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+using namespace Lore;
 
-  //
-  // Forward declarations.
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-  class Background;
-  class Camera;
-  class Context;
-  class Entity;
-  class GPUProgram;
-  class Renderer;
-  class Material;
-  class Light;
-  class Mesh;
-  class Node;
-  class PostProcessor;
-  class Renderable;
-  class ResourceController;
-  struct ResourceGroup;
-  class Scene;
-  class Shader;
-  class StockResourceController;
-  class Texture;
-  class VertexBuffer;
-  class Window;
+std::unique_ptr<Lore::Renderer> RendererFactory::Create( const Lore::RendererType& rt )
+{
+  switch ( rt ) {
 
-  //
-  // Pointer types.
+  default:
+    throw Lore::Exception( "Unknown renderer type in RendererFactory::createRenderer" );
+    break;
 
-  using BackgroundPtr = Background*;
-  using CameraPtr = Camera*;
-  using ContextPtr = Context*;
-  using EntityPtr = Entity*;
-  using GPUProgramPtr = GPUProgram*;
-  using LightPtr = Light*;
-  using MaterialPtr = Material*;
-  using MeshPtr = Mesh*;
-  using NodePtr = Node*;
-  using RendererPtr = Renderer*;
-  using PostProcessorPtr = PostProcessor*;
-  using RenderablePtr = Renderable*;
-  using ResourceControllerPtr = ResourceController*;
-  using ResourceGroupPtr = ResourceGroup*;
-  using ScenePtr = Scene*;
-  using ShaderPtr = Shader*;
-  using StockResourceControllerPtr = StockResourceController*;
-  using TexturePtr = Texture*;
-  using VertexBufferPtr = VertexBuffer*;
-  using WindowPtr = Window*;
+  case Lore::RendererType::Generic:
+    return std::make_unique<GenericRenderer>();
+    break;
 
-  //
-  // Types.
-
-  using real = float;
-  using uint = unsigned int;
-  using string = std::string;
-
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

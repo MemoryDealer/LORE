@@ -27,20 +27,20 @@
 #include "GenericRenderer.h"
 
 #include <LORE2D/Math/Math.h>
-#include <LORE2D/Renderer/SceneGraphVisitor.h>
-#include <LORE2D/Resource/Renderable/Renderable.h>
+#include <LORE2D/Resource/Entity.h>
+#include <LORE2D/Renderer/IRenderAPI.h>
+#include <LORE2D/Resource/Mesh.h>
+#include <LORE2D/Resource/Renderable/Texture.h>
+#include <LORE2D/Resource/StockResource.h>
 #include <LORE2D/Scene/Camera.h>
 #include <LORE2D/Scene/Light.h>
 #include <LORE2D/Scene/Scene.h>
 #include <LORE2D/Shader/GPUProgram.h>
-
-#include <Plugins/OpenGL/Math/MathConverter.h>
-#include <Plugins/OpenGL/Shader/GLGPUProgram.h>
-#include <Plugins/OpenGL/Window/GLWindow.h>
+#include <LORE2D/Window/Window.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-using namespace Lore::OpenGL;
+using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -62,6 +62,7 @@ void GenericRenderer::addRenderData( Lore::EntityPtr e,
                                      Lore::NodePtr node )
 {
   const uint queueId = e->getRenderQueue();
+  const bool blended = e->getMaterial()->blendingMode.enabled;
 
   // Add this queue to the active queue list if not already there.
   activateQueue( queueId, _queues[queueId] );
@@ -71,49 +72,50 @@ void GenericRenderer::addRenderData( Lore::EntityPtr e,
 
   RenderQueue& queue = _queues.at( queueId );
 
-  // Acquire the render data list for this material/vb (or create one).
-  RenderQueue::EntityData entityData;
-  entityData.material = e->getMaterial();
-  entityData.vertexBuffer = e->getMesh()->getVertexBuffer();
+  if ( blended ) {
+    RenderQueue::Transparent t;
+    t.material = e->getMaterial();
+    t.vertexBuffer = e->getMesh()->getVertexBuffer();
+    t.model = node->getFullTransform();
 
-  RenderQueue::RenderDataList& renderData = queue.solids[entityData];
+    const auto depth = node->getDepth();
+    t.model[3][2] = depth;
 
-  // Fill out the render data and add it to the list.
-  RenderQueue::RenderData rd;
-  rd.model = node->getFullTransform();
-  rd.model[3][2] = node->getDepth();
-  rd.colorModifier = node->getColorModifier();
+    queue.transparents.insert( { depth, t } );
+  }
+  else {
+    // Acquire the render data list for this material/vb (or create one).
+    RenderQueue::EntityData entityData;
+    entityData.material = e->getMaterial();
+    entityData.vertexBuffer = e->getMesh()->getVertexBuffer();
 
-  renderData.push_back( rd );
+    RenderQueue::RenderDataList& renderData = queue.solids[entityData];
+
+    // Fill out the render data and add it to the list.
+    RenderQueue::RenderData rd;
+    rd.model = node->getFullTransform();
+    rd.model[3][2] = node->getDepth();
+
+    renderData.push_back( rd );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr window )
 {
-  // Traverse the scene graph and update object transforms.
-  Lore::SceneGraphVisitor sgv( rv.scene->getRootNode() );
-  sgv.visit( *this );
+  const real aspectRatio = window->getAspectRatio();
+  rv.camera->updateTracking( aspectRatio );
 
-  const float aspectRatio = window->getAspectRatio();
-  rv.camera->updateTracking(aspectRatio);
-
-  // TODO: Cache which scenes have been visited and check before doing it again.
-  // [OR] move visitor to context?
-  // ...
-
-  // TODO: Abstract GL calls out of here and move to LORE2D lib.
-  glEnable( GL_DEPTH_TEST );
-  glDepthFunc( GL_LESS );
-
-  glViewport( rv.gl_viewport.x,
-              rv.gl_viewport.y,
-              rv.gl_viewport.width,
-              rv.gl_viewport.height );
+  _api->setDepthTestEnabled( true );
+  _api->setViewport( rv.gl_viewport.x,
+                     rv.gl_viewport.y,
+                     rv.gl_viewport.width,
+                     rv.gl_viewport.height );
 
   Color bg = rv.scene->getBackgroundColor();
-  glClearColor( bg.r, bg.g, bg.b, 0.f );
-  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+  _api->clear();
+  _api->clearColor( bg.r, bg.g, bg.b, 0.f );
 
   // Setup view-projection matrix.
   // TODO: Take viewport dimensions into account. Cache more things inside window.
@@ -132,6 +134,9 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
 
     // Render solids.
     renderMaterialMap( rv.scene, queue.solids, viewProjection );
+
+    // Render transparents.
+    renderTransparents( rv.scene, queue.transparents, viewProjection );
   }
 
   _clearRenderQueues();
@@ -144,6 +149,7 @@ void GenericRenderer::_clearRenderQueues()
   // Remove all data from each queue.
   for ( auto& queue : _queues ) {
     queue.solids.clear();
+    queue.transparents.clear();
   }
 
   // Erase all queues from the active queue list.
@@ -165,47 +171,58 @@ void GenericRenderer::activateQueue( const uint id, Lore::RenderQueue& rq )
 
 void GenericRenderer::renderBackground( const Lore::RenderView& rv,
                                         const real aspectRatio,
-                                        const Lore::Matrix4& proj)
+                                        const Lore::Matrix4& proj )
 {
   BackgroundPtr background = rv.scene->getBackground();
   Background::LayerMap layers = background->getLayerMap();
 
-  VertexBufferPtr vb = Lore::StockResource::GetVertexBuffer( "Background" );
+  VertexBufferPtr vb = StockResource::GetVertexBuffer( "Background" );
   vb->bind();
 
   const Vec2 camPos = rv.camera->getPosition();
 
-  for( const auto& pair : layers ){
+  for ( const auto& pair : layers ) {
     const Background::Layer& layer = pair.second;
     MaterialPtr mat = layer.getMaterial();
 
-    Material::Pass& pass = mat->getPass();
-    GPUProgramPtr program = pass.program;
-    TexturePtr texture = pass.texture;
+    GPUProgramPtr program = mat->program;
+    TexturePtr texture = mat->texture;
+
+    // Enable blending if set.
+    if ( mat->blendingMode.enabled ) {
+      _api->setBlendingEnabled( true );
+      _api->setBlendingFunc( mat->blendingMode.srcFactor, mat->blendingMode.dstFactor );
+    }
 
     if ( texture ) {
       program->use();
       texture->bind();
 
-      Lore::Rect sampleRegion = pass.getTexSampleRegion();
+      Lore::Rect sampleRegion = mat->getTexSampleRegion();
       program->setUniformVar( "texSampleRegion.x", sampleRegion.x );
       program->setUniformVar( "texSampleRegion.y", sampleRegion.y );
       program->setUniformVar( "texSampleRegion.w", sampleRegion.w );
       program->setUniformVar( "texSampleRegion.h", sampleRegion.h );
 
+      program->setUniformVar( "material.diffuse", mat->diffuse );
+
       // Apply scrolling and parallax offsets.
-      Lore::Vec2 offset = pass.getTexCoordOffset();
+      Lore::Vec2 offset = mat->getTexCoordOffset();
       offset.x += camPos.x * layer.getParallax().x;
       offset.y -= camPos.y * layer.getParallax().y;
       program->setUniformVar( "texSampleOffset", offset );
 
       Lore::Matrix4 transform = Math::CreateTransformationMatrix( Lore::Vec2( 0.f, 0.f ), Lore::Quaternion() );
       transform[0][0] = aspectRatio;
-      transform[1][1] = aspectRatio;
+      transform[1][1] = Math::Clamp( aspectRatio, 1.f, 90.f ); // HACK to prevent clipping background on aspect ratios < 1.0.
       transform[3][2] = layer.getDepth();
       program->setTransformVar( proj * transform );
 
       vb->draw();
+    }
+
+    if ( mat->blendingMode.enabled ) {
+      _api->setBlendingEnabled( false );
     }
   }
 
@@ -228,19 +245,18 @@ void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
     //
     // Bind material settings to GPU.
 
-    // TODO: Multi-pass.
-    Material::Pass& pass = entityData.material->getPass();
-    GPUProgramPtr program = pass.program;
+    MaterialPtr mat = entityData.material;
+    GPUProgramPtr program = mat->program;
     VertexBufferPtr vertexBuffer = entityData.vertexBuffer;
-    TexturePtr texture = pass.texture;
+    TexturePtr texture = mat->texture;
 
     program->use();
     if ( texture ) {
       // TODO: Multi-texturing.
       texture->bind();
-      program->setUniformVar( "texSampleOffset", pass.getTexCoordOffset() );
+      program->setUniformVar( "texSampleOffset", mat->getTexCoordOffset() );
 
-      Lore::Rect sampleRegion = pass.getTexSampleRegion();
+      Lore::Rect sampleRegion = mat->getTexSampleRegion();
       program->setUniformVar( "texSampleRegion.x", sampleRegion.x );
       program->setUniformVar( "texSampleRegion.y", sampleRegion.y );
       program->setUniformVar( "texSampleRegion.w", sampleRegion.w );
@@ -248,11 +264,11 @@ void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
     }
 
     // Upload lighting data.
-    if ( pass.lighting ) {
+    if ( mat->lighting ) {
 
       // Material.
-      program->setUniformVar( "material.ambient", pass.ambient );
-      program->setUniformVar( "material.diffuse", pass.diffuse );
+      program->setUniformVar( "material.ambient", mat->ambient );
+      program->setUniformVar( "material.diffuse", mat->diffuse );
 
       // Scene.
       program->setUniformVar( "sceneAmbient", scene->getAmbientLightColor() );
@@ -272,12 +288,8 @@ void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
 
       program->setTransformVar( mvp );
 
-      if ( pass.lighting ) {
+      if ( mat->lighting ) {
         program->setUniformVar( "model", rd.model );
-      }
-
-      if ( pass.colorMod ) {
-        program->setUniformVar( "colorMod", rd.colorModifier );
       }
 
       // Draw the entity.
@@ -288,6 +300,78 @@ void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
     vertexBuffer->unbind();
 
   }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GenericRenderer::renderTransparents( const Lore::ScenePtr scene,
+                                          Lore::RenderQueue::TransparentDataMap& tm,
+                                          const Lore::Matrix4& viewProjection ) const
+{
+  _api->setBlendingEnabled( true );
+
+  // Render in forward order, so the farthest back is rendered first.
+  // (Depth values increase going farther back).
+  for ( auto it = tm.begin(); it != tm.end(); ++it ) {
+
+    RenderQueue::Transparent& t = it->second;
+    MaterialPtr mat = t.material;
+    GPUProgramPtr program = mat->program;
+    VertexBufferPtr vertexBuffer = t.vertexBuffer;
+    TexturePtr texture = mat->texture;
+
+    // Set blending mode using material settings.
+    _api->setBlendingFunc( mat->blendingMode.srcFactor, mat->blendingMode.dstFactor );
+
+    program->use();
+    if ( texture ) {
+      // TODO: Multi-texturing.
+      texture->bind();
+      program->setUniformVar( "texSampleOffset", mat->getTexCoordOffset() );
+
+      Lore::Rect sampleRegion = mat->getTexSampleRegion();
+      program->setUniformVar( "texSampleRegion.x", sampleRegion.x );
+      program->setUniformVar( "texSampleRegion.y", sampleRegion.y );
+      program->setUniformVar( "texSampleRegion.w", sampleRegion.w );
+      program->setUniformVar( "texSampleRegion.h", sampleRegion.h );
+    }
+
+    // Upload lighting data.
+    if ( mat->lighting ) {
+
+      // Material.
+      program->setUniformVar( "material.ambient", mat->ambient );
+      program->setUniformVar( "material.diffuse", mat->diffuse );
+
+      // Scene.
+      program->setUniformVar( "sceneAmbient", scene->getAmbientLightColor() );
+      program->setUniformVar( "numLights", scene->getLightCount() );
+
+      program->updateLights( scene->getLightConstIterator() );
+
+    }
+
+    vertexBuffer->bind();
+
+    {
+      // Calculate model-view-projection matrix for this object.
+      Matrix4 mvp = viewProjection * t.model;
+
+      program->setTransformVar( mvp );
+
+      if ( mat->lighting ) {
+        program->setUniformVar( "model", t.model );
+      }
+
+      // Draw the entity.
+      vertexBuffer->draw();
+    }
+
+    vertexBuffer->unbind();
+
+  }
+
+  _api->setBlendingEnabled( false );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

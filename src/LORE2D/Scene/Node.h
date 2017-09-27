@@ -145,11 +145,6 @@ namespace Lore {
       _depth = depth;
     }
 
-    inline void setColorModifier( const Color& c )
-    {
-      _colorModifier = c;
-    }
-
     //
     // Getters.
 
@@ -186,11 +181,6 @@ namespace Lore {
     inline real getDepth() const
     {
       return _depth;
-    }
-
-    inline Color getColorModifier() const
-    {
-      return _colorModifier;
     }
 
     //
@@ -236,7 +226,7 @@ namespace Lore {
 
     Transform _transform { };
 
-    real _depth { 0 };
+    real _depth { 0.f };
 
     EntityList _entities { };
 
@@ -246,7 +236,6 @@ namespace Lore {
     NodePtr _parent { nullptr };
     NodeMap _childNodes { };
 
-    Color _colorModifier { StockColor::White };
     LightList _lights { };
   };
 

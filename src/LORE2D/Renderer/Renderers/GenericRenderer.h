@@ -25,76 +25,70 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Math/Math.h>
-#include <LORE2D/Memory/Alloc.h>
-#include <LORE2D/Scene/Scene.h>
-#include <LORE2D/Shader/Shader.h>
-#include <LORE2D/Shader/VertexBuffer.h>
+#include <LORE2D/Renderer/Renderer.h>
+
+#include <LORE2D/Resource/Material.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-    class LORE_EXPORT GPUProgram
-    {
+  class IRenderAPI;
 
-        LORE_OBJECT_BODY()
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    public:
+  ///
+  /// \class GenericRenderer
+  /// \brief Renders a scene normally, without any special behavior.
+  class GenericRenderer : public Lore::Renderer
+  {
 
-        GPUProgram();
+  public:
 
-        virtual ~GPUProgram();
+    const size_t DefaultRenderQueueCount = 100;
 
-        virtual void attachShader( ShaderPtr shader );
+  public:
 
-        virtual ShaderPtr getAttachedShader( const Shader::Type& type );
+    GenericRenderer();
 
-        virtual bool link() = 0;
+    virtual ~GenericRenderer() override;
 
-        virtual void use() = 0;
+    virtual void addRenderData( Lore::EntityPtr e,
+                                Lore::NodePtr node ) override;
 
-        inline bool hasAttachedShader( const Shader::Type& type )
-        {
-            return ( _shaders.find( type ) != _shaders.end() );
-        }
+    virtual void present( const Lore::RenderView& rv,
+                          const WindowPtr window ) override;
 
-        //
-        // Getters.
+  private:
 
+    virtual void _clearRenderQueues() override;
 
-        //
-        // Uniform value updating.
+    void activateQueue( const uint id,
+                        Lore::RenderQueue& rq );
 
-        virtual void addTransformVar( const string& id ) = 0;
+    void renderBackground( const Lore::RenderView& rv,
+                            const real aspectRatio,
+                            const Matrix4& proj );
 
-        virtual void setTransformVar( const Matrix4& m ) = 0;
+    void renderMaterialMap( const Lore::ScenePtr scene,
+                            RenderQueue::EntityDataMap& mm,
+                            const Matrix4& viewProjection ) const;
 
-        virtual void addUniformVar( const string& id ) = 0;
+    void renderTransparents( const Lore::ScenePtr scene,
+                              RenderQueue::TransparentDataMap& tm,
+                              const Matrix4& viewProjection ) const;
 
-        virtual void setUniformVar( const string& id, const Matrix4& m ) = 0;
+  private:
 
-        virtual void setUniformVar( const string& id, const Vec2& v ) = 0;
+    using RenderQueueList = std::vector<RenderQueue>;
+    using ActiveRenderQueueList = std::map<uint, RenderQueue&>;
 
-        virtual void setUniformVar( const string& id, const Vec3& v ) = 0;
+  private:
 
-        virtual void setUniformVar( const string& id, const Vec4& v ) = 0;
+    RenderQueueList _queues { };
+    ActiveRenderQueueList _activeQueues { };
 
-        virtual void setUniformVar( const string& id, const real r ) = 0;
-
-        virtual void setUniformVar( const string& id, const int i ) = 0;
-
-        virtual void updateLights( Scene::LightMap::ConstIterator it ) = 0;
-
-    protected:
-
-        using ShaderMap = std::unordered_map<Shader::Type, ShaderPtr>;
-
-    protected:
-
-        ShaderMap _shaders;
-
-    };
+  };
 
 }
 

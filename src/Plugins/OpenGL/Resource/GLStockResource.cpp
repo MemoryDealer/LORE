@@ -146,15 +146,17 @@ Lore::GPUProgramPtr StockResourceController::createUberProgram( const string& na
     src += "uniform sampler2D tex;";
   }
 
-  // Color and lighting.
-  if ( params.colorMod ) {
-    src += "uniform vec3 colorMod;";
-  }
-
   if ( textured ) {
     src += "in vec2 TexCoord;";
     src += "uniform vec2 texSampleOffset = vec2(1.0, 1.0);";
   }
+
+  // Material.
+  src += "struct Material {";
+  src += "vec3 ambient;";
+  src += "vec4 diffuse;";
+  src += "};";
+  src += "uniform Material material;";
 
   // Final pixel output color.
   src += "out vec4 pixel;";
@@ -170,15 +172,8 @@ Lore::GPUProgramPtr StockResourceController::createUberProgram( const string& na
     src += "float intensity;";
     src += "};";
 
-    src += "struct Material {";
-    src += "vec3 ambient;";
-    src += "vec3 diffuse;";
-    src += "};";
-
     src += "uniform Light lights[" + std::to_string( params.maxLights ) + "];";
     src += "uniform int numLights;";
-
-    src += "uniform Material material;";
 
     src += "uniform vec3 sceneAmbient;";
 
@@ -193,7 +188,7 @@ Lore::GPUProgramPtr StockResourceController::createUberProgram( const string& na
     src += "const float d = length(l.pos - FragPos);";
     src += "const float att = l.intensity / (l.constant + l.linear * d + l.quadratic * pow(d, 2.0));";
 
-    src += "const vec3 lDiffuse = l.color * material.diffuse * att;";
+    src += "const vec3 lDiffuse = l.color * material.diffuse.rgb * att;";
     src += "const vec3 lAmbient = material.ambient * sceneAmbient;";
 
     src += "return lDiffuse + lAmbient;";
@@ -212,27 +207,25 @@ Lore::GPUProgramPtr StockResourceController::createUberProgram( const string& na
   if ( textured ) {
     src += "texSample = texture(tex, TexCoord + texSampleOffset);";
     src += "if ( texSample.a < 0.1 ) {";
-    src += "discard;";
+    src += "  discard;";
     src += "}";
   }
+
+  // Apply alpha blending from material.
+  src += "texSample.a *= material.diffuse.a;";
 
   if ( lit ) {
     src += "vec3 lighting = vec3(0.0, 0.0, 0.0);";
 
     src += "for(int i=0; i<numLights; ++i){";
-    src += "lighting += CalcPointLight(lights[i]);";
+    src += "  lighting += CalcPointLight(lights[i]);";
     src += "}";
 
     src += "texSample *= vec4(lighting, 1.0);";
   }
 
   // Final pixel.
-  if ( params.colorMod ) {
-    src += "pixel = texSample * vec4(colorMod, 1.0);";
-  }
-  else {
-    src += "pixel = texSample";
-  }
+  src += "pixel = texSample;";
 
   src += "}";
   auto fsptr = _controller->createFragmentShader( name + "_FS" );
@@ -264,10 +257,6 @@ Lore::GPUProgramPtr StockResourceController::createUberProgram( const string& na
     program->addUniformVar( "material.diffuse" );
     program->addUniformVar( "numLights" );
     program->addUniformVar( "sceneAmbient" );
-  }
-
-  if ( params.colorMod ) {
-    program->addUniformVar( "colorMod" );
   }
 
   if ( textured ) {
@@ -345,6 +334,12 @@ Lore::GPUProgramPtr StockResourceController::createBackgroundProgram( const stri
   src += "in vec2 TexCoord;";
   src += "out vec4 pixel;";
 
+  // Material.
+  src += "struct Material {";
+  src += "vec4 diffuse;";
+  src += "};";
+  src += "uniform Material material;";
+
   if ( params.scrolling ) {
     src += "uniform vec2 texSampleOffset = vec2(1.0, 1.0);";
   }
@@ -358,6 +353,9 @@ Lore::GPUProgramPtr StockResourceController::createBackgroundProgram( const stri
   src += "if ( pixel.a < 0.1 ) {";
   src += "discard;";
   src += "}";
+
+  // Apply alpha blending from material.
+  src += "pixel.a *= material.diffuse.a;";
 
   src += "}";
 
@@ -385,6 +383,8 @@ Lore::GPUProgramPtr StockResourceController::createBackgroundProgram( const stri
   program->addUniformVar( "texSampleRegion.y" );
   program->addUniformVar( "texSampleRegion.w" );
   program->addUniformVar( "texSampleRegion.h" );
+
+  program->addUniformVar( "material.diffuse" );
 
   if ( params.scrolling ) {
     program->addUniformVar( "texSampleOffset" );

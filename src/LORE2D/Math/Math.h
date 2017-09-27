@@ -249,6 +249,20 @@ namespace Lore {
     static inline Quaternion CreateQuaternion( const Vec3& axis,
                                                const Degree& angle );
 
+    //
+
+    template<typename T>
+    static inline T Clamp( const T value, const T min, const T max )
+    {
+      if ( value < min ) {
+        return min;
+      }
+      else if ( value > max ) {
+        return max;
+      }
+      return value;
+    }
+
   };
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

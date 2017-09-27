@@ -25,65 +25,48 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Renderer/IRenderer.h>
-
-#include <LORE2D/Resource/Material.h>
+#include <LORE2D/Renderer/IRenderAPI.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
-  namespace OpenGL {
+namespace Lore { namespace OpenGL {
 
-    ///
-    /// \class GenericRenderer
-    /// \brief Renders a scene normally, without any special behavior.
-    class GenericRenderer : public Lore::IRenderer
-    {
+  class RenderAPI : public Lore::IRenderAPI
+  {
 
-    public:
+  public:
 
-      const size_t DefaultRenderQueueCount = 100;
+    virtual ~RenderAPI() override = default;
 
-    public:
+    //
+    // Viewport.
 
-      GenericRenderer();
+    virtual void clearColor( const real r,
+                             const real g,
+                             const real b,
+                             const real a ) override;
 
-      virtual ~GenericRenderer() override;
+    virtual void clear() override;
 
-      virtual void addRenderData( Lore::EntityPtr e,
-                                  Lore::NodePtr node ) override;
+    virtual void setViewport( const uint32_t x,
+                              const uint32_t y,
+                              const uint32_t width,
+                              const uint32_t height ) override;
 
-      virtual void present( const Lore::RenderView& rv,
-                            const WindowPtr window ) override;
+    //
+    // Depth testing.
 
-    private:
+    virtual void setDepthTestEnabled( const bool enabled ) override;
 
-      virtual void _clearRenderQueues() override;
+    //
+    // Blending.
 
-      void activateQueue( const uint id,
-                          Lore::RenderQueue& rq );
+    virtual void setBlendingEnabled( const bool enabled ) override;
 
-      void renderBackground( const Lore::RenderView& rv,
-                             const real aspectRatio,
-                             const Matrix4& proj);
+    virtual void setBlendingFunc( const Material::BlendFactor& src, const Material::BlendFactor& dst ) override;
 
-      void renderMaterialMap( const Lore::ScenePtr scene,
-                              RenderQueue::EntityDataMap& mm,
-                              const Matrix4& viewProjection ) const;
+  };
 
-    private:
-
-      using RenderQueueList = std::vector<RenderQueue>;
-      using ActiveRenderQueueList = std::map<uint, RenderQueue&>;
-
-    private:
-
-      RenderQueueList _queues { };
-      ActiveRenderQueueList _activeQueues { };
-
-    };
-
-  }
-}
+}}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

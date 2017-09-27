@@ -70,6 +70,10 @@ namespace Lore {
     void destroyLight( LightPtr light );
     void destroyLight( const string& name );
 
+    ///
+    /// \brief Traverses scene graph and updates node transforms based on parent nodes.
+    void updateSceneGraph();
+
     //
     // Setters.
 
@@ -145,26 +149,26 @@ namespace Lore {
 
   private:
 
-    Color _bgColor;
+    Color _bgColor { StockColor::Black };
 
     // The type of renderer this scene uses.
-    RendererPtr _renderer;
+    RendererPtr _renderer { nullptr };
 
     // The scene's root node.
-    Node _root;
+    Node _root {};
 
     // Convenient hash map of all nodes for quick lookup.
-    NodeMap _nodes;
+    NodeMap _nodes {};
 
     //
     // Lighting.
 
-    Color _ambientLightColor;
+    Color _ambientLightColor { StockColor::Black };
 
-    LightMap _lights;
+    LightMap _lights {};
 
     // Lights that are attached to a node.
-    LightMap _activeLights;
+    LightMap _activeLights {};
 
     BackgroundPtr _background { nullptr };
 

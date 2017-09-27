@@ -32,14 +32,10 @@
 namespace Lore {
 
     ///
-    /// \typedef Colori Represents color as 3D vector (r, g, b, a).
+    /// \typedef Colori Represents color as 4D vector (r, g, b, a).
     /// Uses ints with range of [0, 255].
-    using Colori = Vector<int, 3>;
+    using Color4i = Vector<int, 4>;
 
-    ///
-    /// \typedef Color3f Represents color as 3D vector (r, g, b).
-    /// Uses floats with range of [0.f, 1.f].
-    using Colorf = Vector<float, 3>;
 
     ///
     /// \typedef Color4f Represents color as 4D vector (r, g, b, a).
@@ -49,16 +45,16 @@ namespace Lore {
     ///
     /// \typedef Color Represents color as 4D vector (r, g, b, a).
     /// Uses floats with range of [0.f, 1.f].
-    using Color = Colorf; // Default colors to floats.
+    using Color = Color4f; // Default colors to floats.
 
     // Various common colors.
     namespace StockColor {
 
-        static const Color Black    = Color( 0.f, 0.f, 0.f );
-        static const Color White    = Color( 1.f, 1.f, 1.f );
-        static const Color Red      = Color( 1.f, 0.f, 0.f );
-        static const Color Green    = Color( 0.f, 1.f, 0.f );
-        static const Color Blue     = Color( 0.f, 0.f, 1.f );
+        static const Color Black    = Color( 0.f, 0.f, 0.f, 1.f );
+        static const Color White    = Color( 1.f, 1.f, 1.f, 1.f );
+        static const Color Red      = Color( 1.f, 0.f, 0.f, 1.f );
+        static const Color Green    = Color( 0.f, 1.f, 0.f, 1.f );
+        static const Color Blue     = Color( 0.f, 0.f, 1.f, 1.f );
 
     }
 

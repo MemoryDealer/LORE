@@ -25,24 +25,24 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Renderer/IRenderer.h>
+#include <LORE2D/Renderer/Renderer.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore { namespace OpenGL {
+namespace Lore {
 
-    ///
-    /// \class RendererFactory
-    /// \brief Allocates an IRenderer object of the specified type.
-    class RendererFactory final
-    {
+  ///
+  /// \class RendererFactory
+  /// \brief Allocates an IRenderer object of the specified type.
+  class RendererFactory final
+  {
 
-    public:
+  public:
 
-        static std::unique_ptr<Lore::IRenderer> Create( const Lore::RendererType& rt );
+    static LORE_EXPORT std::unique_ptr<Lore::Renderer> Create( const Lore::RendererType& rt );
 
-    };
+  };
 
-}}
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
