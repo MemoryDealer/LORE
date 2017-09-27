@@ -62,7 +62,7 @@ void GenericRenderer::addRenderData( Lore::EntityPtr e,
                                      Lore::NodePtr node )
 {
   const uint queueId = e->getRenderQueue();
-  const bool blended = e->getMaterial()->getPass().blendingMode.enabled;
+  const bool blended = e->getMaterial()->blendingMode.enabled;
 
   // Add this queue to the active queue list if not already there.
   activateQueue( queueId, _queues[queueId] );
@@ -185,22 +185,24 @@ void GenericRenderer::renderBackground( const Lore::RenderView& rv,
     const Background::Layer& layer = pair.second;
     MaterialPtr mat = layer.getMaterial();
 
-    Material::Pass& pass = mat->getPass();
-    GPUProgramPtr program = pass.program;
-    TexturePtr texture = pass.texture;
+    GPUProgramPtr program = mat->program;
+    TexturePtr texture = mat->texture;
+
+    // Enable blending if set.
+
 
     if ( texture ) {
       program->use();
       texture->bind();
 
-      Lore::Rect sampleRegion = pass.getTexSampleRegion();
+      Lore::Rect sampleRegion = mat->getTexSampleRegion();
       program->setUniformVar( "texSampleRegion.x", sampleRegion.x );
       program->setUniformVar( "texSampleRegion.y", sampleRegion.y );
       program->setUniformVar( "texSampleRegion.w", sampleRegion.w );
       program->setUniformVar( "texSampleRegion.h", sampleRegion.h );
 
       // Apply scrolling and parallax offsets.
-      Lore::Vec2 offset = pass.getTexCoordOffset();
+      Lore::Vec2 offset = mat->getTexCoordOffset();
       offset.x += camPos.x * layer.getParallax().x;
       offset.y -= camPos.y * layer.getParallax().y;
       program->setUniformVar( "texSampleOffset", offset );
@@ -234,19 +236,18 @@ void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
     //
     // Bind material settings to GPU.
 
-    // TODO: Multi-pass.
-    Material::Pass& pass = entityData.material->getPass();
-    GPUProgramPtr program = pass.program;
+    MaterialPtr mat = entityData.material;
+    GPUProgramPtr program = mat->program;
     VertexBufferPtr vertexBuffer = entityData.vertexBuffer;
-    TexturePtr texture = pass.texture;
+    TexturePtr texture = mat->texture;
 
     program->use();
     if ( texture ) {
       // TODO: Multi-texturing.
       texture->bind();
-      program->setUniformVar( "texSampleOffset", pass.getTexCoordOffset() );
+      program->setUniformVar( "texSampleOffset", mat->getTexCoordOffset() );
 
-      Lore::Rect sampleRegion = pass.getTexSampleRegion();
+      Lore::Rect sampleRegion = mat->getTexSampleRegion();
       program->setUniformVar( "texSampleRegion.x", sampleRegion.x );
       program->setUniformVar( "texSampleRegion.y", sampleRegion.y );
       program->setUniformVar( "texSampleRegion.w", sampleRegion.w );
@@ -254,11 +255,11 @@ void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
     }
 
     // Upload lighting data.
-    if ( pass.lighting ) {
+    if ( mat->lighting ) {
 
       // Material.
-      program->setUniformVar( "material.ambient", pass.ambient );
-      program->setUniformVar( "material.diffuse", pass.diffuse );
+      program->setUniformVar( "material.ambient", mat->ambient );
+      program->setUniformVar( "material.diffuse", mat->diffuse );
 
       // Scene.
       program->setUniformVar( "sceneAmbient", scene->getAmbientLightColor() );
@@ -278,7 +279,7 @@ void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
 
       program->setTransformVar( mvp );
 
-      if ( pass.lighting ) {
+      if ( mat->lighting ) {
         program->setUniformVar( "model", rd.model );
       }
 
@@ -305,21 +306,21 @@ void GenericRenderer::renderTransparents( const Lore::ScenePtr scene,
   for ( auto it = tm.begin(); it != tm.end(); ++it ) {
 
     RenderQueue::Transparent& t = it->second;
-    Material::Pass& pass = t.material->getPass();
-    GPUProgramPtr program = pass.program;
+    MaterialPtr mat = t.material;
+    GPUProgramPtr program = mat->program;
     VertexBufferPtr vertexBuffer = t.vertexBuffer;
-    TexturePtr texture = pass.texture;
+    TexturePtr texture = mat->texture;
 
-    // Set blending mode using pass settings.
-    _api->setBlendingFunc( pass.blendingMode.srcFactor, pass.blendingMode.dstFactor );
+    // Set blending mode using material settings.
+    _api->setBlendingFunc( mat->blendingMode.srcFactor, mat->blendingMode.dstFactor );
 
     program->use();
     if ( texture ) {
       // TODO: Multi-texturing.
       texture->bind();
-      program->setUniformVar( "texSampleOffset", pass.getTexCoordOffset() );
+      program->setUniformVar( "texSampleOffset", mat->getTexCoordOffset() );
 
-      Lore::Rect sampleRegion = pass.getTexSampleRegion();
+      Lore::Rect sampleRegion = mat->getTexSampleRegion();
       program->setUniformVar( "texSampleRegion.x", sampleRegion.x );
       program->setUniformVar( "texSampleRegion.y", sampleRegion.y );
       program->setUniformVar( "texSampleRegion.w", sampleRegion.w );
@@ -327,11 +328,11 @@ void GenericRenderer::renderTransparents( const Lore::ScenePtr scene,
     }
 
     // Upload lighting data.
-    if ( pass.lighting ) {
+    if ( mat->lighting ) {
 
       // Material.
-      program->setUniformVar( "material.ambient", pass.ambient );
-      program->setUniformVar( "material.diffuse", pass.diffuse );
+      program->setUniformVar( "material.ambient", mat->ambient );
+      program->setUniformVar( "material.diffuse", mat->diffuse );
 
       // Scene.
       program->setUniformVar( "sceneAmbient", scene->getAmbientLightColor() );
@@ -349,7 +350,7 @@ void GenericRenderer::renderTransparents( const Lore::ScenePtr scene,
 
       program->setTransformVar( mvp );
 
-      if ( pass.lighting ) {
+      if ( mat->lighting ) {
         program->setUniformVar( "model", t.model );
       }
 

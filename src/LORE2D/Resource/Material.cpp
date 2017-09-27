@@ -36,35 +36,12 @@ using namespace Lore;
 
 Material::Material()
   : _name()
-  , _passes()
 {
-  // By default a material should have at least one pass.
-  _passes.push_back( Pass() );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Material::~Material()
-{
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Material::_reset()
-{
-  _passes.clear();
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-Material::Pass::Pass()
-{
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-Material::Pass::~Pass()
 {
   if ( _texCoordCallback ) {
     Context::UnregisterFrameStartedCallback( _texCoordCallback );
@@ -72,8 +49,16 @@ Material::Pass::~Pass()
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Material::Pass::setTextureScrollSpeed( const Vec2& scroll )
+void Material::_reset()
+{
+  // 
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Material::setTextureScrollSpeed( const Vec2& scroll )
 {
   // TODO: Put all texture scrolling in a single function (e.g., pass ref to offset).
   if ( !_texCoordCallback ) {
@@ -89,14 +74,14 @@ void Material::Pass::setTextureScrollSpeed( const Vec2& scroll )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Material::Pass::setTextureSampleRegion( const Rect& region )
+void Material::setTextureSampleRegion( const Rect& region )
 {
   _texSampleRegion = region;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Material::Pass::setTextureSampleRegion( const real x,
+void Material::setTextureSampleRegion( const real x,
                                              const real y,
                                              const real w,
                                              const real h )

@@ -99,33 +99,29 @@ void StockResourceController::createStockResources()
   // Lit materials.
   {
     auto material = _controller->createMaterial( "StandardTextured" );
-    Material::Pass& pass = material->getPass();
-    pass.lighting = true;
-    pass.texture = _controller->getTexture( "White" );
-    pass.program = _controller->getGPUProgram( "StandardTextured" );
+    material->lighting = true;
+    material->texture = _controller->getTexture( "White" );
+    material->program = _controller->getGPUProgram( "StandardTextured" );
   }
 
   {
     auto material = _controller->createMaterial( "Standard" );
-    Material::Pass& pass = material->getPass();
-    pass.lighting = true;
-    pass.program = _controller->getGPUProgram( "Standard" );
+    material->lighting = true;
+    material->program = _controller->getGPUProgram( "Standard" );
   }
 
   // Unlit materials.
   {
     auto material = _controller->createMaterial( "UnlitTextured" );
-    Material::Pass& pass = material->getPass();
-    pass.lighting = false;
-    pass.texture = _controller->getTexture( "White" );
-    pass.program = _controller->getGPUProgram( "UnlitTextured" );
+    material->lighting = false;
+    material->texture = _controller->getTexture( "White" );
+    material->program = _controller->getGPUProgram( "UnlitTextured" );
   }
 
   {
     auto material = _controller->createMaterial( "UnlitStandard" );
-    Material::Pass& pass = material->getPass();
-    pass.lighting = false;
-    pass.program = _controller->getGPUProgram( "UnlitStandard" );
+    material->lighting = false;
+    material->program = _controller->getGPUProgram( "UnlitStandard" );
   }
 
   //
@@ -167,10 +163,9 @@ void StockResourceController::createStockResources()
 
   {
     auto material = _controller->createMaterial( "Background" );
-    Material::Pass& pass = material->getPass();
-    pass.lighting = false;
-    pass.texture = _controller->getTexture( "White" );
-    pass.program = _controller->getGPUProgram( "Background" );
+    material->lighting = false;
+    material->texture = _controller->getTexture( "White" );
+    material->program = _controller->getGPUProgram( "Background" );
   }
 
   {

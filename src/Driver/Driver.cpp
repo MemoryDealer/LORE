@@ -80,7 +80,7 @@ int main( int argc, char** argv )
   auto sonicTexture = Lore::Resource::LoadTexture( "sonic-mobile", "H:\\sonic-mobile.png" );
   sonicEntity->setTexture( sonicTexture );
   //sonicEntity->getMaterial()->getPass().blendingMode.enabled = true;
-  sonicEntity->getMaterial()->getPass().diffuse.a = 0.5f;
+  sonicEntity->getMaterial()->diffuse.a = 0.5f;
   sonicNode->attachObject( sonicEntity );
 
   auto sonicLight = scene->createLight( "sonic-light" );
@@ -104,8 +104,8 @@ int main( int argc, char** argv )
   // Create some blended boxes.
 
   auto boxEntity = Lore::Resource::CreateEntity( "box", Lore::MeshType::Quad );
-  boxEntity->getMaterial()->getPass().blendingMode.enabled = true;
-  boxEntity->getMaterial()->getPass().diffuse = Lore::Color( 0.1f, 0.4f, 0.8f, 0.95f );
+  boxEntity->getMaterial()->blendingMode.enabled = true;
+  boxEntity->getMaterial()->diffuse = Lore::Color( 0.1f, 0.4f, 0.8f, 0.95f );
   for ( int i = 0; i < 5; ++i ) {
     auto node = scene->createNode( "box" + std::to_string( i ) );
     node->attachObject( boxEntity );
@@ -127,9 +127,9 @@ int main( int argc, char** argv )
   auto& layer2 = bg->addLayer( "2" );
   layer2.setTexture( Lore::Resource::GetTexture( "death-egg" ) );
   layer2.setParallax( Lore::Vec2(0.1f, 0.1f) );
-  layer2.getMaterial()->getPass().blendingMode.enabled = true;
-  layer2.getMaterial()->getPass().diffuse.a = 0.5f;
-  layer2.getMaterial()->getPass().setTextureSampleRegion( Lore::Rect( 0.0f, 0.0f, 0.55f, 0.55f ) );
+  layer2.getMaterial()->blendingMode.enabled = true;
+  layer2.getMaterial()->diffuse.a = 0.5f;
+  layer2.getMaterial()->setTextureSampleRegion( Lore::Rect( 0.0f, 0.0f, 0.55f, 0.55f ) );
   //layer.getMaterial()->getPass().setTextureSampleRegion( 0.15f, 0.05f, 0.08f, 0.58f );
 
   //Lore::Resource::LoadTexture( "bg_default", "C:\\clouds.jpg" );

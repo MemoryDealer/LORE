@@ -62,67 +62,6 @@ namespace Lore {
       OneMinusConstantAlpha
     };
 
-    ///
-    /// \class Material::Pass
-    /// \brief A single vertex and pixel shader pass.
-    class LORE_EXPORT Pass final
-    {
-
-    public:
-
-      bool lighting { true };
-      Color ambient { StockColor::White };
-      Color diffuse { StockColor::White };
-      TexturePtr texture { nullptr };
-      GPUProgramPtr program { nullptr };
-      
-      struct
-      {
-        bool enabled { false };
-        BlendFactor srcFactor { BlendFactor::SrcAlpha };
-        BlendFactor dstFactor { BlendFactor::OneMinusSrcAlpha };
-      } blendingMode;
-
-    public:
-
-      Pass();
-
-      ~Pass();
-
-      //
-      // Setters.
-
-      void setTextureScrollSpeed( const Vec2& scroll );
-
-      void setTextureSampleRegion( const Rect& region );
-
-      void setTextureSampleRegion( const real x,
-                                   const real y,
-                                   const real w,
-                                   const real h );
-
-      //
-      // Getters.
-
-      inline Vec2 getTexCoordOffset() const
-      {
-        return _texCoordOffset;
-      }
-
-      inline Rect getTexSampleRegion() const
-      {
-        return _texSampleRegion;
-      }
-
-    private:
-
-      Vec2 _texCoordScrollSpeed {};
-      Vec2 _texCoordOffset {};
-      Rect _texSampleRegion { 0.f, 0.f, 1.f, 1.f };
-      FrameListenerController::FrameStartedCallback _texCoordCallback { nullptr };
-
-    };
-
   public:
 
     Material();
@@ -130,29 +69,63 @@ namespace Lore {
     virtual ~Material() override;
 
     //
-    // Getters.
+    // Setters.
 
-    ///
-    /// \brief Returns reference to Pass at specified index. All Materials have
-    ///     at least one pass.
-    Pass& getPass( const size_t idx = 0 )
-    {
-      assert( idx <= _passes.size() );
-      return _passes[idx];
-    }
+    void setTextureScrollSpeed( const Vec2& scroll );
+
+    void setTextureSampleRegion( const Rect& region );
+
+    void setTextureSampleRegion( const real x,
+                                 const real y,
+                                 const real w,
+                                 const real h );
 
     //
-    // Operators.
+    // Getters.
+
+    inline Vec2 getTexCoordOffset() const
+    {
+      return _texCoordOffset;
+    }
+
+    inline Rect getTexSampleRegion() const
+    {
+      return _texSampleRegion;
+    }
 
     Material& operator = ( const Material& rhs )
     {
-      _passes = rhs._passes;
+      lighting = rhs.lighting;
+      ambient = rhs.ambient;
+      diffuse = rhs.diffuse;
+      texture = rhs.texture;
+      program = rhs.program;
+      blendingMode = rhs.blendingMode;
+      _texCoordScrollSpeed = rhs._texCoordScrollSpeed;
+      _texCoordOffset = rhs._texCoordOffset;
+      _texSampleRegion = rhs._texSampleRegion;
+
+      // Re-assign callback for copied material.
+      if ( rhs._texCoordCallback ) {
+        setTextureScrollSpeed( _texCoordScrollSpeed );
+      }
       return *this;
     }
 
-  private:
+  public:
 
-    using PassList = std::vector<Pass>;
+    bool lighting { true };
+    Color ambient { StockColor::White };
+    Color diffuse { StockColor::White };
+    TexturePtr texture { nullptr };
+    GPUProgramPtr program { nullptr };
+
+    struct
+    {
+      bool enabled { false };
+      BlendFactor srcFactor { BlendFactor::SrcAlpha };
+      BlendFactor dstFactor { BlendFactor::OneMinusSrcAlpha };
+    } blendingMode;
 
   private:
 
@@ -160,7 +133,13 @@ namespace Lore {
 
   private:
 
-    PassList _passes;
+    // TODO: Use linked list of materials for multi-pass rendering. The renderer
+    // can pick these up and fill separate rendering queue groups for each pass.
+
+    Vec2 _texCoordScrollSpeed { };
+    Vec2 _texCoordOffset { };
+    Rect _texSampleRegion { 0.f, 0.f, 1.f, 1.f };
+    FrameListenerController::FrameStartedCallback _texCoordCallback { nullptr };
 
   };
 
