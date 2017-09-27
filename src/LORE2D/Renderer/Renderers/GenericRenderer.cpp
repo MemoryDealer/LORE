@@ -189,7 +189,10 @@ void GenericRenderer::renderBackground( const Lore::RenderView& rv,
     TexturePtr texture = mat->texture;
 
     // Enable blending if set.
-
+    if ( mat->blendingMode.enabled ) {
+      _api->setBlendingEnabled( true );
+      _api->setBlendingFunc( mat->blendingMode.srcFactor, mat->blendingMode.dstFactor );
+    }
 
     if ( texture ) {
       program->use();
@@ -200,6 +203,8 @@ void GenericRenderer::renderBackground( const Lore::RenderView& rv,
       program->setUniformVar( "texSampleRegion.y", sampleRegion.y );
       program->setUniformVar( "texSampleRegion.w", sampleRegion.w );
       program->setUniformVar( "texSampleRegion.h", sampleRegion.h );
+
+      program->setUniformVar( "material.diffuse", mat->diffuse );
 
       // Apply scrolling and parallax offsets.
       Lore::Vec2 offset = mat->getTexCoordOffset();
@@ -214,6 +219,10 @@ void GenericRenderer::renderBackground( const Lore::RenderView& rv,
       program->setTransformVar( proj * transform );
 
       vb->draw();
+    }
+
+    if ( mat->blendingMode.enabled ) {
+      _api->setBlendingEnabled( false );
     }
   }
 

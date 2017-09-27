@@ -334,6 +334,12 @@ Lore::GPUProgramPtr StockResourceController::createBackgroundProgram( const stri
   src += "in vec2 TexCoord;";
   src += "out vec4 pixel;";
 
+  // Material.
+  src += "struct Material {";
+  src += "vec4 diffuse;";
+  src += "};";
+  src += "uniform Material material;";
+
   if ( params.scrolling ) {
     src += "uniform vec2 texSampleOffset = vec2(1.0, 1.0);";
   }
@@ -347,6 +353,9 @@ Lore::GPUProgramPtr StockResourceController::createBackgroundProgram( const stri
   src += "if ( pixel.a < 0.1 ) {";
   src += "discard;";
   src += "}";
+
+  // Apply alpha blending from material.
+  src += "pixel.a *= material.diffuse.a;";
 
   src += "}";
 
@@ -374,6 +383,8 @@ Lore::GPUProgramPtr StockResourceController::createBackgroundProgram( const stri
   program->addUniformVar( "texSampleRegion.y" );
   program->addUniformVar( "texSampleRegion.w" );
   program->addUniformVar( "texSampleRegion.h" );
+
+  program->addUniformVar( "material.diffuse" );
 
   if ( params.scrolling ) {
     program->addUniformVar( "texSampleOffset" );

@@ -94,11 +94,13 @@ int main( int argc, char** argv )
 
   auto dogeEntity = Lore::Resource::CreateEntity( "doge", Lore::MeshType::TexturedQuad );
   auto dogeTexture = Lore::Resource::LoadTexture( "doge", "C:\\doge.jpg" );
+  std::vector<Lore::NodePtr> doges;
   dogeEntity->setTexture( dogeTexture );
   for ( int i = 0; i < 5; ++i ) {
     auto node = scene->createNode( "doge" + std::to_string( i ) );
     node->attachObject( dogeEntity );
     node->setPosition( static_cast< float >( i ) / 2.f, 0.f );
+    doges.push_back( node );
   }
 
   // Create some blended boxes.
@@ -128,7 +130,7 @@ int main( int argc, char** argv )
   layer2.setTexture( Lore::Resource::GetTexture( "death-egg" ) );
   layer2.setParallax( Lore::Vec2(0.1f, 0.1f) );
   layer2.getMaterial()->blendingMode.enabled = true;
-  layer2.getMaterial()->diffuse.a = 0.5f;
+  layer2.getMaterial()->diffuse.a = 0.75f;
   layer2.getMaterial()->setTextureSampleRegion( Lore::Rect( 0.0f, 0.0f, 0.55f, 0.55f ) );
   //layer.getMaterial()->getPass().setTextureSampleRegion( 0.15f, 0.05f, 0.08f, 0.58f );
 
@@ -181,6 +183,10 @@ int main( int argc, char** argv )
 
     // TODO: Repro case where both quads appeared to be scaling with only rotations being done.
     //node->getChild( "AChild" )->rotate( Lore::Degree( -.1f ) );
+
+    for ( auto doge : doges ) {
+      doge->rotate( Lore::Degree( .1f ) );
+    }
 
     const float speed = 0.01f;
     if ( GetAsyncKeyState( 0x57 ) ) { // W
