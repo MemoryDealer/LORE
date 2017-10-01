@@ -25,30 +25,46 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Resource/StockResource.h>
+#include <LORE2D/Math/Math.h>
+#include <LORE2D/Resource/Font.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore { namespace OpenGL {
 
-    class StockResourceController : public Lore::StockResourceController
+  class GLFont : public Lore::Font,
+                 public Alloc<GLFont>
+  {
+
+  public:
+
+    struct Glyph
     {
-
-    public:
-
-        StockResourceController();
-
-        virtual ~StockResourceController() override;
-
-        virtual void createStockResources() override;
-
-        virtual GPUProgramPtr createUberProgram( const string& name, const Lore::UberProgramParameters& params ) override;
-
-        virtual GPUProgramPtr createBackgroundProgram( const string& name, const BackgroundProgramParameters& params ) override;
-
-        virtual GPUProgramPtr createTextProgram( const string& name ) override;
-
+      GLuint textureID;
+      GLuint advance;
+      IVec2 size;
+      IVec2 bearing;
     };
+
+  public:
+
+    GLFont() = default;
+
+    virtual ~GLFont() override = default;
+
+    virtual void loadFromFile( const string& file, const uint32_t size ) override;
+
+  private:
+
+    virtual void _reset() override;
+
+  private:
+
+    using GlyphMap = std::map<GLchar, Glyph>;
+
+    GlyphMap _glyphs {};
+
+  };
 
 }}
 

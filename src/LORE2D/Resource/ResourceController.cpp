@@ -235,6 +235,13 @@ VertexBufferPtr ResourceController::getVertexBuffer( const string& name, const s
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+FontPtr ResourceController::getFont( const string& name, const string& groupName )
+{
+  return _getGroup( groupName )->fonts.get( name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 ResourceGroupPtr ResourceController::_getGroup( const string& groupName )
@@ -255,6 +262,13 @@ ResourceGroupPtr ResourceController::_getGroup( const string& groupName )
 TexturePtr Resource::LoadTexture( const string& name, const string& file, const string& groupName )
 {
   return ActiveContext->getResourceController()->loadTexture( name, file, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+FontPtr Resource::LoadFont( const string& name, const string& file, const uint32_t size, const string& groupName )
+{
+  return ActiveContext->getResourceController()->loadFont( name, file, size, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -353,6 +367,13 @@ MaterialPtr Resource::GetMaterial( const string& name, const string& groupName )
 TexturePtr Resource::GetTexture( const string& name, const string& groupName )
 {
   return ActiveContext->getResourceController()->getTexture( name, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+FontPtr Resource::GetFont( const string& name, const string& groupName )
+{
+  return ActiveContext->getResourceController()->getFont( name, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

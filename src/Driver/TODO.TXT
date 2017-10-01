@@ -1,15 +1,15 @@
+-Text rendering, FPS/frametime display
 -Debug tools - view memory pools for each type, hover over to view details
-  Will need text rendering for this
 -UI class; add elements in [0.0, 1.0] range. Text and boxes. Allow scrolling offsets to out of range. Can assign callback for mouse for debug UI.
--Resource file location indexing for easy reloading.
+-Resource file location indexing for easy reloading (see ResourceController.h).
 -Sprites!
--RTT
+-RTT (add priority to renderview, RTTs are automatically rendered before window framebuffers)
 -Multi-texturing
 -Polish resource cloning
 -Normal mapping
+-Lua scripting system, callbacks into bound lua scripts to nodes/scenes.
 -Resource configuration files - materials, scenes, textures all loaded into group via .rsrc file.
   Lua bindings for configuration and resource files
-  Later can be used for hooking up scripts to nodes etc.
 -Input: Mouse clicks hitting nodes
 -AABB drawing, basic collision support
 -Camera tracks - key frames
@@ -18,3 +18,6 @@
 -Particle systems
 -Compositors: visualize depth buffer (https://learnopengl.com/#!Advanced-OpenGL/Depth-testing)
 -Modify memory pool to use raw uint8_t buffers, get rid of reset() functions; use default copy for each pool
+
+---
+-For rotating text: https://github.com/0xc0dec/stb-truetype-examples/blob/master/Example1.cpp

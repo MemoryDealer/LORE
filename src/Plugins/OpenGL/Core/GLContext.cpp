@@ -32,6 +32,7 @@
 
 #include <Plugins/OpenGL/Window/GLWindow.h>
 #include <Plugins/OpenGL/Renderer/RenderAPI.h>
+#include <Plugins/OpenGL/Resource/GLFont.h>
 #include <Plugins/OpenGL/Resource/GLStockResource.h>
 #include <Plugins/OpenGL/Resource/Renderable/GLTexture.h>
 #include <Plugins/OpenGL/Shader/GLGPUProgram.h>
@@ -55,9 +56,6 @@ using namespace GLContextNS;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Context::Context() noexcept
-  : Lore::Context()
-  , _offscreenContextWindow( nullptr )
-  , _renderers()
 {
   lore_log( "Initializing OpenGL render plugin context..." );
   glfwInit();
@@ -119,6 +117,7 @@ void Context::initConfiguration()
   Lore::Context::initConfiguration();
 
   // Setup default memory pool settings.
+  _poolCluster.registerPool<Font, GLFont>( 4 );
   _poolCluster.registerPool<GPUProgram, GLGPUProgram>( 16 );
   _poolCluster.registerPool<Shader, GLShader>( 32 );
   _poolCluster.registerPool<Texture, GLTexture>( 64 );

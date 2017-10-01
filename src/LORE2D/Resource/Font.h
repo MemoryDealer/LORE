@@ -25,31 +25,25 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Resource/StockResource.h>
+#include <LORE2D/Memory/Alloc.h>
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+namespace Lore {
 
-namespace Lore { namespace OpenGL {
+  class LORE_EXPORT Font
+  {
 
-    class StockResourceController : public Lore::StockResourceController
-    {
+    LORE_OBJECT_BODY()
 
-    public:
+  public:
 
-        StockResourceController();
+    Font() = default;
 
-        virtual ~StockResourceController() override;
+    virtual ~Font() = default;
 
-        virtual void createStockResources() override;
+    virtual void loadFromFile( const string& file, const uint32_t size ) = 0;
 
-        virtual GPUProgramPtr createUberProgram( const string& name, const Lore::UberProgramParameters& params ) override;
+  };
 
-        virtual GPUProgramPtr createBackgroundProgram( const string& name, const BackgroundProgramParameters& params ) override;
-
-        virtual GPUProgramPtr createTextProgram( const string& name ) override;
-
-    };
-
-}}
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -394,3 +394,94 @@ Lore::GPUProgramPtr StockResourceController::createBackgroundProgram( const stri
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Lore::GPUProgramPtr StockResourceController::createTextProgram( const string& name )
+{
+  const string header = "#version " +
+    std::to_string( APIVersion::GetMajor() ) + std::to_string( APIVersion::GetMinor() ) + "0" +
+    " core\n";
+
+  //
+  // Vertex shader.
+
+  string src = header;
+
+  //
+  // Layout.
+
+  src += "layout (location = 0) in vec4 vertex;";
+
+  //
+  // Uniforms and outs.
+
+  src += "uniform mat4 projection;";
+  src += "out vec2 TexCoords;";
+
+  //
+  // main function.
+
+  src += "void main() {";
+
+  src += "gl_Position = projection * vec4(vertex.xy, 0.0, 1.0);";
+  src += "TexCoords = vertex.zw;";
+
+  src += "}";
+
+  auto vsptr = _controller->createVertexShader( name + "_VS" );
+  if ( !vsptr->loadFromSource( src ) ) {
+    throw Lore::Exception( "Failed to compile text vertex shader for " + name );
+  }
+
+  // ::::::::::::::::::::::::::::::::: //
+
+  //
+  // Fragment shader.
+
+  src.clear();
+  src = header;
+
+  //
+  // Ins/outs and uniforms.
+
+  src += "in vec2 TexCoords;";
+  src += "out vec4 pixel;";
+  
+  src += "uniform sampler2D text;";
+  src += "uniform vec3 color;";
+
+  //
+  // main function.
+
+  src += "void main() {";
+
+  src += "vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, TexCoords).r);";
+  src += "pixel = vec4(color, 1.0) * sampled;";
+
+  src += "}";
+
+  auto fsptr = _controller->createFragmentShader( name + "_FS" );
+  if ( !fsptr->loadFromSource( src ) ) {
+    throw Lore::Exception( "Failed to compile text fragment shader for " + name );
+    // TODO: Rollback vertex shaders in case of failed fragment shader.
+  }
+
+  // ::::::::::::::::::::::::::::::::: //
+
+  //
+  // GPU program.
+
+  auto program = _controller->createGPUProgram( name );
+  program->attachShader( vsptr );
+  program->attachShader( fsptr );
+
+  if ( !program->link() ) {
+    throw Lore::Exception( "Failed to link GPUProgram " + name );
+  }
+
+  program->addUniformVar( "projection" );
+  program->addUniformVar( "color" );
+
+  return program;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

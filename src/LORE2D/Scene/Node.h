@@ -105,6 +105,8 @@ namespace Lore {
 
     void attachObject( LightPtr l );
 
+    //void attachObject( TextPtr t );
+
     inline EntityListConstIterator getEntityListConstIterator() const
     {
       return _entities.getConstIterator();

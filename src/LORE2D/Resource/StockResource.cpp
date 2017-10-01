@@ -172,6 +172,20 @@ void StockResourceController::createStockResources()
     auto vb = _controller->createVertexBuffer( "Background", MeshType::Background );
     vb->build();
   }
+
+  // ::::::::::::::::::::::::: //
+
+  //
+  // Font stock resources.
+
+  {
+    _controller->loadFont( "Default", "res/fonts/retro.ttf", 48 );
+  }
+
+  {
+    // Generate shaders for text rendering.
+    createTextProgram( "StandardText" );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -207,6 +221,13 @@ TexturePtr StockResourceController::getTexture( const string& name )
 VertexBufferPtr StockResourceController::getVertexBuffer( const string& name )
 {
   return _controller->getVertexBuffer( name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+FontPtr StockResourceController::getFont( const string& name )
+{
+  return _controller->getFont( name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -251,6 +272,13 @@ TexturePtr StockResource::GetTexture( const string& name )
 VertexBufferPtr StockResource::GetVertexBuffer( const string& name )
 {
   return ActiveContext->getStockResourceController()->getVertexBuffer( name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+FontPtr StockResource::GetFont( const string& name )
+{
+  return ActiveContext->getStockResourceController()->getFont( name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

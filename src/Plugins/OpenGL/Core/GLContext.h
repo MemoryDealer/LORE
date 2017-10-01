@@ -33,64 +33,66 @@
 
 namespace Lore { namespace OpenGL {
 
-    class Context final : public Lore::Context
-    {
+  class Context final : public Lore::Context
+  {
 
-    public:
+  public:
 
-        explicit Context() noexcept;
+    explicit Context() noexcept;
 
-        virtual ~Context() override;
+    virtual ~Context() override;
 
-        virtual void initConfiguration() override;
+    virtual void initConfiguration() override;
 
-        //
-        // Rendering.
+    //
+    // Rendering.
 
-        virtual void renderFrame( const float lagMultiplier = 1.f ) override;
+    virtual void renderFrame( const float lagMultiplier = 1.f ) override;
 
-        //
-        // Factory/Destruction functions.
+    //
+    // Factory/Destruction functions.
 
-        ///
-        /// \brief Creates a window and returns a handle to it.
-        virtual WindowPtr createWindow( const string& title,
-                                        const uint width,
-                                        const uint height,
-                                        const Window::Mode& mode = Window::Mode::Windowed ) override;
+    ///
+    /// \brief Creates a window and returns a handle to it.
+    virtual WindowPtr createWindow( const string& title,
+                                    const uint width,
+                                    const uint height,
+                                    const Window::Mode& mode = Window::Mode::Windowed ) override;
 
-        ///
-        /// \brief Destroys specified window. If this is the last remaining window,
-        ///     the context will no longer be active.
-        virtual void destroyWindow( WindowPtr window ) override;
+    ///
+    /// \brief Destroys specified window. If this is the last remaining window,
+    ///     the context will no longer be active.
+    virtual void destroyWindow( WindowPtr window ) override;
 
-        ///
-        /// \brief Creates a scene, assigns, the specified renderer, and returns a handle to it.
-        virtual Lore::ScenePtr createScene( const string& name, const RendererType& rt ) override;
+    ///
+    /// \brief Creates a scene, assigns, the specified renderer, and returns a handle to it.
+    virtual Lore::ScenePtr createScene( const string& name, const RendererType& rt ) override;
 
-        //
-        // Information.
+    //
+    // Information.
 
-        virtual string getRenderPluginName() const override;
+    virtual string getRenderPluginName() const override;
 
-    private:
+  private:
 
-        using RendererMap = std::unordered_map <Lore::RendererType, std::unique_ptr<Lore::Renderer>>;
+    using RendererMap = std::unordered_map <Lore::RendererType, std::unique_ptr<Lore::Renderer>>;
 
-    private:
+  private:
 
-        GLFWwindow* _offscreenContextWindow;
-        RendererMap _renderers;
+    GLFWwindow* _offscreenContextWindow { nullptr };
+    RendererMap _renderers { };
 
-    };
+  };
 
-    // This is the only exported function from the render plugin, which allows the LORE2D 
-    // library to load its version of Context.
-    extern "C" __declspec( dllexport ) Lore::Context* __stdcall CreateContext()
-    {
-        Lore::Context* context = new Context();
-        return context;
-    }
+#if LORE_PLATFORM == LORE_WINDOWS
+  // This is the only exported function from the render plugin, which allows the LORE2D 
+  // library to load its version of Context.
+  extern "C" __declspec( dllexport ) Lore::Context* __stdcall CreateContext()
+  {
+    Lore::Context* context = new Context();
+    return context;
+  }
+#endif
 
 }}
 

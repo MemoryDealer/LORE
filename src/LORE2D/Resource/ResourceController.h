@@ -27,6 +27,7 @@
 
 #include <LORE2D/Core/Util.h>
 #include <LORE2D/Memory/Alloc.h>
+#include <LORE2D/Resource/Font.h>
 #include <LORE2D/Resource/Material.h>
 #include <LORE2D/Resource/Mesh.h>
 #include <LORE2D/Resource/Registry.h>
@@ -67,15 +68,6 @@ namespace Lore {
 
     inline explicit ResourceGroup( const string& name_ )
       : name( name_ )
-      , index()
-      , textures()
-      , programs()
-      , vertexShaders()
-      , fragmentShaders()
-      , vertexBuffers()
-      , materials()
-      , entities()
-      , cameras()
     {
     }
 
@@ -83,34 +75,38 @@ namespace Lore {
 
     string name;
 
-    ResourceIndex index;
+    ResourceIndex index {};
 
-    Registry<std::unordered_map, Texture> textures;
+    Registry<std::unordered_map, Texture> textures {};
 
     // Shaders.
 
-    Registry<std::unordered_map, GPUProgram> programs;
+    Registry<std::unordered_map, GPUProgram> programs {};
 
-    ShaderRegistry vertexShaders;
-    ShaderRegistry fragmentShaders;
+    ShaderRegistry vertexShaders {};
+    ShaderRegistry fragmentShaders {};
 
-    Registry<std::unordered_map, VertexBuffer> vertexBuffers;
+    Registry<std::unordered_map, VertexBuffer> vertexBuffers {};
 
     // Materials.
 
-    Registry<std::unordered_map, Material> materials;
+    Registry<std::unordered_map, Material> materials {};
 
     // Meshes.
 
-    Registry<std::unordered_map, Mesh> meshes;
+    Registry<std::unordered_map, Mesh> meshes {};
 
     // Entities.
 
-    Registry<std::unordered_map, Entity> entities;
+    Registry<std::unordered_map, Entity> entities {};
 
     // Scene.
 
-    Registry<std::unordered_map, Camera> cameras;
+    Registry<std::unordered_map, Camera> cameras {};
+
+    // Fonts.
+
+    Registry<std::unordered_map, Font> fonts {};
 
   };
 
@@ -147,6 +143,8 @@ namespace Lore {
 
     virtual TexturePtr loadTexture( const string& name, const string& file, const string& groupName = DefaultGroupName ) = 0;
 
+    virtual FontPtr loadFont( const string& name, const string& file, const uint32_t size, const string& groupName = ResourceController::DefaultGroupName ) = 0;
+
     //
     // Factory functions.
 
@@ -179,7 +177,6 @@ namespace Lore {
     //
     // Cloning functions.
 
-    
     MaterialPtr cloneMaterial( const string& name, const string& cloneName );
 
     //
@@ -192,6 +189,8 @@ namespace Lore {
     TexturePtr getTexture( const string& name, const string& groupName = DefaultGroupName );
 
     VertexBufferPtr getVertexBuffer( const string& name, const string& groupName = DefaultGroupName );
+
+    FontPtr getFont( const string& name, const string& groupName = DefaultGroupName );
 
     //
     // Destruction.
@@ -230,6 +229,8 @@ namespace Lore {
     // Loading.
 
     static TexturePtr LoadTexture( const string& name, const string& file, const string& groupName = ResourceController::DefaultGroupName );
+
+    static FontPtr LoadFont( const string& name, const string& file, const uint32_t size, const string& groupName = ResourceController::DefaultGroupName );
 
     //
     // Factory functions.
@@ -274,6 +275,8 @@ namespace Lore {
     static MaterialPtr GetMaterial( const string& name, const string& groupName = ResourceController::DefaultGroupName );
 
     static TexturePtr GetTexture( const string& name, const string& groupName = ResourceController::DefaultGroupName );
+
+    static FontPtr GetFont( const string& name, const string& groupName = ResourceController::DefaultGroupName );
 
     //
     // Destruction.

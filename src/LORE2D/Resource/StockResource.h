@@ -76,6 +76,8 @@ namespace Lore {
 
         virtual GPUProgramPtr createBackgroundProgram( const string& name, const BackgroundProgramParameters& params ) = 0;
 
+        virtual GPUProgramPtr createTextProgram( const string& name ) = 0;
+
         //
         // Retrieval functions for each type of stock resource.
 
@@ -88,6 +90,8 @@ namespace Lore {
         TexturePtr getTexture( const string& name );
 
         VertexBufferPtr getVertexBuffer( const string& name );
+
+        FontPtr getFont( const string& name );
 
         //
         // Cloning functions.
@@ -122,6 +126,8 @@ namespace Lore {
         static TexturePtr GetTexture( const string& name );
 
         static VertexBufferPtr GetVertexBuffer( const string& name );
+
+        static FontPtr GetFont( const string& name );
 
         //
         // Cloning.

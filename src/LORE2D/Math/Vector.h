@@ -112,6 +112,8 @@ using Vec2 = Vector<float, 2>;
 using Vec3 = Vector<float, 3>;
 using Vec4 = Vector<float, 4>;
 
+using IVec2 = Vector<int, 2>;
+
 //
 // Specialize component access for all vector sizes.
 
