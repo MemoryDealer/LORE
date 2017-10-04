@@ -51,6 +51,8 @@ namespace Lore { namespace OpenGL {
 
         virtual void draw() override;
 
+        virtual void draw( const Vertices& verts ) override;
+
     private:
 
         virtual void _reset() override;

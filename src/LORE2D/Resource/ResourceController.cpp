@@ -29,6 +29,7 @@
 #include <LORE2D/Core/Context.h>
 #include <LORE2D/Resource/Entity.h>
 #include <LORE2D/Resource/StockResource.h>
+#include <LORE2D/Resource/Renderable/Textbox.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -168,6 +169,18 @@ CameraPtr ResourceController::createCamera( const string& name, const string& gr
 
   _getGroup( groupName )->cameras.insert( name, cam );
   return cam;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+TextboxPtr ResourceController::createTextbox( const string& name, const string& groupName )
+{
+  auto textbox = MemoryAccess::GetPrimaryPoolCluster()->create<Textbox>();
+  textbox->setName( name );
+  textbox->setFont( Lore::StockResource::GetFont( "Default" ) );
+
+  _getGroup( groupName )->textboxes.insert( name, textbox );
+  return textbox;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -325,6 +338,13 @@ TexturePtr Resource::CreateTexture( const string& name, const string& groupName 
 CameraPtr Resource::CreateCamera( const string& name, const string& groupName )
 {
   return ActiveContext->getResourceController()->createCamera( name, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+TextboxPtr Resource::CreateTextbox( const string& name, const string& groupName )
+{
+  return ActiveContext->getResourceController()->createTextbox( name, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -54,6 +54,15 @@ namespace Lore { namespace OpenGL {
 
     virtual void loadFromFile( const string& file, const uint32_t size ) override;
 
+    virtual VertexBuffer::Vertices generateVertices( const char c,
+                                                     const real x,
+                                                     const real y,
+                                                     const real scale ) override;
+
+    virtual void bindTexture( const char c ) override;
+
+    virtual real advanceGlyphX( const char c, const real x, const real scale ) override;
+
   private:
 
     virtual void _reset() override;

@@ -1,3 +1,4 @@
+--- Features ---
 -Text rendering, FPS/frametime display
 -Debug tools - view memory pools for each type, hover over to view details
 -UI class; add elements in [0.0, 1.0] range. Text and boxes. Allow scrolling offsets to out of range. Can assign callback for mouse for debug UI.
@@ -5,6 +6,7 @@
 -Sprites!
 -RTT (add priority to renderview, RTTs are automatically rendered before window framebuffers)
 -Multi-texturing
+-Instanced rendering - for static objects (maybe static nodes?)
 -Polish resource cloning
 -Normal mapping
 -Lua scripting system, callbacks into bound lua scripts to nodes/scenes.
@@ -18,6 +20,10 @@
 -Particle systems
 -Compositors: visualize depth buffer (https://learnopengl.com/#!Advanced-OpenGL/Depth-testing)
 -Modify memory pool to use raw uint8_t buffers, get rid of reset() functions; use default copy for each pool
+-Box select of AABBs
 
----
+--- Optimization ---
+-TODO: Optimize text rendering to use a single texture, allow unicode.
+
+--- 3D ---
 -For rotating text: https://github.com/0xc0dec/stb-truetype-examples/blob/master/Example1.cpp

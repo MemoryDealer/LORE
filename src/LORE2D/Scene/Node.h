@@ -51,6 +51,8 @@ namespace Lore {
     using ConstChildNodeIterator = NodeMap::ConstIterator;
     using EntityList = Registry<std::map, Entity>;
     using EntityListConstIterator = EntityList::ConstIterator;
+    using TextboxList = Registry<std::map, Textbox>;
+    using TextboxListConstIterator = TextboxList::ConstIterator;
     using LightList = std::vector<LightPtr>;
     using CameraList = std::vector<CameraPtr>;
 
@@ -105,11 +107,16 @@ namespace Lore {
 
     void attachObject( LightPtr l );
 
-    //void attachObject( TextPtr t );
+    void attachObject( TextboxPtr t );
 
     inline EntityListConstIterator getEntityListConstIterator() const
     {
       return _entities.getConstIterator();
+    }
+
+    inline TextboxListConstIterator getTextboxListConstIterator() const
+    {
+      return _textboxes.getConstIterator();
     }
 
     //
@@ -226,19 +233,21 @@ namespace Lore {
 
   private:
 
-    Transform _transform { };
+    Transform _transform {};
 
     real _depth { 0.f };
 
-    EntityList _entities { };
+    EntityList _entities {};
+
+    TextboxList _textboxes {};
 
     // The creator of this node.
     ScenePtr _scene { nullptr };
 
     NodePtr _parent { nullptr };
-    NodeMap _childNodes { };
+    NodeMap _childNodes {};
 
-    LightList _lights { };
+    LightList _lights {};
   };
 
 }

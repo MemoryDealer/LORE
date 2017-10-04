@@ -179,12 +179,14 @@ void StockResourceController::createStockResources()
   // Font stock resources.
 
   {
-    _controller->loadFont( "Default", "res/fonts/retro.ttf", 48 );
+    _controller->loadFont( "Default", "res/fonts/sega.ttf", 128 );
   }
 
   {
-    // Generate shaders for text rendering.
+    // Generate shaders and vertex buffer for text rendering.
     createTextProgram( "StandardText" );
+    auto vb = _controller->createVertexBuffer( "StandardText", MeshType::Text );
+    vb->build();
   }
 }
 

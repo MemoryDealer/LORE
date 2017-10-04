@@ -29,8 +29,10 @@
 #include <LORE2D/Math/Math.h>
 #include <LORE2D/Resource/Entity.h>
 #include <LORE2D/Renderer/IRenderAPI.h>
+#include <LORE2D/Resource/Font.h>
 #include <LORE2D/Resource/Mesh.h>
 #include <LORE2D/Resource/Renderable/Texture.h>
+#include <LORE2D/Resource/Renderable/Textbox.h>
 #include <LORE2D/Resource/StockResource.h>
 #include <LORE2D/Scene/Camera.h>
 #include <LORE2D/Scene/Light.h>
@@ -64,6 +66,7 @@ void GenericRenderer::addRenderData( Lore::EntityPtr e,
   const uint queueId = e->getRenderQueue();
   const bool blended = e->getMaterial()->blendingMode.enabled;
 
+  // TODO: Fix two lookups here.
   // Add this queue to the active queue list if not already there.
   activateQueue( queueId, _queues[queueId] );
 
@@ -98,6 +101,24 @@ void GenericRenderer::addRenderData( Lore::EntityPtr e,
 
     renderData.push_back( rd );
   }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GenericRenderer::addTextbox( Lore::TextboxPtr textbox,
+                                  const Lore::Matrix4& transform )
+{
+  const uint queueId = textbox->getRenderQueue();
+
+  activateQueue( queueId, _queues[queueId] );
+
+  RenderQueue& queue = _queues.at( queueId );
+
+  RenderQueue::TextboxData data;
+  data.textbox = textbox;
+  data.model = transform;
+
+  queue.textboxes.push_back( data );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -137,6 +158,9 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
 
     // Render transparents.
     renderTransparents( rv.scene, queue.transparents, viewProjection );
+
+    // Render text.
+    renderTextboxes( queue.textboxes, viewProjection );
   }
 
   _clearRenderQueues();
@@ -150,6 +174,7 @@ void GenericRenderer::_clearRenderQueues()
   for ( auto& queue : _queues ) {
     queue.solids.clear();
     queue.transparents.clear();
+    queue.textboxes.clear();
   }
 
   // Erase all queues from the active queue list.
@@ -371,6 +396,52 @@ void GenericRenderer::renderTransparents( const Lore::ScenePtr scene,
 
   }
 
+  _api->setBlendingEnabled( false );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GenericRenderer::renderTextboxes( RenderQueue::TextboxList& textboxes,
+                                       const Matrix4& proj ) const
+{
+  _api->setBlendingEnabled( true );
+  _api->setBlendingFunc( Material::BlendFactor::SrcAlpha, Material::BlendFactor::OneMinusSrcAlpha );
+
+  GPUProgramPtr program = StockResource::GetGPUProgram( "StandardText" );
+  VertexBufferPtr vb = StockResource::GetVertexBuffer( "StandardText" );
+
+  program->use();
+  vb->bind();
+
+  for ( auto& data : textboxes ) {
+    TextboxPtr textbox = data.textbox;
+    string text = textbox->getText();
+    FontPtr font = textbox->getFont();
+
+    // TODO: Use a better design for this relationship.
+    program->setUniformVar( "color", textbox->getTextColor() );
+    program->setUniformVar( "projection", proj );
+
+    // Render each character.
+    real x = data.model[3][0];
+    const real y = data.model[3][1];
+    const real scale = 1.f;
+    for ( auto c = text.begin(); c != text.end(); ++c ) {
+      // Generate vertices to draw glyph and bind its associated texture.
+      auto vertices = font->generateVertices( *c,
+                                              x,
+                                              y,
+                                              scale );
+      font->bindTexture( *c );
+
+      vb->draw( vertices );
+
+      x = font->advanceGlyphX( *c, x, scale );
+    }
+
+  }
+
+  vb->unbind();
   _api->setBlendingEnabled( false );
 }
 

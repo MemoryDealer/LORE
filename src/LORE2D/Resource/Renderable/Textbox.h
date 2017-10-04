@@ -1,3 +1,4 @@
+#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -24,17 +25,87 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Texture.h"
+#include <LORE2D/Memory/Alloc.h>
+#include <LORE2D/Resource/Renderable/Renderable.h>
+#include <LORE2D/Renderer/Renderer.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-using namespace Lore;
+namespace Lore {
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+  class LORE_EXPORT Textbox : public Renderable,
+                              public Alloc<Textbox>
+  {
 
-Texture::Texture()
-{
-    _type = Renderable::Type::Texture;
+    LORE_OBJECT_BODY()
+
+  public:
+
+    Textbox()
+    {
+      _type = Renderable::Type::Textbox;
+    }
+
+    virtual ~Textbox() override = default;
+
+    // TODO: Add "typed" text effect where each letter appears over time at certain rate.
+    // Add solid/blended box behind text and border.
+
+    //
+    // Setters.
+
+    void setText( const string& text )
+    {
+      _text = text;
+    }
+
+    void setFont( FontPtr font )
+    {
+      _font = font;
+    }
+
+    void setTextColor( const Color& color )
+    {
+      _textColor = color;
+    }
+
+    //
+    // Getters.
+
+    string getText() const
+    {
+      return _text;
+    }
+
+    FontPtr getFont() const
+    {
+      return _font;
+    }
+
+    uint32_t getRenderQueue() const
+    {
+      return _renderQueue;
+    }
+
+    Color getTextColor() const
+    {
+      return _textColor;
+    }
+
+  private:
+
+    virtual void _reset() override
+    { }
+
+  private:
+
+    FontPtr _font { nullptr };
+    string _text {};
+    Color _textColor { StockColor::White };
+    uint32_t _renderQueue { RenderQueue::General };
+
+  };
+
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

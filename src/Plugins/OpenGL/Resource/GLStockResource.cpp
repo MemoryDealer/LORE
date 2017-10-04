@@ -447,7 +447,7 @@ Lore::GPUProgramPtr StockResourceController::createTextProgram( const string& na
   src += "out vec4 pixel;";
   
   src += "uniform sampler2D text;";
-  src += "uniform vec3 color;";
+  src += "uniform vec4 color;";
 
   //
   // main function.
@@ -455,7 +455,7 @@ Lore::GPUProgramPtr StockResourceController::createTextProgram( const string& na
   src += "void main() {";
 
   src += "vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, TexCoords).r);";
-  src += "pixel = vec4(color, 1.0) * sampled;";
+  src += "pixel = color * sampled;";
 
   src += "}";
 

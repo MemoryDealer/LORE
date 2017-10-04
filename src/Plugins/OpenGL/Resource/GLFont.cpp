@@ -35,6 +35,15 @@ using namespace Lore::OpenGL;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+namespace LocalNS {
+
+  constexpr auto ScaleFactor = 0.001f;
+
+}
+using namespace LocalNS;
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void GLFont::loadFromFile( const string& file, const uint32_t size )
 {
   FT_Library ft;
@@ -76,8 +85,8 @@ void GLFont::loadFromFile( const string& file, const uint32_t size )
                   GL_UNSIGNED_BYTE,
                   face->glyph->bitmap.buffer );
 
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
@@ -98,6 +107,49 @@ void GLFont::loadFromFile( const string& file, const uint32_t size )
   // Clean up FT resources.
   FT_Done_Face( face );
   FT_Done_FreeType( ft );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Lore::VertexBuffer::Vertices GLFont::generateVertices( const char c,
+                                                       const real x,
+                                                       const real y,
+                                                       const real scale )
+{
+  const Glyph& glyph = _glyphs.at( c );
+
+  const GLfloat xpos = x + glyph.bearing.x * scale * ScaleFactor;
+  const GLfloat ypos = y - ( glyph.size.y - glyph.bearing.y ) * scale * ScaleFactor;
+  const GLfloat w = glyph.size.x * scale * ScaleFactor;
+  const GLfloat h = glyph.size.y * scale * ScaleFactor;
+
+  Lore::VertexBuffer::Vertices vertices = {
+    xpos, ypos + h, 0.f, 0.f,
+    xpos, ypos,     0.f, 1.f,
+    xpos + w, ypos, 1.f, 1.f,
+    xpos, ypos + h, 0.f, 0.f,
+    xpos + w, ypos, 1.f, 1.f,
+    xpos + w, ypos + h, 1.f, 0.f
+  };
+
+  // Copy will be avoided with RVO.
+  return vertices;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLFont::bindTexture( const char c )
+{
+  const Glyph& glyph = _glyphs.at( c );
+  glBindTexture( GL_TEXTURE_2D, glyph.textureID );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+real GLFont::advanceGlyphX( const char c, const real x, const real scale )
+{
+  const Glyph& glyph = _glyphs.at( c );
+  return x + ( glyph.advance >> 6 ) * ( scale * ScaleFactor ) + 0.01f;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

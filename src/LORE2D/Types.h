@@ -52,6 +52,7 @@ namespace Lore {
   class Scene;
   class Shader;
   class StockResourceController;
+  class Textbox;
   class Texture;
   class VertexBuffer;
   class Window;
@@ -77,6 +78,7 @@ namespace Lore {
   using ScenePtr = Scene*;
   using ShaderPtr = Shader*;
   using StockResourceControllerPtr = StockResourceController*;
+  using TextboxPtr = Textbox*;
   using TexturePtr = Texture*;
   using VertexBufferPtr = VertexBuffer*;
   using WindowPtr = Window*;

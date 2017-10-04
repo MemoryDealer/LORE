@@ -27,6 +27,8 @@
 
 #include <LORE2D/Memory/Alloc.h>
 
+#include <LORE2D/Shader/VertexBuffer.h>
+
 namespace Lore {
 
   class LORE_EXPORT Font
@@ -41,6 +43,15 @@ namespace Lore {
     virtual ~Font() = default;
 
     virtual void loadFromFile( const string& file, const uint32_t size ) = 0;
+
+    virtual VertexBuffer::Vertices generateVertices( const char c,
+                                                     const real x,
+                                                     const real y,
+                                                     const real scale ) = 0;
+
+    virtual void bindTexture( const char c ) = 0;
+
+    virtual real advanceGlyphX( const char c, const real x, const real scale ) = 0;
 
   };
 

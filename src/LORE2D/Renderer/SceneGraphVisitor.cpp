@@ -76,6 +76,12 @@ void SceneGraphVisitor::visit( Renderer* renderer, bool parentDirty )
     renderer->addRenderData( entity, _node );
   }
 
+  auto textboxIt = _node->getTextboxListConstIterator();
+  while ( textboxIt.hasMore() ) {
+    TextboxPtr textbox = textboxIt.getNext();
+    renderer->addTextbox( textbox, _node->getFullTransform() );
+  }
+
   // Recurse over children.
   if ( _node->hasChildNodes() ) {
     // Push this node's transform onto the stack, so the next call can
