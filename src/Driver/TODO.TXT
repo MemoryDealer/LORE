@@ -1,12 +1,13 @@
 --- Features ---
--Text rendering, FPS/frametime display
+-FPS/frametime display
+-Rename resource controller to ResourceCenter?
 -Debug tools - view memory pools for each type, hover over to view details
 -UI class; add elements in [0.0, 1.0] range. Text and boxes. Allow scrolling offsets to out of range. Can assign callback for mouse for debug UI.
 -Resource file location indexing for easy reloading (see ResourceController.h).
 -Sprites!
 -RTT (add priority to renderview, RTTs are automatically rendered before window framebuffers)
 -Multi-texturing
--Instanced rendering - for static objects (maybe static nodes?)
+-Instanced rendering - for static objects (maybe static nodes - StaticNodeBlock)
 -Polish resource cloning
 -Normal mapping
 -Lua scripting system, callbacks into bound lua scripts to nodes/scenes.
@@ -21,6 +22,7 @@
 -Compositors: visualize depth buffer (https://learnopengl.com/#!Advanced-OpenGL/Depth-testing)
 -Modify memory pool to use raw uint8_t buffers, get rid of reset() functions; use default copy for each pool
 -Box select of AABBs
+-Grid rendering
 
 --- Optimization ---
 -TODO: Optimize text rendering to use a single texture, allow unicode.

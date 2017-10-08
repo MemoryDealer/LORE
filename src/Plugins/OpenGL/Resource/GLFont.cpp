@@ -58,7 +58,7 @@ void GLFont::loadFromFile( const string& file, const uint32_t size )
     throw Lore::Exception( "FREETYPE: Unable to load font " + file );
   }
 
-  FT_Set_Pixel_Sizes( face, 0, size );
+  FT_Set_Pixel_Sizes( face, 0, size * 8 );
 
   //
   // Generate glyph textures for each desired character using font.
@@ -149,7 +149,7 @@ void GLFont::bindTexture( const char c )
 real GLFont::advanceGlyphX( const char c, const real x, const real scale )
 {
   const Glyph& glyph = _glyphs.at( c );
-  return x + ( glyph.advance >> 6 ) * ( scale * ScaleFactor ) + 0.01f;
+  return x + ( glyph.advance >> 6 ) * ( scale * ScaleFactor ) + 0.005f;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

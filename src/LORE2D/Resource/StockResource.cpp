@@ -179,7 +179,7 @@ void StockResourceController::createStockResources()
   // Font stock resources.
 
   {
-    _controller->loadFont( "Default", "res/fonts/sega.ttf", 128 );
+    _controller->loadFont( "Default", "res/fonts/default.ttf", 12 );
   }
 
   {
