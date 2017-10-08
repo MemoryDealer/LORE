@@ -29,6 +29,7 @@
 #include <LORE2D/Core/Context.h>
 #include <LORE2D/Resource/Entity.h>
 #include <LORE2D/Resource/StockResource.h>
+#include <LORE2D/Resource/Renderable/Textbox.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -172,6 +173,18 @@ CameraPtr ResourceController::createCamera( const string& name, const string& gr
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+TextboxPtr ResourceController::createTextbox( const string& name, const string& groupName )
+{
+  auto textbox = MemoryAccess::GetPrimaryPoolCluster()->create<Textbox>();
+  textbox->setName( name );
+  textbox->setFont( Lore::StockResource::GetFont( "Default" ) );
+
+  _getGroup( groupName )->textboxes.insert( name, textbox );
+  return textbox;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 EntityPtr ResourceController::createEntity( const string& name, const string& groupName )
 {
   return createEntity( name, MeshType::Custom, groupName );
@@ -235,6 +248,13 @@ VertexBufferPtr ResourceController::getVertexBuffer( const string& name, const s
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+FontPtr ResourceController::getFont( const string& name, const string& groupName )
+{
+  return _getGroup( groupName )->fonts.get( name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 ResourceGroupPtr ResourceController::_getGroup( const string& groupName )
@@ -255,6 +275,13 @@ ResourceGroupPtr ResourceController::_getGroup( const string& groupName )
 TexturePtr Resource::LoadTexture( const string& name, const string& file, const string& groupName )
 {
   return ActiveContext->getResourceController()->loadTexture( name, file, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+FontPtr Resource::LoadFont( const string& name, const string& file, const uint32_t size, const string& groupName )
+{
+  return ActiveContext->getResourceController()->loadFont( name, file, size, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -315,6 +342,13 @@ CameraPtr Resource::CreateCamera( const string& name, const string& groupName )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+TextboxPtr Resource::CreateTextbox( const string& name, const string& groupName )
+{
+  return ActiveContext->getResourceController()->createTextbox( name, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 EntityPtr Resource::CreateEntity( const string& name, const MeshType& meshType, const string& groupName )
 {
   return ActiveContext->getResourceController()->createEntity( name, meshType, groupName );
@@ -353,6 +387,13 @@ MaterialPtr Resource::GetMaterial( const string& name, const string& groupName )
 TexturePtr Resource::GetTexture( const string& name, const string& groupName )
 {
   return ActiveContext->getResourceController()->getTexture( name, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+FontPtr Resource::GetFont( const string& name, const string& groupName )
+{
+  return ActiveContext->getResourceController()->getFont( name, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

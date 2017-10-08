@@ -72,15 +72,23 @@ namespace Lore {
     {
       MaterialPtr material { nullptr };
       VertexBufferPtr vertexBuffer { nullptr };
-      Matrix4 model;
+      Matrix4 model {};
+    };
+
+    struct TextboxData
+    {
+      TextboxPtr textbox { nullptr };
+      Matrix4 model {};
     };
 
     // Every Material maps to a list of RenderData.
     using EntityDataMap = std::map<EntityData, RenderDataList>;
     using TransparentDataMap = std::multimap<real, Transparent>;
+    using TextboxList = std::vector<TextboxData>;
 
-    EntityDataMap solids { };
-    TransparentDataMap transparents { };
+    EntityDataMap solids {};
+    TransparentDataMap transparents {};
+    TextboxList textboxes {};
 
   };
 
@@ -103,6 +111,9 @@ namespace Lore {
     ///     called when a Renderable is attached to a Node.
     virtual void addRenderData( Lore::EntityPtr e,
                                 Lore::NodePtr node ) = 0;
+
+    virtual void addTextbox( Lore::TextboxPtr textbox,
+                             const Lore::Matrix4& transform ) = 0;
 
     ///
     /// \brief Uses internal Renderable lists to create a frame buffer using

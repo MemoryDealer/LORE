@@ -45,6 +45,8 @@ namespace Lore {
             Float
         };
 
+        using Vertices = std::vector<real>;
+
     public:
 
         VertexBuffer();
@@ -60,6 +62,8 @@ namespace Lore {
         virtual void unbind() = 0;
 
         virtual void draw() = 0;
+
+        virtual void draw( const Vertices& verts ) = 0;
 
     private:
 

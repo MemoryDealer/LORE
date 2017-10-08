@@ -59,6 +59,7 @@ void GLVertexBuffer::init( const Lore::MeshType& type )
 
   default:
   case MeshType::Custom:
+  case MeshType::Text:
     _mode = GL_TRIANGLES;
     break;
 
@@ -111,6 +112,20 @@ void GLVertexBuffer::build()
     addAttribute( AttributeType::Float, 2 );
     addAttribute( AttributeType::Float, 2 );
     break;
+
+  case MeshType::Text:
+    // Text VBs are a special case and require dynamic drawing.
+    glGenVertexArrays( 1, &_vao );
+    glGenBuffers( 1, &_vbo );
+    glBindVertexArray( _vao );
+    glBindBuffer( GL_ARRAY_BUFFER, _vbo );
+    glBufferData( GL_ARRAY_BUFFER, sizeof( GLfloat ) * 6 * 4, nullptr, GL_DYNAMIC_DRAW );
+    glEnableVertexAttribArray( 0 );
+    glVertexAttribPointer( 0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof( GLfloat ), 0 );
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    glBindVertexArray( 0 );
+    _attributes.clear();
+    return; // Early return for special case.
   }
 
   glGenVertexArrays( 1, &_vao );
@@ -188,6 +203,17 @@ void GLVertexBuffer::unbind()
 void GLVertexBuffer::draw()
 {
   glDrawElements( _mode, static_cast< GLsizei >( _indices.size() ), GL_UNSIGNED_INT, 0 );
+}
+
+void GLVertexBuffer::draw( const Lore::VertexBuffer::Vertices& verts )
+{
+  assert( MeshType::Text == _type );
+
+  glBindBuffer( GL_ARRAY_BUFFER, _vbo );
+  glBufferSubData( GL_ARRAY_BUFFER, 0, verts.size() * sizeof(real), verts.data() );
+  glBindBuffer( GL_ARRAY_BUFFER, 0 );
+
+  glDrawArrays( GL_TRIANGLES, 0, 6 );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

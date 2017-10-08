@@ -26,8 +26,6 @@
 
 #include <memory>
 #include <LORE2D/Lore.h>
-#include <LORE2D/Scene/Background.h>
-#include <LORE2D/Resource/Renderable/Texture.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // Note: Error 1282 on binding calls with no prior errors indicates a wrong context.
@@ -114,6 +112,15 @@ int main( int argc, char** argv )
     node->setPosition( -1.f - static_cast< float >( i ) / 2.f, 0.f );
   }
 
+  // Create floating text.
+
+  auto textNode = scene->createNode( "text1" );
+  auto textbox = Lore::Resource::CreateTextbox( "text1" );
+  auto font = Lore::Resource::LoadFont( "Sega", "res/fonts/sega.ttf", 14 );
+  textbox->setFont( font );
+  textbox->setText( "SEGA" );
+  textNode->attachObject( textbox );
+
   //
   // Create background.
 
@@ -183,6 +190,12 @@ int main( int argc, char** argv )
 
     // TODO: Repro case where both quads appeared to be scaling with only rotations being done.
     //node->getChild( "AChild" )->rotate( Lore::Degree( -.1f ) );
+
+    {
+      static float sin = 0.f;
+      textNode->setPosition( 0.f, std::sinf( sin ) * 0.5f );
+      sin += 0.01f;
+    }
 
     for ( auto doge : doges ) {
       doge->rotate( Lore::Degree( .1f ) );

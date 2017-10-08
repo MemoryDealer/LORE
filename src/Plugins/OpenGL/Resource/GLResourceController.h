@@ -42,6 +42,8 @@ namespace Lore { namespace OpenGL {
 
         virtual TexturePtr loadTexture( const string& name, const string& file, const string& groupName = DefaultGroupName ) override;
 
+        virtual FontPtr loadFont( const string& name, const string& file, const uint32_t size, const string& groupName = DefaultGroupName ) override;
+
         virtual GPUProgramPtr createGPUProgram( const string& name, const string& groupName = DefaultGroupName ) override;
 
         virtual ShaderPtr createVertexShader( const string& name, const string& groupName = DefaultGroupName ) override;

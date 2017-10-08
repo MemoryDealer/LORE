@@ -29,6 +29,7 @@
 #include <LORE2D/Resource/Material.h>
 #include <LORE2D/Scene/Camera.h>
 
+#include <Plugins/OpenGL/Resource/GLFont.h>
 #include <Plugins/OpenGL/Resource/GLStockResource.h>
 #include <Plugins/OpenGL/Resource/Renderable/GLTexture.h>
 #include <Plugins/OpenGL/Shader/GLGPUProgram.h>
@@ -42,7 +43,7 @@ using namespace Lore::OpenGL;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 ResourceController::ResourceController()
-: Lore::ResourceController()
+  : Lore::ResourceController()
 {
 }
 
@@ -56,111 +57,124 @@ ResourceController::~ResourceController()
 
 Lore::TexturePtr ResourceController::loadTexture( const string& name, const string& file, const string& groupName )
 {
-    auto texture = MemoryAccess::GetPrimaryPoolCluster()->create<Texture, GLTexture>();
-    texture->setName( name );
-    texture->setResourceGroupName( groupName );
-    texture->loadFromFile( file );
+  auto texture = MemoryAccess::GetPrimaryPoolCluster()->create<Texture, GLTexture>();
+  texture->setName( name );
+  texture->setResourceGroupName( groupName );
+  texture->loadFromFile( file );
 
-    _getGroup( groupName )->textures.insert( name, texture );
-    return texture;
+  _getGroup( groupName )->textures.insert( name, texture );
+  return texture;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Lore::FontPtr ResourceController::loadFont( const string& name, const string& file, const uint32_t size, const string& groupName )
+{
+  auto font = MemoryAccess::GetPrimaryPoolCluster()->create<Font, GLFont>();
+  font->setName( name );
+  font->setResourceGroupName( groupName );
+  font->loadFromFile( file, size );
+
+  _getGroup( groupName )->fonts.insert( name, font );
+  return font;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Lore::GPUProgramPtr ResourceController::createGPUProgram( const string& name, const string& groupName )
 {
-    auto program = MemoryAccess::GetPrimaryPoolCluster()->create<GPUProgram, GLGPUProgram>();
-    program->setName( name );
-    program->setResourceGroupName( groupName );
-    program->init();
+  auto program = MemoryAccess::GetPrimaryPoolCluster()->create<GPUProgram, GLGPUProgram>();
+  program->setName( name );
+  program->setResourceGroupName( groupName );
+  program->init();
 
-    _getGroup( groupName )->programs.insert( name, program );
-    return program;
+  _getGroup( groupName )->programs.insert( name, program );
+  return program;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Lore::ShaderPtr ResourceController::createVertexShader( const string& name, const string& groupName )
 {
-    auto shader = MemoryAccess::GetPrimaryPoolCluster()->create<Shader, GLShader>();
-    shader->setName( name );
-    shader->setResourceGroupName( groupName );
-    shader->init( Shader::Type::Vertex );
+  auto shader = MemoryAccess::GetPrimaryPoolCluster()->create<Shader, GLShader>();
+  shader->setName( name );
+  shader->setResourceGroupName( groupName );
+  shader->init( Shader::Type::Vertex );
 
-    _getGroup( groupName )->vertexShaders.insert( name, shader );
-    return shader;
+  _getGroup( groupName )->vertexShaders.insert( name, shader );
+  return shader;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Lore::ShaderPtr ResourceController::createFragmentShader( const string& name, const string& groupName )
 {
-    auto shader = MemoryAccess::GetPrimaryPoolCluster()->create<Shader, GLShader>();
-    shader->setName( name );
-    shader->setResourceGroupName( groupName );
-    shader->init( Shader::Type::Fragment );
+  auto shader = MemoryAccess::GetPrimaryPoolCluster()->create<Shader, GLShader>();
+  shader->setName( name );
+  shader->setResourceGroupName( groupName );
+  shader->init( Shader::Type::Fragment );
 
-    _getGroup( groupName )->fragmentShaders.insert( name, shader );
-    return shader;
+  _getGroup( groupName )->fragmentShaders.insert( name, shader );
+  return shader;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Lore::VertexBufferPtr ResourceController::createVertexBuffer( const string& name, const Lore::MeshType& type, const string& groupName )
 {
-    auto vb = MemoryAccess::GetPrimaryPoolCluster()->create<VertexBuffer, GLVertexBuffer>();
-    vb->setName( name );
-    vb->setResourceGroupName( groupName );
-    vb->init( type );
+  auto vb = MemoryAccess::GetPrimaryPoolCluster()->create<VertexBuffer, GLVertexBuffer>();
+  vb->setName( name );
+  vb->setResourceGroupName( groupName );
+  vb->init( type );
 
-    _getGroup( groupName )->vertexBuffers.insert( name, vb );
+  _getGroup( groupName )->vertexBuffers.insert( name, vb );
 
-    // If this vertex buffer is a stock type, index it in the hash table.
-    // TODO: Clean this up, stock resources should not mix in here.
-    switch ( type ) {
+  // If this vertex buffer is a stock type, index it in the hash table.
+  // TODO: Clean this up, stock resources should not mix in here.
+  switch ( type ) {
 
-    default:
-        break;
+  default:
+    break;
 
-    case MeshType::Quad:
-    case MeshType::TexturedQuad:
-        _vertexBufferTable.insert( { type, vb } );
-        break;
+  case MeshType::Quad:
+  case MeshType::TexturedQuad:
+    _vertexBufferTable.insert( { type, vb } );
+    break;
 
-    }
+  }
 
-    return vb;
+  return vb;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Lore::TexturePtr ResourceController::createTexture( const string& name, const string& groupName )
 {
-    auto texture = MemoryAccess::GetPrimaryPoolCluster()->create<Texture, GLTexture>();
-    texture->setName( name );
+  auto texture = MemoryAccess::GetPrimaryPoolCluster()->create<Texture, GLTexture>();
+  texture->setName( name );
 
-    _getGroup( groupName )->textures.insert( name, texture );
-    return texture;
+  _getGroup( groupName )->textures.insert( name, texture );
+  return texture;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void ResourceController::destroyTexture( Lore::TexturePtr texture )
 {
-    auto groupName = texture->getResourceGroupName();
-    _getGroup( groupName )->textures.remove( texture->getName() );
+  auto groupName = texture->getResourceGroupName();
+  _getGroup( groupName )->textures.remove( texture->getName() );
 
-    MemoryAccess::GetPrimaryPoolCluster()->destroy<Texture, GLTexture>( texture );
+  MemoryAccess::GetPrimaryPoolCluster()->destroy<Texture, GLTexture>( texture );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void ResourceController::destroyTexture( const string& name, const string& groupName )
 {
-    auto texture = _getGroup( groupName )->textures.get( name );
-    if ( texture ) {
-        destroyTexture( texture );
-    }
+  auto texture = _getGroup( groupName )->textures.get( name );
+  if ( texture ) {
+    destroyTexture( texture );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -38,6 +38,7 @@ namespace Lore {
   class Camera;
   class Context;
   class Entity;
+  class Font;
   class GPUProgram;
   class Renderer;
   class Material;
@@ -51,6 +52,7 @@ namespace Lore {
   class Scene;
   class Shader;
   class StockResourceController;
+  class Textbox;
   class Texture;
   class VertexBuffer;
   class Window;
@@ -61,6 +63,7 @@ namespace Lore {
   using BackgroundPtr = Background*;
   using CameraPtr = Camera*;
   using ContextPtr = Context*;
+  using FontPtr = Font*;
   using EntityPtr = Entity*;
   using GPUProgramPtr = GPUProgram*;
   using LightPtr = Light*;
@@ -75,6 +78,7 @@ namespace Lore {
   using ScenePtr = Scene*;
   using ShaderPtr = Shader*;
   using StockResourceControllerPtr = StockResourceController*;
+  using TextboxPtr = Textbox*;
   using TexturePtr = Texture*;
   using VertexBufferPtr = VertexBuffer*;
   using WindowPtr = Window*;

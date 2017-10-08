@@ -32,6 +32,7 @@
 #include <LORE2D/Renderer/SceneGraphVisitor.h>
 #include <LORE2D/Resource/Entity.h>
 #include <LORE2D/Resource/StockResource.h>
+#include <LORE2D/Resource/Renderable/Textbox.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -67,14 +68,15 @@ Context::~Context()
 void Context::initConfiguration()
 {
   // Setup default memory pool settings.
-  _poolCluster.registerPool<Background>( 32 );
-  _poolCluster.registerPool<Camera>( 32 );
-  _poolCluster.registerPool<Entity>( 32 );
-  _poolCluster.registerPool<Light>( 64 );
+  _poolCluster.registerPool<Background>( 16 );
+  _poolCluster.registerPool<Camera>( 16 );
+  _poolCluster.registerPool<Entity>( 16 );
+  _poolCluster.registerPool<Light>( 32 );
   _poolCluster.registerPool<Material>( 32 );
-  _poolCluster.registerPool<Mesh>( 32 );
+  _poolCluster.registerPool<Mesh>( 8 );
   _poolCluster.registerPool<Node>( 1024 );
-  _poolCluster.registerPool<Scene>( 32 );
+  _poolCluster.registerPool<Scene>( 4 );
+  _poolCluster.registerPool<Textbox>( 32 );
 
   // TODO: Parse pool settings from cfg file (Lua).
 }

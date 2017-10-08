@@ -6,7 +6,8 @@ targetdir "../bin/%{cfg.buildcfg}/Run"
 objdir "../bin/%{cfg.buildcfg}/Obj"
 debugdir "../bin/%{cfg.buildcfg}/Run"
 
-includedirs { ".", "%{prj.location}", "%{sln.location}/Plugins/ThirdParty" }
+includedirs { ".", "%{prj.location}", "%{sln.location}/Plugins/ThirdParty", "%{sln.location}/External",
+               "%{sln.location}/External/freetype2" }
 libdirs { "../lib/x64/%{cfg.buildcfg}" }
 architecture "x86_64"
 characterset ( "MBCS" )
@@ -56,7 +57,7 @@ project "Plugin_OpenGL"
     files {
         "Plugins/OpenGL/**.h", "Plugins/OpenGL/**.cpp",
     }
-    links { "LORE2D", "glfw3dll", "glad" }
+    links { "LORE2D", "glfw3dll", "glad", "freetype" }
     postbuildcommands { "xcopy ..\\..\\..\\lib\\x64\\%{cfg.buildcfg}\\*.dll ..\\..\\..\\bin\\%{cfg.buildcfg}\\Run\\ /Y" }
     
 project "glad"
@@ -72,7 +73,8 @@ project "Driver"
     kind "ConsoleApp"
     language "C++"
     files {
-        "Driver/**.cpp"
+        "Driver/**.cpp",
+        "Driver/TODO.TXT"
     }
     links { "LORE2D" }
     

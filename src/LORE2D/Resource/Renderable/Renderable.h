@@ -27,40 +27,43 @@
 
 namespace Lore {
 
-    class LORE_EXPORT Renderable
+  class LORE_EXPORT Renderable
+  {
+
+    LORE_OBJECT_BODY()
+
+  public:
+
+    enum class Type
     {
-
-        LORE_OBJECT_BODY()
-
-    public:
-
-        enum class Type
-        {
-            Unknown,
-            Texture,
-            Sprite
-        };
-
-    public:
-
-        inline Renderable()
-        : _type( Type::Unknown )
-        { }
-
-        inline virtual ~Renderable() { }
-
-        virtual void bind() = 0;
-
-        inline Type getType() const
-        {
-            return _type;
-        }
-
-    protected:
-
-        Type _type;
-
+      Unknown,
+      Texture,
+      Sprite,
+      Textbox
     };
+
+  public:
+
+    inline Renderable()
+      : _type( Type::Unknown )
+    {
+    }
+
+    inline virtual ~Renderable() = default;
+
+    // TODO: This class may not even be necessary. Flesh out a design for this.
+    virtual void bind() { }
+
+    inline Type getType() const
+    {
+      return _type;
+    }
+
+  protected:
+
+    Type _type;
+
+  };
 
 }
 
