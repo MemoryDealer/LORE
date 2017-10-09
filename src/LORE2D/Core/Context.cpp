@@ -85,13 +85,6 @@ void Context::initConfiguration()
 
 void Context::renderFrame( const real lagMultiplier )
 {
-  // Update all scenes for this frame.
-  auto sceneIt = _sceneRegistry.getIterator();
-  while ( sceneIt.hasMore() ) {
-    ScenePtr scene = sceneIt.getNext();
-    scene->updateSceneGraph();
-  }
-
   _frameListenerController->frameStarted();
 
   // Render all RenderViews for each window.

@@ -67,6 +67,11 @@ namespace Lore {
                               const uint32_t height ) = 0;
 
     //
+    // Framebuffers.
+
+    virtual void bindDefaultFramebuffer() = 0;
+
+    //
     // Depth testing.
 
     virtual void setDepthTestEnabled( const bool enabled ) = 0;
@@ -77,6 +82,14 @@ namespace Lore {
     virtual void setBlendingEnabled( const bool enabled ) = 0;
 
     virtual void setBlendingFunc( const Material::BlendFactor& src, const Material::BlendFactor& dst ) = 0;
+
+    //
+    // Debugging.
+#ifdef _DEBUG
+    
+    virtual void getLastError( const string& prefix = "" ) = 0;
+
+#endif
 
   };
 

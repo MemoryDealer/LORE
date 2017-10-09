@@ -37,6 +37,7 @@
 #include <LORE2D/Shader/GPUProgram.h>
 #include <LORE2D/Shader/Shader.h>
 #include <LORE2D/Shader/VertexBuffer.h>
+#include <LORE2D/Window/RenderTarget.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -112,6 +113,9 @@ namespace Lore {
 
     Registry<std::unordered_map, Textbox> textboxes {};
 
+    // Render targets.
+    Registry<std::unordered_map, RenderTarget> renderTargets {};
+
   };
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -160,7 +164,11 @@ namespace Lore {
 
     virtual VertexBufferPtr createVertexBuffer( const string& name, const MeshType& type, const string& groupName = DefaultGroupName ) = 0;
 
-    virtual TexturePtr createTexture( const string& name, const string& groupName = DefaultGroupName ) = 0;
+    virtual TexturePtr createTexture( const string& name, const uint32_t width, const uint32_t height, const string& groupName = DefaultGroupName ) = 0;
+
+    virtual TexturePtr createTexture( const string& name, const uint32_t width, const uint32_t height, const Color& color, const string& groupName = DefaultGroupName ) = 0;
+
+    virtual RenderTargetPtr createRenderTarget( const string& name, const uint32_t width, const uint32_t height, const string& groupName = DefaultGroupName ) = 0;
 
     //
     // Factory functions (non-virtual).
@@ -253,7 +261,9 @@ namespace Lore {
 
     static MeshPtr CreateMesh( const string& name, const MeshType& meshType, const string& groupName = ResourceController::DefaultGroupName );
 
-    static TexturePtr CreateTexture( const string& name, const string& groupName = ResourceController::DefaultGroupName );
+    static TexturePtr CreateTexture( const string& name, const uint32_t width, const uint32_t height, const string& groupName = ResourceController::DefaultGroupName );
+
+    static RenderTargetPtr CreateRenderTarget( const string& name, const uint32_t width, const uint32_t height, const string& groupName = ResourceController::DefaultGroupName );
 
     static CameraPtr CreateCamera( const string& name, const string& groupName = ResourceController::DefaultGroupName );
 

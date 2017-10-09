@@ -67,6 +67,7 @@ int main( int argc, char** argv )
   Lore::CameraPtr camera = Lore::Resource::CreateCamera( "cam1" );
   Lore::RenderView rv( "main", scene, vp );
   rv.camera = camera;
+  //rv.renderTarget = Lore::Resource::CreateRenderTarget( "rt1", 1920, 1080 );
   window->addRenderView( rv );
 
   //
@@ -180,6 +181,32 @@ int main( int argc, char** argv )
 
   n->setColorModifier( Lore::Color( 1.f - static_cast< Lore::real >( i * .1f ), 1.f, 1.f ) );
   }*/
+
+  // ---
+
+  // RTT.
+
+  /*Lore::ScenePtr postScene = context->createScene( "pp" );
+  Lore::CameraPtr postCamera = Lore::Resource::CreateCamera( "postCam" );
+  Lore::RenderView postProcessor( "pp", postScene, vp );
+  postProcessor.camera = postCamera;
+  window->addRenderView( postProcessor );
+
+  auto pLight = postScene->createLight( "l1" );
+  pLight->setColor( Lore::Color( .9f, .4f, .9f, 1.f ) );
+
+  postScene->setAmbientLightColor( Lore::Color( 0.12f, 0.12f, 0.12f, 1.f ) );
+
+  auto ppe = Lore::Resource::CreateEntity( "ppe", Lore::MeshType::TexturedQuad );
+  ppe->getMaterial()->lighting = false;
+  ppe->getMaterial()->program = Lore::StockResource::GetGPUProgram( "UnlitTexturedRTT" );
+  ppe->setTexture( rv.renderTarget->getTexture() );
+  auto ppeNode = postScene->createNode( "ppe" );
+  ppeNode->attachObject( ppe );
+  ppeNode->attachObject( pLight );
+  ppeNode->scale( Lore::Vec2( 10.6664f, 8.f ) );*/
+
+  // ---
 
 
   float f = 0.f;

@@ -38,6 +38,7 @@
 #include <LORE2D/Scene/Light.h>
 #include <LORE2D/Scene/Scene.h>
 #include <LORE2D/Shader/GPUProgram.h>
+#include <LORE2D/Window/RenderTarget.h>
 #include <LORE2D/Window/Window.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -125,14 +126,28 @@ void GenericRenderer::addTextbox( Lore::TextboxPtr textbox,
 
 void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr window )
 {
-  const real aspectRatio = window->getAspectRatio();
+  // Build render queues for this RenderView.
+  rv.scene->updateSceneGraph();
+
+  const real aspectRatio = (rv.renderTarget) ? rv.renderTarget->getAspectRatio() : window->getAspectRatio();
   rv.camera->updateTracking( aspectRatio );
 
+  if ( rv.renderTarget ) {
+    rv.renderTarget->bind();
+    _api->setViewport( 0,
+                       0,
+                       static_cast<uint32_t>( rv.viewport.width * rv.renderTarget->getWidth() ),
+                       static_cast<uint32_t>( rv.viewport.height * rv.renderTarget->getHeight() ) );
+  }
+  else {
+    // TODO: Get rid of gl_viewport.
+    _api->setViewport( rv.gl_viewport.x,
+                       rv.gl_viewport.y,
+                       rv.gl_viewport.width,
+                       rv.gl_viewport.height );
+  }
+
   _api->setDepthTestEnabled( true );
-  _api->setViewport( rv.gl_viewport.x,
-                     rv.gl_viewport.y,
-                     rv.gl_viewport.width,
-                     rv.gl_viewport.height );
 
   Color bg = rv.scene->getBackgroundColor();
   _api->clear();
@@ -161,6 +176,10 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
 
     // Render text.
     renderTextboxes( queue.textboxes, viewProjection );
+  }
+
+  if ( rv.renderTarget ) {
+    _api->bindDefaultFramebuffer();
   }
 
   _clearRenderQueues();

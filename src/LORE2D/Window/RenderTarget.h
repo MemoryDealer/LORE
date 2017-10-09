@@ -25,33 +25,51 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Resource/Color.h>
-#include <LORE2D/Resource/Renderable/Renderable.h>
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 namespace Lore {
 
-  // TODO: How to handle multi-texturing? With current rendering pipeline,
-  // it may be best to have a link to the next texture for each texture object.
-  // Then let the material inform the renderer to iterate the linked list.
-  class LORE_EXPORT Texture : public Renderable
+  ///
+  /// \class RenderTarget
+  /// \brief Can be rendered to instead of a window, and then sampled as a texture
+  ///   in another RenderView.
+  class LORE_EXPORT RenderTarget
   {
+
+    LORE_OBJECT_BODY()
 
   public:
 
-    Texture()
+    RenderTarget() = default;
+
+    virtual ~RenderTarget() = default;
+
+    virtual void bind() = 0;
+
+    TexturePtr getTexture() const
     {
-      _type = Renderable::Type::Texture;
+      return _texture;
     }
 
-    virtual ~Texture() override = default;
+    uint32_t getWidth() const
+    {
+      return _width;
+    }
 
-    virtual void loadFromFile( const string& file ) = 0;
+    uint32_t getHeight() const
+    {
+      return _height;
+    }
 
-    virtual void create( const uint32_t width, const uint32_t height ) = 0;
+    real getAspectRatio() const
+    {
+      return _aspectRatio;
+    }
 
-    virtual void create( const int width, const int height, const Color& color ) = 0;
+  protected:
+
+    TexturePtr _texture { nullptr };
+    uint32_t _width { 0 };
+    uint32_t _height { 0 };
+    real _aspectRatio { 0.f };
 
   };
 

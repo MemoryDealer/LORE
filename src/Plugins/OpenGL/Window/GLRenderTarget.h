@@ -25,36 +25,38 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Resource/Color.h>
-#include <LORE2D/Resource/Renderable/Renderable.h>
+#include <LORE2D/Memory/Alloc.h>
+#include <LORE2D/Window/RenderTarget.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+namespace Lore { namespace OpenGL {
 
-  // TODO: How to handle multi-texturing? With current rendering pipeline,
-  // it may be best to have a link to the next texture for each texture object.
-  // Then let the material inform the renderer to iterate the linked list.
-  class LORE_EXPORT Texture : public Renderable
+  class GLRenderTarget : public Lore::RenderTarget,
+                         public Alloc<GLRenderTarget>
   {
 
   public:
 
-    Texture()
-    {
-      _type = Renderable::Type::Texture;
-    }
+    GLRenderTarget() = default;
 
-    virtual ~Texture() override = default;
+    virtual ~GLRenderTarget() override;
 
-    virtual void loadFromFile( const string& file ) = 0;
+    virtual void bind() override;
 
-    virtual void create( const uint32_t width, const uint32_t height ) = 0;
+    void create( const uint32_t width, const uint32_t height );
 
-    virtual void create( const int width, const int height, const Color& color ) = 0;
+  private:
+
+    virtual void _reset() override;
+
+  private:
+
+    GLuint _fbo { 0 };
+    GLuint _rbo { 0 };
 
   };
 
-}
+}}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

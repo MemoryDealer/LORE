@@ -94,6 +94,7 @@ void RenderAPI::clearColor( const real r,
 void RenderAPI::clear()
 {
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+  glPolygonMode( GL_FRONT, GL_LINE );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -104,6 +105,13 @@ void RenderAPI::setViewport( const uint32_t x,
                              const uint32_t height )
 {
   glViewport( x, y, width, height );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void RenderAPI::bindDefaultFramebuffer()
+{
+  glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

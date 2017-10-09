@@ -142,6 +142,10 @@ void Camera::trackNode( NodePtr node, const TrackingStyle& mode )
 
 void Camera::updateTracking( const real aspectRatio )
 {
+  if ( !_trackingNode ) {
+    return;
+  }
+
   const Vec2 nodePos = _trackingNode->getPosition();
 
   switch ( _trackingStyle ) {

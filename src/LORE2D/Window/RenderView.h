@@ -72,7 +72,7 @@ namespace Lore {
     string name {};
     ScenePtr scene { nullptr };
     CameraPtr camera { nullptr };
-    //PostProcesser
+    RenderTargetPtr renderTarget { nullptr };
 
     Viewport viewport {};
 

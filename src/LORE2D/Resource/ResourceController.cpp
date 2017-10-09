@@ -328,9 +328,16 @@ MeshPtr Resource::CreateMesh( const string& name, const MeshType& meshType, cons
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-TexturePtr Resource::CreateTexture( const string& name, const string& groupName )
+TexturePtr Resource::CreateTexture( const string& name, const uint32_t width, const uint32_t height, const string& groupName )
 {
-  return ActiveContext->getResourceController()->createTexture( name, groupName );
+  return ActiveContext->getResourceController()->createTexture( name, width, height, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+RenderTargetPtr Resource::CreateRenderTarget( const string& name, const uint32_t width, const uint32_t height, const string& groupName )
+{
+  return ActiveContext->getResourceController()->createRenderTarget( name, width, height, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

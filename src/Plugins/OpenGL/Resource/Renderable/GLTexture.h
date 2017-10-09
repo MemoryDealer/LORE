@@ -43,6 +43,8 @@ namespace Lore { namespace OpenGL {
 
         virtual void loadFromFile( const string& file ) override;
 
+        virtual void create( const uint32_t width, const uint32_t height ) override;
+
         virtual void create( const int width, const int height, const Color& color ) override;
 
         virtual void bind() override;
@@ -61,7 +63,7 @@ namespace Lore { namespace OpenGL {
 
     private:
 
-        void _createGLTexture( const unsigned char* pixels, const int width, const int height );
+        void _createGLTexture( const unsigned char* pixels, const int width, const int height, const bool genMipMaps = true );
 
     private:
 

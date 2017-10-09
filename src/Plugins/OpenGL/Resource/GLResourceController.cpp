@@ -35,6 +35,7 @@
 #include <Plugins/OpenGL/Shader/GLGPUProgram.h>
 #include <Plugins/OpenGL/Shader/GLShader.h>
 #include <Plugins/OpenGL/Shader/GLVertexBuffer.h>
+#include <Plugins/OpenGL/Window/GLRenderTarget.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -131,6 +132,7 @@ Lore::VertexBufferPtr ResourceController::createVertexBuffer( const string& name
 
   // If this vertex buffer is a stock type, index it in the hash table.
   // TODO: Clean this up, stock resources should not mix in here.
+  // (Perhaps use functions for adding to resource group, e.g., addVertexBuffer().
   switch ( type ) {
 
   default:
@@ -148,13 +150,41 @@ Lore::VertexBufferPtr ResourceController::createVertexBuffer( const string& name
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::TexturePtr ResourceController::createTexture( const string& name, const string& groupName )
+Lore::TexturePtr ResourceController::createTexture( const string& name, const uint32_t width, const uint32_t height, const string& groupName )
 {
   auto texture = MemoryAccess::GetPrimaryPoolCluster()->create<Texture, GLTexture>();
   texture->setName( name );
+  texture->setResourceGroupName( groupName );
+  texture->create( width, height );
 
   _getGroup( groupName )->textures.insert( name, texture );
   return texture;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Lore::TexturePtr ResourceController::createTexture( const string& name, const uint32_t width, const uint32_t height, const Lore::Color& color, const string& groupName )
+{
+  auto texture = MemoryAccess::GetPrimaryPoolCluster()->create<Texture, GLTexture>();
+  texture->setName( name );
+  texture->setResourceGroupName( groupName );
+  texture->create( width, height, color );
+
+  _getGroup( groupName )->textures.insert( name, texture );
+  return texture;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Lore::RenderTargetPtr ResourceController::createRenderTarget( const string& name, const uint32_t width, const uint32_t height, const string& groupName )
+{
+  auto renderTarget = MemoryAccess::GetPrimaryPoolCluster()->create<RenderTarget, GLRenderTarget>();
+  renderTarget->setName( name );
+  renderTarget->setResourceGroupName( groupName );
+  renderTarget->create( width, height );
+
+  _getGroup( groupName )->renderTargets.insert( name, renderTarget );
+  return renderTarget;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

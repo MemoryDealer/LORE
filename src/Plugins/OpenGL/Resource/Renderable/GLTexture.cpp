@@ -67,6 +67,22 @@ void GLTexture::loadFromFile( const string& file )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void GLTexture::create( const uint32_t width, const uint32_t height )
+{
+  glGenTextures( 1, &_id );
+  glBindTexture( GL_TEXTURE_2D, _id );
+
+  // Create empty texture.
+  glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr );
+
+  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+
+  glBindTexture( GL_TEXTURE_2D, 0 );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void GLTexture::create( const int width, const int height, const Lore::Color& color )
 {
     const auto size = width * height * 4;
@@ -114,7 +130,7 @@ void GLTexture::bind()
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLTexture::_createGLTexture( const unsigned char* pixels, const int width, const int height )
+void GLTexture::_createGLTexture( const unsigned char* pixels, const int width, const int height, const bool genMipMaps )
 {
     glGenTextures( 1, &_id );
     glBindTexture( GL_TEXTURE_2D, _id );
@@ -127,7 +143,10 @@ void GLTexture::_createGLTexture( const unsigned char* pixels, const int width, 
 
     // Create the OpenGL texture.
     glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
-    glGenerateMipmap( GL_TEXTURE_2D );
+
+    if ( genMipMaps ) {
+      glGenerateMipmap( GL_TEXTURE_2D );
+    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

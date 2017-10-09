@@ -52,7 +52,11 @@ namespace Lore { namespace OpenGL {
 
         virtual VertexBufferPtr createVertexBuffer( const string& name, const MeshType& type, const string& groupName = DefaultGroupName ) override;
 
-        virtual TexturePtr createTexture( const string& name, const string& groupName = DefaultGroupName ) override;
+        virtual TexturePtr createTexture( const string& name, const uint32_t width, const uint32_t height, const string& groupName = DefaultGroupName ) override;
+
+        virtual TexturePtr createTexture( const string& name, const uint32_t width, const uint32_t height, const Color& color, const string& groupName = DefaultGroupName ) override;
+
+        virtual RenderTargetPtr createRenderTarget( const string& name, const uint32_t width, const uint32_t height, const string& groupName = DefaultGroupName ) override;
 
         //
         // Destruction.

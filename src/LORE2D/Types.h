@@ -47,6 +47,7 @@ namespace Lore {
   class Node;
   class PostProcessor;
   class Renderable;
+  class RenderTarget;
   class ResourceController;
   struct ResourceGroup;
   class Scene;
@@ -73,6 +74,7 @@ namespace Lore {
   using RendererPtr = Renderer*;
   using PostProcessorPtr = PostProcessor*;
   using RenderablePtr = Renderable*;
+  using RenderTargetPtr = RenderTarget*;
   using ResourceControllerPtr = ResourceController*;
   using ResourceGroupPtr = ResourceGroup*;
   using ScenePtr = Scene*;

@@ -85,12 +85,21 @@ void StockResourceController::createStockResources()
     createUberProgram( "UnlitStandard", params );
   }
 
+  // RTT programs.
+  {
+    UberProgramParameters params;
+
+    // When rendering to texture, don't flip Y texture coordinates.
+    params.texYCoordinateFlipped = false;
+    params.maxLights = 0;
+    createUberProgram( "UnlitTexturedRTT", params );
+  }
+
   //
   // Create stock textures.
 
   {
-    auto texture = _controller->createTexture( "White" );
-    texture->create( 128, 128, StockColor::White );
+    _controller->createTexture( "White", 128, 128, StockColor::White );
   }
 
   //

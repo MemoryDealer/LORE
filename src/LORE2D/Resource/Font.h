@@ -25,8 +25,6 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Memory/Alloc.h>
-
 #include <LORE2D/Shader/VertexBuffer.h>
 
 namespace Lore {

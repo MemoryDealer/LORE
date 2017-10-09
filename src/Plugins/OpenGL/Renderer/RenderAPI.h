@@ -54,6 +54,11 @@ namespace Lore { namespace OpenGL {
                               const uint32_t height ) override;
 
     //
+    // Framebuffers.
+
+    virtual void bindDefaultFramebuffer() override;
+
+    //
     // Depth testing.
 
     virtual void setDepthTestEnabled( const bool enabled ) override;
@@ -64,6 +69,17 @@ namespace Lore { namespace OpenGL {
     virtual void setBlendingEnabled( const bool enabled ) override;
 
     virtual void setBlendingFunc( const Material::BlendFactor& src, const Material::BlendFactor& dst ) override;
+
+    //
+    // Debugging.
+#ifdef _DEBUG
+
+    virtual void getLastError( const string& prefix ) override
+    {
+      printf( "E: %s\t%d\n", prefix.c_str(), glGetError() );
+    }
+
+#endif
 
   };
 
