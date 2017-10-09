@@ -65,6 +65,10 @@ void GLRenderTarget::create( const uint32_t width, const uint32_t height )
   glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, _width, _height );
   glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, _rbo );
 
+  if ( GL_FRAMEBUFFER_COMPLETE != glCheckFramebufferStatus( GL_FRAMEBUFFER ) ) {
+    throw Lore::Exception( "Failed to create framebuffer for RenderTarget" );
+  }
+
   glBindRenderbuffer( GL_RENDERBUFFER, 0 );
   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 }

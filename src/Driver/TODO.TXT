@@ -1,4 +1,5 @@
 --- Features ---
+-Fix gl 1282 regression
 -FPS/frametime display
 -Rename resource controller to ResourceCenter?
 -Debug tools - view memory pools for each type, hover over to view details
@@ -23,6 +24,7 @@
 -Compositors: visualize depth buffer (https://learnopengl.com/#!Advanced-OpenGL/Depth-testing)
 -Modify memory pool to use raw uint8_t buffers, get rid of reset() functions; use default copy for each pool
 -Box select of AABBs
+-Post-processing effect factory to create entities to use render targets, provide helper functions to setup in one call
 -Grid rendering
 -Finish unit tests
 
