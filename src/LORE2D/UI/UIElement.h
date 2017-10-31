@@ -25,26 +25,73 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Include this file for all Lore2D functionality.
+#include <LORE2D/Math/Math.h>
+#include <LORE2D/Memory/Alloc.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "LorePrerequisites.h"
+namespace Lore {
 
-// Core.
-#include <LORE2D/Core/Context.h>
+  ///
+  /// \class UIElement
+  /// \brief Contains an entity/textbox to render on a UI panel.
+  class LORE_EXPORT UIElement : public Alloc<UIElement>
+  {
 
-// Math.
-#include <LORE2D/Math/Math.h>
+  public:
 
-// Resource.
-#include <LORE2D/Resource/Entity.h>
-#include <LORE2D/Resource/Material.h>
-#include <LORE2D/Resource/StockResource.h>
-#include <LORE2D/Resource/Renderable/Texture.h>
-#include <LORE2D/Resource/Renderable/Textbox.h>
-#include <LORE2D/Scene/Background.h>
-#include <LORE2D/UI/UI.h>
-#include <LORE2D/UI/UIElement.h>
+    UIElement() = default;
+    ~UIElement() override = default;
+
+    //
+    // Getters.
+
+    inline EntityPtr getEntity() const
+    {
+      return _entity;
+    }
+
+    inline TextboxPtr getTextbox() const
+    {
+      return _textbox;
+    }
+
+    //
+    // Setters.
+
+    inline void setPosition( const real x, const real y )
+    {
+      _pos = Vec2( x, y );
+    }
+
+    inline void setDimensions( const real w, const real h )
+    {
+      _dimensions = Vec2( w, h );
+    }
+
+    inline void setEntity( const EntityPtr entity )
+    {
+      _entity = entity;
+    }
+
+    inline void setTextbox( const TextboxPtr textbox )
+    {
+      _textbox = textbox;
+    }
+
+  protected:
+
+    virtual void _reset() override { }
+
+  private:
+
+    Vec2 _pos {};
+    Vec2 _dimensions { 0.1f, 0.1f };
+    EntityPtr _entity { nullptr };
+    TextboxPtr _textbox { nullptr };
+
+  };
+
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

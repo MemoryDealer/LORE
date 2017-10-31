@@ -67,6 +67,7 @@ int main( int argc, char** argv )
   Lore::CameraPtr camera = Lore::Resource::CreateCamera( "cam1" );
   Lore::RenderView rv( "main", scene, vp );
   rv.camera = camera;
+  rv.ui = Lore::Resource::CreateUI( "UI-1" );
   //rv.renderTarget = Lore::Resource::CreateRenderTarget( "rt1", 1920, 1080 );
   window->addRenderView( rv );
 
@@ -208,6 +209,14 @@ int main( int argc, char** argv )
 
   // ---
 
+  //
+  // UI.
+
+  auto panel = rv.ui->createPanel( "P-1" );
+  auto fpsElement = panel->createElement( "FPS" );
+  auto fpsTextbox = Lore::Resource::CreateTextbox( "fps" );
+  fpsTextbox->setText( "9000" );
+  fpsElement->setTextbox( fpsTextbox );
 
   float f = 0.f;
   while ( context->active() ) {

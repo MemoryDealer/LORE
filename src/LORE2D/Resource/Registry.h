@@ -31,104 +31,103 @@
 
 namespace Lore {
 
-    using id = string;
+  using id = string;
 
-    ///
-    /// \class Registry
-    /// \brief Generic container class supporting multiple map types.
-    template<template <typename ...> typename MapType, typename T, typename ... MapParams>
-    class Registry
+  ///
+  /// \class Registry
+  /// \brief Generic container class supporting multiple map types.
+  template<template <typename ...> typename MapType, typename T, typename ... MapParams>
+  class Registry
+  {
+
+  public:
+
+    using Iterator = MapIterator<MapType<string, T*, MapParams ...>>;
+    using ConstIterator = ConstMapIterator<MapType<string, T*, MapParams ...>>;
+
+  public:
+
+    constexpr
+    explicit Registry()
     {
+    }
 
-    public:
+    void insert( const id& id_, T* resource )
+    {
+      if ( _container.find( id_ ) != _container.end() ) {
+        throw Lore::Exception( "Resource with id " + id_ + " already exists" );
+      }
 
-        using Iterator = MapIterator<MapType<string, T*, MapParams ...>>;
-        using ConstIterator = ConstMapIterator<MapType<string, T*, MapParams ...>>;
+      auto it = _container.begin();
+      _container.insert( it, std::pair<id, T*>( id_, resource ) );
+    }
 
-    public:
+    void remove( const id& id_ )
+    {
+      auto lookup = _container.find( id_ );
+      if ( _container.end() == lookup ) {
+        log_warning( "Tried to remove resource with id " + id_ + " which does not exist" );
+        return;
+      }
 
-        constexpr
-        explicit Registry()
-        : _container()
-        {
-        }
+      _container.erase( id_ );
+    }
 
-        void insert( const id& id_, T* resource )
-        {
-            if ( _container.find( id_ ) != _container.end() ) {
-                throw Lore::Exception( "Resource with id " + id_ + " already exists" );
-            }
+    void clear()
+    {
+      _container.clear();
+    }
 
-            auto it = _container.begin();
-            _container.insert( it, std::pair<id, T*>( id_, resource ) );
-        }
+    T* get( const id& id ) const
+    {
+      auto lookup = _container.find( id );
+      if ( _container.end() == lookup ) {
+        throw Lore::ItemIdentityException( "Resource with id " + id + " does not exist" );
+      }
 
-        void remove( const id& id_ )
-        {
-            auto lookup = _container.find( id_ );
-            if ( _container.end() == lookup ) {
-                log_warning( "Tried to remove resource with id " + id_ + " which does not exist" );
-                return;
-            }
+      return lookup->second;
+    }
 
-            _container.erase( id_ );
-        }
+    bool exists( const id& id ) const
+    {
+      return ( _container.find( id ) != _container.end() );
+    }
 
-        void clear()
-        {
-            _container.clear();
-        }
+    size_t size() const
+    {
+      return _container.size();
+    }
 
-        T* get( const id& id ) const
-        {
-            auto lookup = _container.find( id );
-            if ( _container.end() == lookup ) {
-                throw Lore::ItemIdentityException( "Resource with id " + id + " does not exist" );
-            }
+    bool empty() const
+    {
+      return _container.empty();
+    }
 
-            return lookup->second;
-        }
+    Iterator getIterator()
+    {
+      return Iterator( std::begin( _container ), std::end( _container ) );
+    }
 
-        bool exists( const id& id ) const
-        {
-            return ( _container.find( id ) != _container.end() );
-        }
+    ConstIterator getConstIterator() const
+    {
+      return ConstIterator( std::begin( _container ), std::end( _container ) );
+    }
 
-        size_t size() const
-        {
-            return _container.size();
-        }
+    //
+    // Deleted functions/operators.
 
-        bool empty() const
-        {
-            return _container.empty();
-        }
+    Registry& operator = ( const Registry& rhs ) = delete;
+    Registry( const Registry& rhs ) = delete;
 
-        Iterator getIterator()
-        {
-            return Iterator( std::begin( _container ), std::end( _container ) );
-        }
+  private:
 
-        ConstIterator getConstIterator() const
-        {
-            return ConstIterator( std::begin( _container ), std::end( _container ) );
-        }
+    MapType<string, T*, MapParams ...> _container {};
 
-        //
-        // Deleted functions/operators.
+  };
 
-        Registry& operator = ( const Registry& rhs ) = delete;
-        Registry( const Registry& rhs ) = delete;
-
-    private:
-
-        MapType<string, T*, MapParams ...> _container;
-
-    };
-
-    ///
-    /// \class SafeRegistry
-    /// \brief Thread-safe version of Registry.
+  ///
+  /// \class SafeRegistry
+  /// \brief Thread-safe version of Registry.
 
 
 }

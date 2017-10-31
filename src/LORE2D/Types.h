@@ -55,6 +55,9 @@ namespace Lore {
   class StockResourceController;
   class Textbox;
   class Texture;
+  class UI;
+  class UIPanel;
+  class UIElement;
   class VertexBuffer;
   class Window;
 
@@ -82,6 +85,9 @@ namespace Lore {
   using StockResourceControllerPtr = StockResourceController*;
   using TextboxPtr = Textbox*;
   using TexturePtr = Texture*;
+  using UIPtr = UI*;
+  using UIPanelPtr = UIPanel*;
+  using UIElementPtr = UIElement*;
   using VertexBufferPtr = VertexBuffer*;
   using WindowPtr = Window*;
 

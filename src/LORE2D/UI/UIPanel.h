@@ -25,26 +25,49 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Include this file for all Lore2D functionality.
+#include <LORE2D/Math/Math.h>
+#include <LORE2D/Memory/Alloc.h>
+#include <LORE2D/Resource/Registry.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "LorePrerequisites.h"
+namespace Lore {
 
-// Core.
-#include <LORE2D/Core/Context.h>
+  class LORE_EXPORT UIPanel final : public Alloc<UIPanel>
+  {
 
-// Math.
-#include <LORE2D/Math/Math.h>
+  public:
 
-// Resource.
-#include <LORE2D/Resource/Entity.h>
-#include <LORE2D/Resource/Material.h>
-#include <LORE2D/Resource/StockResource.h>
-#include <LORE2D/Resource/Renderable/Texture.h>
-#include <LORE2D/Resource/Renderable/Textbox.h>
-#include <LORE2D/Scene/Background.h>
-#include <LORE2D/UI/UI.h>
-#include <LORE2D/UI/UIElement.h>
+    UIPanel() = default;
+    ~UIPanel() = default;
+
+    UIElementPtr createElement( const string& name );
+    void destroyElement( const string& name );
+
+    // Getters.
+
+    Vec2 getOrigin() const { return _origin; }
+
+    UIElementPtr getElement( const string& name );
+
+    // Setters.
+
+    void setOrigin( const real x, const real y )
+    {
+      _origin = Vec2( x, y );
+    }
+
+  protected:
+
+    virtual void _reset() override { }
+
+  private:
+
+    Vec2 _origin {};
+    Registry<std::map, UIElement> _elements {};
+
+  };
+
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

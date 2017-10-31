@@ -25,26 +25,41 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Include this file for all Lore2D functionality.
+#include <LORE2D/Resource/Registry.h>
+#include <LORE2D/UI/UIPanel.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "LorePrerequisites.h"
+namespace Lore {
 
-// Core.
-#include <LORE2D/Core/Context.h>
+  class LORE_EXPORT UI final : public Alloc<UI>
+  {
 
-// Math.
-#include <LORE2D/Math/Math.h>
+    LORE_OBJECT_BODY()
 
-// Resource.
-#include <LORE2D/Resource/Entity.h>
-#include <LORE2D/Resource/Material.h>
-#include <LORE2D/Resource/StockResource.h>
-#include <LORE2D/Resource/Renderable/Texture.h>
-#include <LORE2D/Resource/Renderable/Textbox.h>
-#include <LORE2D/Scene/Background.h>
-#include <LORE2D/UI/UI.h>
-#include <LORE2D/UI/UIElement.h>
+  public:
+
+    UI() = default;
+    virtual ~UI() override = default;
+
+    UIPanelPtr createPanel( const string& name );
+
+    void destroyPanel( const string& name );
+
+    // Getters.
+
+    UIPanelPtr getPanel( const string& name );
+
+  protected:
+
+    virtual void _reset() override { }
+
+  private:
+
+    Registry<std::unordered_map, UIPanel> _panels;
+
+  };
+
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -73,6 +73,7 @@ namespace Lore {
     ScenePtr scene { nullptr };
     CameraPtr camera { nullptr };
     RenderTargetPtr renderTarget { nullptr };
+    UIPtr ui { nullptr };
 
     Viewport viewport {};
 
@@ -92,24 +93,18 @@ namespace Lore {
 
     RenderView( const string& name_ )
       : name( name_ )
-      , scene( nullptr )
-      , camera( nullptr )
-      , viewport()
     {
     }
 
     RenderView( const string& name_, ScenePtr scene_ )
       : name( name_ )
       , scene( scene_ )
-      , camera( nullptr )
-      , viewport()
     {
     }
 
     RenderView( const string& name_, ScenePtr scene_, const Viewport& viewport_ )
       : name( name_ )
       , scene( scene_ )
-      , camera( nullptr )
       , viewport( viewport_ )
     {
     }

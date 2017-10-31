@@ -178,6 +178,11 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
     renderTextboxes( queue.textboxes, viewProjection );
   }
 
+  // Render UI.
+  if ( rv.ui ) {
+
+  }
+
   if ( rv.renderTarget ) {
     _api->bindDefaultFramebuffer();
   }

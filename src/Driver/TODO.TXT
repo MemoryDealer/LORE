@@ -6,6 +6,7 @@
 -UI class; add elements in [0.0, 1.0] range. Text and boxes. Allow scrolling offsets to out of range. Can assign callback for mouse for debug UI.
 -Resource file location indexing for easy reloading (see ResourceController.h).
 -Sprites!
+-Re-organize to include/src directories
 -RTT (add priority to renderview, RTTs are automatically rendered before window framebuffers)
 -Multi-texturing
 -Instanced rendering - for static objects (maybe static nodes - StaticNodeBlock)
@@ -20,9 +21,11 @@
   Animation system for nodes with key frames
 -Self-illumination for all lights
 -Particle systems
+-Camera zooming should affect background scale
 -Proper cleanup of resources
 -Compositors: visualize depth buffer (https://learnopengl.com/#!Advanced-OpenGL/Depth-testing)
 -Modify memory pool to use raw uint8_t buffers, get rid of reset() functions; use default copy for each pool
+  Get rid of _reset() functions
 -Box select of AABBs
 -Post-processing effect factory to create entities to use render targets, provide helper functions to setup in one call
 -Grid rendering

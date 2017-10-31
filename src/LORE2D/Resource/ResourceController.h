@@ -38,6 +38,7 @@
 #include <LORE2D/Shader/Shader.h>
 #include <LORE2D/Shader/VertexBuffer.h>
 #include <LORE2D/Window/RenderTarget.h>
+#include <LORE2D/UI/UI.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -116,6 +117,9 @@ namespace Lore {
     // Render targets.
     Registry<std::unordered_map, RenderTarget> renderTargets {};
 
+    // UIs.
+    Registry<std::unordered_map, UI> uis {};
+
   };
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -178,6 +182,8 @@ namespace Lore {
     CameraPtr createCamera( const string& name, const string& groupName = DefaultGroupName );
 
     TextboxPtr createTextbox( const string& name, const string& groupName = DefaultGroupName );
+
+    UIPtr createUI( const string& name, const string& groupName = DefaultGroupName );
 
     //
     // Entity.
@@ -268,6 +274,8 @@ namespace Lore {
     static CameraPtr CreateCamera( const string& name, const string& groupName = ResourceController::DefaultGroupName );
 
     static TextboxPtr CreateTextbox( const string& name, const string& groupname = ResourceController::DefaultGroupName );
+
+    static UIPtr CreateUI( const string& name, const string& groupName = ResourceController::DefaultGroupName );
 
     //
     // Entity.
