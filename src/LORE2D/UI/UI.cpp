@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,27 +24,35 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Include this file for all Lore2D functionality.
+#include "UI.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "LorePrerequisites.h"
+using namespace Lore;
 
-// Core.
-#include <LORE2D/Core/Context.h>
-#include <LORE2D/Core/Timer.h>
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Math.
-#include <LORE2D/Math/Math.h>
+UIPanelPtr UI::createPanel( const string& name )
+{
+  auto panel = MemoryAccess::GetPrimaryPoolCluster()->create<UIPanel>();
+  _panels.insert( name, panel );
+  return panel;
+}
 
-// Resource.
-#include <LORE2D/Resource/Entity.h>
-#include <LORE2D/Resource/Material.h>
-#include <LORE2D/Resource/StockResource.h>
-#include <LORE2D/Resource/Renderable/Texture.h>
-#include <LORE2D/Resource/Renderable/Textbox.h>
-#include <LORE2D/Scene/Background.h>
-#include <LORE2D/UI/UI.h>
-#include <LORE2D/UI/UIElement.h>
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void UI::destroyPanel( const string& name )
+{
+  auto panel = getPanel( name );
+  MemoryAccess::GetPrimaryPoolCluster()->destroy<UIPanel>( panel );
+  _panels.remove( name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+UIPanelPtr UI::getPanel( const string& name )
+{
+  return _panels.get( name );
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

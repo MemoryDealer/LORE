@@ -415,6 +415,7 @@ Lore::GPUProgramPtr StockResourceController::createTextProgram( const string& na
   // Uniforms and outs.
 
   src += "uniform mat4 projection;";
+  src += "uniform float depth;";
   src += "out vec2 TexCoords;";
 
   //
@@ -422,7 +423,7 @@ Lore::GPUProgramPtr StockResourceController::createTextProgram( const string& na
 
   src += "void main() {";
 
-  src += "gl_Position = projection * vec4(vertex.xy, 0.0, 1.0);";
+  src += "gl_Position = projection * vec4(vertex.xy, depth, 1.0);";
   src += "TexCoords = vertex.zw;";
 
   src += "}";
@@ -479,6 +480,7 @@ Lore::GPUProgramPtr StockResourceController::createTextProgram( const string& na
   }
 
   program->addUniformVar( "projection" );
+  program->addUniformVar( "depth" );
   program->addUniformVar( "color" );
 
   return program;

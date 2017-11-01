@@ -165,6 +165,7 @@ MaterialPtr ResourceController::createMaterial( const string& name, const string
 CameraPtr ResourceController::createCamera( const string& name, const string& groupName )
 {
   auto cam = MemoryAccess::GetPrimaryPoolCluster()->create<Camera>();
+  cam->setResourceGroupName( groupName ); // TODO: Camera should not be a resource (something else should hold the registry).
   cam->setName( name );
 
   _getGroup( groupName )->cameras.insert( name, cam );
@@ -177,10 +178,23 @@ TextboxPtr ResourceController::createTextbox( const string& name, const string& 
 {
   auto textbox = MemoryAccess::GetPrimaryPoolCluster()->create<Textbox>();
   textbox->setName( name );
+  textbox->setResourceGroupName( groupName );
   textbox->setFont( Lore::StockResource::GetFont( "Default" ) );
 
   _getGroup( groupName )->textboxes.insert( name, textbox );
   return textbox;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+UIPtr ResourceController::createUI( const string& name, const string& groupName )
+{
+  auto ui = MemoryAccess::GetPrimaryPoolCluster()->create<UI>();
+  ui->setName( name );
+  ui->setResourceGroupName( groupName );
+
+  _getGroup( groupName )->uis.insert( name, ui );
+  return ui;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -352,6 +366,13 @@ CameraPtr Resource::CreateCamera( const string& name, const string& groupName )
 TextboxPtr Resource::CreateTextbox( const string& name, const string& groupName )
 {
   return ActiveContext->getResourceController()->createTextbox( name, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+UIPtr Resource::CreateUI( const string& name, const string& groupName )
+{
+  return ActiveContext->getResourceController()->createUI( name, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -27,58 +27,58 @@
 
 namespace Lore {
 
+  ///
+  /// \class Timer
+  /// \brief Tracks elapsed time in seconds.
+  class LORE_EXPORT Timer final
+  {
+
+  public:
+
+    Timer();
+
+    ~Timer() = default;
+
     ///
-    /// \class Timer
-    /// \brief Tracks elapsed time in seconds.
-    class Timer final
-    {
+    /// \brief Return elapsed time in seconds since timer start, not including pauses.
+    float getDeltaTime() const;
 
-    public:
+    ///
+    /// \brief Returns total time elapsed time in seconds from application start.
+    float getTotalElapsedTime() const;
 
-        Timer();
+    ///
+    /// \brief Resets delta time since timer was last started.
+    void reset();
 
-        ~Timer() = default;
+    ///
+    /// \brief Begins tracking delta time.
+    void start();
 
-        ///
-        /// \brief Return elapsed time in seconds since timer start, not including pauses.
-        float getDeltaTime() const;
+    ///
+    /// \brief Stops tracking delta time, until start() is called again.
+    void stop();
 
-        ///
-        /// \brief Returns total time elapsed time in seconds from application start.
-        float getTotalElapsedTime() const;
+    ///
+    /// \brief Moves delta time along based on elapsed time since last call to tick().
+    void tick();
 
-        ///
-        /// \brief Resets delta time since timer was last started.
-        void reset();
+  private:
 
-        ///
-        /// \brief Begins tracking delta time.
-        void start();
-
-        ///
-        /// \brief Stops tracking delta time, until start() is called again.
-        void stop();
-
-        ///
-        /// \brief Moves delta time along based on elapsed time since last call to tick().
-        void tick();
-
-    private:
-
-        double mSecondsPerCount;
-        double mDeltaTime;
+    double mSecondsPerCount;
+    double mDeltaTime;
 
 #if LORE_PLATFORM == LORE_WINDOWS
-        __int64 mBaseTime;
-        __int64 mPausedTime;
-        __int64 mStopTime;
-        __int64 mPrevTime;
-        __int64 mCurrTime;
+    __int64 mBaseTime;
+    __int64 mPausedTime;
+    __int64 mStopTime;
+    __int64 mPrevTime;
+    __int64 mCurrTime;
 #endif
 
-        bool mStopped;
+    bool mStopped;
 
-    };
+  };
 
 }
 

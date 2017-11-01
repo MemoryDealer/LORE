@@ -25,95 +25,92 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Scene/Camera.h>
-#include <LORE2D/Scene/Scene.h>
+#include <LORE2D/Math/Math.h>
+#include <LORE2D/Memory/Alloc.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
   ///
-  /// \class Viewport
-  /// \brief Viewport dimensions in float coordinates (0.0f to 1.0f).
-  struct Viewport final
+  /// \class UIElement
+  /// \brief Contains an entity/textbox to render on a UI panel.
+  class LORE_EXPORT UIElement : public Alloc<UIElement>
   {
 
-    float x { 0.f };
-    float y { 0.f };
-    float width { 1.f };
-    float height { 1.f };
+  public:
 
-    Viewport() = default;
+    UIElement() = default;
+    ~UIElement() override = default;
 
-    Viewport( const float x_,
-              const float y_,
-              const float width_,
-              const float height_ )
-      : x( x_ )
-      , y( y_ )
-      , width( width_ )
-      , height( height_ )
+    //
+    // Getters.
+
+    inline Vec2 getPosition() const
     {
+      return _pos;
     }
 
-    ~Viewport() = default;
-
-  };
-
-  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-  ///
-  /// \class RenderView
-  /// \brief Contains the information needed to render a scene to a window.
-  /// \details ...
-  struct RenderView final
-  {
-
-    string name {};
-    ScenePtr scene { nullptr };
-    CameraPtr camera { nullptr };
-    RenderTargetPtr renderTarget { nullptr };
-    UIPtr ui { nullptr };
-
-    Viewport viewport {};
-
-    // Viewports are stored in a union, so each render plugin can do the 
-    // conversion once, when the RenderView is added to a window.
-    union
+    inline Vec2 getDimensions() const
     {
-
-      struct
-      {
-        int x, y;
-        uint width, height;
-        real aspectRatio;
-      }  gl_viewport;
-
-    };
-
-    RenderView( const string& name_ )
-      : name( name_ )
-    {
+      return _dimensions;
     }
 
-    RenderView( const string& name_, ScenePtr scene_ )
-      : name( name_ )
-      , scene( scene_ )
+    inline real getDepth() const
     {
+      return _depth;
     }
 
-    RenderView( const string& name_, ScenePtr scene_, const Viewport& viewport_ )
-      : name( name_ )
-      , scene( scene_ )
-      , viewport( viewport_ )
+    inline EntityPtr getEntity() const
     {
+      return _entity;
     }
 
-    bool operator == ( const RenderView& rhs ) const
+    inline TextboxPtr getTextbox() const
     {
-      // RenderView names are unique.
-      return ( name == rhs.name );
+      return _textbox;
     }
+
+    //
+    // Setters.
+
+    inline void setPosition( const real x, const real y )
+    {
+      _pos = Vec2( x, y );
+    }
+
+    inline void setDimensions( const real w, const real h )
+    {
+      _dimensions = Vec2( w, h );
+    }
+
+    inline void setDepth( const real depth )
+    {
+      assert( depth <= 100.f && depth >= -100.f );
+      _depth = depth;
+    }
+
+    inline void setEntity( const EntityPtr entity )
+    {
+      _entity = entity;
+    }
+
+    inline void setTextbox( const TextboxPtr textbox )
+    {
+      _textbox = textbox;
+    }
+
+  protected:
+
+    virtual void _reset() override { }
+
+  private:
+
+    Vec2 _pos {};
+    Vec2 _dimensions { 0.1f, 0.1f };
+    real _depth { 0.f };
+    EntityPtr _entity { nullptr };
+    TextboxPtr _textbox { nullptr };
 
   };
 

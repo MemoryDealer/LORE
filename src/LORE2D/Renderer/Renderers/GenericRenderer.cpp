@@ -38,6 +38,7 @@
 #include <LORE2D/Scene/Light.h>
 #include <LORE2D/Scene/Scene.h>
 #include <LORE2D/Shader/GPUProgram.h>
+#include <LORE2D/UI/UI.h>
 #include <LORE2D/Window/RenderTarget.h>
 #include <LORE2D/Window/Window.h>
 
@@ -157,7 +158,7 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
   // TODO: Take viewport dimensions into account. Cache more things inside window.
   const Matrix4 projection = Math::OrthoRH( -aspectRatio, aspectRatio,
                                             -1.f, 1.f,
-                                            1000.f, -1000.f );
+                                            1500.f, -1500.f );
 
   const Matrix4 viewProjection = rv.camera->getViewMatrix() * projection;
 
@@ -178,7 +179,13 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
     renderTextboxes( queue.textboxes, viewProjection );
   }
 
+  // Render UI.
+  if ( rv.ui ) {
+    renderUI( rv, aspectRatio, projection );
+  }
+
   if ( rv.renderTarget ) {
+    // Re-bind default frame buffer if custom render target was specified.
     _api->bindDefaultFramebuffer();
   }
 
@@ -256,7 +263,7 @@ void GenericRenderer::renderBackground( const Lore::RenderView& rv,
       offset.y -= camPos.y * layer.getParallax().y;
       program->setUniformVar( "texSampleOffset", offset );
 
-      Lore::Matrix4 transform = Math::CreateTransformationMatrix( Lore::Vec2( 0.f, 0.f ), Lore::Quaternion() );
+      Lore::Matrix4 transform = Math::CreateTransformationMatrix( Lore::Vec2( 0.f, 0.f ) );
       transform[0][0] = aspectRatio;
       transform[1][1] = Math::Clamp( aspectRatio, 1.f, 90.f ); // HACK to prevent clipping background on aspect ratios < 1.0.
       transform[3][2] = layer.getDepth();
@@ -421,7 +428,7 @@ void GenericRenderer::renderTransparents( const Lore::ScenePtr scene,
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void GenericRenderer::renderTextboxes( RenderQueue::TextboxList& textboxes,
-                                       const Matrix4& proj ) const
+                                       const Matrix4& viewProjection ) const
 {
   _api->setBlendingEnabled( true );
   _api->setBlendingFunc( Material::BlendFactor::SrcAlpha, Material::BlendFactor::OneMinusSrcAlpha );
@@ -438,8 +445,9 @@ void GenericRenderer::renderTextboxes( RenderQueue::TextboxList& textboxes,
     FontPtr font = textbox->getFont();
 
     // TODO: Use a better design for this relationship.
+    program->setUniformVar( "projection", viewProjection );
+    program->setUniformVar( "depth", data.model[3][2] );
     program->setUniformVar( "color", textbox->getTextColor() );
-    program->setUniformVar( "projection", proj );
 
     // Render each character.
     real x = data.model[3][0];
@@ -462,6 +470,59 @@ void GenericRenderer::renderTextboxes( RenderQueue::TextboxList& textboxes,
 
   vb->unbind();
   _api->setBlendingEnabled( false );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GenericRenderer::renderUI( const RenderView& rv,
+                                const real aspectRatio,
+                                const Matrix4& proj ) const
+{
+  auto panelIt = rv.ui->getPanelIterator();
+
+  RenderQueue::EntityDataMap entityDataMap;
+  RenderQueue::TextboxList textboxes;
+  constexpr const real DepthOffset = -1101.f;
+
+  // For each panel.
+  while ( panelIt.hasMore() ) {
+    auto panel = panelIt.getNext();
+    const Vec2 panelOrigin = panel->getOrigin();
+
+    // For each element in this panel.
+    auto elementIt = panel->getElementIterator();
+    while ( elementIt.hasMore() ) {
+      auto element = elementIt.getNext();
+      auto elementPos = panelOrigin + element->getPosition();
+      elementPos.x *= aspectRatio;
+
+      // Build list of entity data and textboxes to render.
+      auto entity = element->getEntity();
+      if ( entity ) {
+        RenderQueue::EntityData entityData;
+        entityData.material = entity->getMaterial();
+        entityData.vertexBuffer = entity->getMesh()->getVertexBuffer();
+
+        RenderQueue::RenderData rd;
+        rd.model = Math::CreateTransformationMatrix( elementPos, Quaternion(), element->getDimensions() );
+        rd.model[3][2] = element->getDepth() + DepthOffset; // Offset UI element depth beyond scene node depth.
+        entityDataMap[entityData].push_back( rd );
+      }
+
+      auto textbox = element->getTextbox();
+      if ( textbox ) {
+        RenderQueue::TextboxData td;
+        td.textbox = textbox;
+        td.model = Math::CreateTransformationMatrix( elementPos );
+        td.model[3][2] = element->getDepth() + DepthOffset;
+        textboxes.push_back( td );
+      }
+    }
+  }
+
+  // Now render the UI elements.
+  renderMaterialMap( rv.scene, entityDataMap, proj );
+  renderTextboxes( textboxes, proj );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
