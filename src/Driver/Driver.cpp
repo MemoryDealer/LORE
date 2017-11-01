@@ -140,7 +140,7 @@ int main( int argc, char** argv )
   layer.setTexture( Lore::Resource::GetTexture( "bg_city" ) );
   layer.setScrollSpeed( Lore::Vec2( 0.0008f, 0.0004f ) );
   layer.setParallax( Lore::Vec2( 0.05f, 0.05f ) );
-  layer.setDepth( 800.f );
+  layer.setDepth( 1001.f );
 
   auto& layer2 = bg->addLayer( "2" );
   layer2.setTexture( Lore::Resource::GetTexture( "death-egg" ) );

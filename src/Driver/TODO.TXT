@@ -1,9 +1,7 @@
 --- Features ---
 -Fix gl 1282 regression
--FPS/frametime display
 -Rename resource controller to ResourceCenter?
 -Debug tools - view memory pools for each type, hover over to view details
--UI class; add elements in [0.0, 1.0] range. Text and boxes. Allow scrolling offsets to out of range. Can assign callback for mouse for debug UI.
 -Resource file location indexing for easy reloading (see ResourceController.h).
 -Sprites!
 -Re-organize to include/src directories

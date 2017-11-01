@@ -85,7 +85,7 @@ namespace Lore {
     private:
 
       Vec2 _parallax { 0.f, 0.f };
-      real _depth { 750.f };
+      real _depth { 1000.f };
       MaterialPtr _material { nullptr };
       TexturePtr _texture { nullptr };
       string _name {};
