@@ -82,7 +82,11 @@ namespace Lore {
                               const Matrix4& viewProjection ) const;
 
     void renderTextboxes( RenderQueue::TextboxList& textboxes,
-                          const Matrix4& proj ) const;
+                          const Matrix4& viewProjection ) const;
+
+    void renderUI( const Lore::RenderView& rv,
+                   const real aspectRatio,
+                   const Matrix4& proj ) const;
 
   private:
 

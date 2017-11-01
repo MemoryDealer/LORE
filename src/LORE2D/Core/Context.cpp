@@ -34,8 +34,6 @@
 #include <LORE2D/Resource/StockResource.h>
 #include <LORE2D/Resource/Renderable/Textbox.h>
 #include <LORE2D/UI/UI.h>
-#include <LORE2D/UI/UIElement.h>
-#include <LORE2D/UI/UIPanel.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 

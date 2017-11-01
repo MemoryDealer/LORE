@@ -33,6 +33,7 @@
 
 // Core.
 #include <LORE2D/Core/Context.h>
+#include <LORE2D/Core/Timer.h>
 
 // Math.
 #include <LORE2D/Math/Math.h>

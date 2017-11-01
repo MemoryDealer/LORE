@@ -113,7 +113,7 @@ namespace Lore {
     ///
     /// \brief Creates 4x4 matrix from a position and orientation.
     static inline Matrix4 CreateTransformationMatrix( const Vec2& position,
-                                                      const Quaternion& orientation )
+                                                      const Quaternion& orientation = Quaternion() )
     {
       Matrix4 m;
       Matrix3 rot3x3 = orientation.createRotationMatrix();

@@ -46,6 +46,21 @@ namespace Lore {
     //
     // Getters.
 
+    inline Vec2 getPosition() const
+    {
+      return _pos;
+    }
+
+    inline Vec2 getDimensions() const
+    {
+      return _dimensions;
+    }
+
+    inline real getDepth() const
+    {
+      return _depth;
+    }
+
     inline EntityPtr getEntity() const
     {
       return _entity;
@@ -69,6 +84,12 @@ namespace Lore {
       _dimensions = Vec2( w, h );
     }
 
+    inline void setDepth( const real depth )
+    {
+      assert( depth <= 100.f && depth >= -100.f );
+      _depth = depth;
+    }
+
     inline void setEntity( const EntityPtr entity )
     {
       _entity = entity;
@@ -87,6 +108,7 @@ namespace Lore {
 
     Vec2 _pos {};
     Vec2 _dimensions { 0.1f, 0.1f };
+    real _depth { 0.f };
     EntityPtr _entity { nullptr };
     TextboxPtr _textbox { nullptr };
 

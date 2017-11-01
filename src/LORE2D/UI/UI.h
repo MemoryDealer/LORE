@@ -39,6 +39,10 @@ namespace Lore {
 
   public:
 
+    using PanelRegistry = Registry<std::unordered_map, UIPanel>;
+
+  public:
+
     UI() = default;
     virtual ~UI() override = default;
 
@@ -50,13 +54,18 @@ namespace Lore {
 
     UIPanelPtr getPanel( const string& name );
 
+    inline PanelRegistry::ConstIterator getPanelIterator() const
+    {
+      return _panels.getConstIterator();
+    }
+
   protected:
 
     virtual void _reset() override { }
 
   private:
 
-    Registry<std::unordered_map, UIPanel> _panels;
+    PanelRegistry _panels;
 
   };
 

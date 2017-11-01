@@ -28,6 +28,7 @@
 #include <LORE2D/Math/Math.h>
 #include <LORE2D/Memory/Alloc.h>
 #include <LORE2D/Resource/Registry.h>
+#include <LORE2D/UI/UIElement.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -35,6 +36,10 @@ namespace Lore {
 
   class LORE_EXPORT UIPanel final : public Alloc<UIPanel>
   {
+
+  public:
+
+    using ElementRegistry = Registry<std::map, UIElement>;
 
   public:
 
@@ -50,9 +55,14 @@ namespace Lore {
 
     UIElementPtr getElement( const string& name );
 
+    inline ElementRegistry::ConstIterator getElementIterator() const
+    {
+      return _elements.getConstIterator();
+    }
+
     // Setters.
 
-    void setOrigin( const real x, const real y )
+    inline void setOrigin( const real x, const real y )
     {
       _origin = Vec2( x, y );
     }
@@ -64,7 +74,7 @@ namespace Lore {
   private:
 
     Vec2 _origin {};
-    Registry<std::map, UIElement> _elements {};
+    ElementRegistry _elements {};
 
   };
 

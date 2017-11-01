@@ -46,7 +46,7 @@ namespace Lore {
     // Lore supports 100 render queues, rendered in order from 0-99.
     static const uint32_t Background = 0;
     static const uint32_t General = 50;
-    static const uint32_t UI = 99;
+    static const uint32_t Foreground = 99;
 
     // :::::: //
 

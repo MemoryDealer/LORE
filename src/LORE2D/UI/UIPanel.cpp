@@ -26,8 +26,6 @@
 
 #include "UIPanel.h"
 
-#include <LORE2D/UI/UIElement.h>
-
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 using namespace Lore;

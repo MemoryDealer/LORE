@@ -25,6 +25,8 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 #include <memory>
+#include <sstream>
+
 #include <LORE2D/Lore.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -32,6 +34,11 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 #include <LORE2D/Memory/PoolCluster.h>
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+static Lore::Timer __timer;
+static void UpdateFPS( Lore::TextboxPtr textbox );
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -215,16 +222,22 @@ int main( int argc, char** argv )
   auto panel = rv.ui->createPanel( "P-1" );
   auto fpsElement = panel->createElement( "FPS" );
   auto fpsTextbox = Lore::Resource::CreateTextbox( "fps" );
-  fpsTextbox->setText( "9000" );
   fpsElement->setTextbox( fpsTextbox );
+  fpsElement->setPosition( -1.f, 0.92f );
+  fpsTextbox->setText( "Calculating..." );
+  fpsTextbox->setTextColor( Lore::StockColor::Green );
+  //fpsTextbox->setFont( font );
 
   float f = 0.f;
+  __timer.reset();
   while ( context->active() ) {
+    __timer.tick();
+
     //node->translate( 0.01f * std::sinf( f ), 0.01f * std::cosf( f ) );
     f += 0.0005f;
     //sonicNode->scale( 10.05f * std::sinf( f ) );
-
-    // TODO: Repro case where both quads appeared to be scaling with only rotations being done.
+    //textureElement->setPosition( f, 0.5f );
+    // TODO: Repro case where both quads appeared to be scaling with only rotations being done (create test for this).
     //node->getChild( "AChild" )->rotate( Lore::Degree( -.1f ) );
 
     {
@@ -265,15 +278,41 @@ int main( int argc, char** argv )
       }
     }
 
+    UpdateFPS( fpsTextbox );
     context->renderFrame();
   }
 
   DestroyLoreContext( context );
 
-#ifdef _DEBUG
+  #ifdef _DEBUG
   system( "pause" );
-#endif
+  #endif
   return 0;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+// TODO: Move this to internal debug UI.
+static void UpdateFPS( Lore::TextboxPtr textbox )
+{
+  static int32_t frameCount = 0;
+  static float elapsed = 0.f;
+
+  ++frameCount;
+
+  // Get averages over one second period.
+  if ( ( __timer.getTotalElapsedTime() - elapsed ) >= 1.f ) {
+    float fps = static_cast< float >( frameCount );
+    float mspf = 1000.f / fps;
+
+    std::ostringstream oss;
+    oss.precision( 3 );
+    oss << "FPS: " << fps << "    " << "Frame Time: " << mspf << " (ms)";
+    textbox->setText( oss.str() );
+
+    frameCount = 0;
+    elapsed += 1.f;
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
