@@ -29,6 +29,7 @@
 #include <LORE2D/Core/APIVersion.h>
 #include <LORE2D/Core/NotificationCenter.h>
 #include <LORE2D/Core/Timestamp.h>
+#include <LORE2D/Input/Input.h>
 #include <LORE2D/Renderer/SceneGraphVisitor.h>
 #include <LORE2D/Resource/Entity.h>
 #include <LORE2D/Resource/StockResource.h>
@@ -169,6 +170,13 @@ StockResourceControllerPtr Context::getStockResourceController() const
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+InputControllerPtr Context::getInputController() const
+{
+  return _inputController.get();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void Context::setActiveWindow( WindowPtr window )
 {
   _activeWindow = window;
@@ -219,6 +227,7 @@ std::unique_ptr<Context> Context::Create( const RenderPlugin& renderer )
   // Load the context class from the plugin.
   auto context = __rpl->createContext();
 
+  Input::AssignContext( context.get() );
   Resource::AssignContext( context.get() );
   StockResource::AssignContext( context.get() );
   MemoryAccess::_SetPrimaryPoolCluster( &context->_poolCluster );
@@ -235,6 +244,8 @@ std::unique_ptr<Context> Context::Create( const RenderPlugin& renderer )
 void Context::Destroy( std::unique_ptr<Context> context )
 {
   context.reset();
+  // TODO: Use null object pattern to prevent segfaults in the following.
+  Input::AssignContext( nullptr );
   Resource::AssignContext( nullptr );
   StockResource::AssignContext( nullptr );
   MemoryAccess::_SetPrimaryPoolCluster( nullptr );

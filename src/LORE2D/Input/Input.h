@@ -25,30 +25,65 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Include this file for all Lore2D functionality.
+#include "Keys.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "LorePrerequisites.h"
+namespace Lore {
 
-// Core.
-#include <LORE2D/Core/Context.h>
-#include <LORE2D/Core/Timer.h>
+  using KeyCallback = void(*)( const Keycode, const bool );
+  using MouseButtonCallback = void(*)( const int, const bool );
+  using MouseMovedCallback = void(*)( const double x, const double y );
 
-// Input.
-#include <LORE2D/Input/Input.h>
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Math.
-#include <LORE2D/Math/Math.h>
+  class LORE_EXPORT InputController
+  {
 
-// Resource.
-#include <LORE2D/Resource/Entity.h>
-#include <LORE2D/Resource/Material.h>
-#include <LORE2D/Resource/StockResource.h>
-#include <LORE2D/Resource/Renderable/Texture.h>
-#include <LORE2D/Resource/Renderable/Textbox.h>
-#include <LORE2D/Scene/Background.h>
-#include <LORE2D/UI/UI.h>
-#include <LORE2D/UI/UIElement.h>
+  public:
+
+    InputController() = default;
+    virtual ~InputController() = default;
+
+    void setKeyCallback( const KeyCallback callback );
+    void setMouseButtonCallback( const MouseButtonCallback callback );
+    void setMouseMovedCallback( const MouseMovedCallback callback );
+
+    virtual void createCallbacks( WindowPtr window ) = 0;
+
+    virtual bool getKeyState( WindowPtr window, const Keycode key ) = 0;
+
+  protected:
+
+    KeyCallback _keyCallback { nullptr };
+    MouseButtonCallback _mouseButtonCallback { nullptr };
+    MouseMovedCallback _mouseMovedCallback { nullptr };
+
+  };
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  class LORE_EXPORT Input final
+  {
+
+  public:
+
+    static void SetKeyCallback( const KeyCallback callback );
+    static void SetMouseButtonCallback( const MouseButtonCallback callback );
+    static void SetMouseMovedCallback( const MouseMovedCallback callback );
+
+    static bool GetKeyState( const Keycode key );
+
+  private:
+
+    friend class Context;
+
+  private:
+
+    static void AssignContext( ContextPtr context );
+
+  };
+
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

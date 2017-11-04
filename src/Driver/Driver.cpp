@@ -38,7 +38,10 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 static Lore::Timer __timer;
+static Lore::CameraPtr __camera;
+static Lore::NodePtr __sonic;
 static void UpdateFPS( Lore::TextboxPtr textbox );
+static void OnKeyChanged( const Lore::Keycode key, const bool state );
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -72,6 +75,7 @@ int main( int argc, char** argv )
 
   Lore::Viewport vp( 0.f, 0.f, 1.f, 1.f );
   Lore::CameraPtr camera = Lore::Resource::CreateCamera( "cam1" );
+  __camera = camera;
   Lore::RenderView rv( "main", scene, vp );
   rv.camera = camera;
   rv.ui = Lore::Resource::CreateUI( "UI-1" );
@@ -100,7 +104,7 @@ int main( int argc, char** argv )
   // Create some doges.
 
   auto dogeEntity = Lore::Resource::CreateEntity( "doge", Lore::MeshType::TexturedQuad );
-  auto dogeTexture = Lore::Resource::LoadTexture( "doge", "C:\\doge.jpg" );
+  auto dogeTexture = Lore::Resource::LoadTexture( "doge", "H:\\doge.jpg" );
   std::vector<Lore::NodePtr> doges;
   dogeEntity->setTexture( dogeTexture );
   for ( int i = 0; i < 5; ++i ) {
@@ -133,7 +137,7 @@ int main( int argc, char** argv )
   //
   // Create background.
 
-  Lore::Resource::LoadTexture( "bg_city", "C:\\clouds.jpg" );
+  Lore::Resource::LoadTexture( "bg_city", "H:\\clouds.jpg" );
   Lore::Resource::LoadTexture( "death-egg", "H:\\bg.png" );
   auto bg = scene->getBackground();
   auto& layer = bg->addLayer( "1" );
@@ -228,6 +232,9 @@ int main( int argc, char** argv )
   fpsTextbox->setTextColor( Lore::StockColor::Green );
   //fpsTextbox->setFont( font );
 
+  __sonic = sonicNode;
+  //Lore::Input::SetKeyCallback( OnKeyChanged );
+
   float f = 0.f;
   __timer.reset();
   while ( context->active() ) {
@@ -251,22 +258,22 @@ int main( int argc, char** argv )
     }
 
     const float speed = 0.01f;
-    if ( GetAsyncKeyState( 0x57 ) ) { // W
+    if ( Lore::Input::GetKeyState( Lore::Keycode::W ) ) {
       sonicNode->translate( 0.f, speed );
     }
-    else if ( GetAsyncKeyState( 0x53 ) ) { // S
+    else if ( Lore::Input::GetKeyState( Lore::Keycode::S ) ) {
       sonicNode->translate( 0.f, -speed );
     }
-    if ( GetAsyncKeyState( 0x41 ) ) { // A
-      sonicNode->translate( -speed, 0 );
+    if ( Lore::Input::GetKeyState( Lore::Keycode::D ) ) {
+      sonicNode->translate( speed, 0.f );
     }
-    else if ( GetAsyncKeyState( 0x44 ) ) { // D
-      sonicNode->translate( speed, 0 );
+    else if ( Lore::Input::GetKeyState( Lore::Keycode::A ) ) {
+      sonicNode->translate( -speed, 0.f );
     }
-    if ( GetAsyncKeyState( 0x5A ) ) { // Z
+    if ( Lore::Input::GetKeyState( Lore::Keycode::Z ) ) {
       camera->zoom( 0.01f );
     }
-    else if ( GetAsyncKeyState( 0x58 ) ) { // X
+    else if ( Lore::Input::GetKeyState( Lore::Keycode::X ) ) {
       camera->zoom( -0.01f );
     }
 
@@ -312,6 +319,42 @@ static void UpdateFPS( Lore::TextboxPtr textbox )
 
     frameCount = 0;
     elapsed += 1.f;
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+static void OnKeyChanged( const Lore::Keycode key, const bool state )
+{
+  const float speed = 0.01f;
+
+  switch ( key ) {
+  default:
+    break;
+
+  case Lore::Keycode::W:
+    __sonic->translate( 0.f, speed );
+    break;
+
+  case Lore::Keycode::S:
+    __sonic->translate( 0.f, -speed );
+    break;
+
+  case Lore::Keycode::A:
+    __sonic->translate( -speed, 0 );
+    break;
+
+  case Lore::Keycode::D:
+    __sonic->translate( speed, 0 );
+    break;
+
+  case Lore::Keycode::Z:
+    __camera->zoom( 0.01f );
+    break;
+
+  case Lore::Keycode::X:
+    __camera->zoom( -0.01f );
+    break;
   }
 }
 

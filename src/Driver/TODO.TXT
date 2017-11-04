@@ -3,7 +3,7 @@
 -Rename resource controller to ResourceCenter?
 -Debug tools - view memory pools for each type, hover over to view details
 -Resource file location indexing for easy reloading (see ResourceController.h).
--Sprites!
+-Sprites! - rename Texture to Sprite; textures will become a sprite with a single texture/frame
 -Re-organize to include/src directories
 -RTT (add priority to renderview, RTTs are automatically rendered before window framebuffers)
 -Multi-texturing
@@ -26,6 +26,7 @@
   Get rid of _reset() functions
 -Box select of AABBs
 -Post-processing effect factory to create entities to use render targets, provide helper functions to setup in one call
+-Exception handling, all functions that do not throw should be noexcept
 -Grid rendering
 -Finish unit tests
 

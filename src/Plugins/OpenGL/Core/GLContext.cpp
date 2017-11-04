@@ -30,6 +30,7 @@
 
 #include <LORE2D/Renderer/RendererFactory.h>
 
+#include <Plugins/OpenGL/Input/GLInput.h>
 #include <Plugins/OpenGL/Renderer/RenderAPI.h>
 #include <Plugins/OpenGL/Resource/GLFont.h>
 #include <Plugins/OpenGL/Resource/GLStockResource.h>
@@ -97,6 +98,7 @@ Context::Context() noexcept
   }
 
   _renderAPI = std::make_unique<RenderAPI>();
+  _inputController = std::make_unique<GLInputController>();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -157,6 +159,9 @@ Lore::WindowPtr Context::createWindow( const string& title,
   if ( !_activeWindow ) {
     _activeWindow = window;
   }
+
+  // Register input callbacks for this window.
+  _inputController->createCallbacks( window );
 
   // Return a handle.
   return window;

@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,30 +24,60 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Include this file for all Lore2D functionality.
+#include "GLInput.h"
+
+#include <Plugins/OpenGL/Window/GLWindow.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "LorePrerequisites.h"
+namespace LocalNS {
 
-// Core.
-#include <LORE2D/Core/Context.h>
-#include <LORE2D/Core/Timer.h>
+  static Lore::OpenGL::GLInputController* InputControllerInstance = nullptr;
 
-// Input.
-#include <LORE2D/Input/Input.h>
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Math.
-#include <LORE2D/Math/Math.h>
+  static void GLFWKeyCallback( GLFWwindow* window, int key, int scancode, int action, int mods )
+  {
+    Lore::KeyCallback callback = InputControllerInstance->getKeyCallback();
+    if ( callback ) {
+      callback( static_cast<Lore::Keycode>( key ), ( action > 0 ) ? true : false );
+    }
+  }
 
-// Resource.
-#include <LORE2D/Resource/Entity.h>
-#include <LORE2D/Resource/Material.h>
-#include <LORE2D/Resource/StockResource.h>
-#include <LORE2D/Resource/Renderable/Texture.h>
-#include <LORE2D/Resource/Renderable/Textbox.h>
-#include <LORE2D/Scene/Background.h>
-#include <LORE2D/UI/UI.h>
-#include <LORE2D/UI/UIElement.h>
+}
+using namespace LocalNS;
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+using namespace Lore::OpenGL;
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+GLInputController::GLInputController()
+{
+  InputControllerInstance = this;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+GLInputController::~GLInputController()
+{
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLInputController::createCallbacks( Lore::WindowPtr window )
+{
+  GLFWwindow* glfwWindow = static_cast<GLWindow*>( window )->getInternalWindow();
+  glfwSetKeyCallback( glfwWindow, GLFWKeyCallback );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+bool GLInputController::getKeyState( Lore::WindowPtr window, const Lore::Keycode key )
+{
+  GLFWwindow* glfwWindow = static_cast<GLWindow*>( window )->getInternalWindow();
+  return glfwGetKey( glfwWindow, static_cast< int >( key ) );
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

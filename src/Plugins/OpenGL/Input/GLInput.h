@@ -25,30 +25,46 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Include this file for all Lore2D functionality.
+#include <LORE2D/Input/Input.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "LorePrerequisites.h"
+namespace Lore { namespace OpenGL {
 
-// Core.
-#include <LORE2D/Core/Context.h>
-#include <LORE2D/Core/Timer.h>
+  class GLWindow;
 
-// Input.
-#include <LORE2D/Input/Input.h>
+  class GLInputController : public Lore::InputController
+  {
 
-// Math.
-#include <LORE2D/Math/Math.h>
+  public:
 
-// Resource.
-#include <LORE2D/Resource/Entity.h>
-#include <LORE2D/Resource/Material.h>
-#include <LORE2D/Resource/StockResource.h>
-#include <LORE2D/Resource/Renderable/Texture.h>
-#include <LORE2D/Resource/Renderable/Textbox.h>
-#include <LORE2D/Scene/Background.h>
-#include <LORE2D/UI/UI.h>
-#include <LORE2D/UI/UIElement.h>
+    GLInputController();
+    ~GLInputController() override;
+
+    virtual void createCallbacks( WindowPtr window ) override;
+
+    virtual bool getKeyState( WindowPtr window, const Keycode key ) override;
+
+    //
+    // Getters.
+
+    KeyCallback getKeyCallback() const
+    {
+      return _keyCallback;
+    }
+
+    MouseButtonCallback getMouseButtonCallback() const
+    {
+      return _mouseButtonCallback;
+    }
+
+    MouseMovedCallback getMouseMovedCallback() const
+    {
+      return _mouseMovedCallback;
+    }
+
+  };
+
+}}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
