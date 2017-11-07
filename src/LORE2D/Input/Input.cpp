@@ -50,6 +50,13 @@ void InputController::setKeyCallback( const KeyCallback callback )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void InputController::setCharCallback( const CharCallback callback )
+{
+  _charCallback = callback;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void InputController::setMouseButtonCallback( const MouseButtonCallback callback )
 {
   _mouseButtonCallback = callback;
@@ -57,9 +64,9 @@ void InputController::setMouseButtonCallback( const MouseButtonCallback callback
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void InputController::setMouseMovedCallback( const MouseMovedCallback callback )
+void InputController::setMouseMovedCallback( const MousePosCallback callback )
 {
-  _mouseMovedCallback = callback;
+  _mousePosCallback = callback;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -72,6 +79,13 @@ void Input::SetKeyCallback( const KeyCallback callback )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void Input::SetCharCallback( const CharCallback callback )
+{
+  ActiveContext->getInputController()->setCharCallback( callback );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void Input::SetMouseButtonCallback( const MouseButtonCallback callback )
 {
   ActiveContext->getInputController()->setMouseButtonCallback( callback );
@@ -79,7 +93,7 @@ void Input::SetMouseButtonCallback( const MouseButtonCallback callback )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Input::SetMouseMovedCallback( const MouseMovedCallback callback )
+void Input::SetMouseMovedCallback( const MousePosCallback callback )
 {
   ActiveContext->getInputController()->setMouseMovedCallback( callback );
 }
@@ -89,6 +103,27 @@ void Input::SetMouseMovedCallback( const MouseMovedCallback callback )
 bool Input::GetKeyState( const Keycode key )
 {
   return ActiveContext->getInputController()->getKeyState( ActiveContext->getActiveWindow(), key );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+bool Input::GetKeymodState( const Keymod mod )
+{
+  return ActiveContext->getInputController()->getKeymodState( mod );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Input::GetCursorPos( int32_t& x, int32_t& y )
+{
+  ActiveContext->getInputController()->getCursorPos( ActiveContext->getActiveWindow(), x, y );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+bool Input::GetMouseButtonState( const MouseButton button )
+{
+  return ActiveContext->getInputController()->getMouseButtonState( ActiveContext->getActiveWindow(), button );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

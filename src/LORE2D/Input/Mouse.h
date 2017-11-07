@@ -25,54 +25,20 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Input/Input.h>
+namespace Lore {
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-namespace Lore { namespace OpenGL {
-
-  class GLWindow;
-
-  class GLInputController : public Lore::InputController
+  enum class MouseButton
   {
-
-  public:
-
-    GLInputController();
-    ~GLInputController() override;
-
-    virtual void createCallbacks( WindowPtr window ) override;
-
-    virtual bool getKeyState( WindowPtr window, const Keycode key ) override;
-    virtual bool getKeymodState( const Keymod key ) override;
-    virtual void getCursorPos( WindowPtr window, int32_t& x, int32_t& y ) override;
-    virtual bool getMouseButtonState( WindowPtr window, const MouseButton button ) override;
-
-    //
-    // Getters.
-
-    KeyCallback getKeyCallback() const
-    {
-      return _keyCallback;
-    }
-
-    CharCallback getCharCallback() const
-    {
-      return _charCallback;
-    }
-
-    MouseButtonCallback getMouseButtonCallback() const
-    {
-      return _mouseButtonCallback;
-    }
-
-    MousePosCallback getMousePosCallback() const
-    {
-      return _mousePosCallback;
-    }
-
+    Left,
+    Right,
+    Middle,
+    Four,
+    Five,
+    Six,
+    Seven,
+    Eight,
   };
 
-}}
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -42,6 +42,7 @@ static Lore::CameraPtr __camera;
 static Lore::NodePtr __sonic;
 static void UpdateFPS( Lore::TextboxPtr textbox );
 static void OnKeyChanged( const Lore::Keycode key, const bool state );
+static void OnChar( const char c );
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -234,9 +235,11 @@ int main( int argc, char** argv )
 
   __sonic = sonicNode;
   //Lore::Input::SetKeyCallback( OnKeyChanged );
+  Lore::Input::SetCharCallback( OnChar );
 
   float f = 0.f;
   __timer.reset();
+  bool pause = true;
   while ( context->active() ) {
     __timer.tick();
 
@@ -257,7 +260,10 @@ int main( int argc, char** argv )
       doge->rotate( Lore::Degree( .1f ) );
     }
 
-    const float speed = 0.01f;
+    float speed = 0.01f;
+    if ( Lore::Input::GetKeymodState( Lore::Keymod::Shift ) ) {
+      speed *= 2.f;
+    }
     if ( Lore::Input::GetKeyState( Lore::Keycode::W ) ) {
       sonicNode->translate( 0.f, speed );
     }
@@ -277,12 +283,24 @@ int main( int argc, char** argv )
       camera->zoom( -0.01f );
     }
 
-    if ( GetAsyncKeyState( VK_F8 ) ) {
+    if ( Lore::Input::GetKeyState( Lore::Keycode::F8 ) ) {
       static bool destroyed = false;
       if ( !destroyed ) {
         Lore::Resource::DestroyTexture( sonicTexture );
         destroyed = true;
       }
+    }
+
+    if ( Lore::Input::GetKeyState( Lore::Keycode::Escape ) ) {
+      pause = false;
+      break;
+    }
+
+    if ( Lore::Input::GetMouseButtonState( Lore::MouseButton::Left ) ) {
+      printf( "Left!\n" );
+    }
+    if ( Lore::Input::GetMouseButtonState( Lore::MouseButton::Right ) ) {
+      printf( "Right!\n" );
     }
 
     UpdateFPS( fpsTextbox );
@@ -292,8 +310,11 @@ int main( int argc, char** argv )
   DestroyLoreContext( context );
 
   #ifdef _DEBUG
-  system( "pause" );
+  if ( pause ) {
+    system( "pause" );
+  }
   #endif
+
   return 0;
 }
 
@@ -356,6 +377,11 @@ static void OnKeyChanged( const Lore::Keycode key, const bool state )
     __camera->zoom( -0.01f );
     break;
   }
+}
+
+static void OnChar( const char c )
+{
+  printf( "OnChar: %c\n", c );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -32,7 +32,8 @@
 
 namespace LocalNS {
 
-  static Lore::OpenGL::GLInputController* InputControllerInstance = nullptr;
+  static Lore::OpenGL::GLInputController* InputControllerInstance { nullptr };
+  static std::unordered_map<Lore::Keymod, bool> KeymodStates {};
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -40,7 +41,64 @@ namespace LocalNS {
   {
     Lore::KeyCallback callback = InputControllerInstance->getKeyCallback();
     if ( callback ) {
-      callback( static_cast<Lore::Keycode>( key ), ( action > 0 ) ? true : false );
+      const auto loreKey = static_cast< Lore::Keycode >( key );
+      const bool pressed = ( action > 0 ) ? true : false;
+
+      // Trigger developer-provided callback.
+      callback( loreKey, pressed );
+    }
+
+    // Set modifier bits.
+    KeymodStates[Lore::Keymod::Shift] = ( mods & GLFW_MOD_SHIFT );
+    KeymodStates[Lore::Keymod::Control] = ( mods & GLFW_MOD_CONTROL );
+    KeymodStates[Lore::Keymod::Alt] = ( mods & GLFW_MOD_ALT );
+    KeymodStates[Lore::Keymod::Super] = ( mods & GLFW_MOD_SUPER );
+  }
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  static void GLFWCharCallback( GLFWwindow* window, unsigned int codepoint )
+  {
+    Lore::CharCallback callback = InputControllerInstance->getCharCallback();
+    if ( callback ) {
+      callback( static_cast<char>( codepoint ) );
+    }
+  }
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  static void GLFWMousePosCallback( GLFWwindow* window, double x, double y )
+  {
+    Lore::MousePosCallback callback = InputControllerInstance->getMousePosCallback();
+    if ( callback ) {
+      callback( static_cast<int32_t>( x ), static_cast<int32_t>( y ) );
+    }
+  }
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  static void GLFWMouseButtonCallback( GLFWwindow* window, int button, int action, int mods )
+  {
+    Lore::MouseButtonCallback callback = InputControllerInstance->getMouseButtonCallback();
+    if ( callback ) {
+      const bool pressed = ( action > 0 ) ? true : false;
+      switch ( button ) {
+      case GLFW_MOUSE_BUTTON_LEFT:
+        callback( Lore::MouseButton::Left, pressed );
+        break;
+
+      case GLFW_MOUSE_BUTTON_MIDDLE:
+        callback( Lore::MouseButton::Middle, pressed );
+        break;
+
+      case GLFW_MOUSE_BUTTON_RIGHT:
+        callback( Lore::MouseButton::Right, pressed );
+        break;
+
+      default:
+        callback( static_cast< Lore::MouseButton >( button ), pressed );
+        break;
+      }
     }
   }
 
@@ -70,6 +128,9 @@ void GLInputController::createCallbacks( Lore::WindowPtr window )
 {
   GLFWwindow* glfwWindow = static_cast<GLWindow*>( window )->getInternalWindow();
   glfwSetKeyCallback( glfwWindow, GLFWKeyCallback );
+  glfwSetCharCallback( glfwWindow, GLFWCharCallback );
+  glfwSetCursorPosCallback( glfwWindow, GLFWMousePosCallback );
+  glfwSetMouseButtonCallback( glfwWindow, GLFWMouseButtonCallback );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -78,6 +139,50 @@ bool GLInputController::getKeyState( Lore::WindowPtr window, const Lore::Keycode
 {
   GLFWwindow* glfwWindow = static_cast<GLWindow*>( window )->getInternalWindow();
   return glfwGetKey( glfwWindow, static_cast< int >( key ) );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+bool GLInputController::getKeymodState( const Lore::Keymod key )
+{
+  return KeymodStates[key];
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLInputController::getCursorPos( Lore::WindowPtr window, int32_t& x, int32_t& y )
+{
+  GLFWwindow* glfwWindow = static_cast<GLWindow*>( window )->getInternalWindow();
+  double _x, _y;
+  glfwGetCursorPos( glfwWindow, &_x, &_y );
+  x = static_cast<int32_t>( _x );
+  y = static_cast<int32_t>( _y );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+bool GLInputController::getMouseButtonState( Lore::WindowPtr window, const Lore::MouseButton button )
+{
+  GLFWwindow* glfwWindow = static_cast<GLWindow*>( window )->getInternalWindow();
+  int glfwBtn = -1;
+  switch ( button ) {
+  case Lore::MouseButton::Left:
+    glfwBtn = GLFW_MOUSE_BUTTON_LEFT;
+    break;
+
+  case Lore::MouseButton::Right:
+    glfwBtn = GLFW_MOUSE_BUTTON_RIGHT;
+    break;
+
+  case Lore::MouseButton::Middle:
+    glfwBtn = GLFW_MOUSE_BUTTON_MIDDLE;
+    break;
+
+  default:
+    glfwBtn = static_cast< int >( button );
+  }
+
+  return ( GLFW_PRESS == glfwGetMouseButton( glfwWindow, glfwBtn ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

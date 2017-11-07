@@ -26,14 +26,16 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 #include "Keys.h"
+#include "Mouse.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
   using KeyCallback = void(*)( const Keycode, const bool );
-  using MouseButtonCallback = void(*)( const int, const bool );
-  using MouseMovedCallback = void(*)( const double x, const double y );
+  using CharCallback = void(*)( const char c );
+  using MouseButtonCallback = void(*)( const MouseButton, const bool );
+  using MousePosCallback = void(*)( const int32_t x, const int32_t y );
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -46,18 +48,23 @@ namespace Lore {
     virtual ~InputController() = default;
 
     void setKeyCallback( const KeyCallback callback );
+    void setCharCallback( const CharCallback callback );
     void setMouseButtonCallback( const MouseButtonCallback callback );
-    void setMouseMovedCallback( const MouseMovedCallback callback );
+    void setMouseMovedCallback( const MousePosCallback callback );
 
     virtual void createCallbacks( WindowPtr window ) = 0;
 
     virtual bool getKeyState( WindowPtr window, const Keycode key ) = 0;
+    virtual bool getKeymodState( const Keymod key ) = 0;
+    virtual void getCursorPos( WindowPtr window, int32_t& x, int32_t& y ) = 0;
+    virtual bool getMouseButtonState( WindowPtr window, const MouseButton button ) = 0;
 
   protected:
 
     KeyCallback _keyCallback { nullptr };
+    CharCallback _charCallback { nullptr };
     MouseButtonCallback _mouseButtonCallback { nullptr };
-    MouseMovedCallback _mouseMovedCallback { nullptr };
+    MousePosCallback _mousePosCallback { nullptr };
 
   };
 
@@ -69,10 +76,14 @@ namespace Lore {
   public:
 
     static void SetKeyCallback( const KeyCallback callback );
+    static void SetCharCallback( const CharCallback callback );
     static void SetMouseButtonCallback( const MouseButtonCallback callback );
-    static void SetMouseMovedCallback( const MouseMovedCallback callback );
+    static void SetMouseMovedCallback( const MousePosCallback callback );
 
     static bool GetKeyState( const Keycode key );
+    static bool GetKeymodState( const Keymod mod );
+    static void GetCursorPos( int32_t& x, int32_t& y );
+    static bool GetMouseButtonState( const MouseButton button );
 
   private:
 
