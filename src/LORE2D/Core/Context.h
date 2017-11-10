@@ -150,12 +150,23 @@ namespace Lore {
     }
 
     ///
+    /// \brief Gets active Window of Context.
+    WindowPtr getActiveWindow() const
+    {
+      return _activeWindow;
+    }
+
+    ///
     /// \brief Returns pointer to Scene in Context of the specified name.
     ///     Throws ItemIdentityException if not found.
     ScenePtr getScene( const string& name )
     {
       return _sceneRegistry.get( name );
     }
+
+    ///
+    /// \brief Returns InputController instance allocated by render plugin's Context.
+    InputControllerPtr getInputController() const;
 
     //
     // Modifiers.
@@ -254,6 +265,7 @@ namespace Lore {
     std::unique_ptr<FrameListenerController> _frameListenerController { std::make_unique<FrameListenerController>() };
     PoolCluster _poolCluster { "Primary" };
 
+    std::unique_ptr<InputController> _inputController { nullptr };
     std::unique_ptr<IRenderAPI> _renderAPI { nullptr };
 
     // True if one or more Windows exist in Context.

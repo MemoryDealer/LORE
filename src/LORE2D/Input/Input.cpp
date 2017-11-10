@@ -24,10 +24,18 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Camera.h"
+#include "Input.h"
 
-#include <LORE2D/Math/Math.h>
-#include <LORE2D/Scene/Node.h>
+#include <LORE2D/Core/Context.h>
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+namespace LocalNS {
+
+  Lore::ContextPtr ActiveContext = nullptr;
+
+}
+using namespace LocalNS;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -35,164 +43,115 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace LocalNS {
-
-  constexpr real ZoomLimit = 0.1f;
-
-}
-using namespace LocalNS;
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-Camera::Camera()
+void InputController::setKeyCallback( const KeyCallback callback )
 {
+  _keyCallback = callback;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Camera::~Camera()
+void InputController::setCharCallback( const CharCallback callback )
 {
+  _charCallback = callback;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Camera::setPosition( const Vec2& pos )
+void InputController::setMouseButtonCallback( const MouseButtonCallback callback )
 {
-  _position = pos;
-  _dirty();
+  _mouseButtonCallback = callback;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Camera::setPosition( const real x, const real y )
+void InputController::setMouseMovedCallback( const MousePosCallback callback )
 {
-  _position.x = x / _zoom;
-  _position.y = y / _zoom;
-  _dirty();
+  _mousePosCallback = callback;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Camera::translate( const Vec2& offset )
+void InputController::setMouseScrollCallback( const MouseScrollCallback callback )
 {
-  _position += offset / _zoom;
-  _dirty();
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Camera::translate( const real xOffset, const real yOffset )
-{
-  _position.x += xOffset / _zoom;
-  _position.y += yOffset / _zoom;
-  _dirty();
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Camera::zoom( const real amount )
-{
-  _zoom += amount * _zoom; // Scale zooming speed as it goes farther.
-  if ( _zoom < ZoomLimit ) {
-    _zoom = ZoomLimit;
-  }
-
-  _dirty();
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Camera::setZoom( const real amount )
-{
-  _zoom = amount;
-  if ( _zoom < ZoomLimit ) {
-    _zoom = ZoomLimit;
-  }
-  
-  _dirty();
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-Vec2 Camera::getPosition() const
-{
-  return _position;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-Matrix4 Camera::getViewMatrix()
-{
-  if ( _viewMatrixDirty ) {
-    _updateViewMatrix();
-  }
-
-  return _view;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Camera::trackNode( NodePtr node, const TrackingStyle& mode )
-{
-  _trackingNode = node;
-  _trackingStyle = mode;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Camera::updateTracking( const real aspectRatio )
-{
-  if ( !_trackingNode ) {
-    return;
-  }
-
-  const Vec2 nodePos = _trackingNode->getPosition();
-
-  switch ( _trackingStyle ) {
-  default:
-  case TrackingStyle::Simple:
-    _position.x = nodePos.x / aspectRatio;
-    _position.y = nodePos.y;
-    break;
-  }
-
-  _dirty();
+  _mouseScrollCallback = callback;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Camera::_dirty()
+void Input::SetKeyCallback( const KeyCallback callback )
 {
-  _viewMatrixDirty = true;
+  ActiveContext->getInputController()->setKeyCallback( callback );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Camera::_reset()
+void Input::SetCharCallback( const CharCallback callback )
 {
-  // TODO: After memory pool refactor, remove data resets.
-  // Replace with cleanup functions that only free dynamic memory and graphics resources.
-  _position = Vec2();
-  _view = Matrix4();
-  _zoom = 1.f;
-  _viewMatrixDirty = true;
+  ActiveContext->getInputController()->setCharCallback( callback );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Camera::_updateViewMatrix()
+void Input::SetMouseButtonCallback( const MouseButtonCallback callback )
 {
-  Vec2 scale( _zoom, _zoom );
-  _view = Math::CreateTransformationMatrix( _position,
-                                            Quaternion(),
-                                            scale );
+  ActiveContext->getInputController()->setMouseButtonCallback( callback );
+}
 
-  // Wtf? Have to invert x/y values...not sure why at the moment.
-  _view[3][0] *= -_zoom;
-  _view[3][1] *= -_zoom;
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-  _viewMatrixDirty = false;
+void Input::SetMouseMovedCallback( const MousePosCallback callback )
+{
+  ActiveContext->getInputController()->setMouseMovedCallback( callback );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Input::SetMouseScrollCallback( const MouseScrollCallback callback )
+{
+  ActiveContext->getInputController()->setMouseScrollCallback( callback );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Input::SetCursorEnabled( const bool enabled )
+{
+  ActiveContext->getInputController()->setCursorEnabled( ActiveContext->getActiveWindow(), enabled );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+bool Input::GetKeyState( const Keycode key )
+{
+  return ActiveContext->getInputController()->getKeyState( ActiveContext->getActiveWindow(), key );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+bool Input::GetKeymodState( const Keymod mod )
+{
+  return ActiveContext->getInputController()->getKeymodState( mod );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Input::GetCursorPos( int32_t& x, int32_t& y )
+{
+  ActiveContext->getInputController()->getCursorPos( ActiveContext->getActiveWindow(), x, y );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+bool Input::GetMouseButtonState( const MouseButton button )
+{
+  return ActiveContext->getInputController()->getMouseButtonState( ActiveContext->getActiveWindow(), button );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Input::AssignContext( ContextPtr context )
+{
+  ActiveContext = context;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -3,7 +3,7 @@
 -Rename resource controller to ResourceCenter?
 -Debug tools - view memory pools for each type, hover over to view details
 -Resource file location indexing for easy reloading (see ResourceController.h).
--Sprites!
+-Sprites! - rename Texture to Sprite; textures will become a sprite with a single texture/frame
 -Re-organize to include/src directories
 -RTT (add priority to renderview, RTTs are automatically rendered before window framebuffers)
 -Multi-texturing
@@ -13,7 +13,7 @@
 -Lua scripting system, callbacks into bound lua scripts to nodes/scenes.
 -Resource configuration files - materials, scenes, textures all loaded into group via .rsrc file.
   Lua bindings for configuration and resource files
--Input: Mouse clicks hitting nodes
+-Input: Mouse clicks hitting nodes (provide helper function that converts mouse coordinates to world)
 -AABB drawing, basic collision support
 -Camera tracks - key frames
   Animation system for nodes with key frames
@@ -23,9 +23,9 @@
 -Proper cleanup of resources
 -Compositors: visualize depth buffer (https://learnopengl.com/#!Advanced-OpenGL/Depth-testing)
 -Modify memory pool to use raw uint8_t buffers, get rid of reset() functions; use default copy for each pool
-  Get rid of _reset() functions
 -Box select of AABBs
 -Post-processing effect factory to create entities to use render targets, provide helper functions to setup in one call
+-Exception handling, all functions that do not throw should be noexcept
 -Grid rendering
 -Finish unit tests
 

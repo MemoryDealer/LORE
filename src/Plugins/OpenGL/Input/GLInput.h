@@ -25,30 +25,61 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Include this file for all Lore2D functionality.
+#include <LORE2D/Input/Input.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "LorePrerequisites.h"
+namespace Lore { namespace OpenGL {
 
-// Core.
-#include <LORE2D/Core/Context.h>
-#include <LORE2D/Core/Timer.h>
+  class GLWindow;
 
-// Input.
-#include <LORE2D/Input/Input.h>
+  class GLInputController : public Lore::InputController
+  {
 
-// Math.
-#include <LORE2D/Math/Math.h>
+  public:
 
-// Resource.
-#include <LORE2D/Resource/Entity.h>
-#include <LORE2D/Resource/Material.h>
-#include <LORE2D/Resource/StockResource.h>
-#include <LORE2D/Resource/Renderable/Texture.h>
-#include <LORE2D/Resource/Renderable/Textbox.h>
-#include <LORE2D/Scene/Background.h>
-#include <LORE2D/UI/UI.h>
-#include <LORE2D/UI/UIElement.h>
+    GLInputController();
+    ~GLInputController() override;
+
+    virtual void createCallbacks( WindowPtr window ) override;
+
+    virtual bool getKeyState( WindowPtr window, const Keycode key ) override;
+    virtual bool getKeymodState( const Keymod key ) override;
+    virtual void getCursorPos( WindowPtr window, int32_t& x, int32_t& y ) override;
+    virtual bool getMouseButtonState( WindowPtr window, const MouseButton button ) override;
+
+    virtual void setCursorEnabled( WindowPtr window, const bool enabled ) override;
+
+    //
+    // Getters.
+
+    KeyCallback getKeyCallback() const
+    {
+      return _keyCallback;
+    }
+
+    CharCallback getCharCallback() const
+    {
+      return _charCallback;
+    }
+
+    MouseButtonCallback getMouseButtonCallback() const
+    {
+      return _mouseButtonCallback;
+    }
+
+    MousePosCallback getMousePosCallback() const
+    {
+      return _mousePosCallback;
+    }
+
+    MouseScrollCallback getMouseScrollCallback() const
+    {
+      return _mouseScrollCallback;
+    }
+
+  };
+
+}}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

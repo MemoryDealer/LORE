@@ -67,6 +67,14 @@ namespace Lore { namespace OpenGL {
 
         void updateRenderViews();
 
+        //
+        // Getters.
+
+        GLFWwindow* getInternalWindow() const
+        {
+          return _window;
+        }
+
     protected:
 
         virtual void _reset() override;
