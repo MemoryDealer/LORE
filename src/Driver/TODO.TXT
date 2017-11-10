@@ -23,7 +23,6 @@
 -Proper cleanup of resources
 -Compositors: visualize depth buffer (https://learnopengl.com/#!Advanced-OpenGL/Depth-testing)
 -Modify memory pool to use raw uint8_t buffers, get rid of reset() functions; use default copy for each pool
-  Get rid of _reset() functions
 -Box select of AABBs
 -Post-processing effect factory to create entities to use render targets, provide helper functions to setup in one call
 -Exception handling, all functions that do not throw should be noexcept

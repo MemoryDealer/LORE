@@ -70,6 +70,13 @@ void InputController::setMouseMovedCallback( const MousePosCallback callback )
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void InputController::setMouseScrollCallback( const MouseScrollCallback callback )
+{
+  _mouseScrollCallback = callback;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Input::SetKeyCallback( const KeyCallback callback )
@@ -96,6 +103,20 @@ void Input::SetMouseButtonCallback( const MouseButtonCallback callback )
 void Input::SetMouseMovedCallback( const MousePosCallback callback )
 {
   ActiveContext->getInputController()->setMouseMovedCallback( callback );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Input::SetMouseScrollCallback( const MouseScrollCallback callback )
+{
+  ActiveContext->getInputController()->setMouseScrollCallback( callback );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Input::SetCursorEnabled( const bool enabled )
+{
+  ActiveContext->getInputController()->setCursorEnabled( ActiveContext->getActiveWindow(), enabled );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

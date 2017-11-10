@@ -36,6 +36,7 @@ namespace Lore {
   using CharCallback = void(*)( const char c );
   using MouseButtonCallback = void(*)( const MouseButton, const bool );
   using MousePosCallback = void(*)( const int32_t x, const int32_t y );
+  using MouseScrollCallback = void(*)( const double xOffset, const double yOffset );
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -51,6 +52,7 @@ namespace Lore {
     void setCharCallback( const CharCallback callback );
     void setMouseButtonCallback( const MouseButtonCallback callback );
     void setMouseMovedCallback( const MousePosCallback callback );
+    void setMouseScrollCallback( const MouseScrollCallback callback );
 
     virtual void createCallbacks( WindowPtr window ) = 0;
 
@@ -59,12 +61,15 @@ namespace Lore {
     virtual void getCursorPos( WindowPtr window, int32_t& x, int32_t& y ) = 0;
     virtual bool getMouseButtonState( WindowPtr window, const MouseButton button ) = 0;
 
+    virtual void setCursorEnabled( WindowPtr window, const bool enabled ) = 0;
+
   protected:
 
     KeyCallback _keyCallback { nullptr };
     CharCallback _charCallback { nullptr };
     MouseButtonCallback _mouseButtonCallback { nullptr };
     MousePosCallback _mousePosCallback { nullptr };
+    MouseScrollCallback _mouseScrollCallback { nullptr };
 
   };
 
@@ -79,6 +84,8 @@ namespace Lore {
     static void SetCharCallback( const CharCallback callback );
     static void SetMouseButtonCallback( const MouseButtonCallback callback );
     static void SetMouseMovedCallback( const MousePosCallback callback );
+    static void SetMouseScrollCallback( const MouseScrollCallback callback );
+    static void SetCursorEnabled( const bool enabled );
 
     static bool GetKeyState( const Keycode key );
     static bool GetKeymodState( const Keymod mod );

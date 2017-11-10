@@ -48,6 +48,8 @@ namespace Lore { namespace OpenGL {
     virtual void getCursorPos( WindowPtr window, int32_t& x, int32_t& y ) override;
     virtual bool getMouseButtonState( WindowPtr window, const MouseButton button ) override;
 
+    virtual void setCursorEnabled( WindowPtr window, const bool enabled ) override;
+
     //
     // Getters.
 
@@ -69,6 +71,11 @@ namespace Lore { namespace OpenGL {
     MousePosCallback getMousePosCallback() const
     {
       return _mousePosCallback;
+    }
+
+    MouseScrollCallback getMouseScrollCallback() const
+    {
+      return _mouseScrollCallback;
     }
 
   };

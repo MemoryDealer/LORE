@@ -234,7 +234,7 @@ int main( int argc, char** argv )
   //fpsTextbox->setFont( font );
 
   __sonic = sonicNode;
-  //Lore::Input::SetKeyCallback( OnKeyChanged );
+  Lore::Input::SetKeyCallback( OnKeyChanged );
   Lore::Input::SetCharCallback( OnChar );
 
   float f = 0.f;
@@ -353,28 +353,12 @@ static void OnKeyChanged( const Lore::Keycode key, const bool state )
   default:
     break;
 
-  case Lore::Keycode::W:
-    __sonic->translate( 0.f, speed );
-    break;
-
-  case Lore::Keycode::S:
-    __sonic->translate( 0.f, -speed );
-    break;
-
-  case Lore::Keycode::A:
-    __sonic->translate( -speed, 0 );
-    break;
-
-  case Lore::Keycode::D:
-    __sonic->translate( speed, 0 );
-    break;
-
-  case Lore::Keycode::Z:
-    __camera->zoom( 0.01f );
-    break;
-
-  case Lore::Keycode::X:
-    __camera->zoom( -0.01f );
+  case Lore::Keycode::C:
+    {
+      static bool enabled = true;
+      enabled = !enabled;
+      Lore::Input::SetCursorEnabled( enabled );
+    }
     break;
   }
 }

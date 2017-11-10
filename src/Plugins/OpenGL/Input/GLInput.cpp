@@ -102,6 +102,16 @@ namespace LocalNS {
     }
   }
 
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  static void GLFWMouseScrollCallback( GLFWwindow* window, double xOffset, double yOffset )
+  {
+    Lore::MouseScrollCallback callback = InputControllerInstance->getMouseScrollCallback();
+    if ( callback ) {
+      callback( xOffset, yOffset );
+    }
+  }
+
 }
 using namespace LocalNS;
 
@@ -131,6 +141,7 @@ void GLInputController::createCallbacks( Lore::WindowPtr window )
   glfwSetCharCallback( glfwWindow, GLFWCharCallback );
   glfwSetCursorPosCallback( glfwWindow, GLFWMousePosCallback );
   glfwSetMouseButtonCallback( glfwWindow, GLFWMouseButtonCallback );
+  glfwSetScrollCallback( glfwWindow, GLFWMouseScrollCallback );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -183,6 +194,15 @@ bool GLInputController::getMouseButtonState( Lore::WindowPtr window, const Lore:
   }
 
   return ( GLFW_PRESS == glfwGetMouseButton( glfwWindow, glfwBtn ) );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLInputController::setCursorEnabled( Lore::WindowPtr window, const bool enabled )
+{
+  GLFWwindow* glfwWindow = static_cast<GLWindow*>( window )->getInternalWindow();
+  glfwSetInputMode( glfwWindow, GLFW_CURSOR,
+    ( enabled ) ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
