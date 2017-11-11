@@ -125,7 +125,7 @@ namespace Lore {
     Color _borderColor { StockColor::White };
     Color _fillColor { 1.f, 1.f, 1.f, 0.3f };
     Vec2 _size { 1.f, 1.f };
-    real _borderWidth { 0.025f };
+    real _borderWidth { 0.02f };
 
   };
 
