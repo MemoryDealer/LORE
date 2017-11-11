@@ -35,6 +35,7 @@ namespace Lore {
   // Forward declarations.
 
   class Background;
+  class Box;
   class Camera;
   class Context;
   class Entity;
@@ -66,6 +67,7 @@ namespace Lore {
   // Pointer types.
 
   using BackgroundPtr = Background*;
+  using BoxPtr = Box*;
   using CameraPtr = Camera*;
   using ContextPtr = Context*;
   using FontPtr = Font*;

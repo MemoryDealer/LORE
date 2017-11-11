@@ -56,7 +56,7 @@ namespace Lore {
 
     Scene();
 
-    ~Scene();
+    virtual ~Scene() override;
 
     NodePtr createNode( const string& name );
 

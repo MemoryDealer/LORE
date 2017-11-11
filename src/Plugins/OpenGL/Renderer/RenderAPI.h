@@ -39,6 +39,11 @@ namespace Lore { namespace OpenGL {
     virtual ~RenderAPI() override = default;
 
     //
+    // General.
+
+    virtual void setPolygonMode( const PolygonMode& mode ) override;
+
+    //
     // Viewport.
 
     virtual void clearColor( const real r,

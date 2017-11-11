@@ -31,6 +31,7 @@
 #include <LORE2D/Renderer/IRenderAPI.h>
 #include <LORE2D/Resource/Font.h>
 #include <LORE2D/Resource/Mesh.h>
+#include <LORE2D/Resource/Renderable/Box.h>
 #include <LORE2D/Resource/Renderable/Texture.h>
 #include <LORE2D/Resource/Renderable/Textbox.h>
 #include <LORE2D/Resource/StockResource.h>
@@ -107,6 +108,23 @@ void GenericRenderer::addRenderData( Lore::EntityPtr e,
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void GenericRenderer::addBox( Lore::BoxPtr box,
+                              const Lore::Matrix4& transform )
+{
+  const uint queueId = RenderQueue::General;
+
+  activateQueue( queueId, _queues[queueId] );
+
+  RenderQueue& queue = _queues.at( queueId );
+  RenderQueue::BoxData data;
+  data.box = box;
+  data.model = transform;
+
+  queue.boxes.push_back( data );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void GenericRenderer::addTextbox( Lore::TextboxPtr textbox,
                                   const Lore::Matrix4& transform )
 {
@@ -115,7 +133,6 @@ void GenericRenderer::addTextbox( Lore::TextboxPtr textbox,
   activateQueue( queueId, _queues[queueId] );
 
   RenderQueue& queue = _queues.at( queueId );
-
   RenderQueue::TextboxData data;
   data.textbox = textbox;
   data.model = transform;
@@ -153,6 +170,7 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
   Color bg = rv.scene->getBackgroundColor();
   _api->clear();
   _api->clearColor( bg.r, bg.g, bg.b, 0.f );
+  _api->setPolygonMode( IRenderAPI::PolygonMode::Fill );
 
   // Setup view-projection matrix.
   // TODO: Take viewport dimensions into account. Cache more things inside window.
@@ -174,6 +192,9 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
 
     // Render transparents.
     renderTransparents( rv.scene, queue.transparents, viewProjection );
+
+    // Render boxes.
+    renderBoxes( queue.boxes, viewProjection );
 
     // Render text.
     renderTextboxes( queue.textboxes, viewProjection );
@@ -200,6 +221,7 @@ void GenericRenderer::_clearRenderQueues()
   for ( auto& queue : _queues ) {
     queue.solids.clear();
     queue.transparents.clear();
+    queue.boxes.clear();
     queue.textboxes.clear();
   }
 
@@ -422,6 +444,34 @@ void GenericRenderer::renderTransparents( const Lore::ScenePtr scene,
 
   }
 
+  _api->setBlendingEnabled( false );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GenericRenderer::renderBoxes( RenderQueue::BoxList& boxes,
+                                   const Matrix4& viewProjection ) const
+{
+  _api->setBlendingEnabled( true );
+  _api->setBlendingFunc( Material::BlendFactor::SrcAlpha, Material::BlendFactor::OneMinusSrcAlpha );
+
+  GPUProgramPtr program = StockResource::GetGPUProgram( "StandardBox" );
+  VertexBufferPtr vb = StockResource::GetVertexBuffer( "TexturedQuad" );
+
+  program->use();
+  vb->bind();
+
+  for ( auto& data : boxes ) {
+    BoxPtr box = data.box;
+    program->setUniformVar( "borderColor", box->getBorderColor() );
+    program->setUniformVar( "fillColor", box->getFillColor() );
+    program->setUniformVar( "borderWidth", box->getBorderWidth() );
+    program->setTransformVar( viewProjection * data.model );
+
+    vb->draw();
+  }
+
+  vb->unbind();
   _api->setBlendingEnabled( false );
 }
 

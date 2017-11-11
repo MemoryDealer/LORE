@@ -25,83 +25,107 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Resource/Material.h>
-#include <LORE2D/Math/Rectangle.h>
+#include <LORE2D/Memory/Alloc.h>
 #include <LORE2D/Resource/Color.h>
+#include <LORE2D/Resource/Renderable/Renderable.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-  ///
-  /// \class IRenderAPI
-  /// \brief Interface to render APIs to be implemented by render plugins.
-  class IRenderAPI
+  class LORE_EXPORT Box : public Renderable,
+                          public Alloc<Box>
   {
 
-  public:
-
-    enum ClearFlags
-    {
-      ColorBufferBit = 0,
-      DepthBufferBit
-    };
-
-    enum PolygonMode
-    {
-      Fill,
-      Line,
-      Point
-    };
+    LORE_OBJECT_BODY()
 
   public:
 
-    virtual ~IRenderAPI() = default;
+    Box()
+    {
+      _type = Renderable::Type::Box;
+    }
+
+    virtual ~Box() override = default;
 
     //
-    // General.
+    // Getters.
 
-    virtual void setPolygonMode( const PolygonMode& mode ) = 0;
+    inline Color getBorderColor() const
+    {
+      return _borderColor;
+    }
 
-    //
-    // Viewport.
+    inline Color getFillColor() const
+    {
+      return _fillColor;
+    }
 
-    virtual void clearColor( const real r,
-                             const real g,
-                             const real b,
-                             const real a ) = 0;
+    inline real getBorderWidth() const
+    {
+      return _borderWidth;
+    }
 
-    virtual void clear() = 0;
+    inline real getWidth() const
+    {
+      return _size.x;
+    }
 
-    virtual void setViewport( const uint32_t x,
-                              const uint32_t y,
-                              const uint32_t width,
-                              const uint32_t height ) = 0;
-
-    //
-    // Framebuffers.
-
-    virtual void bindDefaultFramebuffer() = 0;
-
-    //
-    // Depth testing.
-
-    virtual void setDepthTestEnabled( const bool enabled ) = 0;
+    inline real getHeight() const
+    {
+      return _size.y;
+    }
 
     //
-    // Blending.
+    // Setters.
 
-    virtual void setBlendingEnabled( const bool enabled ) = 0;
+    inline void setBorderColor( const Color& color )
+    {
+      _borderColor = color;
+    }
 
-    virtual void setBlendingFunc( const Material::BlendFactor& src, const Material::BlendFactor& dst ) = 0;
+    inline void setBorderColor( const real r, const real g, const real b, const real a )
+    {
+      setBorderColor( Color( r, g, b, a ) );
+    }
 
-    //
-    // Debugging.
-#ifdef _DEBUG
-    
-    virtual void getLastError( const string& prefix = "" ) = 0;
+    inline void setFillColor( const Color& color )
+    {
+      _fillColor = color;
+    }
 
-#endif
+    inline void setFillColor( const real r, const real g, const real b, const real a )
+    {
+      setFillColor( Color( r, g, b, a ) );
+    }
+
+    inline void setSize( const Vec2& size )
+    {
+      _size = size;
+    }
+
+    inline void setSize( const real w, const real h )
+    {
+      setSize( Vec2( w, h ) );
+    }
+
+    inline void setBorderWidth( const real width )
+    {
+      _borderWidth = width;
+    }
+
+  private:
+
+    virtual void _reset() override {}
+
+  private:
+
+    bool _fill { true };
+
+    Color _borderColor { StockColor::White };
+    Color _fillColor { 1.f, 1.f, 1.f, 0.3f };
+    Vec2 _size { 1.f, 1.f };
+    real _borderWidth { 0.025f };
 
   };
 

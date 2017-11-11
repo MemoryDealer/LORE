@@ -110,6 +110,10 @@ namespace Lore {
 
     Registry<std::unordered_map, Font> fonts {};
 
+    // Boxes.
+
+    Registry<std::unordered_map, Box> boxes {};
+
     // Textboxes.
 
     Registry<std::unordered_map, Textbox> textboxes {};
@@ -180,6 +184,8 @@ namespace Lore {
     MaterialPtr createMaterial( const string& name, const string& groupName = DefaultGroupName );
 
     CameraPtr createCamera( const string& name, const string& groupName = DefaultGroupName );
+
+    BoxPtr createBox( const string& name, const string& groupName = DefaultGroupName );
 
     TextboxPtr createTextbox( const string& name, const string& groupName = DefaultGroupName );
 
@@ -272,6 +278,8 @@ namespace Lore {
     static RenderTargetPtr CreateRenderTarget( const string& name, const uint32_t width, const uint32_t height, const string& groupName = ResourceController::DefaultGroupName );
 
     static CameraPtr CreateCamera( const string& name, const string& groupName = ResourceController::DefaultGroupName );
+
+    static BoxPtr CreateBox( const string& name, const string& groupname = ResourceController::DefaultGroupName );
 
     static TextboxPtr CreateTextbox( const string& name, const string& groupname = ResourceController::DefaultGroupName );
 

@@ -221,6 +221,22 @@ int main( int argc, char** argv )
 
   // ---
 
+  auto boxNode = scene->createNode( "boxNode" );
+  auto box = Lore::Resource::CreateBox( "Box1" );
+  box->setBorderColor( Lore::StockColor::Green );
+  box->setFillColor( Lore::Color( 0.f, 1.f, 0.f, 0.4f ) );
+  box->setSize( 2.f, 1.f );
+  boxNode->attachObject( box );
+  boxNode->translate( -0.2f, 0.f );
+
+  for ( int i = 0; i < 15; ++i ) {
+    auto node = scene->createNode( "boxx" + std::to_string( i ) );
+    node->attachObject( box );
+    node->setPosition( 0.f, -1.f - static_cast< float >( i ) / 2.f );
+  }
+
+  // ---
+
   //
   // UI.
 

@@ -45,6 +45,7 @@
 #include <LORE2D/Resource/Entity.h>
 #include <LORE2D/Resource/Material.h>
 #include <LORE2D/Resource/StockResource.h>
+#include <LORE2D/Resource/Renderable/Box.h>
 #include <LORE2D/Resource/Renderable/Texture.h>
 #include <LORE2D/Resource/Renderable/Textbox.h>
 #include <LORE2D/Scene/Background.h>

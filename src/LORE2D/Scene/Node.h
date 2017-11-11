@@ -46,11 +46,14 @@ namespace Lore {
 
   public:
 
+    // TODO: Use a RenderableList for textboxes, textures, boxes, etc?
     using NodeMap = Registry<std::map, Node>;
     using ChildNodeIterator = NodeMap::Iterator;
     using ConstChildNodeIterator = NodeMap::ConstIterator;
     using EntityList = Registry<std::map, Entity>;
     using EntityListConstIterator = EntityList::ConstIterator;
+    using BoxList = Registry<std::map, Box>;
+    using BoxListConstIterator = BoxList::ConstIterator;
     using TextboxList = Registry<std::map, Textbox>;
     using TextboxListConstIterator = TextboxList::ConstIterator;
     using LightList = std::vector<LightPtr>;
@@ -107,11 +110,18 @@ namespace Lore {
 
     void attachObject( LightPtr l );
 
+    void attachObject( BoxPtr b );
+
     void attachObject( TextboxPtr t );
 
     inline EntityListConstIterator getEntityListConstIterator() const
     {
       return _entities.getConstIterator();
+    }
+
+    inline BoxListConstIterator getBoxListConstIterator() const
+    {
+      return _boxes.getConstIterator();
     }
 
     inline TextboxListConstIterator getTextboxListConstIterator() const
@@ -238,6 +248,8 @@ namespace Lore {
     real _depth { 0.f };
 
     EntityList _entities {};
+
+    BoxList _boxes {};
 
     TextboxList _textboxes {};
 

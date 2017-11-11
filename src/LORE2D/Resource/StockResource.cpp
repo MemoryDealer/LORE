@@ -185,6 +185,15 @@ void StockResourceController::createStockResources()
   // ::::::::::::::::::::::::: //
 
   //
+  // Box stock resources.
+
+  {
+    createBoxProgram( "StandardBox" );
+  }
+
+  // ::::::::::::::::::::::::: //
+
+  //
   // Font stock resources.
 
   {

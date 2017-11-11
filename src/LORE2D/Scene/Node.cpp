@@ -27,6 +27,7 @@
 #include "Node.h"
 
 #include <LORE2D/Resource/Entity.h>
+#include <LORE2D/Resource/Renderable/Box.h>
 #include <LORE2D/Resource/Renderable/Textbox.h>
 #include <LORE2D/Scene/Camera.h>
 #include <LORE2D/Scene/Scene.h>
@@ -130,6 +131,13 @@ void Node::attachObject( LightPtr l )
   l->_position.x = _transform.world[3][0];
   l->_position.y = _transform.world[3][1];
   _scene->_addActiveLight( l );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Node::attachObject( BoxPtr b )
+{
+  _boxes.insert( b->getName(), b );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -26,8 +26,8 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 #include <LORE2D/Memory/Alloc.h>
-#include <LORE2D/Resource/Renderable/Renderable.h>
 #include <LORE2D/Renderer/Renderer.h>
+#include <LORE2D/Resource/Renderable/Renderable.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -82,14 +82,14 @@ namespace Lore {
       return _font;
     }
 
-    uint32_t getRenderQueue() const
-    {
-      return _renderQueue;
-    }
-
     Color getTextColor() const
     {
       return _textColor;
+    }
+
+    uint32_t getRenderQueue() const
+    {
+      return _renderQueue;
     }
 
   private:

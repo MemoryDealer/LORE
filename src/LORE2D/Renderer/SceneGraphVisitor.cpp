@@ -76,6 +76,12 @@ void SceneGraphVisitor::visit( Renderer* renderer, bool parentDirty )
     renderer->addRenderData( entity, _node );
   }
 
+  auto boxIt = _node->getBoxListConstIterator();
+  while ( boxIt.hasMore() ) {
+    BoxPtr box = boxIt.getNext();
+    renderer->addBox( box, _node->getFullTransform() );
+  }
+
   auto textboxIt = _node->getTextboxListConstIterator();
   while ( textboxIt.hasMore() ) {
     TextboxPtr textbox = textboxIt.getNext();

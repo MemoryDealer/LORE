@@ -39,6 +39,7 @@ namespace Lore {
       Unknown,
       Texture,
       Sprite,
+      Box,
       Textbox
     };
 
