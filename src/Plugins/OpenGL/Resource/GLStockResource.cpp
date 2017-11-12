@@ -450,6 +450,7 @@ Lore::GPUProgramPtr StockResourceController::createBoxProgram( const string& nam
   src += "uniform vec4 borderColor;";
   src += "uniform vec4 fillColor;";
   src += "uniform float borderWidth;";
+  src += "uniform vec2 scale;"; // TODO: Once debug UI is up fix border scaling.
 
   //
   // main function.
@@ -458,8 +459,8 @@ Lore::GPUProgramPtr StockResourceController::createBoxProgram( const string& nam
 
   src += "const float maxX = 1.0 - borderWidth;";
   src += "const float minX = borderWidth;";
-  src += "const float maxY = maxX / 1.0;";
-  src += "const float minY = minX / 1.0;";
+  src += "const float maxY = maxX;";
+  src += "const float minY = minX;";
 
   src += "if (TexCoord.x < maxX && TexCoord.x > minX &&"
          "    TexCoord.y < maxY && TexCoord.y > minY) {";
@@ -493,6 +494,7 @@ Lore::GPUProgramPtr StockResourceController::createBoxProgram( const string& nam
   program->addUniformVar( "borderColor" );
   program->addUniformVar( "fillColor" );
   program->addUniformVar( "borderWidth" );
+  program->addUniformVar( "scale" );
 
   return program;
 }

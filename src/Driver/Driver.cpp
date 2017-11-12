@@ -225,7 +225,7 @@ int main( int argc, char** argv )
   auto box = Lore::Resource::CreateBox( "Box1" );
   box->setBorderColor( Lore::StockColor::Green );
   box->setFillColor( Lore::Color( 0.f, 1.f, 0.f, 0.4f ) );
-  box->setSize( 2.f, 1.f );
+  box->setSize( 2.f, 2.f );
   boxNode->attachObject( box );
   boxNode->translate( -0.2f, 0.f );
 

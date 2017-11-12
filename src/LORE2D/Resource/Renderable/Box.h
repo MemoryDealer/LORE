@@ -76,6 +76,11 @@ namespace Lore {
       return _size.y;
     }
 
+    inline Vec2 getSize() const
+    {
+      return _size;
+    }
+
     //
     // Setters.
 

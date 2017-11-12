@@ -466,6 +466,11 @@ void GenericRenderer::renderBoxes( RenderQueue::BoxList& boxes,
     program->setUniformVar( "borderColor", box->getBorderColor() );
     program->setUniformVar( "fillColor", box->getFillColor() );
     program->setUniformVar( "borderWidth", box->getBorderWidth() );
+    program->setUniformVar( "scale", box->getSize() );
+
+    // Apply box scaling to final transform.
+    data.model[0][0] *= box->getWidth();
+    data.model[1][1] *= box->getHeight();
     program->setTransformVar( viewProjection * data.model );
 
     vb->draw();
