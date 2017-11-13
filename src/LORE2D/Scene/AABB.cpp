@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,35 +24,49 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Include this file for all Lore2D functionality.
+#include "AABB.h"
+
+#include <LORE2D/Resource/Renderable/Box.h>
+#include <LORE2D/Resource/ResourceController.h>
+#include <LORE2D/Scene/Node.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "LorePrerequisites.h"
+using namespace Lore;
 
-// Config.
-#include <LORE2D/Config/Config.h>
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Core.
-#include <LORE2D/Core/Context.h>
-#include <LORE2D/Core/Timer.h>
+AABB::AABB( NodePtr node )
+: _node( node )
+{
+  _box = Lore::Resource::CreateBox( node->getName() + "_AABB", node->getResourceGroupName() );
+}
 
-// Input.
-#include <LORE2D/Input/Input.h>
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Math.
-#include <LORE2D/Math/Math.h>
+AABB::~AABB()
+{
+  //Lore::Resource::DestroyBox
+}
 
-// Resource.
-#include <LORE2D/Resource/Entity.h>
-#include <LORE2D/Resource/Material.h>
-#include <LORE2D/Resource/StockResource.h>
-#include <LORE2D/Resource/Renderable/Box.h>
-#include <LORE2D/Resource/Renderable/Texture.h>
-#include <LORE2D/Resource/Renderable/Textbox.h>
-#include <LORE2D/Scene/AABB.h>
-#include <LORE2D/Scene/Background.h>
-#include <LORE2D/UI/UI.h>
-#include <LORE2D/UI/UIElement.h>
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void AABB::update()
+{
+  auto transform = _node->getFullTransform();
+  _rect.x = transform[3][0];
+  _rect.y = transform[3][1];
+  _rect.w = _node->getDerivedScale().x * 0.2f;
+  _rect.h = _node->getDerivedScale().y * 0.2f;
+  /*_rect.w = _node->getDerivedScale().x;
+  _rect.h = _node->getDerivedScale().y;*/
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+bool AABB::intersects( const AABB& rhs ) const
+{
+  return _rect.intersects( rhs._rect );
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

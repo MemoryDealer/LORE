@@ -225,7 +225,7 @@ int main( int argc, char** argv )
   auto box = Lore::Resource::CreateBox( "Box1" );
   box->setBorderColor( Lore::StockColor::Green );
   box->setFillColor( Lore::Color( 0.f, 1.f, 0.f, 0.4f ) );
-  box->setSize( 2.f, 2.f );
+  box->setSize( 1.f, 2.f );
   boxNode->attachObject( box );
   boxNode->translate( -0.2f, 0.f );
 
@@ -258,6 +258,26 @@ int main( int argc, char** argv )
   bool pause = true;
   while ( context->active() ) {
     __timer.tick();
+
+    sonicNode->getAABB()->getBox()->setFillColor( Lore::Color( 1.f, 1.f, 1.f, 0.3f ) );
+
+    auto root = scene->getRootNode();
+    auto it = root->getChildNodeIterator();
+    while ( it.hasMore() ) {
+      auto node = it.getNext();
+      if ( node == sonicNode ) {
+        continue;
+      }
+      if ( sonicNode->intersects( node ) ) {
+        sonicNode->getAABB()->getBox()->setFillColor( Lore::Color( 1.f, 0.f, 0.f, 0.3f ) );
+        //printf( "Collision with %s\n", node->getName().c_str() );
+        auto r1 = sonicNode->getAABB()->getRect();
+        auto r2 = node->getAABB()->getRect();
+        printf( "Sonic: %.2f, %.2f, %.2f, %.2f\n", r1.x, r1.y, r1.w, r1.h );
+        printf( "%s: %.2f, %.2f, %.2f, %.2f\n", node->getName().c_str(), r2.x, r2.y, r2.w, r2.h );
+        break;
+      }
+    }
 
     //node->translate( 0.01f * std::sinf( f ), 0.01f * std::cosf( f ) );
     f += 0.0005f;
@@ -312,11 +332,18 @@ int main( int argc, char** argv )
       break;
     }
 
+    if ( Lore::Input::GetKeyState( Lore::Keycode::Right ) ) {
+      sonicNode->scale( 1.1f );
+    }
+    else if ( Lore::Input::GetKeyState( Lore::Keycode::Left ) ) {
+      sonicNode->scale( 0.9f );
+    }
+
     if ( Lore::Input::GetMouseButtonState( Lore::MouseButton::Left ) ) {
-      printf( "Left!\n" );
+      //printf( "Left!\n" );
     }
     if ( Lore::Input::GetMouseButtonState( Lore::MouseButton::Right ) ) {
-      printf( "Right!\n" );
+      //printf( "Right!\n" );
     }
 
     UpdateFPS( fpsTextbox );
@@ -369,8 +396,15 @@ static void OnKeyChanged( const Lore::Keycode key, const bool state )
   default:
     break;
 
+  case Lore::Keycode::B:
+    if ( state ) {
+      auto value = Lore::Config::GetValue( "RenderAABBs" );
+      Lore::Config::SetValue( "RenderAABBs", !std::get<bool>( value ) );
+    }
+    break;
+
   case Lore::Keycode::C:
-    {
+    if ( state ) {
       static bool enabled = true;
       enabled = !enabled;
       Lore::Input::SetCursorEnabled( enabled );
@@ -381,7 +415,7 @@ static void OnKeyChanged( const Lore::Keycode key, const bool state )
 
 static void OnChar( const char c )
 {
-  printf( "OnChar: %c\n", c );
+  //printf( "OnChar: %c\n", c );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

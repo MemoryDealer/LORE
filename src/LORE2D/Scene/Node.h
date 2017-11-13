@@ -85,6 +85,12 @@ namespace Lore {
 
     };
 
+    struct Depth {
+      static constexpr const real Max = 1000.f;
+      static constexpr const real Default = 0.f;
+      static constexpr const real Min = -1000.f;
+    };
+
   public:
 
     ~Node();
@@ -128,6 +134,10 @@ namespace Lore {
     {
       return _textboxes.getConstIterator();
     }
+
+    // Misc.
+
+    bool intersects( NodePtr rhs ) const;
 
     //
     // Modifiers.
@@ -202,6 +212,8 @@ namespace Lore {
       return _depth;
     }
 
+    AABBPtr getAABB() const;
+
     //
     // Deleted functions/operators.
 
@@ -243,9 +255,13 @@ namespace Lore {
 
   private:
 
+    // TODO: Node is getting large, consider holding node -> entity mappings somewhere else.
+
+    std::unique_ptr<AABB> _aabb { nullptr };
+
     Transform _transform {};
 
-    real _depth { 0.f };
+    real _depth { Depth::Default };
 
     EntityList _entities {};
 

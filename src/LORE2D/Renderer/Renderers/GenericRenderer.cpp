@@ -26,6 +26,7 @@
 
 #include "GenericRenderer.h"
 
+#include <LORE2D/Config/Config.h>
 #include <LORE2D/Math/Math.h>
 #include <LORE2D/Resource/Entity.h>
 #include <LORE2D/Renderer/IRenderAPI.h>
@@ -35,6 +36,7 @@
 #include <LORE2D/Resource/Renderable/Texture.h>
 #include <LORE2D/Resource/Renderable/Textbox.h>
 #include <LORE2D/Resource/StockResource.h>
+#include <LORE2D/Scene/AABB.h>
 #include <LORE2D/Scene/Camera.h>
 #include <LORE2D/Scene/Light.h>
 #include <LORE2D/Scene/Scene.h>
@@ -198,6 +200,38 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
 
     // Render text.
     renderTextboxes( queue.textboxes, viewProjection );
+  }
+
+  // AABBs.
+  auto renderAABBs = Config::GetValue( "RenderAABBs" );
+  if ( std::get<bool>( renderAABBs ) ) {
+    RenderQueue::BoxList boxes;
+
+    std::function<void( NodePtr )> AddAABB = [&] ( NodePtr node ) {
+      AABBPtr aabb = node->getAABB();
+      if ( aabb ) {
+        RenderQueue::BoxData data;
+        data.box = node->getAABB()->getBox();
+        const Rect r = aabb->getRect();
+        data.model = Math::CreateTransformationMatrix( Vec2( r.x, r.y ), Quaternion(), Vec2( r.w * 5.f, r.h * 5.f ) );
+        //data.model = Math::CreateTransformationMatrix( node->getPosition(), Quaternion(), node->getDerivedScale() );
+        data.model[3][2] = Node::Depth::Min;
+
+        boxes.push_back( data );
+      }
+
+      Node::ChildNodeIterator it = node->getChildNodeIterator();
+      while ( it.hasMore() ) {
+        AddAABB( it.getNext() );
+      }
+    };
+
+    auto root = rv.scene->getRootNode();
+    Node::ChildNodeIterator it = root->getChildNodeIterator();
+    while ( it.hasMore() ) {
+      AddAABB( it.getNext() );
+    }
+    renderBoxes( boxes, viewProjection );
   }
 
   // Render UI.

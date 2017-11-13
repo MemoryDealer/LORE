@@ -25,35 +25,46 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Include this file for all Lore2D functionality.
+#include <LORE2D/Math/Rectangle.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "LorePrerequisites.h"
+namespace Lore {
 
-// Config.
-#include <LORE2D/Config/Config.h>
+  class AABB final
+  {
 
-// Core.
-#include <LORE2D/Core/Context.h>
-#include <LORE2D/Core/Timer.h>
+  public:
 
-// Input.
-#include <LORE2D/Input/Input.h>
+    explicit AABB( NodePtr node );
 
-// Math.
-#include <LORE2D/Math/Math.h>
+    ~AABB();
 
-// Resource.
-#include <LORE2D/Resource/Entity.h>
-#include <LORE2D/Resource/Material.h>
-#include <LORE2D/Resource/StockResource.h>
-#include <LORE2D/Resource/Renderable/Box.h>
-#include <LORE2D/Resource/Renderable/Texture.h>
-#include <LORE2D/Resource/Renderable/Textbox.h>
-#include <LORE2D/Scene/AABB.h>
-#include <LORE2D/Scene/Background.h>
-#include <LORE2D/UI/UI.h>
-#include <LORE2D/UI/UIElement.h>
+    void update();
+
+    bool intersects( const AABB& rhs ) const;
+
+    //
+    // Getters.
+
+    inline BoxPtr getBox() const
+    {
+      return _box;
+    }
+
+    inline Rect getRect() const
+    {
+      return _rect;
+    }
+
+  private:
+
+    NodePtr _node { nullptr };
+    BoxPtr _box { nullptr };
+    Rect _rect {};
+
+  };
+
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

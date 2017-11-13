@@ -30,6 +30,7 @@
 #include <LORE2D/Resource/Material.h>
 #include <LORE2D/Resource/ResourceController.h>
 #include <LORE2D/Resource/StockResource.h>
+#include <LORE2D/Scene/AABB.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -59,7 +60,9 @@ NodePtr Scene::createNode( const string& name )
   // Note: Not using make_unique here because Node's new operator is private.
   auto node = MemoryAccess::GetPrimaryPoolCluster()->create<Node>();
   node->setName( name );
+  node->setResourceGroupName( ResourceController::DefaultGroupName );
   node->_scene = this;
+  node->_aabb.reset( new AABB( node ) );
 
   _nodes.insert( name, node );
   _root.attachChildNode( node );

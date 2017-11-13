@@ -27,8 +27,10 @@
 #include "Node.h"
 
 #include <LORE2D/Resource/Entity.h>
+#include <LORE2D/Resource/ResourceController.h>
 #include <LORE2D/Resource/Renderable/Box.h>
 #include <LORE2D/Resource/Renderable/Textbox.h>
+#include <LORE2D/Scene/AABB.h>
 #include <LORE2D/Scene/Camera.h>
 #include <LORE2D/Scene/Scene.h>
 
@@ -55,6 +57,7 @@ NodePtr Node::createChildNode( const string& name )
 {
   auto node = MemoryAccess::GetPrimaryPoolCluster()->create<Node>();
   node->setName( name );
+  node->setResourceGroupName( ResourceController::DefaultGroupName );
   node->_scene = _scene;
   node->_parent = this;
 
@@ -145,6 +148,13 @@ void Node::attachObject( BoxPtr b )
 void Node::attachObject( TextboxPtr t )
 {
   _textboxes.insert( t->getName(), t );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+bool Node::intersects( NodePtr rhs ) const
+{
+  return _aabb->intersects( *rhs->_aabb );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -253,6 +263,14 @@ void Node::scale( const real s )
 {
   Vec2 ss( s, s );
   scale( ss );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+AABBPtr Node::getAABB() const
+{
+  _aabb->update();
+  return _aabb.get();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

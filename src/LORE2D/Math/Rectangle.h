@@ -46,6 +46,22 @@ namespace Lore {
       , h( h_ )
     { }
 
+    bool intersects( const Rectangle& rhs ) const
+    {
+      /*if ( x < rhs.x + rhs.w &&
+           x + w > rhs.x &&
+           y < rhs.y + rhs.h &&
+           h + y > rhs.y ) {
+        return true;
+      }
+      return false;*/
+      return !( rhs.x > x + w ||
+                rhs.x + rhs.w < x ||
+                rhs.y > y + h ||
+                rhs.y + rhs.h < y
+              );
+    }
+
   };
 
   using Rect = Rectangle;
