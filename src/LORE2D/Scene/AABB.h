@@ -25,7 +25,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Math/Rectangle.h>
+#include <LORE2D/Math/Vector.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -52,16 +52,38 @@ namespace Lore {
       return _box;
     }
 
-    inline Rect getRect() const
+    Vec2 getMin() const
     {
-      return _rect;
+      return _min;
+    }
+
+    Vec2 getMax() const
+    {
+      return _max;
+    }
+
+    real getWidth() const
+    {
+      return _dimensions.x;
+    }
+
+    real getHeight() const
+    {
+      return _dimensions.y;
+    }
+
+    Vec2 getDimensions() const
+    {
+      return _dimensions;
     }
 
   private:
 
     NodePtr _node { nullptr };
     BoxPtr _box { nullptr };
-    Rect _rect {};
+    Vec2 _min {};
+    Vec2 _max {};
+    Vec2 _dimensions {};
 
   };
 

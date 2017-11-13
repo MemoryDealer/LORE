@@ -99,8 +99,6 @@ int main( int argc, char** argv )
   sonicLight->setColor( Lore::StockColor::White );
   sonicNode->attachObject( sonicLight );
 
-  camera->trackNode( sonicNode );
-
   //
   // Create some doges.
 
@@ -109,7 +107,7 @@ int main( int argc, char** argv )
   std::vector<Lore::NodePtr> doges;
   dogeEntity->setTexture( dogeTexture );
   for ( int i = 0; i < 5; ++i ) {
-    auto node = scene->createNode( "doge" + std::to_string( i ) );
+    auto node = sonicNode->createChildNode( "doge" + std::to_string( i ) );
     node->attachObject( dogeEntity );
     node->setPosition( static_cast< float >( i ) / 2.f, 0.f );
     doges.push_back( node );
@@ -253,13 +251,32 @@ int main( int argc, char** argv )
   Lore::Input::SetKeyCallback( OnKeyChanged );
   Lore::Input::SetCharCallback( OnChar );
 
+  sonicNode = doges[0];
   float f = 0.f;
   __timer.reset();
+
+  camera->trackNode( sonicNode );
   bool pause = true;
   while ( context->active() ) {
     __timer.tick();
 
     sonicNode->getAABB()->getBox()->setFillColor( Lore::Color( 1.f, 1.f, 1.f, 0.3f ) );
+    printf( "%.2f\n", doges[0]->getRotation() );
+    /*if ( sonicNode->intersects( boxNode ) ) {
+      sonicNode->getAABB()->getBox()->setFillColor( Lore::Color( 1.f, 0.f, 0.f, 0.3f ) );
+    }
+
+    {
+      auto min = sonicNode->getAABB()->getMin();
+      auto max = sonicNode->getAABB()->getMax();
+      printf( "Sonic: %.2f, %.2f, %.2f, %.2f\n", min.x, min.y, max.x, max.y );
+    }
+
+    {
+      auto min = boxNode->getAABB()->getMin();
+      auto max = boxNode->getAABB()->getMax();
+      printf( "Box: %.2f, %.2f, %.2f, %.2f\n", min.x, min.y, max.x, max.y );
+    }*/
 
     auto root = scene->getRootNode();
     auto it = root->getChildNodeIterator();
@@ -270,11 +287,11 @@ int main( int argc, char** argv )
       }
       if ( sonicNode->intersects( node ) ) {
         sonicNode->getAABB()->getBox()->setFillColor( Lore::Color( 1.f, 0.f, 0.f, 0.3f ) );
-        //printf( "Collision with %s\n", node->getName().c_str() );
-        auto r1 = sonicNode->getAABB()->getRect();
+        printf( "Collision with %s\n", node->getName().c_str() );
+        /*auto r1 = sonicNode->getAABB()->getRect();
         auto r2 = node->getAABB()->getRect();
         printf( "Sonic: %.2f, %.2f, %.2f, %.2f\n", r1.x, r1.y, r1.w, r1.h );
-        printf( "%s: %.2f, %.2f, %.2f, %.2f\n", node->getName().c_str(), r2.x, r2.y, r2.w, r2.h );
+        printf( "%s: %.2f, %.2f, %.2f, %.2f\n", node->getName().c_str(), r2.x, r2.y, r2.w, r2.h );*/
         break;
       }
     }
@@ -293,8 +310,10 @@ int main( int argc, char** argv )
     }
 
     for ( auto doge : doges ) {
-      doge->rotate( Lore::Degree( .1f ) );
+     doge->rotate( Lore::Degree( .1f ) );
     }
+
+    sonicNode->rotate( Lore::Degree( .1f ) );
 
     float speed = 0.01f;
     if ( Lore::Input::GetKeymodState( Lore::Keymod::Shift ) ) {

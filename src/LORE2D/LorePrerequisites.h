@@ -66,6 +66,7 @@
 
 // Windows.
 #if LORE_PLATFORM == LORE_WINDOWS
+#define NOMINMAX
 #include <Windows.h>
 #endif
 

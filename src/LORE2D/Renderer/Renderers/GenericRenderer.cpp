@@ -211,10 +211,8 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
       AABBPtr aabb = node->getAABB();
       if ( aabb ) {
         RenderQueue::BoxData data;
-        data.box = node->getAABB()->getBox();
-        const Rect r = aabb->getRect();
-        data.model = Math::CreateTransformationMatrix( Vec2( r.x, r.y ), Quaternion(), Vec2( r.w * 5.f, r.h * 5.f ) );
-        //data.model = Math::CreateTransformationMatrix( node->getPosition(), Quaternion(), node->getDerivedScale() );
+        data.box = aabb->getBox();
+        data.model = Math::CreateTransformationMatrix( node->getDerivedPosition(), Quaternion(), aabb->getDimensions() * 5.f );
         data.model[3][2] = Node::Depth::Min;
 
         boxes.push_back( data );

@@ -67,6 +67,8 @@ namespace Lore {
       Vec2 scale;
       Vec2 derivedScale;
 
+      real zRotation { 0.f };
+
       Matrix4 local; // Local transformation matrix.
       bool dirty; // True if matrix needs update.
 
@@ -187,6 +189,11 @@ namespace Lore {
       return _transform.position;
     }
 
+    inline Vec2 getDerivedPosition() const
+    {
+      return Vec2( _transform.world[3][0], _transform.world[3][1] );
+    }
+
     inline Matrix4 getFullTransform() const
     {
       return _transform.world;
@@ -213,6 +220,11 @@ namespace Lore {
     }
 
     AABBPtr getAABB() const;
+
+    real getRotation() const
+    {
+      return _transform.zRotation;
+    }
 
     //
     // Deleted functions/operators.

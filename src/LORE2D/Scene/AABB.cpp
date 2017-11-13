@@ -53,20 +53,31 @@ AABB::~AABB()
 
 void AABB::update()
 {
-  auto transform = _node->getFullTransform();
-  _rect.x = transform[3][0];
-  _rect.y = transform[3][1];
-  _rect.w = _node->getDerivedScale().x * 0.2f;
-  _rect.h = _node->getDerivedScale().y * 0.2f;
-  /*_rect.w = _node->getDerivedScale().x;
-  _rect.h = _node->getDerivedScale().y;*/
+  const auto x = _node->getDerivedPosition().x;
+  const auto y = _node->getDerivedPosition().y;
+  const auto w = _node->getDerivedScale().x * 0.2f;
+  const auto h = _node->getDerivedScale().y * 0.2f;
+
+  const auto angle = _node->getRotation();
+  _dimensions.x = h * std::abs( std::sin( angle ) ) + w * std::abs( std::cos( angle ) );
+  _dimensions.y = w * std::abs( std::sin( angle ) ) + h * std::abs( std::cos( angle ) );
+
+  _min.x = x - _dimensions.x / 2.f;
+  _min.y = y - _dimensions.y / 2.f;
+  _max.x = x + _dimensions.x / 2.f;
+  _max.y = y + _dimensions.y / 2.f;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 bool AABB::intersects( const AABB& rhs ) const
 {
-  return _rect.intersects( rhs._rect );
+  return !(
+    _max.x < rhs._min.x ||
+    _max.y < rhs._min.y ||
+    _min.x > rhs._max.x ||
+    _min.y > rhs._max.y
+    );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

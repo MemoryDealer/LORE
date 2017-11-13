@@ -60,6 +60,7 @@ NodePtr Node::createChildNode( const string& name )
   node->setResourceGroupName( ResourceController::DefaultGroupName );
   node->_scene = _scene;
   node->_parent = this;
+  node->_aabb.reset( new AABB( node ) );
 
   _scene->_nodes.insert( name, node );
   _childNodes.insert( name, node );
@@ -215,6 +216,7 @@ void Node::rotate( const Vec3& axis, const Degree& angle, const TransformSpace& 
 {
   Quaternion q = Math::CreateQuaternion( axis, angle );
   rotate( q, ts );
+  _transform.zRotation += angle.valueRadians();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
