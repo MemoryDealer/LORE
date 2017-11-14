@@ -27,6 +27,7 @@
 #include "SceneGraphVisitor.h"
 
 #include <LORE2D/Renderer/Renderer.h>
+#include <LORE2D/Scene/AABB.h>
 #include <LORE2D/Scene/Node.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -63,9 +64,11 @@ void SceneGraphVisitor::visit( Renderer* renderer, bool parentDirty )
 
   if ( parentDirty ) {
     _node->_updateWorldTransform( _stack.top() * transform );
+    _node->_aabb->update();
   }
   else if ( transformDirty ) {
     _node->_updateWorldTransform( _stack.top() * transform );
+    _node->_aabb->update();
     parentDirty = true;
   }
 

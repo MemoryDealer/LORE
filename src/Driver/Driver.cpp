@@ -112,10 +112,13 @@ int main( int argc, char** argv )
     node->setPosition( static_cast< float >( i ) / 2.f, 0.f );
     doges.push_back( node );
   }
+  doges[4]->createChildNode( "dogen" )->attachObject( dogeEntity );
+  scene->getNode( "dogen" )->setPosition( 0.2f, 0.f );
+
 
   // Create some blended boxes.
 
-  auto boxEntity = Lore::Resource::CreateEntity( "box", Lore::MeshType::Quad );
+  auto boxEntity = Lore::Resource::CreateEntity( "boxeuler.z", Lore::MeshType::Quad );
   boxEntity->getMaterial()->blendingMode.enabled = true;
   boxEntity->getMaterial()->diffuse = Lore::Color( 0.1f, 0.4f, 0.8f, 0.95f );
   for ( int i = 0; i < 5; ++i ) {
@@ -251,7 +254,7 @@ int main( int argc, char** argv )
   Lore::Input::SetKeyCallback( OnKeyChanged );
   Lore::Input::SetCharCallback( OnChar );
 
-  sonicNode = doges[0];
+  //sonicNode = doges[0];
   float f = 0.f;
   __timer.reset();
 
@@ -261,7 +264,7 @@ int main( int argc, char** argv )
     __timer.tick();
 
     sonicNode->getAABB()->getBox()->setFillColor( Lore::Color( 1.f, 1.f, 1.f, 0.3f ) );
-    printf( "%.2f\n", doges[0]->getRotation() );
+
     /*if ( sonicNode->intersects( boxNode ) ) {
       sonicNode->getAABB()->getBox()->setFillColor( Lore::Color( 1.f, 0.f, 0.f, 0.3f ) );
     }

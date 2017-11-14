@@ -178,6 +178,18 @@ namespace Lore {
             m[3][0] = m03; m[3][1] = m13; m[3][2] = m23; m[3][3] = m33;
         }
 
+        Vec3 toEulerAngles() const
+        {
+          Vec3 euler;
+          euler.x = std::atan2f( m[2][1], m[2][2] );
+          const auto c2 = std::sqrtf( m[0][0] * m[0][0] + m[1][0] * m[1][0] );
+          euler.y = std::atan2f( -m[2][0], c2 );
+          const auto s1 = std::sinf( euler.x );
+          const auto c1 = std::cosf( euler.x );
+          euler.z = std::atan2f( s1 * m[0][2] - c1 * m[0][1], c1 * m[1][1] - s1 * m[1][2] );
+          return euler;
+        }
+
     private:
 
         Vec m[4];

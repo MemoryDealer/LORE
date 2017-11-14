@@ -14,6 +14,7 @@
 -Resource configuration files - materials, scenes, textures all loaded into group via .rsrc file.
   Lua bindings for configuration and resource files
 -Input: Mouse clicks hitting nodes (provide helper function that converts mouse coordinates to world)
+  -Add key/mouse listeners
 -AABB drawing, basic collision support
 -Camera tracks - key frames
   Animation system for nodes with key frames

@@ -42,7 +42,7 @@ using namespace Lore;
 
 Node::Node()
 {
-  _getLocalTransform();
+  //_getLocalTransform();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -216,7 +216,6 @@ void Node::rotate( const Vec3& axis, const Degree& angle, const TransformSpace& 
 {
   Quaternion q = Math::CreateQuaternion( axis, angle );
   rotate( q, ts );
-  _transform.zRotation += angle.valueRadians();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -271,7 +270,6 @@ void Node::scale( const real s )
 
 AABBPtr Node::getAABB() const
 {
-  _aabb->update();
   return _aabb.get();
 }
 
