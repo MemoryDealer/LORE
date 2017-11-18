@@ -107,14 +107,17 @@ int main( int argc, char** argv )
   std::vector<Lore::NodePtr> doges;
   dogeEntity->setTexture( dogeTexture );
   for ( int i = 0; i < 5; ++i ) {
-    auto node = sonicNode->createChildNode( "doge" + std::to_string( i ) );
+    auto node = scene->createNode( "doge" + std::to_string( i ) );
     node->attachObject( dogeEntity );
     node->setPosition( static_cast< float >( i ) / 2.f, 0.f );
     doges.push_back( node );
   }
-  doges[4]->createChildNode( "dogen" )->attachObject( dogeEntity );
-  scene->getNode( "dogen" )->setPosition( 0.2f, 0.f );
-
+  doges[0]->createChildNode( "dogen" )->attachObject( dogeEntity );
+  scene->getNode( "dogen" )->setPosition( 0.4f, 0.f );
+  scene->getNode( "dogen" )->createChildNode( "dogen2" )->attachObject( dogeEntity );
+  scene->getNode( "dogen2" )->setPosition( 0.4f, 0.f );
+  scene->getNode( "dogen2" )->createChildNode( "dogen3" )->attachObject( dogeEntity );
+  scene->getNode( "dogen3" )->setPosition( -0.4f, 0.f );
 
   // Create some blended boxes.
 
@@ -290,15 +293,23 @@ int main( int argc, char** argv )
       }
       if ( sonicNode->intersects( node ) ) {
         sonicNode->getAABB()->getBox()->setFillColor( Lore::Color( 1.f, 0.f, 0.f, 0.3f ) );
-        printf( "Collision with %s\n", node->getName().c_str() );
+        //printf( "Collision with %s\n", node->getName().c_str() );
         /*auto r1 = sonicNode->getAABB()->getRect();
         auto r2 = node->getAABB()->getRect();
         printf( "Sonic: %.2f, %.2f, %.2f, %.2f\n", r1.x, r1.y, r1.w, r1.h );
         printf( "%s: %.2f, %.2f, %.2f, %.2f\n", node->getName().c_str(), r2.x, r2.y, r2.w, r2.h );*/
         break;
       }
+      auto it2 = node->getChildNodeIterator();
+      while ( it2.hasMore() ) {
+        auto node2 = it2.getNext();
+        if ( sonicNode->intersects( node2 ) || sonicNode->intersects( scene->getNode("dogen2") ) || sonicNode->intersects( scene->getNode( "dogen3" ) ) ) {
+          sonicNode->getAABB()->getBox()->setFillColor( Lore::Color( 1.f, 0.f, 0.f, 0.3f ) );
+        }
+      }
     }
-
+    auto pos = scene->getNode( "dogen2" )->getDerivedPosition();
+    printf( "dogen2: %.2f, %.2f, %.2f\n", pos.x, pos.y );
     //node->translate( 0.01f * std::sinf( f ), 0.01f * std::cosf( f ) );
     f += 0.0005f;
     //sonicNode->scale( 10.05f * std::sinf( f ) );
@@ -315,6 +326,9 @@ int main( int argc, char** argv )
     for ( auto doge : doges ) {
      doge->rotate( Lore::Degree( .1f ) );
     }
+
+    scene->getNode( "dogen" )->rotate( Lore::Degree( -.2f ) );
+    scene->getNode( "dogen2" )->rotate( Lore::Degree( .2f ) );
 
     sonicNode->rotate( Lore::Degree( .1f ) );
 
