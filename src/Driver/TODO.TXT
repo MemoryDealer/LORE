@@ -24,10 +24,12 @@
 -Modify memory pool to use raw uint8_t buffers, get rid of reset() functions; use default copy for each pool
 -Box select of AABBs
 -OOBBs
+-Line rendering
 -Post-processing effect factory to create entities to use render targets, provide helper functions to setup in one call
 -Exception handling, all functions that do not throw should be noexcept
 -Grid rendering
 -Finish unit tests
+-External CLI through pipe, optional and off by default
 
 --- Optimization ---
 -TODO: Optimize text rendering to use a single texture, allow unicode.

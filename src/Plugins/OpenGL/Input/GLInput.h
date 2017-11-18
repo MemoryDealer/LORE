@@ -78,6 +78,21 @@ namespace Lore { namespace OpenGL {
       return _mouseScrollCallback;
     }
 
+    const KeyListenerList& getKeyListeners() const
+    {
+      return _keyListeners;
+    }
+
+    const CharListenerList& getCharListeners() const
+    {
+      return _charListeners;
+    }
+
+    const MouseListenerList getMouseListeners() const
+    {
+      return _mouseListeners;
+    }
+
   };
 
 }}

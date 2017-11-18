@@ -46,6 +46,26 @@ static void OnChar( const char c );
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+class CharHandler : public Lore::CharListener
+{
+public:
+  CharHandler()
+  {
+    Lore::Input::AddCharListener( this );
+  }
+  ~CharHandler()
+  {
+    Lore::Input::RemoveCharListener( this );
+  }
+
+  virtual void onChar( const char c ) override
+  {
+    printf( "onChar: %c\n", c );
+  }
+};
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 int main( int argc, char** argv )
 {
   auto context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
@@ -121,7 +141,7 @@ int main( int argc, char** argv )
 
   // Create some blended boxes.
 
-  auto boxEntity = Lore::Resource::CreateEntity( "boxeuler.z", Lore::MeshType::Quad );
+  auto boxEntity = Lore::Resource::CreateEntity( "box", Lore::MeshType::Quad );
   boxEntity->getMaterial()->blendingMode.enabled = true;
   boxEntity->getMaterial()->diffuse = Lore::Color( 0.1f, 0.4f, 0.8f, 0.95f );
   for ( int i = 0; i < 5; ++i ) {
@@ -256,6 +276,7 @@ int main( int argc, char** argv )
   __sonic = sonicNode;
   Lore::Input::SetKeyCallback( OnKeyChanged );
   Lore::Input::SetCharCallback( OnChar );
+  auto ch = new CharHandler();
 
   //sonicNode = doges[0];
   float f = 0.f;
@@ -308,8 +329,7 @@ int main( int argc, char** argv )
         }
       }
     }
-    auto pos = scene->getNode( "dogen2" )->getDerivedPosition();
-    printf( "dogen2: %.2f, %.2f, %.2f\n", pos.x, pos.y );
+
     //node->translate( 0.01f * std::sinf( f ), 0.01f * std::cosf( f ) );
     f += 0.0005f;
     //sonicNode->scale( 10.05f * std::sinf( f ) );

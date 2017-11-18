@@ -77,6 +77,63 @@ void InputController::setMouseScrollCallback( const MouseScrollCallback callback
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void InputController::addKeyListener( const KeyListenerPtr listener )
+{
+  _keyListeners.push_back( listener );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void InputController::addCharListener( const CharListenerPtr listener )
+{
+  _charListeners.push_back( listener );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void InputController::addMouseListener( const MouseListenerPtr listener )
+{
+  _mouseListeners.push_back( listener );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void InputController::removeKeyListener( const KeyListenerPtr listener )
+{
+  for ( auto it = _keyListeners.begin(); it != _keyListeners.end(); ++it ) {
+    if ( listener == ( *it ) ) {
+      _keyListeners.erase( it );
+      return;
+    }
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void InputController::removeCharListener( const CharListenerPtr listener )
+{
+  for ( auto it = _charListeners.begin(); it != _charListeners.end(); ++it ) {
+    if ( listener == ( *it ) ) {
+      _charListeners.erase( it );
+      return;
+    }
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void InputController::removeMouseListener( const MouseListenerPtr listener )
+{
+  for ( auto it = _mouseListeners.begin(); it != _mouseListeners.end(); ++it ) {
+    if ( listener == ( *it ) ) {
+      _mouseListeners.erase( it );
+      return;
+    }
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Input::SetKeyCallback( const KeyCallback callback )
@@ -114,9 +171,44 @@ void Input::SetMouseScrollCallback( const MouseScrollCallback callback )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Input::SetCursorEnabled( const bool enabled )
+void Input::AddKeyListener( const KeyListenerPtr callback )
 {
-  ActiveContext->getInputController()->setCursorEnabled( ActiveContext->getActiveWindow(), enabled );
+  ActiveContext->getInputController()->addKeyListener( callback );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Input::AddCharListener( const CharListenerPtr callback )
+{
+  ActiveContext->getInputController()->addCharListener( callback );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Input::AddMouseListener( const MouseListenerPtr callback )
+{
+  ActiveContext->getInputController()->addMouseListener( callback );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Input::RemoveKeyListener( const KeyListenerPtr callback )
+{
+  ActiveContext->getInputController()->removeKeyListener( callback );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Input::RemoveCharListener( const CharListenerPtr callback )
+{
+  ActiveContext->getInputController()->removeCharListener( callback );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Input::RemoveMouseListener( const MouseListenerPtr callback )
+{
+  ActiveContext->getInputController()->removeMouseListener( callback );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -145,6 +237,13 @@ void Input::GetCursorPos( int32_t& x, int32_t& y )
 bool Input::GetMouseButtonState( const MouseButton button )
 {
   return ActiveContext->getInputController()->getMouseButtonState( ActiveContext->getActiveWindow(), button );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Input::SetCursorEnabled( const bool enabled )
+{
+  ActiveContext->getInputController()->setCursorEnabled( ActiveContext->getActiveWindow(), enabled );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
