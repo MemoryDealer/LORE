@@ -95,7 +95,8 @@ void SceneGraphVisitor::visit( Renderer* renderer, bool parentDirty )
   if ( _node->hasChildNodes() ) {
     // Push this node's transform onto the stack, so the next call can
     // use it to calculate its derived transform.
-    _stack.push( transform );
+    const auto newTransform = ( _stack.empty() ) ? transform : _stack.top() * transform;
+    _stack.push( newTransform );
 
     Node::ChildNodeIterator it = _node->getChildNodeIterator();
     while ( it.hasMore() ) {
