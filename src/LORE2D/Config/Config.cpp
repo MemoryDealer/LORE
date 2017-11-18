@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,35 +24,46 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Include this file for all Lore2D functionality.
+#include "Config.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "LorePrerequisites.h"
+namespace LocalNS {
 
-// Config.
-#include <LORE2D/Config/Config.h>
+  static std::unordered_map<std::string, Lore::ConfigValue> ConfigValues;
 
-// Core.
-#include <LORE2D/Core/Context.h>
-#include <LORE2D/Core/Timer.h>
+}
+using namespace LocalNS;
 
-// Input.
-#include <LORE2D/Input/Input.h>
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Math.
-#include <LORE2D/Math/Math.h>
+using namespace Lore;
 
-// Resource.
-#include <LORE2D/Resource/Entity.h>
-#include <LORE2D/Resource/Material.h>
-#include <LORE2D/Resource/StockResource.h>
-#include <LORE2D/Resource/Renderable/Box.h>
-#include <LORE2D/Resource/Renderable/Texture.h>
-#include <LORE2D/Resource/Renderable/Textbox.h>
-#include <LORE2D/Scene/AABB.h>
-#include <LORE2D/Scene/Background.h>
-#include <LORE2D/UI/UI.h>
-#include <LORE2D/UI/UIElement.h>
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Config::SetValue( const string& key, const string& value )
+{
+  ConfigValues[key] = value;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Config::SetValue( const string& key, const bool value )
+{
+  ConfigValues[key] = value;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+ConfigValue Config::GetValue( const string& key )
+{
+  auto it = ConfigValues.find( key );
+  if ( ConfigValues.end() != it ) {
+    return it->second;
+  }
+
+  log_error( "Config value " + key + " does not exist" );
+  return ConfigValue();
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

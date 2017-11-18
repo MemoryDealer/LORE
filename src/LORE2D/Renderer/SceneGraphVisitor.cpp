@@ -27,6 +27,7 @@
 #include "SceneGraphVisitor.h"
 
 #include <LORE2D/Renderer/Renderer.h>
+#include <LORE2D/Scene/AABB.h>
 #include <LORE2D/Scene/Node.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -63,9 +64,11 @@ void SceneGraphVisitor::visit( Renderer* renderer, bool parentDirty )
 
   if ( parentDirty ) {
     _node->_updateWorldTransform( _stack.top() * transform );
+    _node->_aabb->update();
   }
   else if ( transformDirty ) {
     _node->_updateWorldTransform( _stack.top() * transform );
+    _node->_aabb->update();
     parentDirty = true;
   }
 
@@ -74,6 +77,12 @@ void SceneGraphVisitor::visit( Renderer* renderer, bool parentDirty )
   while ( it.hasMore() ) {
     EntityPtr entity = it.getNext();
     renderer->addRenderData( entity, _node );
+  }
+
+  auto boxIt = _node->getBoxListConstIterator();
+  while ( boxIt.hasMore() ) {
+    BoxPtr box = boxIt.getNext();
+    renderer->addBox( box, _node->getFullTransform() );
   }
 
   auto textboxIt = _node->getTextboxListConstIterator();
@@ -86,7 +95,8 @@ void SceneGraphVisitor::visit( Renderer* renderer, bool parentDirty )
   if ( _node->hasChildNodes() ) {
     // Push this node's transform onto the stack, so the next call can
     // use it to calculate its derived transform.
-    _stack.push( transform );
+    const auto newTransform = ( _stack.empty() ) ? transform : _stack.top() * transform;
+    _stack.push( newTransform );
 
     Node::ChildNodeIterator it = _node->getChildNodeIterator();
     while ( it.hasMore() ) {

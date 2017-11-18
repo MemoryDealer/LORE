@@ -59,12 +59,14 @@
 #include <typeinfo>
 #include <queue>
 #include <unordered_map>
+#include <variant>
 #include <vector>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 // Windows.
 #if LORE_PLATFORM == LORE_WINDOWS
+#define NOMINMAX
 #include <Windows.h>
 #endif
 

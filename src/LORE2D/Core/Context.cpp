@@ -26,6 +26,7 @@
 
 #include "Context.h"
 
+#include <LORE2D/Config/Config.h>
 #include <LORE2D/Core/APIVersion.h>
 #include <LORE2D/Core/NotificationCenter.h>
 #include <LORE2D/Core/Timestamp.h>
@@ -33,6 +34,7 @@
 #include <LORE2D/Renderer/SceneGraphVisitor.h>
 #include <LORE2D/Resource/Entity.h>
 #include <LORE2D/Resource/StockResource.h>
+#include <LORE2D/Resource/Renderable/Box.h>
 #include <LORE2D/Resource/Renderable/Textbox.h>
 #include <LORE2D/UI/UI.h>
 
@@ -71,6 +73,7 @@ void Context::initConfiguration()
 {
   // Setup default memory pool settings. (TODO: Move out of Context.cpp).
   _poolCluster.registerPool<Background>( 16 );
+  _poolCluster.registerPool<Box>( 1024 );
   _poolCluster.registerPool<Camera>( 16 );
   _poolCluster.registerPool<Entity>( 16 );
   _poolCluster.registerPool<Light>( 32 );
@@ -78,12 +81,13 @@ void Context::initConfiguration()
   _poolCluster.registerPool<Mesh>( 8 );
   _poolCluster.registerPool<Node>( 1024 );
   _poolCluster.registerPool<Scene>( 4 );
-  _poolCluster.registerPool<Textbox>( 32 );
+  _poolCluster.registerPool<Textbox>( 4 );
   _poolCluster.registerPool<UI>( 1 );
   _poolCluster.registerPool<UIPanel>( 1 );
   _poolCluster.registerPool<UIElement>( 4 );
 
-  // TODO: Parse pool settings from cfg file (Lua).
+  // TODO: Parse pool/config settings from cfg file (Lua).
+  Config::SetValue( "RenderAABBs", false );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

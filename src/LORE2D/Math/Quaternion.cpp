@@ -80,6 +80,17 @@ Matrix3 Quaternion::createRotationMatrix() const
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+Vec3 Quaternion::getEulerAngles() const
+{
+  Vec3 euler;
+  euler.x = std::atan2( 2.f * ( y * z + w * x ), w * w - x * x - y * y + z * z );
+  euler.y = std::asin( -2.f * ( x * z - w * y ) );
+  euler.z = std::atan2( 2.f * ( x * y + w * z ), w * w + x * x - y * y - z * z );
+  return euler;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 Quaternion Quaternion::operator * ( const Quaternion& rhs ) const
 {
     return Quaternion(

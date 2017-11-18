@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,35 +24,60 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Include this file for all Lore2D functionality.
+#include "AABB.h"
+
+#include <LORE2D/Resource/Renderable/Box.h>
+#include <LORE2D/Resource/ResourceController.h>
+#include <LORE2D/Scene/Node.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "LorePrerequisites.h"
+using namespace Lore;
 
-// Config.
-#include <LORE2D/Config/Config.h>
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Core.
-#include <LORE2D/Core/Context.h>
-#include <LORE2D/Core/Timer.h>
+AABB::AABB( NodePtr node )
+: _node( node )
+{
+  _box = Lore::Resource::CreateBox( node->getName() + "_AABB", node->getResourceGroupName() );
+}
 
-// Input.
-#include <LORE2D/Input/Input.h>
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Math.
-#include <LORE2D/Math/Math.h>
+AABB::~AABB()
+{
+  //Lore::Resource::DestroyBox
+}
 
-// Resource.
-#include <LORE2D/Resource/Entity.h>
-#include <LORE2D/Resource/Material.h>
-#include <LORE2D/Resource/StockResource.h>
-#include <LORE2D/Resource/Renderable/Box.h>
-#include <LORE2D/Resource/Renderable/Texture.h>
-#include <LORE2D/Resource/Renderable/Textbox.h>
-#include <LORE2D/Scene/AABB.h>
-#include <LORE2D/Scene/Background.h>
-#include <LORE2D/UI/UI.h>
-#include <LORE2D/UI/UIElement.h>
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void AABB::update()
+{
+  const auto x = _node->getDerivedPosition().x;
+  const auto y = _node->getDerivedPosition().y;
+  const auto w = _node->getDerivedScale().x * 0.2f;
+  const auto h = _node->getDerivedScale().y * 0.2f;
+
+  auto angle = _node->getFullTransform().toEulerAngles().z;
+  _dimensions.x = h * std::abs( std::sin( angle ) ) + w * std::abs( std::cos( angle ) );
+  _dimensions.y = w * std::abs( std::sin( angle ) ) + h * std::abs( std::cos( angle ) );
+
+  _min.x = x - _dimensions.x / 2.f;
+  _min.y = y - _dimensions.y / 2.f;
+  _max.x = x + _dimensions.x / 2.f;
+  _max.y = y + _dimensions.y / 2.f;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+bool AABB::intersects( const AABB& rhs ) const
+{
+  return !(
+    _max.x < rhs._min.x ||
+    _max.y < rhs._min.y ||
+    _min.x > rhs._max.x ||
+    _min.y > rhs._max.y
+    );
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -99,8 +99,6 @@ int main( int argc, char** argv )
   sonicLight->setColor( Lore::StockColor::White );
   sonicNode->attachObject( sonicLight );
 
-  camera->trackNode( sonicNode );
-
   //
   // Create some doges.
 
@@ -114,10 +112,16 @@ int main( int argc, char** argv )
     node->setPosition( static_cast< float >( i ) / 2.f, 0.f );
     doges.push_back( node );
   }
+  doges[0]->createChildNode( "dogen" )->attachObject( dogeEntity );
+  scene->getNode( "dogen" )->setPosition( 0.4f, 0.f );
+  scene->getNode( "dogen" )->createChildNode( "dogen2" )->attachObject( dogeEntity );
+  scene->getNode( "dogen2" )->setPosition( 0.4f, 0.f );
+  scene->getNode( "dogen2" )->createChildNode( "dogen3" )->attachObject( dogeEntity );
+  scene->getNode( "dogen3" )->setPosition( -0.4f, 0.f );
 
   // Create some blended boxes.
 
-  auto boxEntity = Lore::Resource::CreateEntity( "box", Lore::MeshType::Quad );
+  auto boxEntity = Lore::Resource::CreateEntity( "boxeuler.z", Lore::MeshType::Quad );
   boxEntity->getMaterial()->blendingMode.enabled = true;
   boxEntity->getMaterial()->diffuse = Lore::Color( 0.1f, 0.4f, 0.8f, 0.95f );
   for ( int i = 0; i < 5; ++i ) {
@@ -221,6 +225,22 @@ int main( int argc, char** argv )
 
   // ---
 
+  auto boxNode = scene->createNode( "boxNode" );
+  auto box = Lore::Resource::CreateBox( "Box1" );
+  box->setBorderColor( Lore::StockColor::Green );
+  box->setFillColor( Lore::Color( 0.f, 1.f, 0.f, 0.4f ) );
+  box->setSize( 1.f, 2.f );
+  boxNode->attachObject( box );
+  boxNode->translate( -0.2f, 0.f );
+
+  for ( int i = 0; i < 15; ++i ) {
+    auto node = scene->createNode( "boxx" + std::to_string( i ) );
+    node->attachObject( box );
+    node->setPosition( 0.f, -1.f - static_cast< float >( i ) / 2.f );
+  }
+
+  // ---
+
   //
   // UI.
 
@@ -237,12 +257,59 @@ int main( int argc, char** argv )
   Lore::Input::SetKeyCallback( OnKeyChanged );
   Lore::Input::SetCharCallback( OnChar );
 
+  //sonicNode = doges[0];
   float f = 0.f;
   __timer.reset();
+
+  camera->trackNode( sonicNode );
   bool pause = true;
   while ( context->active() ) {
     __timer.tick();
 
+    sonicNode->getAABB()->getBox()->setFillColor( Lore::Color( 1.f, 1.f, 1.f, 0.3f ) );
+
+    /*if ( sonicNode->intersects( boxNode ) ) {
+      sonicNode->getAABB()->getBox()->setFillColor( Lore::Color( 1.f, 0.f, 0.f, 0.3f ) );
+    }
+
+    {
+      auto min = sonicNode->getAABB()->getMin();
+      auto max = sonicNode->getAABB()->getMax();
+      printf( "Sonic: %.2f, %.2f, %.2f, %.2f\n", min.x, min.y, max.x, max.y );
+    }
+
+    {
+      auto min = boxNode->getAABB()->getMin();
+      auto max = boxNode->getAABB()->getMax();
+      printf( "Box: %.2f, %.2f, %.2f, %.2f\n", min.x, min.y, max.x, max.y );
+    }*/
+
+    auto root = scene->getRootNode();
+    auto it = root->getChildNodeIterator();
+    while ( it.hasMore() ) {
+      auto node = it.getNext();
+      if ( node == sonicNode ) {
+        continue;
+      }
+      if ( sonicNode->intersects( node ) ) {
+        sonicNode->getAABB()->getBox()->setFillColor( Lore::Color( 1.f, 0.f, 0.f, 0.3f ) );
+        //printf( "Collision with %s\n", node->getName().c_str() );
+        /*auto r1 = sonicNode->getAABB()->getRect();
+        auto r2 = node->getAABB()->getRect();
+        printf( "Sonic: %.2f, %.2f, %.2f, %.2f\n", r1.x, r1.y, r1.w, r1.h );
+        printf( "%s: %.2f, %.2f, %.2f, %.2f\n", node->getName().c_str(), r2.x, r2.y, r2.w, r2.h );*/
+        break;
+      }
+      auto it2 = node->getChildNodeIterator();
+      while ( it2.hasMore() ) {
+        auto node2 = it2.getNext();
+        if ( sonicNode->intersects( node2 ) || sonicNode->intersects( scene->getNode("dogen2") ) || sonicNode->intersects( scene->getNode( "dogen3" ) ) ) {
+          sonicNode->getAABB()->getBox()->setFillColor( Lore::Color( 1.f, 0.f, 0.f, 0.3f ) );
+        }
+      }
+    }
+    auto pos = scene->getNode( "dogen2" )->getDerivedPosition();
+    printf( "dogen2: %.2f, %.2f, %.2f\n", pos.x, pos.y );
     //node->translate( 0.01f * std::sinf( f ), 0.01f * std::cosf( f ) );
     f += 0.0005f;
     //sonicNode->scale( 10.05f * std::sinf( f ) );
@@ -257,8 +324,13 @@ int main( int argc, char** argv )
     }
 
     for ( auto doge : doges ) {
-      doge->rotate( Lore::Degree( .1f ) );
+     doge->rotate( Lore::Degree( .1f ) );
     }
+
+    scene->getNode( "dogen" )->rotate( Lore::Degree( -.2f ) );
+    scene->getNode( "dogen2" )->rotate( Lore::Degree( .2f ) );
+
+    sonicNode->rotate( Lore::Degree( .1f ) );
 
     float speed = 0.01f;
     if ( Lore::Input::GetKeymodState( Lore::Keymod::Shift ) ) {
@@ -296,11 +368,18 @@ int main( int argc, char** argv )
       break;
     }
 
+    if ( Lore::Input::GetKeyState( Lore::Keycode::Right ) ) {
+      sonicNode->scale( 1.1f );
+    }
+    else if ( Lore::Input::GetKeyState( Lore::Keycode::Left ) ) {
+      sonicNode->scale( 0.9f );
+    }
+
     if ( Lore::Input::GetMouseButtonState( Lore::MouseButton::Left ) ) {
-      printf( "Left!\n" );
+      //printf( "Left!\n" );
     }
     if ( Lore::Input::GetMouseButtonState( Lore::MouseButton::Right ) ) {
-      printf( "Right!\n" );
+      //printf( "Right!\n" );
     }
 
     UpdateFPS( fpsTextbox );
@@ -353,8 +432,15 @@ static void OnKeyChanged( const Lore::Keycode key, const bool state )
   default:
     break;
 
+  case Lore::Keycode::B:
+    if ( state ) {
+      auto value = Lore::Config::GetValue( "RenderAABBs" );
+      Lore::Config::SetValue( "RenderAABBs", !std::get<bool>( value ) );
+    }
+    break;
+
   case Lore::Keycode::C:
-    {
+    if ( state ) {
       static bool enabled = true;
       enabled = !enabled;
       Lore::Input::SetCursorEnabled( enabled );
@@ -365,7 +451,7 @@ static void OnKeyChanged( const Lore::Keycode key, const bool state )
 
 static void OnChar( const char c )
 {
-  printf( "OnChar: %c\n", c );
+  //printf( "OnChar: %c\n", c );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -24,12 +24,14 @@ solution "LORE2D"
 
 filter "configurations:Debug"
     defines { "DEBUG" }
-    flags { "Symbols" }
+    symbols "On"
     
 filter "configurations:Release"
     defines { "NDEBUG" }
     optimize "On"
-    
+
+-- Use latest C++ standard for all projects
+buildoptions { "/std:c++latest" }
     
 -- Project(s)
 
@@ -44,6 +46,7 @@ project "LORE2D"
     files {
         "LORE2D/**.h", "LORE2D/**.cpp"
     }
+
     
 project "Plugin_OpenGL"
     location "Plugins/OpenGL"

@@ -46,11 +46,14 @@ namespace Lore {
 
   public:
 
+    // TODO: Use a RenderableList for textboxes, textures, boxes, etc?
     using NodeMap = Registry<std::map, Node>;
     using ChildNodeIterator = NodeMap::Iterator;
     using ConstChildNodeIterator = NodeMap::ConstIterator;
     using EntityList = Registry<std::map, Entity>;
     using EntityListConstIterator = EntityList::ConstIterator;
+    using BoxList = Registry<std::map, Box>;
+    using BoxListConstIterator = BoxList::ConstIterator;
     using TextboxList = Registry<std::map, Textbox>;
     using TextboxListConstIterator = TextboxList::ConstIterator;
     using LightList = std::vector<LightPtr>;
@@ -82,6 +85,12 @@ namespace Lore {
 
     };
 
+    struct Depth {
+      static constexpr const real Max = 1000.f;
+      static constexpr const real Default = 0.f;
+      static constexpr const real Min = -1000.f;
+    };
+
   public:
 
     ~Node();
@@ -107,6 +116,8 @@ namespace Lore {
 
     void attachObject( LightPtr l );
 
+    void attachObject( BoxPtr b );
+
     void attachObject( TextboxPtr t );
 
     inline EntityListConstIterator getEntityListConstIterator() const
@@ -114,10 +125,19 @@ namespace Lore {
       return _entities.getConstIterator();
     }
 
+    inline BoxListConstIterator getBoxListConstIterator() const
+    {
+      return _boxes.getConstIterator();
+    }
+
     inline TextboxListConstIterator getTextboxListConstIterator() const
     {
       return _textboxes.getConstIterator();
     }
+
+    // Misc.
+
+    bool intersects( NodePtr rhs ) const;
 
     //
     // Modifiers.
@@ -167,6 +187,16 @@ namespace Lore {
       return _transform.position;
     }
 
+    inline Vec2 getDerivedPosition() const
+    {
+      return Vec2( _transform.world[3][0], _transform.world[3][1] );
+    }
+
+    inline Quaternion getOrientation() const
+    {
+      return _transform.orientation;
+    }
+
     inline Matrix4 getFullTransform() const
     {
       return _transform.world;
@@ -191,6 +221,9 @@ namespace Lore {
     {
       return _depth;
     }
+
+    AABBPtr getAABB() const;
+
 
     //
     // Deleted functions/operators.
@@ -233,11 +266,17 @@ namespace Lore {
 
   private:
 
+    // TODO: Node is getting large, consider holding node -> entity mappings somewhere else.
+
+    std::unique_ptr<AABB> _aabb { nullptr };
+
     Transform _transform {};
 
-    real _depth { 0.f };
+    real _depth { Depth::Default };
 
     EntityList _entities {};
+
+    BoxList _boxes {};
 
     TextboxList _textboxes {};
 

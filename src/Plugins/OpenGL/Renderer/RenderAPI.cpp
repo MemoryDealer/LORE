@@ -81,6 +81,26 @@ using namespace Lore::OpenGL;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void RenderAPI::setPolygonMode( const Lore::IRenderAPI::PolygonMode& mode )
+{
+  switch ( mode ) {
+  default:
+  case Lore::IRenderAPI::PolygonMode::Fill:
+    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+    break;
+
+  case Lore::IRenderAPI::PolygonMode::Line:
+    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+    break;
+
+  case Lore::IRenderAPI::PolygonMode::Point:
+    glPolygonMode( GL_FRONT_AND_BACK, GL_POINT );
+    break;
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void RenderAPI::clearColor( const real r,
                             const real g,
                             const real b,
@@ -94,7 +114,6 @@ void RenderAPI::clearColor( const real r,
 void RenderAPI::clear()
 {
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-  glPolygonMode( GL_FRONT, GL_LINE );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

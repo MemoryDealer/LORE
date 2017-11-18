@@ -47,9 +47,21 @@ namespace Lore {
       DepthBufferBit
     };
 
+    enum PolygonMode
+    {
+      Fill,
+      Line,
+      Point
+    };
+
   public:
 
     virtual ~IRenderAPI() = default;
+
+    //
+    // General.
+
+    virtual void setPolygonMode( const PolygonMode& mode ) = 0;
 
     //
     // Viewport.

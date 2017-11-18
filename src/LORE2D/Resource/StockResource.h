@@ -76,6 +76,8 @@ namespace Lore {
 
         virtual GPUProgramPtr createBackgroundProgram( const string& name, const BackgroundProgramParameters& params ) = 0;
 
+        virtual GPUProgramPtr createBoxProgram( const string& name ) = 0;
+
         virtual GPUProgramPtr createTextProgram( const string& name ) = 0;
 
         //

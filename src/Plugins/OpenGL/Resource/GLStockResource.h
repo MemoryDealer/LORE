@@ -46,6 +46,8 @@ namespace Lore { namespace OpenGL {
 
         virtual GPUProgramPtr createBackgroundProgram( const string& name, const BackgroundProgramParameters& params ) override;
 
+        virtual GPUProgramPtr createBoxProgram( const string& name ) override;
+
         virtual GPUProgramPtr createTextProgram( const string& name ) override;
 
     };

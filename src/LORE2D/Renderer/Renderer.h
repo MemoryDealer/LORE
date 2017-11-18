@@ -75,6 +75,12 @@ namespace Lore {
       Matrix4 model {};
     };
 
+    struct BoxData
+    {
+      BoxPtr box { nullptr };
+      Matrix4 model {};
+    };
+
     struct TextboxData
     {
       TextboxPtr textbox { nullptr };
@@ -84,10 +90,12 @@ namespace Lore {
     // Every Material maps to a list of RenderData.
     using EntityDataMap = std::map<EntityData, RenderDataList>;
     using TransparentDataMap = std::multimap<real, Transparent>;
+    using BoxList = std::vector<BoxData>;
     using TextboxList = std::vector<TextboxData>;
 
     EntityDataMap solids {};
     TransparentDataMap transparents {};
+    BoxList boxes {};
     TextboxList textboxes {};
 
   };
@@ -111,6 +119,9 @@ namespace Lore {
     ///     called when a Renderable is attached to a Node.
     virtual void addRenderData( Lore::EntityPtr e,
                                 Lore::NodePtr node ) = 0;
+
+    virtual void addBox( Lore::BoxPtr box,
+                         const Lore::Matrix4& transform ) = 0;
 
     virtual void addTextbox( Lore::TextboxPtr textbox,
                              const Lore::Matrix4& transform ) = 0;

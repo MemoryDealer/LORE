@@ -26,83 +26,111 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 #include <LORE2D/Memory/Alloc.h>
-#include <LORE2D/Renderer/Renderer.h>
+#include <LORE2D/Resource/Color.h>
 #include <LORE2D/Resource/Renderable/Renderable.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-  class LORE_EXPORT Textbox : public Renderable,
-                              public Alloc<Textbox>
+  class LORE_EXPORT Box : public Renderable,
+                          public Alloc<Box>
   {
 
     LORE_OBJECT_BODY()
 
   public:
 
-    Textbox()
+    Box()
     {
-      _type = Renderable::Type::Textbox;
+      _type = Renderable::Type::Box;
     }
 
-    virtual ~Textbox() override = default;
-
-    // TODO: Add "typed" text effect where each letter appears over time at certain rate.
-    // Add solid/blended box behind text and border.
-
-    //
-    // Setters.
-
-    void setText( const string& text )
-    {
-      _text = text;
-    }
-
-    void setFont( FontPtr font )
-    {
-      _font = font;
-    }
-
-    void setTextColor( const Color& color )
-    {
-      _textColor = color;
-    }
+    virtual ~Box() override = default;
 
     //
     // Getters.
 
-    string getText() const
+    inline Color getBorderColor() const
     {
-      return _text;
+      return _borderColor;
     }
 
-    FontPtr getFont() const
+    inline Color getFillColor() const
     {
-      return _font;
+      return _fillColor;
     }
 
-    Color getTextColor() const
+    inline real getBorderWidth() const
     {
-      return _textColor;
+      return _borderWidth;
     }
 
-    uint32_t getRenderQueue() const
+    inline real getWidth() const
     {
-      return _renderQueue;
+      return _size.x;
+    }
+
+    inline real getHeight() const
+    {
+      return _size.y;
+    }
+
+    inline Vec2 getSize() const
+    {
+      return _size;
+    }
+
+    //
+    // Setters.
+
+    inline void setBorderColor( const Color& color )
+    {
+      _borderColor = color;
+    }
+
+    inline void setBorderColor( const real r, const real g, const real b, const real a )
+    {
+      setBorderColor( Color( r, g, b, a ) );
+    }
+
+    inline void setFillColor( const Color& color )
+    {
+      _fillColor = color;
+    }
+
+    inline void setFillColor( const real r, const real g, const real b, const real a )
+    {
+      setFillColor( Color( r, g, b, a ) );
+    }
+
+    inline void setSize( const Vec2& size )
+    {
+      _size = size;
+    }
+
+    inline void setSize( const real w, const real h )
+    {
+      setSize( Vec2( w, h ) );
+    }
+
+    inline void setBorderWidth( const real width )
+    {
+      _borderWidth = width;
     }
 
   private:
 
-    virtual void _reset() override
-    { }
+    virtual void _reset() override {}
 
   private:
 
-    FontPtr _font { nullptr };
-    string _text {};
-    Color _textColor { StockColor::White };
-    uint32_t _renderQueue { RenderQueue::General };
+    bool _fill { true };
+
+    Color _borderColor { StockColor::White };
+    Color _fillColor { 1.f, 1.f, 1.f, 0.3f };
+    Vec2 _size { 1.f, 1.f };
+    real _borderWidth { 0.02f };
 
   };
 

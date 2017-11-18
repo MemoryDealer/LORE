@@ -25,35 +25,68 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Include this file for all Lore2D functionality.
+#include <LORE2D/Math/Vector.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "LorePrerequisites.h"
+namespace Lore {
 
-// Config.
-#include <LORE2D/Config/Config.h>
+  class AABB final
+  {
 
-// Core.
-#include <LORE2D/Core/Context.h>
-#include <LORE2D/Core/Timer.h>
+  public:
 
-// Input.
-#include <LORE2D/Input/Input.h>
+    explicit AABB( NodePtr node );
 
-// Math.
-#include <LORE2D/Math/Math.h>
+    ~AABB();
 
-// Resource.
-#include <LORE2D/Resource/Entity.h>
-#include <LORE2D/Resource/Material.h>
-#include <LORE2D/Resource/StockResource.h>
-#include <LORE2D/Resource/Renderable/Box.h>
-#include <LORE2D/Resource/Renderable/Texture.h>
-#include <LORE2D/Resource/Renderable/Textbox.h>
-#include <LORE2D/Scene/AABB.h>
-#include <LORE2D/Scene/Background.h>
-#include <LORE2D/UI/UI.h>
-#include <LORE2D/UI/UIElement.h>
+    void update();
+
+    bool intersects( const AABB& rhs ) const;
+
+    //
+    // Getters.
+
+    inline BoxPtr getBox() const
+    {
+      return _box;
+    }
+
+    Vec2 getMin() const
+    {
+      return _min;
+    }
+
+    Vec2 getMax() const
+    {
+      return _max;
+    }
+
+    real getWidth() const
+    {
+      return _dimensions.x;
+    }
+
+    real getHeight() const
+    {
+      return _dimensions.y;
+    }
+
+    Vec2 getDimensions() const
+    {
+      return _dimensions;
+    }
+
+  private:
+
+    NodePtr _node { nullptr };
+    BoxPtr _box { nullptr };
+    Vec2 _min {};
+    Vec2 _max {};
+    Vec2 _dimensions {};
+
+  };
+
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

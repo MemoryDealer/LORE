@@ -395,6 +395,112 @@ Lore::GPUProgramPtr StockResourceController::createBackgroundProgram( const stri
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+Lore::GPUProgramPtr StockResourceController::createBoxProgram( const string& name )
+{
+  const string header = "#version " +
+    std::to_string( APIVersion::GetMajor() ) + std::to_string( APIVersion::GetMinor() ) + "0" +
+    " core\n";
+
+  //
+  // Vertex shader.
+
+  string src = header;
+
+  //
+  // Layout.
+
+  src += "layout (location = 0) in vec2 vertex;";
+  src += "layout (location = 1) in vec2 texCoord;";
+
+  //
+  // Uniforms and outs.
+
+  src += "uniform mat4 transform;";
+  src += "out vec2 TexCoord;";
+
+  //
+  // main function.
+
+  src += "void main() {";
+
+  src += "gl_Position = transform * vec4(vertex, 1.0, 1.0);";
+  src += "TexCoord = texCoord;";
+
+  src += "}";
+
+  auto vsptr = _controller->createVertexShader( name + "_VS" );
+  if ( !vsptr->loadFromSource( src ) ) {
+    throw Lore::Exception( "Failed to compile text vertex shader for " + name );
+  }
+
+  // ::::::::::::::::::::::::::::::::: //
+
+  //
+  // Fragment shader.
+
+  src.clear();
+  src = header;
+
+  //
+  // Ins/outs and uniforms.
+
+  src += "in vec2 TexCoord;";
+  src += "out vec4 pixel;";
+
+  src += "uniform vec4 borderColor;";
+  src += "uniform vec4 fillColor;";
+  src += "uniform float borderWidth;";
+  src += "uniform vec2 scale;"; // TODO: Once debug UI is up fix border scaling.
+
+  //
+  // main function.
+
+  src += "void main() {";
+
+  src += "const float maxX = 1.0 - borderWidth;";
+  src += "const float minX = borderWidth;";
+  src += "const float maxY = maxX;";
+  src += "const float minY = minX;";
+
+  src += "if (TexCoord.x < maxX && TexCoord.x > minX &&"
+         "    TexCoord.y < maxY && TexCoord.y > minY) {";
+  src += "  pixel = fillColor;";
+  src += "} else {";
+  src += "  pixel = borderColor;";
+  src += "}";
+
+  src += "}";
+
+  auto fsptr = _controller->createFragmentShader( name + "_FS" );
+  if ( !fsptr->loadFromSource( src ) ) {
+    throw Lore::Exception( "Failed to compile text fragment shader for " + name );
+    // TODO: Rollback vertex shaders in case of failed fragment shader.
+  }
+
+  // ::::::::::::::::::::::::::::::::: //
+
+  //
+  // GPU program.
+
+  auto program = _controller->createGPUProgram( name );
+  program->attachShader( vsptr );
+  program->attachShader( fsptr );
+
+  if ( !program->link() ) {
+    throw Lore::Exception( "Failed to link GPUProgram " + name );
+  }
+
+  program->addTransformVar( "transform" );
+  program->addUniformVar( "borderColor" );
+  program->addUniformVar( "fillColor" );
+  program->addUniformVar( "borderWidth" );
+  program->addUniformVar( "scale" );
+
+  return program;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 Lore::GPUProgramPtr StockResourceController::createTextProgram( const string& name )
 {
   const string header = "#version " +

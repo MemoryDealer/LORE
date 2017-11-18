@@ -29,6 +29,7 @@
 #include <LORE2D/Core/Context.h>
 #include <LORE2D/Resource/Entity.h>
 #include <LORE2D/Resource/StockResource.h>
+#include <LORE2D/Resource/Renderable/Box.h>
 #include <LORE2D/Resource/Renderable/Textbox.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -170,6 +171,18 @@ CameraPtr ResourceController::createCamera( const string& name, const string& gr
 
   _getGroup( groupName )->cameras.insert( name, cam );
   return cam;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+BoxPtr ResourceController::createBox( const string& name, const string& groupName )
+{
+  auto box = MemoryAccess::GetPrimaryPoolCluster()->create<Box>();
+  box->setName( name );
+  box->setResourceGroupName( groupName );
+
+  _getGroup( groupName )->boxes.insert( name, box );
+  return box;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -359,6 +372,13 @@ RenderTargetPtr Resource::CreateRenderTarget( const string& name, const uint32_t
 CameraPtr Resource::CreateCamera( const string& name, const string& groupName )
 {
   return ActiveContext->getResourceController()->createCamera( name, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+BoxPtr Resource::CreateBox( const string& name, const string& groupName )
+{
+  return ActiveContext->getResourceController()->createBox( name, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

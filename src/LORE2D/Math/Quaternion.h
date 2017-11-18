@@ -68,6 +68,11 @@ namespace Lore {
         /// \brief Returns 3x3 matrix representing orientation of Quaternion.
         Matrix3 createRotationMatrix() const;
 
+        ///
+        /// \brief Returns 3D vector representing quaternion's orientation in
+        ///   euler angles (pitch, yaw, roll).
+        Vec3 getEulerAngles() const;
+
         //
         // Operator overloading.
 
