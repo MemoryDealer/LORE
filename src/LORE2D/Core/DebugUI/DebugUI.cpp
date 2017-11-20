@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,60 +24,47 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Platform define:
+#include "DebugUI.h"
 
-#define LORE_WINDOWS 0
-#define LORE_LINUX 1
-#define LORE_APPLE 2
-
-#if defined( WIN32 ) || defined( _WIN32 )
-#define LORE_PLATFORM LORE_WINDOWS
-#elif defined( LINUX ) || defined( _LINUX )
-#define LORE_PLATFORM LORE_LINUX
-#elif defined( APPLE ) || defined( _APPLE )
-#define LORE_PLATFORM LORE_APPLE
-#endif
+#include <LORE2D/Core/DebugUI/DebugUIConsole.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// C/C++/STL.
-#include <atomic>
-#include <cassert>
-#include <chrono>
-#include <condition_variable>
-#include <ctime>
-#include <fstream>
-#include <functional>
-#include <map>
-#include <memory>
-#include <mutex>
-#include <sstream>
-#include <stack>
-#include <string>
-#include <thread>
-#include <typeindex>
-#include <typeinfo>
-#include <queue>
-#include <unordered_map>
-#include <variant>
-#include <vector>
+using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Windows.
-#if LORE_PLATFORM == LORE_WINDOWS
-#define NOMINMAX
-#include <Windows.h>
-#endif
+bool DebugUI::ConsoleEnabled = false;
+std::unique_ptr<DebugUIConsole> DebugUI::Console = nullptr;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Lore.
-#include "Exports.h"
-#include "Types.h"
-#include "Core/ClassMacros.h"
-#include "Core/Logging/Log.h"
-#include "Core/Exception.h"
-#include "Memory/MemoryAccess.h"
+void DebugUI::Init()
+{
+  Console.reset( new DebugUIConsole() );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void DebugUI::DisplayConsole()
+{
+  ConsoleEnabled = true;
+  Input::OverrideHooks( Console->getInputHooks() );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void DebugUI::HideConsole()
+{
+  ConsoleEnabled = false;
+  Input::ResetHooks();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+UIPtr DebugUI::GetConsoleUI()
+{
+  return Console->getUI();
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -25,60 +25,34 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Platform define:
-
-#define LORE_WINDOWS 0
-#define LORE_LINUX 1
-#define LORE_APPLE 2
-
-#if defined( WIN32 ) || defined( _WIN32 )
-#define LORE_PLATFORM LORE_WINDOWS
-#elif defined( LINUX ) || defined( _LINUX )
-#define LORE_PLATFORM LORE_LINUX
-#elif defined( APPLE ) || defined( _APPLE )
-#define LORE_PLATFORM LORE_APPLE
-#endif
+#include <LORE2D/Input/Input.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// C/C++/STL.
-#include <atomic>
-#include <cassert>
-#include <chrono>
-#include <condition_variable>
-#include <ctime>
-#include <fstream>
-#include <functional>
-#include <map>
-#include <memory>
-#include <mutex>
-#include <sstream>
-#include <stack>
-#include <string>
-#include <thread>
-#include <typeindex>
-#include <typeinfo>
-#include <queue>
-#include <unordered_map>
-#include <variant>
-#include <vector>
+namespace Lore {
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+  class DebugUIComponent
+  {
 
-// Windows.
-#if LORE_PLATFORM == LORE_WINDOWS
-#define NOMINMAX
-#include <Windows.h>
-#endif
+  public:
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    const string DebugUIResourceGroupName = "DebugUI";
 
-// Lore.
-#include "Exports.h"
-#include "Types.h"
-#include "Core/ClassMacros.h"
-#include "Core/Logging/Log.h"
-#include "Core/Exception.h"
-#include "Memory/MemoryAccess.h"
+  public:
+
+    DebugUIComponent() = default;
+    virtual ~DebugUIComponent() = default;
+
+    InputHooksPtr getInputHooks() { return &_hooks; }
+    UIPtr getUI() const { return _ui; }
+
+  protected:
+
+    UIPtr _ui { nullptr };
+    InputHooks _hooks;
+
+  };
+
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

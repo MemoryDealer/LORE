@@ -25,60 +25,35 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Platform define:
+namespace Lore {
 
-#define LORE_WINDOWS 0
-#define LORE_LINUX 1
-#define LORE_APPLE 2
+  class DebugUIConsole;
 
-#if defined( WIN32 ) || defined( _WIN32 )
-#define LORE_PLATFORM LORE_WINDOWS
-#elif defined( LINUX ) || defined( _LINUX )
-#define LORE_PLATFORM LORE_LINUX
-#elif defined( APPLE ) || defined( _APPLE )
-#define LORE_PLATFORM LORE_APPLE
-#endif
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+  class LORE_EXPORT DebugUI
+  {
 
-// C/C++/STL.
-#include <atomic>
-#include <cassert>
-#include <chrono>
-#include <condition_variable>
-#include <ctime>
-#include <fstream>
-#include <functional>
-#include <map>
-#include <memory>
-#include <mutex>
-#include <sstream>
-#include <stack>
-#include <string>
-#include <thread>
-#include <typeindex>
-#include <typeinfo>
-#include <queue>
-#include <unordered_map>
-#include <variant>
-#include <vector>
+  public:
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    static void Init();
 
-// Windows.
-#if LORE_PLATFORM == LORE_WINDOWS
-#define NOMINMAX
-#include <Windows.h>
-#endif
+    static void DisplayConsole();
+    static void HideConsole();
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    //
+    // Getters.
 
-// Lore.
-#include "Exports.h"
-#include "Types.h"
-#include "Core/ClassMacros.h"
-#include "Core/Logging/Log.h"
-#include "Core/Exception.h"
-#include "Memory/MemoryAccess.h"
+    static bool IsConsoleEnabled() { return ConsoleEnabled; }
+    static UIPtr GetConsoleUI();
+
+  private:
+
+    static bool ConsoleEnabled;
+    static std::unique_ptr<DebugUIConsole> Console;
+
+  };
+
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

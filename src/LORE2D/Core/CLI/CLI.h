@@ -25,60 +25,39 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Platform define:
+namespace Lore {
 
-#define LORE_WINDOWS 0
-#define LORE_LINUX 1
-#define LORE_APPLE 2
+  class LORE_EXPORT CLI
+  {
 
-#if defined( WIN32 ) || defined( _WIN32 )
-#define LORE_PLATFORM LORE_WINDOWS
-#elif defined( LINUX ) || defined( _LINUX )
-#define LORE_PLATFORM LORE_LINUX
-#elif defined( APPLE ) || defined( _APPLE )
-#define LORE_PLATFORM LORE_APPLE
-#endif
+  public:
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    struct Command
+    {
 
-// C/C++/STL.
-#include <atomic>
-#include <cassert>
-#include <chrono>
-#include <condition_variable>
-#include <ctime>
-#include <fstream>
-#include <functional>
-#include <map>
-#include <memory>
-#include <mutex>
-#include <sstream>
-#include <stack>
-#include <string>
-#include <thread>
-#include <typeindex>
-#include <typeinfo>
-#include <queue>
-#include <unordered_map>
-#include <variant>
-#include <vector>
+      virtual string execute( string& args ) = 0;
+      virtual void undo() { }
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    };
+    using CommandPtr = Command*;
 
-// Windows.
-#if LORE_PLATFORM == LORE_WINDOWS
-#define NOMINMAX
-#include <Windows.h>
-#endif
+  public:
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    static void Init();
 
-// Lore.
-#include "Exports.h"
-#include "Types.h"
-#include "Core/ClassMacros.h"
-#include "Core/Logging/Log.h"
-#include "Core/Exception.h"
-#include "Memory/MemoryAccess.h"
+    static string Execute( const string& command );
+
+    static bool RegisterCommand( const string& commandName, CommandPtr command );
+
+    // String processing.
+
+    // Returns next isolated string, and removes it from str.
+    static string GetNextArg( string& str );
+
+    static uint32_t GetNumArgs( const string& str );
+
+  };
+
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

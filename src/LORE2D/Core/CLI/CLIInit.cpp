@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,60 +24,60 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Platform define:
-
-#define LORE_WINDOWS 0
-#define LORE_LINUX 1
-#define LORE_APPLE 2
-
-#if defined( WIN32 ) || defined( _WIN32 )
-#define LORE_PLATFORM LORE_WINDOWS
-#elif defined( LINUX ) || defined( _LINUX )
-#define LORE_PLATFORM LORE_LINUX
-#elif defined( APPLE ) || defined( _APPLE )
-#define LORE_PLATFORM LORE_APPLE
-#endif
+#include "CLI.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// C/C++/STL.
-#include <atomic>
-#include <cassert>
-#include <chrono>
-#include <condition_variable>
-#include <ctime>
-#include <fstream>
-#include <functional>
-#include <map>
-#include <memory>
-#include <mutex>
-#include <sstream>
-#include <stack>
-#include <string>
-#include <thread>
-#include <typeindex>
-#include <typeinfo>
-#include <queue>
-#include <unordered_map>
-#include <variant>
-#include <vector>
+namespace LocalNS {
+
+  using Lore::CLI;
+  using Lore::string;
+
+  struct SetNodePos : public CLI::Command
+  {
+
+    virtual string execute( string& args ) override
+    {
+      if ( 2 == CLI::GetNumArgs( args ) ) {
+        auto nodeName = CLI::GetNextArg( args );
+        auto pos = CLI::GetNextArg( args );
+
+        return nodeName + pos;
+      }
+      return string( "Invalid arguments" );
+    }
+
+  };
+
+  struct Test : public CLI::Command
+  {
+
+    virtual string execute( string& args ) override
+    {
+      string re;
+      const auto numArgs = CLI::GetNumArgs( args );
+      for ( uint32_t i = 0; i < numArgs; ++i ) {
+        re += CLI::GetNextArg( args ) + " ";
+      }
+
+      return re;
+    }
+
+  };
+
+}
+using namespace LocalNS;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Windows.
-#if LORE_PLATFORM == LORE_WINDOWS
-#define NOMINMAX
-#include <Windows.h>
-#endif
+using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Lore.
-#include "Exports.h"
-#include "Types.h"
-#include "Core/ClassMacros.h"
-#include "Core/Logging/Log.h"
-#include "Core/Exception.h"
-#include "Memory/MemoryAccess.h"
+void CLI::Init()
+{
+  CLI::RegisterCommand( "SetNodePos", new SetNodePos() );
+  CLI::RegisterCommand( "test", new Test() );
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

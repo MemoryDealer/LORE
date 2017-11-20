@@ -37,6 +37,7 @@
 // Core.
 #include <LORE2D/Core/Context.h>
 #include <LORE2D/Core/Timer.h>
+#include <LORE2D/Core/DebugUI/DebugUI.h>
 
 // Input.
 #include <LORE2D/Input/Input.h>

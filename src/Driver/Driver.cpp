@@ -306,29 +306,29 @@ int main( int argc, char** argv )
     }*/
 
     auto root = scene->getRootNode();
-    auto it = root->getChildNodeIterator();
-    while ( it.hasMore() ) {
-      auto node = it.getNext();
-      if ( node == sonicNode ) {
-        continue;
-      }
-      if ( sonicNode->intersects( node ) ) {
-        sonicNode->getAABB()->getBox()->setFillColor( Lore::Color( 1.f, 0.f, 0.f, 0.3f ) );
-        //printf( "Collision with %s\n", node->getName().c_str() );
-        /*auto r1 = sonicNode->getAABB()->getRect();
-        auto r2 = node->getAABB()->getRect();
-        printf( "Sonic: %.2f, %.2f, %.2f, %.2f\n", r1.x, r1.y, r1.w, r1.h );
-        printf( "%s: %.2f, %.2f, %.2f, %.2f\n", node->getName().c_str(), r2.x, r2.y, r2.w, r2.h );*/
-        break;
-      }
-      auto it2 = node->getChildNodeIterator();
-      while ( it2.hasMore() ) {
-        auto node2 = it2.getNext();
-        if ( sonicNode->intersects( node2 ) || sonicNode->intersects( scene->getNode("dogen2") ) || sonicNode->intersects( scene->getNode( "dogen3" ) ) ) {
-          sonicNode->getAABB()->getBox()->setFillColor( Lore::Color( 1.f, 0.f, 0.f, 0.3f ) );
-        }
-      }
-    }
+    //auto it = root->getChildNodeIterator();
+    //while ( it.hasMore() ) {
+    //  auto node = it.getNext();
+    //  if ( node == sonicNode ) {
+    //    continue;
+    //  }
+    //  if ( sonicNode->intersects( node ) ) {
+    //    sonicNode->getAABB()->getBox()->setFillColor( Lore::Color( 1.f, 0.f, 0.f, 0.3f ) );
+    //    //printf( "Collision with %s\n", node->getName().c_str() );
+    //    /*auto r1 = sonicNode->getAABB()->getRect();
+    //    auto r2 = node->getAABB()->getRect();
+    //    printf( "Sonic: %.2f, %.2f, %.2f, %.2f\n", r1.x, r1.y, r1.w, r1.h );
+    //    printf( "%s: %.2f, %.2f, %.2f, %.2f\n", node->getName().c_str(), r2.x, r2.y, r2.w, r2.h );*/
+    //    break;
+    //  }
+    //  auto it2 = node->getChildNodeIterator();
+    //  while ( it2.hasMore() ) {
+    //    auto node2 = it2.getNext();
+    //    if ( sonicNode->intersects( node2 ) || sonicNode->intersects( scene->getNode("dogen2") ) || sonicNode->intersects( scene->getNode( "dogen3" ) ) ) {
+    //      sonicNode->getAABB()->getBox()->setFillColor( Lore::Color( 1.f, 0.f, 0.f, 0.3f ) );
+    //    }
+    //  }
+    //}
 
     //node->translate( 0.01f * std::sinf( f ), 0.01f * std::cosf( f ) );
     f += 0.0005f;
@@ -353,53 +353,55 @@ int main( int argc, char** argv )
     sonicNode->rotate( Lore::Degree( .1f ) );
 
     float speed = 0.01f;
-    if ( Lore::Input::GetKeymodState( Lore::Keymod::Shift ) ) {
-      speed *= 2.f;
-    }
-    if ( Lore::Input::GetKeyState( Lore::Keycode::W ) ) {
-      sonicNode->translate( 0.f, speed );
-    }
-    else if ( Lore::Input::GetKeyState( Lore::Keycode::S ) ) {
-      sonicNode->translate( 0.f, -speed );
-    }
-    if ( Lore::Input::GetKeyState( Lore::Keycode::D ) ) {
-      sonicNode->translate( speed, 0.f );
-    }
-    else if ( Lore::Input::GetKeyState( Lore::Keycode::A ) ) {
-      sonicNode->translate( -speed, 0.f );
-    }
-    if ( Lore::Input::GetKeyState( Lore::Keycode::Z ) ) {
-      camera->zoom( 0.01f );
-    }
-    else if ( Lore::Input::GetKeyState( Lore::Keycode::X ) ) {
-      camera->zoom( -0.01f );
-    }
-
-    if ( Lore::Input::GetKeyState( Lore::Keycode::F8 ) ) {
-      static bool destroyed = false;
-      if ( !destroyed ) {
-        Lore::Resource::DestroyTexture( sonicTexture );
-        destroyed = true;
+    if ( !Lore::DebugUI::IsConsoleEnabled() ) {
+      if ( Lore::Input::GetKeymodState( Lore::Keymod::Shift ) ) {
+        speed *= 2.f;
       }
-    }
+      if ( Lore::Input::GetKeyState( Lore::Keycode::W ) ) {
+        sonicNode->translate( 0.f, speed );
+      }
+      else if ( Lore::Input::GetKeyState( Lore::Keycode::S ) ) {
+        sonicNode->translate( 0.f, -speed );
+      }
+      if ( Lore::Input::GetKeyState( Lore::Keycode::D ) ) {
+        sonicNode->translate( speed, 0.f );
+      }
+      else if ( Lore::Input::GetKeyState( Lore::Keycode::A ) ) {
+        sonicNode->translate( -speed, 0.f );
+      }
+      if ( Lore::Input::GetKeyState( Lore::Keycode::Z ) ) {
+        camera->zoom( 0.01f );
+      }
+      else if ( Lore::Input::GetKeyState( Lore::Keycode::X ) ) {
+        camera->zoom( -0.01f );
+      }
 
-    if ( Lore::Input::GetKeyState( Lore::Keycode::Escape ) ) {
-      pause = false;
-      break;
-    }
+      if ( Lore::Input::GetKeyState( Lore::Keycode::F8 ) ) {
+        static bool destroyed = false;
+        if ( !destroyed ) {
+          Lore::Resource::DestroyTexture( sonicTexture );
+          destroyed = true;
+        }
+      }
 
-    if ( Lore::Input::GetKeyState( Lore::Keycode::Right ) ) {
-      sonicNode->scale( 1.1f );
-    }
-    else if ( Lore::Input::GetKeyState( Lore::Keycode::Left ) ) {
-      sonicNode->scale( 0.9f );
-    }
+      if ( Lore::Input::GetKeyState( Lore::Keycode::Escape ) ) {
+        pause = false;
+        break;
+      }
 
-    if ( Lore::Input::GetMouseButtonState( Lore::MouseButton::Left ) ) {
-      //printf( "Left!\n" );
-    }
-    if ( Lore::Input::GetMouseButtonState( Lore::MouseButton::Right ) ) {
-      //printf( "Right!\n" );
+      if ( Lore::Input::GetKeyState( Lore::Keycode::Right ) ) {
+        sonicNode->scale( 1.1f );
+      }
+      else if ( Lore::Input::GetKeyState( Lore::Keycode::Left ) ) {
+        sonicNode->scale( 0.9f );
+      }
+
+      if ( Lore::Input::GetMouseButtonState( Lore::MouseButton::Left ) ) {
+        //printf( "Left!\n" );
+      }
+      if ( Lore::Input::GetMouseButtonState( Lore::MouseButton::Right ) ) {
+        //printf( "Right!\n" );
+      }
     }
 
     UpdateFPS( fpsTextbox );
@@ -464,6 +466,12 @@ static void OnKeyChanged( const Lore::Keycode key, const bool state )
       static bool enabled = true;
       enabled = !enabled;
       Lore::Input::SetCursorEnabled( enabled );
+    }
+    break;
+
+  case Lore::Keycode::GraveAccent:
+    if ( state ) {
+      Lore::DebugUI::DisplayConsole();
     }
     break;
   }

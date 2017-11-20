@@ -25,7 +25,12 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore { namespace Util {
+namespace Lore {
+
+  class Util
+  {
+
+  public:
 
     //
     // Provide unordered_map that supports strongly typed enums as a key.
@@ -33,11 +38,11 @@ namespace Lore { namespace Util {
     // Hash function for strongly typed enums.
     struct EnumClassHash
     {
-        template<typename T>
-        std::size_t operator()( T t ) const
-        {
-            return static_cast< std::size_t >( t );
-        }
+      template<typename T>
+      std::size_t operator()( T t ) const
+      {
+        return static_cast< std::size_t >( t );
+      }
     };
 
     // Use custom hash function for enums, or default hash function for the rest.
@@ -53,13 +58,22 @@ namespace Lore { namespace Util {
     ///
     /// \brief Returns the address of the function encapsulated in a std::function object.
     template<typename T>
-    size_t GetFPAddress( std::function<void( T& )> function )
+    static size_t GetFPAddress( std::function<void( T& )> function )
     {
       using fType = void( T& );
       fType** fp = function.template target<fType*>();
       return reinterpret_cast< size_t >( fp );
     }
 
-}}
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    static void ToLower( std::string& str )
+    {
+      std::transform( str.begin(), str.end(), str.begin(), ::tolower );
+    }
+
+  };
+
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -96,7 +96,7 @@ namespace Lore {
 
         inline T* create()
         {
-            assert( nullptr != _next );
+            assert( nullptr != _next ); // Pool limit reached if null.
 
             T* p = _next;
             assert( false == p->_inUse );

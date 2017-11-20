@@ -139,6 +139,11 @@ namespace LocalNS {
     if ( callback ) {
       callback( xOffset, yOffset );
     }
+
+    const auto& listeners = InputControllerInstance->getMouseListeners();
+    for ( auto listener : listeners ) {
+      listener->onMouseScroll( xOffset, yOffset );
+    }
   }
 
 }
