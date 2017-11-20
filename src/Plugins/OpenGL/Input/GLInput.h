@@ -55,42 +55,42 @@ namespace Lore { namespace OpenGL {
 
     KeyCallback getKeyCallback() const
     {
-      return _keyCallback;
+      return _activeHooks->keyCallback;
     }
 
     CharCallback getCharCallback() const
     {
-      return _charCallback;
+      return _activeHooks->charCallback;
     }
 
     MouseButtonCallback getMouseButtonCallback() const
     {
-      return _mouseButtonCallback;
+      return _activeHooks->mouseButtonCallback;
     }
 
     MousePosCallback getMousePosCallback() const
     {
-      return _mousePosCallback;
+      return _activeHooks->mousePosCallback;
     }
 
     MouseScrollCallback getMouseScrollCallback() const
     {
-      return _mouseScrollCallback;
+      return _activeHooks->mouseScrollCallback;
     }
 
     const KeyListenerList& getKeyListeners() const
     {
-      return _keyListeners;
+      return _activeHooks->keyListeners;
     }
 
     const CharListenerList& getCharListeners() const
     {
-      return _charListeners;
+      return _activeHooks->charListeners;
     }
 
     const MouseListenerList getMouseListeners() const
     {
-      return _mouseListeners;
+      return _activeHooks->mouseListeners;
     }
 
   };

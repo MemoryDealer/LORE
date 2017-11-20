@@ -62,6 +62,7 @@ namespace Lore {
     virtual void onMouseMoved( const int32_t x, const int32_t y ) { }
     virtual void onMouseButtonDown( const MouseButton button ) { }
     virtual void onMouseButtonUp( const MouseButton button ) { }
+    virtual void onMouseScroll( const double xOffset, const double yOffset ) { }
 
   };
 
@@ -79,6 +80,22 @@ namespace Lore {
   using KeyListenerList = std::vector<KeyListenerPtr>;
   using CharListenerList = std::vector<CharListenerPtr>;
   using MouseListenerList = std::vector<MouseListenerPtr>;
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  struct InputHooks
+  {
+    KeyCallback keyCallback { nullptr };
+    CharCallback charCallback { nullptr };
+    MouseButtonCallback mouseButtonCallback { nullptr };
+    MousePosCallback mousePosCallback { nullptr };
+    MouseScrollCallback mouseScrollCallback { nullptr };
+
+    KeyListenerList keyListeners { };
+    CharListenerList charListeners { };
+    MouseListenerList mouseListeners { };
+  };
+  using InputHooksPtr = InputHooks*;
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -114,19 +131,12 @@ namespace Lore {
 
   protected:
 
-    KeyCallback _keyCallback { nullptr };
-    CharCallback _charCallback { nullptr };
-    MouseButtonCallback _mouseButtonCallback { nullptr };
-    MousePosCallback _mousePosCallback { nullptr };
-    MouseScrollCallback _mouseScrollCallback { nullptr };
-
-    KeyListenerList _keyListeners {};
-    CharListenerList _charListeners {};
-    MouseListenerList _mouseListeners {};
+    InputHooks _hooks;
+    InputHooksPtr _activeHooks { &_hooks };
 
   private:
 
-    friend class DebugUI;
+    friend class Input;
 
   };
 
@@ -155,6 +165,9 @@ namespace Lore {
     static void GetCursorPos( int32_t& x, int32_t& y );
     static bool GetMouseButtonState( const MouseButton button );
     static void SetCursorEnabled( const bool enabled );
+
+    static void OverrideHooks( InputHooksPtr hooks );
+    static void ResetHooks();
 
   private:
 

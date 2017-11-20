@@ -45,65 +45,65 @@ using namespace Lore;
 
 void InputController::setKeyCallback( const KeyCallback callback )
 {
-  _keyCallback = callback;
+  _hooks.keyCallback = callback;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void InputController::setCharCallback( const CharCallback callback )
 {
-  _charCallback = callback;
+  _hooks.charCallback = callback;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void InputController::setMouseButtonCallback( const MouseButtonCallback callback )
 {
-  _mouseButtonCallback = callback;
+  _hooks.mouseButtonCallback = callback;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void InputController::setMouseMovedCallback( const MousePosCallback callback )
 {
-  _mousePosCallback = callback;
+  _hooks.mousePosCallback = callback;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void InputController::setMouseScrollCallback( const MouseScrollCallback callback )
 {
-  _mouseScrollCallback = callback;
+  _hooks.mouseScrollCallback = callback;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void InputController::addKeyListener( const KeyListenerPtr listener )
 {
-  _keyListeners.push_back( listener );
+  _hooks.keyListeners.push_back( listener );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void InputController::addCharListener( const CharListenerPtr listener )
 {
-  _charListeners.push_back( listener );
+  _hooks.charListeners.push_back( listener );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void InputController::addMouseListener( const MouseListenerPtr listener )
 {
-  _mouseListeners.push_back( listener );
+  _hooks.mouseListeners.push_back( listener );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void InputController::removeKeyListener( const KeyListenerPtr listener )
 {
-  for ( auto it = _keyListeners.begin(); it != _keyListeners.end(); ++it ) {
+  for ( auto it = _hooks.keyListeners.begin(); it != _hooks.keyListeners.end(); ++it ) {
     if ( listener == ( *it ) ) {
-      _keyListeners.erase( it );
+      _hooks.keyListeners.erase( it );
       return;
     }
   }
@@ -113,9 +113,9 @@ void InputController::removeKeyListener( const KeyListenerPtr listener )
 
 void InputController::removeCharListener( const CharListenerPtr listener )
 {
-  for ( auto it = _charListeners.begin(); it != _charListeners.end(); ++it ) {
+  for ( auto it = _hooks.charListeners.begin(); it != _hooks.charListeners.end(); ++it ) {
     if ( listener == ( *it ) ) {
-      _charListeners.erase( it );
+      _hooks.charListeners.erase( it );
       return;
     }
   }
@@ -125,9 +125,9 @@ void InputController::removeCharListener( const CharListenerPtr listener )
 
 void InputController::removeMouseListener( const MouseListenerPtr listener )
 {
-  for ( auto it = _mouseListeners.begin(); it != _mouseListeners.end(); ++it ) {
+  for ( auto it = _hooks.mouseListeners.begin(); it != _hooks.mouseListeners.end(); ++it ) {
     if ( listener == ( *it ) ) {
-      _mouseListeners.erase( it );
+      _hooks.mouseListeners.erase( it );
       return;
     }
   }
@@ -244,6 +244,20 @@ bool Input::GetMouseButtonState( const MouseButton button )
 void Input::SetCursorEnabled( const bool enabled )
 {
   ActiveContext->getInputController()->setCursorEnabled( ActiveContext->getActiveWindow(), enabled );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Input::OverrideHooks( InputHooksPtr hooks )
+{
+  ActiveContext->getInputController()->_activeHooks = hooks;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Input::ResetHooks()
+{
+  ActiveContext->getInputController()->_activeHooks = &ActiveContext->getInputController()->_hooks;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
