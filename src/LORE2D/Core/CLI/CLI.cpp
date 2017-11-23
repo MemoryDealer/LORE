@@ -207,6 +207,33 @@ Vec2 CLI::ToVec2( const string& str )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+Vec4 CLI::ToVec4( const string& str )
+{
+  std::istringstream tokenizer( str );
+  string x, y, z, w;
+  std::getline( tokenizer, x, ',' );
+  std::getline( tokenizer, y, ',' );
+  std::getline( tokenizer, z, ',' );
+  std::getline( tokenizer, w );
+
+  if ( x.empty() ) {
+    x = "0";
+  }
+  if ( y.empty() ) {
+    y = "0";
+  }
+  if ( z.empty() ) {
+    z = "0";
+  }
+  if ( w.empty() ) {
+    w = "0";
+  }
+
+  return Vec4( std::stof( x ), std::stof( y ), std::stof( z ), std::stof( w ) );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void CLI::AssignContext( ContextPtr context )
 {
   ActiveContext = context;

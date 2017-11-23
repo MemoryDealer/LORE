@@ -35,6 +35,8 @@ namespace LocalNS {
   using Lore::CLI;
   using Lore::string;
 
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
   struct SetNodePos : public CLI::Command
   {
 
@@ -49,8 +51,8 @@ namespace LocalNS {
           auto node = CLI::GetActiveScene()->getNode( nodeName );
           node->setPosition( pos );
         }
-        catch ( Lore::ItemIdentityException& e ) {
-          return string( e.getDescription() );
+        catch ( const Lore::Exception& e ) {
+          return e.getDescription();
         }
 
         return string("Set " + nodeName + " to position " + posStr);
@@ -59,6 +61,62 @@ namespace LocalNS {
     }
 
   };
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  struct TranslateNode : public CLI::Command
+  {
+
+    virtual string execute( string& args ) override
+    {
+      if ( 2 == CLI::GetNumArgs( args ) ) {
+        auto nodeName = CLI::ExtractNextArg( args );
+        auto offsetStr = CLI::ExtractNextArg( args );
+        auto offset = CLI::ToVec2( offsetStr );
+
+        try {
+          auto node = CLI::GetActiveScene()->getNode( nodeName );
+          node->translate( offset );
+        }
+        catch ( const Lore::Exception& e ) {
+          return e.getDescription();
+        }
+
+        return string( "Translated " + nodeName + " " + offsetStr );
+      }
+      return Command::execute( args );
+    }
+
+  };
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  struct SetLightColor : public CLI::Command
+  {
+
+    virtual string execute( string& args ) override
+    {
+      if ( 2 == CLI::GetNumArgs( args ) ) {
+        auto lightName = CLI::ExtractNextArg( args );
+        auto lightColorStr = CLI::ExtractNextArg( args );
+        auto lightColor = CLI::ToVec4( lightColorStr );
+
+        try {
+          auto light = CLI::GetActiveScene()->getLight( lightName );
+          light->setColor( lightColor );
+        }
+        catch ( const Lore::Exception& e ) {
+          return e.getDescription();
+        }
+
+        return string( "Light " + lightName + "'s color set to " + lightColorStr );
+      }
+      return Command::execute( args );
+    }
+
+  };
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
   struct Test : public CLI::Command
   {
@@ -88,6 +146,8 @@ using namespace Lore;
 void CLI::Init()
 {
   CLI::RegisterCommand( new SetNodePos(), 2, "SetNodePos", "SetNodePosition");
+  CLI::RegisterCommand( new TranslateNode(), 2, "TranslateNode", "MoveNode" );
+  CLI::RegisterCommand( new SetLightColor(), 2, "SetLightColor", "slc" );
   CLI::RegisterCommand( new Test(), 1, "test" );
 }
 

@@ -124,6 +124,11 @@ namespace Lore {
       return _ambientLightColor;
     }
 
+    inline LightPtr getLight( const string& name ) const
+    {
+      return _lights.get( name );
+    }
+
     inline int getLightCount() const
     {
       return static_cast< int >( _activeLights.size() );

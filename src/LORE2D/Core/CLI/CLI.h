@@ -77,6 +77,8 @@ namespace Lore {
 
     static Vec2 ToVec2( const string& str );
 
+    static Vec4 ToVec4( const string& str );
+
   private:
 
     friend class Context;
