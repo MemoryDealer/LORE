@@ -42,8 +42,10 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 // C/C++/STL.
+#include <algorithm>
 #include <atomic>
 #include <cassert>
+#include <cctype>
 #include <chrono>
 #include <condition_variable>
 #include <ctime>

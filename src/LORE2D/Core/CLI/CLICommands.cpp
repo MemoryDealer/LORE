@@ -26,6 +26,8 @@
 
 #include "CLI.h"
 
+#include <LORE2D/Core/Context.h>
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace LocalNS {
@@ -39,12 +41,21 @@ namespace LocalNS {
     virtual string execute( string& args ) override
     {
       if ( 2 == CLI::GetNumArgs( args ) ) {
-        auto nodeName = CLI::GetNextArg( args );
-        auto pos = CLI::GetNextArg( args );
+        auto nodeName = CLI::ExtractNextArg( args );
+        auto posStr = CLI::ExtractNextArg( args );
+        auto pos = CLI::ToVec2( posStr );
 
-        return nodeName + pos;
+        try {
+          auto node = CLI::GetActiveScene()->getNode( nodeName );
+          node->setPosition( pos );
+        }
+        catch ( Lore::ItemIdentityException& e ) {
+          return string( e.getDescription() );
+        }
+
+        return string("Set " + nodeName + " to position " + posStr);
       }
-      return string( "Invalid arguments" );
+      return Command::execute( args );
     }
 
   };
@@ -57,7 +68,7 @@ namespace LocalNS {
       string re;
       const auto numArgs = CLI::GetNumArgs( args );
       for ( uint32_t i = 0; i < numArgs; ++i ) {
-        re += CLI::GetNextArg( args ) + " ";
+        re += CLI::ExtractNextArg( args ) + " ";
       }
 
       return re;
@@ -76,8 +87,8 @@ using namespace Lore;
 
 void CLI::Init()
 {
-  CLI::RegisterCommand( "SetNodePos", new SetNodePos() );
-  CLI::RegisterCommand( "test", new Test() );
+  CLI::RegisterCommand( new SetNodePos(), 2, "SetNodePos", "SetNodePosition");
+  CLI::RegisterCommand( new Test(), 1, "test" );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

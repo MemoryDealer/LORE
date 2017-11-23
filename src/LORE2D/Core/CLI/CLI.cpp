@@ -32,7 +32,10 @@
 
 namespace LocalNS {
 
-  static std::unordered_map<Lore::string, std::unique_ptr<Lore::CLI::Command>> CommandMap;
+  static Lore::ContextPtr ActiveContext = nullptr;
+  static std::unordered_multimap<Lore::string, Lore::CLI::CommandPtr> CommandMap {};
+  static std::vector<Lore::string> CommandHistory {};
+  static int32_t CommandHistoryIdx= -1;
 
 }
 using namespace LocalNS;
@@ -40,6 +43,17 @@ using namespace LocalNS;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 using namespace Lore;
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+ScenePtr CLI::ActiveScene = nullptr;
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+ContextPtr CLI::GetContext()
+{
+  return ActiveContext;
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -58,10 +72,28 @@ string CLI::Execute( const string& command )
     args = command.substr( end + 1, command.size() - end );
   }
 
+  // Add command to history. Don't add if the previous command is identical.
+  bool dup = false;
+  if ( !CommandHistory.empty() ) {
+    if ( CommandHistory[0].compare( command ) == 0 ) {
+      dup = true;
+    }
+  }
+  if ( !dup ) {
+    CommandHistory.insert( CommandHistory.begin(), command );
+  }
+  CommandHistoryIdx = -1;
+
   Util::ToLower( commandName );
   auto lookup = CommandMap.find( commandName );
   if ( CommandMap.end() != lookup ) {
-    std::unique_ptr<Command>& p = lookup->second;
+    CommandPtr p = lookup->second;
+
+    // Shrink blocks of multiple spaces to a single space.
+    auto newEnd = std::unique( args.begin(), args.end(),
+                               [] ( const char lhs, const char rhs ) { return ( lhs == rhs ) && ( lhs == ' ' ); } );
+    args.erase( newEnd, args.end() );
+
     return p->execute( args );
   }
 
@@ -70,19 +102,53 @@ string CLI::Execute( const string& command )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-bool CLI::RegisterCommand( const string& commandName, CommandPtr command )
+bool CLI::RegisterCommand( CommandPtr command, const uint32_t count, ... )
 {
-  std::unique_ptr<Command> p( command );
-  Util::ToLower( const_cast<string&>( commandName ) );
-  auto pair = CommandMap.emplace( commandName, std::move( p ) );
-  return pair.second;
+  va_list v;
+  va_start( v, count );
+
+  for ( uint32_t n = 0; n < count; ++n ) {
+    auto c = va_arg( v, const char* );
+    string commandName( c );
+    Util::ToLower( commandName );
+    std::pair<string, CommandPtr> pair( commandName, command );
+    CommandMap.insert( pair );
+  }
+
+  va_end( v );
+  return true;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-string CLI::GetNextArg( string& str )
+string CLI::GetPreviousCommand()
 {
-  // TODO: Remove multiple whitespace .
+  if ( CommandHistory.empty() ) {
+    return string();
+  }
+
+  if ( CommandHistoryIdx + 1 != CommandHistory.size() ) {
+    ++CommandHistoryIdx;
+  }
+
+  return CommandHistory[CommandHistoryIdx];
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+string CLI::GetNextCommand()
+{
+  if ( 0 != CommandHistoryIdx ) {
+    --CommandHistoryIdx;
+  }
+
+  return CommandHistory[CommandHistoryIdx];
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+string CLI::ExtractNextArg( string& str )
+{
   string arg;
   const size_t nextArgPos = str.find_first_of( ' ' );
   if ( string::npos != nextArgPos ) {
@@ -97,6 +163,11 @@ string CLI::GetNextArg( string& str )
     // Last argument, so clear string.
     str.clear();
   }
+
+  // Remove whitespace.
+  arg.erase( std::remove_if( arg.begin(), arg.end(),
+             [] ( unsigned char c ) { return std::isspace( c ); } ),
+             arg.end() );
 
   return arg;
 }
@@ -113,6 +184,32 @@ uint32_t CLI::GetNumArgs( const string& str )
   }
 
   return count;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Vec2 CLI::ToVec2( const string& str )
+{
+  std::istringstream tokenizer( str );
+  string x, y;
+  std::getline( tokenizer, x, ',' );
+  std::getline( tokenizer, y );
+
+  if ( x.empty() ) {
+    x = "0";
+  }
+  if ( y.empty() ) {
+    y = "0";
+  }
+
+  return Vec2( std::stof( x ), std::stof( y ) );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void CLI::AssignContext( ContextPtr context )
+{
+  ActiveContext = context;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

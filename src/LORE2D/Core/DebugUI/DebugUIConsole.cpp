@@ -59,6 +59,14 @@ namespace LocalNS {
         ConsoleInstance->execute();
         break;
 
+      case Keycode::Up:
+        ConsoleInstance->setCommandStr( CLI::GetPreviousCommand() );
+        break;
+
+      case Keycode::Down:
+        ConsoleInstance->setCommandStr( CLI::GetNextCommand() );
+        break;
+
       case Keycode::GraveAccent:
       case Keycode::Escape:
         ConsoleInstance->clear();
@@ -92,7 +100,6 @@ DebugUIConsole::DebugUIConsole()
 
   // Create textbox for console.
   _consoleTextbox = Resource::CreateTextbox( "DebugUI_Console" );
-  _consoleTextbox->setText( "> ..." );
   _consoleElement->setTextbox( _consoleTextbox );
   _consoleHistoryTextbox = Resource::CreateTextbox( "DebugUI_ConsoleHistory" );
   _consoleHistoryElement->setTextbox( _consoleHistoryTextbox );

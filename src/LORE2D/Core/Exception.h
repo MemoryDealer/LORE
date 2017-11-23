@@ -45,6 +45,11 @@ namespace Lore {
         {
         }
 
+        virtual string getDescription() const
+        {
+          return _what;
+        }
+
     };
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -62,9 +67,9 @@ namespace Lore {
         {
         }
 
-        virtual char const* what() const override
+        virtual string getDescription() const override
         {
-            return ( "ItemIdentityException: " + _what ).c_str();
+          return string( "ItemIdentityException: " + _what );
         }
 
     };

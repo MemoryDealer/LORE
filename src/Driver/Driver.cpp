@@ -94,6 +94,9 @@ int main( int argc, char** argv )
   Lore::ScenePtr scene = context->createScene( "Default" );
   scene->setBackgroundColor( Lore::StockColor::Black );
 
+  // Hack.
+  Lore::CLI::SetActiveScene( scene );
+
   Lore::Viewport vp( 0.f, 0.f, 1.f, 1.f );
   Lore::CameraPtr camera = Lore::Resource::CreateCamera( "cam1" );
   __camera = camera;

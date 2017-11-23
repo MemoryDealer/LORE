@@ -96,9 +96,9 @@ void Window::removeRenderView( const string& name )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-RenderView& Window::getRenderView( const string& name )
+const RenderView& Window::getRenderView( const string& name ) const
 {
-    for ( auto& rv : _renderViews ) {
+    for ( const auto& rv : _renderViews ) {
         if ( name == rv.name ) {
             return rv;
         }
@@ -134,6 +134,16 @@ void Window::setDimensions( const int width, const int height )
 void Window::setMode( const Mode& mode )
 {
     _mode = mode;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+const RenderView& Window::getRenderView( const int32_t idx ) const
+{
+  if ( _renderViews.size() < idx ) {
+    throw Lore::Exception( "Render view with index " + std::to_string( idx ) + " does not exist in window " + _title );
+  }
+  return _renderViews[idx];
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

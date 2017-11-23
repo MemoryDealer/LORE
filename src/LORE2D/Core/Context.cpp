@@ -235,6 +235,7 @@ std::unique_ptr<Context> Context::Create( const RenderPlugin& renderer )
   // Load the context class from the plugin.
   auto context = __rpl->createContext();
 
+  CLI::AssignContext( context.get() );
   Input::AssignContext( context.get() );
   Resource::AssignContext( context.get() );
   StockResource::AssignContext( context.get() );
@@ -253,6 +254,7 @@ void Context::Destroy( std::unique_ptr<Context> context )
 {
   context.reset();
   // TODO: Use null object pattern to prevent segfaults in the following.
+  CLI::AssignContext( nullptr );
   Input::AssignContext( nullptr );
   Resource::AssignContext( nullptr );
   StockResource::AssignContext( nullptr );

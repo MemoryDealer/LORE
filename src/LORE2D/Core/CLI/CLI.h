@@ -25,6 +25,10 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Math/Math.h>
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 namespace Lore {
 
   class LORE_EXPORT CLI
@@ -35,7 +39,10 @@ namespace Lore {
     struct Command
     {
 
-      virtual string execute( string& args ) = 0;
+      virtual string execute( string& args )
+      {
+        return string( "Invalid arguments: " + args );
+      }
       virtual void undo() { }
 
     };
@@ -45,16 +52,39 @@ namespace Lore {
 
     static void Init();
 
+    static ContextPtr GetContext();
+
     static string Execute( const string& command );
 
-    static bool RegisterCommand( const string& commandName, CommandPtr command );
+    static bool RegisterCommand( CommandPtr command, const uint32_t count, ... );
+
+    static string GetPreviousCommand();
+
+    static string GetNextCommand();
+
+    static ScenePtr GetActiveScene() { return ActiveScene; }
+
+    static void SetActiveScene( ScenePtr scene ) { ActiveScene = scene; }
 
     // String processing.
 
     // Returns next isolated string, and removes it from str.
-    static string GetNextArg( string& str );
+    static string ExtractNextArg( string& str );
 
     static uint32_t GetNumArgs( const string& str );
+
+    // Conversion.
+
+    static Vec2 ToVec2( const string& str );
+
+  private:
+
+    friend class Context;
+    static void AssignContext( ContextPtr context );
+
+  private:
+
+    static ScenePtr ActiveScene;
 
   };
 
