@@ -31,15 +31,16 @@ filter "configurations:Release"
     optimize "On"
 
 -- Use latest C++ standard for all projects
-buildoptions { "/std:c++latest" }
-    
+--buildoptions { "/std:c++latest" }
+
+
 -- Project(s)
 
 project "LORE2D"
     location "LORE2D"
     kind "SharedLib"
     language "C++"
-    defines { "__Lore_Exports__" }
+    defines { "__Lore_Exports__", "_HAS_CXX17" }
     pchheader "_pch.h"
     pchsource "LORE2D/_pch.cpp"
     forceincludes { "_pch.h" }
@@ -53,7 +54,7 @@ project "Plugin_OpenGL"
     kind "SharedLib"
     language "C++"
     libdirs { "../bin/%{cfg.buildcfg}/Run" } -- Location of LORE2D.lib after build.
-    defines { "__LoreOpenGL_Exports__" }
+    defines { "__LoreOpenGL_Exports__", "_HAS_CXX17" }
     pchheader "_pch.h"
     pchsource "Plugins/OpenGL/_pch.cpp"
     forceincludes { "_pch.h" }
@@ -75,6 +76,7 @@ project "Driver"
     location "Driver"
     kind "ConsoleApp"
     language "C++"
+    defines { "_HAS_CXX17" }
     files {
         "Driver/**.cpp",
         "Driver/TODO.TXT"
@@ -85,6 +87,7 @@ project "UnitTests"
     location "UnitTests"
     kind "ConsoleApp"
     language "C++"
+    defines { "_HAS_CXX17" }
     forceincludes { "UnitTests.h" }
     files {
         "UnitTests/**.h", "UnitTests/**.hpp", "UnitTests/**.cpp"
