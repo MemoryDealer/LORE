@@ -60,7 +60,12 @@ namespace LocalNS {
         break;
 
       case Keycode::Up:
-        ConsoleInstance->setCommandStr( CLI::GetPreviousCommand() );
+        {
+          auto str = CLI::GetPreviousCommand();
+          if ( !str.empty() ) {
+            ConsoleInstance->setCommandStr( str );
+          }
+        }
         break;
 
       case Keycode::Down:

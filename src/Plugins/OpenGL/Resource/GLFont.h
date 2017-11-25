@@ -64,6 +64,8 @@ namespace Lore { namespace OpenGL {
 
     virtual real advanceGlyphX( const char c, const real x, const real scale ) override;
 
+    virtual real getWidth( const char c ) override;
+
   private:
 
     virtual void _reset() override;

@@ -1,5 +1,6 @@
 --- Features ---
 -Fix gl 1282 regression
+-Also a regression in math tests for vector division, introduced somewhere during AABBs
 -Rename resource controller to ResourceCenter?
 -Debug tools - view memory pools for each type, hover over to view details
 -Resource file location indexing for easy reloading (see ResourceController.h).

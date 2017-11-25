@@ -49,6 +49,7 @@ namespace Lore {
     virtual ~Textbox() override = default;
 
     // TODO: Add "typed" text effect where each letter appears over time at certain rate.
+    //   This can be an external class such as TextboxTypist. 
     // Add solid/blended box behind text and border.
 
     //
