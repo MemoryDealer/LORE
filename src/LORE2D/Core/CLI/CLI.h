@@ -62,6 +62,8 @@ namespace Lore {
 
     static string GetNextCommand();
 
+    static void ResetCommandHistoryIndex();
+
     static ScenePtr GetActiveScene() { return ActiveScene; }
 
     static void SetActiveScene( ScenePtr scene ) { ActiveScene = scene; }

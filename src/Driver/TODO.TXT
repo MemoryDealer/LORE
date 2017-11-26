@@ -7,6 +7,7 @@
 -Sprites! - rename Texture to Sprite; textures will become a sprite with a single texture/frame
 -Re-organize to include/src directories
 -RTT (add priority to renderview, RTTs are automatically rendered before window framebuffers)
+-Config: https://nlohmann.github.io/json/
 -Multi-texturing
 -Instanced rendering - for static objects (maybe static nodes - StaticNodeBlock)
 -Polish resource cloning
@@ -17,6 +18,7 @@
 -Camera tracks - key frames
   Animation system for nodes with key frames
 -Self-illumination for all lights
+-Replace current boxes with regular rect and line drawing?
 -CPU Particle systems
 -Camera zooming should affect background scale
 -Proper cleanup of resources

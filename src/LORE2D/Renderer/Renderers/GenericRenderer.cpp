@@ -504,7 +504,7 @@ void GenericRenderer::renderBoxes( RenderQueue::BoxList& boxes,
     program->setUniformVar( "borderColor", box->getBorderColor() );
     program->setUniformVar( "fillColor", box->getFillColor() );
     program->setUniformVar( "borderWidth", box->getBorderWidth() );
-    program->setUniformVar( "scale", box->getSize() );
+    program->setUniformVar( "scale", Vec2( data.model[0][0], data.model[1][1] ) * box->getSize() );
 
     // Apply box scaling to final transform.
     data.model[0][0] *= box->getWidth();
@@ -577,6 +577,7 @@ void GenericRenderer::renderUI( const Lore::UIPtr ui,
   auto panelIt = ui->getPanelIterator();
 
   RenderQueue::EntityDataMap entityDataMap;
+  RenderQueue::BoxList boxes;
   RenderQueue::TextboxList textboxes;
   constexpr const real DepthOffset = -1101.f;
 
@@ -607,6 +608,15 @@ void GenericRenderer::renderUI( const Lore::UIPtr ui,
         entityDataMap[entityData].push_back( rd );
       }
 
+      auto box = element->getBox();
+      if ( box ) {
+        RenderQueue::BoxData bd;
+        bd.box = box;
+        bd.model = Math::CreateTransformationMatrix( elementPos, Quaternion(), elementDimensions );
+        bd.model[3][2] = element->getDepth() + DepthOffset;
+        boxes.push_back( bd );
+      }
+
       auto textbox = element->getTextbox();
       if ( textbox ) {
         RenderQueue::TextboxData td;
@@ -620,6 +630,7 @@ void GenericRenderer::renderUI( const Lore::UIPtr ui,
 
   // Now render the UI elements.
   renderMaterialMap( scene, entityDataMap, proj );
+  renderBoxes( boxes, proj );
   renderTextboxes( textboxes, proj );
 
   _api->setBlendingEnabled( false );

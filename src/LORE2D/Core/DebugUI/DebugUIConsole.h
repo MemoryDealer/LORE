@@ -50,6 +50,8 @@ namespace Lore {
     UIPanelPtr _panel { nullptr };
     UIElementPtr _consoleElement { nullptr };
     TextboxPtr _consoleTextbox { nullptr };
+    BoxPtr _consoleBox { nullptr };
+    UIElementPtr _consoleBoxElement { nullptr };
     UIElementPtr _consoleHistoryElement { nullptr };
     TextboxPtr _consoleHistoryTextbox { nullptr };
     UIElementPtr _backgroundElement { nullptr };

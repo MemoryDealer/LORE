@@ -270,7 +270,7 @@ int main( int argc, char** argv )
   auto panel = rv.ui->createPanel( "P-1" );
   auto fpsElement = panel->createElement( "FPS" );
   auto fpsTextbox = Lore::Resource::CreateTextbox( "fps" );
-  fpsElement->setTextbox( fpsTextbox );
+  fpsElement->attachTextbox( fpsTextbox );
   fpsElement->setPosition( -1.f, 0.92f );
   fpsTextbox->setText( "Calculating..." );
   fpsTextbox->setTextColor( Lore::StockColor::Green );

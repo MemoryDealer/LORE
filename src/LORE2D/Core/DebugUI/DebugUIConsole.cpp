@@ -29,6 +29,7 @@
 #include <LORE2D/Core/CLI/CLI.h>
 #include <LORE2D/Core/DebugUI/DebugUI.h>
 #include <LORE2D/Resource/Entity.h>
+#include <LORE2D/Resource/Renderable/Box.h>
 #include <LORE2D/Resource/Renderable/Textbox.h>
 #include <LORE2D/Resource/ResourceController.h>
 
@@ -75,6 +76,7 @@ namespace LocalNS {
       case Keycode::GraveAccent:
       case Keycode::Escape:
         ConsoleInstance->clear();
+        CLI::ResetCommandHistoryIndex();
         DebugUI::HideConsole();
         break;
       }
@@ -101,29 +103,37 @@ DebugUIConsole::DebugUIConsole()
   _ui = Resource::CreateUI( "DebugUI_Console" ); // TODO: Different resource group for debug UI.
   _panel = _ui->createPanel( "default" );
   _consoleElement = _panel->createElement( "Console" );
+  _consoleBoxElement = _panel->createElement( "ConsoleBox" );
   _consoleHistoryElement = _panel->createElement( "ConsoleHistory" );
 
   // Create textbox for console.
   _consoleTextbox = Resource::CreateTextbox( "DebugUI_Console" );
-  _consoleElement->setTextbox( _consoleTextbox );
+  _consoleElement->attachTextbox( _consoleTextbox );
   _consoleHistoryTextbox = Resource::CreateTextbox( "DebugUI_ConsoleHistory" );
-  _consoleHistoryElement->setTextbox( _consoleHistoryTextbox );
-  
+  _consoleHistoryElement->attachTextbox( _consoleHistoryTextbox );
+  _consoleBox = Resource::CreateBox( "DebugUI_Console" );
+  _consoleBoxElement->attachBox( _consoleBox );
 
   // Create background for console.
   _backgroundElement = _panel->createElement( "background" );
   _backgroundEntity = Resource::CreateEntity( "DebugUI_ConsoleBackground", MeshType::Quad );
-  auto backgroundMat = _backgroundEntity->getMaterial();
-  backgroundMat->blendingMode.enabled = true;
-  backgroundMat->diffuse = Color( 0.f, 0.f, 0.f, 0.5f );
-  _backgroundElement->setEntity( _backgroundEntity );
+  _backgroundElement->attachEntity( _backgroundEntity );
 
   // Setup positional data.
   _consoleElement->setPosition( -.98f, -.94f );
-  _consoleHistoryElement->setPosition( -.98f, -.82f );
-  _backgroundElement->setPosition( 0.f, -0.5f );
+  _consoleBoxElement->setPosition( 0.f, -.91f );
+  _consoleBoxElement->setDimensions( 10.f, .8f );
+  _consoleHistoryElement->setPosition( -.98f, -.80f );
+  _backgroundElement->setPosition( 0.f, -1.2f );
   _backgroundElement->setDimensions( 15.f, 5.f );
   _backgroundElement->setDepth( 1.f ); // Behind console text.
+
+  // Setup colors.
+  auto backgroundMat = _backgroundEntity->getMaterial();
+  backgroundMat->blendingMode.enabled = true;
+  backgroundMat->diffuse = Color( 0.f, 0.f, 0.f, 0.5f );
+  _consoleBox->setFillColor( Color( 0.f, 0.f, 0.f, 0.6f ) );
+  _consoleBox->setBorderColor( Color( .5f, .5f, .5f, .9f ) );
 
   // Setup input hooks.
   _hooks.keyCallback = OnKeyChanged;
@@ -169,9 +179,11 @@ void DebugUIConsole::popBack()
 
 void DebugUIConsole::execute()
 {
-  auto output = CLI::Execute( _command );
-  clear();
-  _consoleHistoryTextbox->setText( output );
+  if ( !_command.empty() ) {
+    auto output = CLI::Execute( _command );
+    clear();
+    _consoleHistoryTextbox->setText( output );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -147,6 +147,13 @@ string CLI::GetNextCommand()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void CLI::ResetCommandHistoryIndex()
+{
+  CommandHistoryIdx = -1;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 string CLI::ExtractNextArg( string& str )
 {
   string arg;

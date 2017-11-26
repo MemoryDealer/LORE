@@ -66,6 +66,11 @@ namespace Lore {
       return _entity;
     }
 
+    inline BoxPtr getBox() const
+    {
+      return _box;
+    }
+
     inline TextboxPtr getTextbox() const
     {
       return _textbox;
@@ -90,12 +95,17 @@ namespace Lore {
       _depth = depth;
     }
 
-    inline void setEntity( const EntityPtr entity )
+    inline void attachEntity( const EntityPtr entity )
     {
       _entity = entity;
     }
 
-    inline void setTextbox( const TextboxPtr textbox )
+    inline void attachBox( const BoxPtr box )
+    {
+      _box = box;
+    }
+
+    inline void attachTextbox( const TextboxPtr textbox )
     {
       _textbox = textbox;
     }
@@ -110,6 +120,7 @@ namespace Lore {
     Vec2 _dimensions { 0.1f, 0.1f };
     real _depth { 0.f };
     EntityPtr _entity { nullptr };
+    BoxPtr _box { nullptr };
     TextboxPtr _textbox { nullptr };
 
   };
