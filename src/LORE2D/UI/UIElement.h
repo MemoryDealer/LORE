@@ -76,12 +76,22 @@ namespace Lore {
       return _textbox;
     }
 
+    inline bool isVisible() const
+    {
+      return _visible;
+    }
+
     //
-    // Setters.
+    // Modifiers.
 
     inline void setPosition( const real x, const real y )
     {
       _pos = Vec2( x, y );
+    }
+
+    inline void translate( const real x, const real y )
+    {
+      _pos += Vec2( x, y );
     }
 
     inline void setDimensions( const real w, const real h )
@@ -110,6 +120,11 @@ namespace Lore {
       _textbox = textbox;
     }
 
+    inline void setVisible( const bool visible )
+    {
+      _visible = visible;
+    }
+
   protected:
 
     virtual void _reset() override { }
@@ -122,6 +137,7 @@ namespace Lore {
     EntityPtr _entity { nullptr };
     BoxPtr _box { nullptr };
     TextboxPtr _textbox { nullptr };
+    bool _visible { true };
 
   };
 

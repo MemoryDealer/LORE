@@ -10,6 +10,8 @@
 -Config: https://nlohmann.github.io/json/
 -Multi-texturing
 -Instanced rendering - for static objects (maybe static nodes - StaticNodeBlock)
+-Make UI code more convenient, for example in DebugUIConsole, it requires so much code to do basic setup.
+  There needs to be pair structs for elements and their attachments, and factory functions to create them.
 -Polish resource cloning
 -Normal mapping
 -Resource configuration files - materials, scenes, textures all loaded into group via .rsrc file.

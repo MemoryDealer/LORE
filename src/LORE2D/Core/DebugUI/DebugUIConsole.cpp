@@ -26,12 +26,14 @@
 
 #include "DebugUIConsole.h"
 
+#include <LORE2D/Core/Context.h>
 #include <LORE2D/Core/CLI/CLI.h>
 #include <LORE2D/Core/DebugUI/DebugUI.h>
 #include <LORE2D/Resource/Entity.h>
 #include <LORE2D/Resource/Renderable/Box.h>
 #include <LORE2D/Resource/Renderable/Textbox.h>
 #include <LORE2D/Resource/ResourceController.h>
+#include <LORE2D/Resource/StockResource.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -42,6 +44,7 @@ using namespace Lore;
 namespace LocalNS {
 
   static DebugUIConsole* ConsoleInstance = nullptr;
+  static constexpr const auto CursorDefaultX = -.96f;
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -119,6 +122,15 @@ DebugUIConsole::DebugUIConsole()
   _backgroundEntity = Resource::CreateEntity( "DebugUI_ConsoleBackground", MeshType::Quad );
   _backgroundElement->attachEntity( _backgroundEntity );
 
+  // Create blinking cursor.
+  _cursorElement = _panel->createElement( "DebugUI_Cursor" );
+  _cursorEntity = Resource::CreateEntity( "DebugUI_Cursor", MeshType::Quad );
+  _cursorEntity->setMaterial( StockResource::GetMaterial( "UnlitStandard" ) ); // TODO: Add parameter or overload to CreateEntity to avoid cloning default material.
+  _cursorElement->attachEntity( _cursorEntity );
+  _cursorElement->setDimensions( .16f, .4f );
+  _cursorElement->setPosition( CursorDefaultX, -.91f );
+  _cursorElement->setDepth( -1.f );
+
   // Setup positional data.
   _consoleElement->setPosition( -.98f, -.94f );
   _consoleBoxElement->setPosition( 0.f, -.91f );
@@ -140,12 +152,17 @@ DebugUIConsole::DebugUIConsole()
   _hooks.charCallback = OnChar;
 
   ConsoleInstance = this;
+
+  // TODO: Move these static functions out of Context.
+  Context::RegisterFrameListener( this );
+  _time = Clock::now();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 DebugUIConsole::~DebugUIConsole()
 {
+  //Context::UnregisterFrameListener( this ); // too late, context null.
   // destroy ui
 }
 
@@ -163,6 +180,12 @@ void DebugUIConsole::appendChar( const char c )
 {
   _command += c;
   _consoleTextbox->setText( _command );
+
+  // Move blinking cursor.
+  const auto width = _consoleTextbox->getFont()->getWidth( c );
+  // TODO: Dividing by aspect ratio is major hack to account for adjustment in GenericRenderer.
+  //   This indicates a wider problem with UI rendering.
+  _cursorElement->translate( width / Context::GetActiveWindow()->getAspectRatio(), 0.f );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -170,8 +193,14 @@ void DebugUIConsole::appendChar( const char c )
 void DebugUIConsole::popBack()
 {
   if ( !_command.empty() ) {
+    const char c = _command.back();
+
     _command.pop_back();
     _consoleTextbox->setText( _command );
+
+    // Move blinking cursor.
+    const auto width = _consoleTextbox->getFont()->getWidth( c );
+    _cursorElement->translate( -width / Context::GetActiveWindow()->getAspectRatio(), 0.f );
   }
 }
 
@@ -193,6 +222,21 @@ void DebugUIConsole::clear()
   _command.clear();
   _consoleTextbox->setText( "" );
   _consoleHistoryTextbox->setText( "" );
+  _cursorElement->setPosition( CursorDefaultX, _cursorElement->getPosition().y );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void DebugUIConsole::frameStarted( const FrameEvent& e )
+{
+  static bool cursorVisible = false;
+
+  auto now = Clock::now();
+  if ( std::chrono::duration_cast<std::chrono::milliseconds>( now - _time ).count() > 500 ) {
+    cursorVisible = !cursorVisible;
+    _cursorElement->setVisible( cursorVisible );
+    _time = now;
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

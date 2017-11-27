@@ -27,11 +27,19 @@
 
 #include "DebugUIComponent.h"
 
+#include <LORE2D/Core/Timer.h>
+#include <LORE2D/Renderer/FrameListener/FrameListener.h>
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-  class DebugUIConsole final : public DebugUIComponent
+  using Clock = std::chrono::high_resolution_clock;
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  class DebugUIConsole final : public DebugUIComponent,
+                               public FrameListener
   {
 
   public:
@@ -45,6 +53,8 @@ namespace Lore {
     void execute();
     void clear();
 
+    virtual void frameStarted( const FrameEvent& e ) override;
+
   private:
 
     UIPanelPtr _panel { nullptr };
@@ -56,6 +66,11 @@ namespace Lore {
     TextboxPtr _consoleHistoryTextbox { nullptr };
     UIElementPtr _backgroundElement { nullptr };
     EntityPtr _backgroundEntity { nullptr };
+
+    UIElementPtr _cursorElement { nullptr };
+    EntityPtr _cursorEntity { nullptr };
+
+    Clock::time_point _time;
 
     string _command {};
 

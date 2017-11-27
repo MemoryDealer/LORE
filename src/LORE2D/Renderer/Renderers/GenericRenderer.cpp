@@ -572,11 +572,10 @@ void GenericRenderer::renderUI( const Lore::UIPtr ui,
                                 const real aspectRatio,
                                 const Matrix4& proj ) const
 {
-  _api->setBlendingEnabled( true );
-  _api->setBlendingFunc( Material::BlendFactor::SrcAlpha, Material::BlendFactor::OneMinusSrcAlpha );
   auto panelIt = ui->getPanelIterator();
 
-  RenderQueue::EntityDataMap entityDataMap;
+  RenderQueue::EntityDataMap solids;
+  RenderQueue::TransparentDataMap transparents;
   RenderQueue::BoxList boxes;
   RenderQueue::TextboxList textboxes;
   constexpr const real DepthOffset = -1101.f;
@@ -590,6 +589,10 @@ void GenericRenderer::renderUI( const Lore::UIPtr ui,
     auto elementIt = panel->getElementIterator();
     while ( elementIt.hasMore() ) {
       auto element = elementIt.getNext();
+      if ( !element->isVisible() ) {
+        continue;
+      }
+
       auto elementPos = panelOrigin + element->getPosition();
       auto elementDimensions = element->getDimensions();
       elementPos.x *= aspectRatio;
@@ -598,14 +601,27 @@ void GenericRenderer::renderUI( const Lore::UIPtr ui,
       // Build list of entity data and textboxes to render.
       auto entity = element->getEntity();
       if ( entity ) {
-        RenderQueue::EntityData entityData;
-        entityData.material = entity->getMaterial();
-        entityData.vertexBuffer = entity->getMesh()->getVertexBuffer();
+        auto mat = entity->getMaterial();
 
         RenderQueue::RenderData rd;
         rd.model = Math::CreateTransformationMatrix( elementPos, Quaternion(), elementDimensions );
         rd.model[3][2] = element->getDepth() + DepthOffset; // Offset UI element depth beyond scene node depth.
-        entityDataMap[entityData].push_back( rd );
+
+        if ( mat->blendingMode.enabled ) {
+          RenderQueue::Transparent t;
+          t.material = entity->getMaterial();
+          t.vertexBuffer = entity->getMesh()->getVertexBuffer();
+          t.model = rd.model;
+
+          transparents.insert( { t.model[3][2], t } );
+        }
+        else {
+          RenderQueue::EntityData entityData;
+          entityData.material = mat;
+          entityData.vertexBuffer = entity->getMesh()->getVertexBuffer();
+
+          solids[entityData].push_back( rd );
+        }
       }
 
       auto box = element->getBox();
@@ -629,7 +645,8 @@ void GenericRenderer::renderUI( const Lore::UIPtr ui,
   }
 
   // Now render the UI elements.
-  renderMaterialMap( scene, entityDataMap, proj );
+  renderMaterialMap( scene, solids, proj );
+  renderTransparents( scene, transparents, proj );
   renderBoxes( boxes, proj );
   renderTextboxes( textboxes, proj );
 

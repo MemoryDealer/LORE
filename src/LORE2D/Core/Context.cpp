@@ -308,6 +308,13 @@ void Context::UnregisterFrameEndedCallback( FrameListenerController::FrameEndedC
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+WindowPtr Context::GetActiveWindow()
+{
+  return _activeContextPtr->getActiveWindow();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void Context::onWindowEvent( const Notification& n )
 {
   const WindowEventNotification& wen = static_cast< const WindowEventNotification& >( n );
