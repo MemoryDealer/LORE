@@ -356,55 +356,53 @@ int main( int argc, char** argv )
     sonicNode->rotate( Lore::Degree( .1f ) );
 
     float speed = 0.01f;
-    if ( !Lore::DebugUI::IsConsoleEnabled() ) {
-      if ( Lore::Input::GetKeymodState( Lore::Keymod::Shift ) ) {
-        speed *= 2.f;
-      }
-      if ( Lore::Input::GetKeyState( Lore::Keycode::W ) ) {
-        sonicNode->translate( 0.f, speed );
-      }
-      else if ( Lore::Input::GetKeyState( Lore::Keycode::S ) ) {
-        sonicNode->translate( 0.f, -speed );
-      }
-      if ( Lore::Input::GetKeyState( Lore::Keycode::D ) ) {
-        sonicNode->translate( speed, 0.f );
-      }
-      else if ( Lore::Input::GetKeyState( Lore::Keycode::A ) ) {
-        sonicNode->translate( -speed, 0.f );
-      }
-      if ( Lore::Input::GetKeyState( Lore::Keycode::Z ) ) {
-        camera->zoom( 0.01f );
-      }
-      else if ( Lore::Input::GetKeyState( Lore::Keycode::X ) ) {
-        camera->zoom( -0.01f );
-      }
+    if ( Lore::Input::GetKeymodState( Lore::Keymod::Shift ) ) {
+      speed *= 2.f;
+    }
+    if ( Lore::Input::GetKeyState( Lore::Keycode::W ) ) {
+      sonicNode->translate( 0.f, speed );
+    }
+    else if ( Lore::Input::GetKeyState( Lore::Keycode::S ) ) {
+      sonicNode->translate( 0.f, -speed );
+    }
+    if ( Lore::Input::GetKeyState( Lore::Keycode::D ) ) {
+      sonicNode->translate( speed, 0.f );
+    }
+    else if ( Lore::Input::GetKeyState( Lore::Keycode::A ) ) {
+      sonicNode->translate( -speed, 0.f );
+    }
+    if ( Lore::Input::GetKeyState( Lore::Keycode::Z ) ) {
+      camera->zoom( 0.01f );
+    }
+    else if ( Lore::Input::GetKeyState( Lore::Keycode::X ) ) {
+      camera->zoom( -0.01f );
+    }
 
-      if ( Lore::Input::GetKeyState( Lore::Keycode::F8 ) ) {
-        static bool destroyed = false;
-        if ( !destroyed ) {
-          Lore::Resource::DestroyTexture( sonicTexture );
-          destroyed = true;
-        }
+    if ( Lore::Input::GetKeyState( Lore::Keycode::F8 ) ) {
+      static bool destroyed = false;
+      if ( !destroyed ) {
+        Lore::Resource::DestroyTexture( sonicTexture );
+        destroyed = true;
       }
+    }
 
-      if ( Lore::Input::GetKeyState( Lore::Keycode::Escape ) ) {
-        pause = false;
-        break;
-      }
+    if ( Lore::Input::GetKeyState( Lore::Keycode::Escape ) ) {
+      pause = false;
+      break;
+    }
 
-      if ( Lore::Input::GetKeyState( Lore::Keycode::Right ) ) {
-        sonicNode->scale( 1.1f );
-      }
-      else if ( Lore::Input::GetKeyState( Lore::Keycode::Left ) ) {
-        sonicNode->scale( 0.9f );
-      }
+    if ( Lore::Input::GetKeyState( Lore::Keycode::Right ) ) {
+      sonicNode->scale( 1.1f );
+    }
+    else if ( Lore::Input::GetKeyState( Lore::Keycode::Left ) ) {
+      sonicNode->scale( 0.9f );
+    }
 
-      if ( Lore::Input::GetMouseButtonState( Lore::MouseButton::Left ) ) {
-        //printf( "Left!\n" );
-      }
-      if ( Lore::Input::GetMouseButtonState( Lore::MouseButton::Right ) ) {
-        //printf( "Right!\n" );
-      }
+    if ( Lore::Input::GetMouseButtonState( Lore::MouseButton::Left ) ) {
+      //printf( "Left!\n" );
+    }
+    if ( Lore::Input::GetMouseButtonState( Lore::MouseButton::Right ) ) {
+      //printf( "Right!\n" );
     }
 
     UpdateFPS( fpsTextbox );

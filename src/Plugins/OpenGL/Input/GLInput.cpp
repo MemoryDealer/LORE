@@ -182,6 +182,11 @@ void GLInputController::createCallbacks( Lore::WindowPtr window )
 
 bool GLInputController::getKeyState( Lore::WindowPtr window, const Lore::Keycode key )
 {
+  const auto hooked = ( _activeHooks != &_hooks );
+  if ( hooked ) {
+    return false;
+  }
+
   GLFWwindow* glfwWindow = static_cast<GLWindow*>( window )->getInternalWindow();
   return glfwGetKey( glfwWindow, static_cast< int >( key ) );
 }
@@ -190,6 +195,11 @@ bool GLInputController::getKeyState( Lore::WindowPtr window, const Lore::Keycode
 
 bool GLInputController::getKeymodState( const Lore::Keymod key )
 {
+  const auto hooked = ( _activeHooks != &_hooks );
+  if ( hooked ) {
+    return false;
+  }
+
   return KeymodStates[key];
 }
 
@@ -197,6 +207,13 @@ bool GLInputController::getKeymodState( const Lore::Keymod key )
 
 void GLInputController::getCursorPos( Lore::WindowPtr window, int32_t& x, int32_t& y )
 {
+  const auto hooked = ( _activeHooks != &_hooks );
+  if ( hooked ) {
+    x = 0;
+    y = 0;
+    return;
+  }
+
   GLFWwindow* glfwWindow = static_cast<GLWindow*>( window )->getInternalWindow();
   double _x, _y;
   glfwGetCursorPos( glfwWindow, &_x, &_y );
@@ -208,6 +225,11 @@ void GLInputController::getCursorPos( Lore::WindowPtr window, int32_t& x, int32_
 
 bool GLInputController::getMouseButtonState( Lore::WindowPtr window, const Lore::MouseButton button )
 {
+  const auto hooked = ( _activeHooks != &_hooks );
+  if ( hooked ) {
+    return false;
+  }
+
   GLFWwindow* glfwWindow = static_cast<GLWindow*>( window )->getInternalWindow();
   int glfwBtn = -1;
   switch ( button ) {
