@@ -56,11 +56,23 @@ namespace LocalNS {
         break;
 
       case Keycode::Backspace:
-        ConsoleInstance->popBack();
+        ConsoleInstance->backspace();
+        break;
+
+      case Keycode::Delete:
+        ConsoleInstance->onDelete();
         break;
 
       case Keycode::Enter:
         ConsoleInstance->execute();
+        break;
+
+      case Keycode::Left:
+        ConsoleInstance->cursorLeft();
+        break;
+
+      case Keycode::Right:
+        ConsoleInstance->cursorRight();
         break;
 
       case Keycode::Up:
@@ -73,7 +85,20 @@ namespace LocalNS {
         break;
 
       case Keycode::Down:
-        ConsoleInstance->setCommandStr( CLI::GetNextCommand() );
+        {
+          auto str = CLI::GetNextCommand();
+          if ( !str.empty() ) {
+            ConsoleInstance->setCommandStr( str );
+          }
+        }
+        break;
+
+      case Keycode::Home:
+        ConsoleInstance->cursorHome();
+        break;
+
+      case Keycode::End:
+        ConsoleInstance->cursorEnd();
         break;
 
       case Keycode::GraveAccent:
@@ -172,13 +197,22 @@ void DebugUIConsole::setCommandStr( const string& cmd )
 {
   _command = cmd;
   _consoleTextbox->setText( _command );
+  _cursorElement->setPosition( CursorDefaultX, -.91f );
+  _cursorIdx = 0;
+  for ( const char c : _command ) {
+    const auto width = _consoleTextbox->getFont()->getWidth( c );
+    _cursorElement->translate( width / Context::GetActiveWindow()->getAspectRatio(), 0.f );
+    ++_cursorIdx;
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void DebugUIConsole::appendChar( const char c )
 {
-  _command += c;
+  string s;
+  s += c;
+  _command.insert( _cursorIdx, s );
   _consoleTextbox->setText( _command );
 
   // Move blinking cursor.
@@ -186,21 +220,75 @@ void DebugUIConsole::appendChar( const char c )
   // TODO: Dividing by aspect ratio is major hack to account for adjustment in GenericRenderer.
   //   This indicates a wider problem with UI rendering.
   _cursorElement->translate( width / Context::GetActiveWindow()->getAspectRatio(), 0.f );
+  ++_cursorIdx;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void DebugUIConsole::popBack()
+void DebugUIConsole::backspace()
 {
-  if ( !_command.empty() ) {
-    const char c = _command.back();
-
-    _command.pop_back();
+  if ( !_command.empty() && _cursorIdx > 0 ) {
+    --_cursorIdx;
+    const char c = _command[_cursorIdx];
+    _command.erase( _cursorIdx, 1 );
     _consoleTextbox->setText( _command );
 
-    // Move blinking cursor.
     const auto width = _consoleTextbox->getFont()->getWidth( c );
     _cursorElement->translate( -width / Context::GetActiveWindow()->getAspectRatio(), 0.f );
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void DebugUIConsole::onDelete()
+{
+  if ( !_command.empty() && _cursorIdx < _command.size() ) {
+    _command.erase( _cursorIdx, 1 );
+    _consoleTextbox->setText( _command );
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void DebugUIConsole::cursorLeft()
+{
+  if ( _cursorIdx > 0 ) {
+    --_cursorIdx;
+    const char c = _command[_cursorIdx];
+    const auto width = _consoleTextbox->getFont()->getWidth( c );
+    _cursorElement->translate( -width / Context::GetActiveWindow()->getAspectRatio(), 0.f );
+  }
+  _cursorElement->setVisible( true );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void DebugUIConsole::cursorRight()
+{
+  if ( _command.size() > _cursorIdx ) {
+    const char c = _command[_cursorIdx];
+    ++_cursorIdx;
+    const auto width = _consoleTextbox->getFont()->getWidth( c );
+    _cursorElement->translate( width / Context::GetActiveWindow()->getAspectRatio(), 0.f );
+  }
+  _cursorElement->setVisible( true );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void DebugUIConsole::cursorHome()
+{
+  while ( _cursorIdx > 0 ) {
+    cursorLeft();
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void DebugUIConsole::cursorEnd()
+{
+  while ( _cursorIdx < _command.size() ) {
+    cursorRight();
   }
 }
 
@@ -223,6 +311,7 @@ void DebugUIConsole::clear()
   _consoleTextbox->setText( "" );
   _consoleHistoryTextbox->setText( "" );
   _cursorElement->setPosition( CursorDefaultX, _cursorElement->getPosition().y );
+  _cursorIdx = 0;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

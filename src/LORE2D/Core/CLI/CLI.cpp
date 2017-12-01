@@ -138,6 +138,10 @@ string CLI::GetPreviousCommand()
 
 string CLI::GetNextCommand()
 {
+  if ( CommandHistory.empty() ) {
+    return string();
+  }
+
   if ( 0 != CommandHistoryIdx ) {
     --CommandHistoryIdx;
   }

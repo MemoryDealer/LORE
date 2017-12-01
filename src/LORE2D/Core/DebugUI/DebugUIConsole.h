@@ -49,7 +49,12 @@ namespace Lore {
 
     void setCommandStr( const string& cmd );
     void appendChar( const char c );
-    void popBack();
+    void backspace();
+    void onDelete();
+    void cursorLeft();
+    void cursorRight();
+    void cursorHome();
+    void cursorEnd();
     void execute();
     void clear();
 
@@ -73,6 +78,7 @@ namespace Lore {
     Clock::time_point _time;
 
     string _command {};
+    uint32_t _cursorIdx { 0 };
 
   };
 
