@@ -56,12 +56,12 @@ namespace Lore {
 
         virtual void addRenderView( const RenderView& renderView );
 
-        virtual void removeRenderView( const RenderView& renderView );
-        virtual void removeRenderView( const string& name );
+        void removeRenderView( const RenderView& renderView );
+        void removeRenderView( const string& name );
 
-        virtual RenderView& getRenderView( const string& name );
+        const RenderView& getRenderView( const string& name ) const;
 
-        virtual void resetRenderViews();
+        void resetRenderViews();
 
         //
         // Modifiers.
@@ -116,6 +116,8 @@ namespace Lore {
         {
             return _height;
         }
+
+        const RenderView& getRenderView( const int32_t idx ) const;
 
         ResourceControllerPtr getResourceController() const;
 

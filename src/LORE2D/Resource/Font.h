@@ -51,6 +51,8 @@ namespace Lore {
 
     virtual real advanceGlyphX( const char c, const real x, const real scale ) = 0;
 
+    virtual real getWidth( const char c ) = 0;
+
   };
 
 }

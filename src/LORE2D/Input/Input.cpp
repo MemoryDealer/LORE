@@ -45,35 +45,92 @@ using namespace Lore;
 
 void InputController::setKeyCallback( const KeyCallback callback )
 {
-  _keyCallback = callback;
+  _hooks.keyCallback = callback;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void InputController::setCharCallback( const CharCallback callback )
 {
-  _charCallback = callback;
+  _hooks.charCallback = callback;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void InputController::setMouseButtonCallback( const MouseButtonCallback callback )
 {
-  _mouseButtonCallback = callback;
+  _hooks.mouseButtonCallback = callback;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void InputController::setMouseMovedCallback( const MousePosCallback callback )
 {
-  _mousePosCallback = callback;
+  _hooks.mousePosCallback = callback;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void InputController::setMouseScrollCallback( const MouseScrollCallback callback )
 {
-  _mouseScrollCallback = callback;
+  _hooks.mouseScrollCallback = callback;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void InputController::addKeyListener( const KeyListenerPtr listener )
+{
+  _hooks.keyListeners.push_back( listener );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void InputController::addCharListener( const CharListenerPtr listener )
+{
+  _hooks.charListeners.push_back( listener );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void InputController::addMouseListener( const MouseListenerPtr listener )
+{
+  _hooks.mouseListeners.push_back( listener );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void InputController::removeKeyListener( const KeyListenerPtr listener )
+{
+  for ( auto it = _hooks.keyListeners.begin(); it != _hooks.keyListeners.end(); ++it ) {
+    if ( listener == ( *it ) ) {
+      _hooks.keyListeners.erase( it );
+      return;
+    }
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void InputController::removeCharListener( const CharListenerPtr listener )
+{
+  for ( auto it = _hooks.charListeners.begin(); it != _hooks.charListeners.end(); ++it ) {
+    if ( listener == ( *it ) ) {
+      _hooks.charListeners.erase( it );
+      return;
+    }
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void InputController::removeMouseListener( const MouseListenerPtr listener )
+{
+  for ( auto it = _hooks.mouseListeners.begin(); it != _hooks.mouseListeners.end(); ++it ) {
+    if ( listener == ( *it ) ) {
+      _hooks.mouseListeners.erase( it );
+      return;
+    }
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -114,9 +171,44 @@ void Input::SetMouseScrollCallback( const MouseScrollCallback callback )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Input::SetCursorEnabled( const bool enabled )
+void Input::AddKeyListener( const KeyListenerPtr callback )
 {
-  ActiveContext->getInputController()->setCursorEnabled( ActiveContext->getActiveWindow(), enabled );
+  ActiveContext->getInputController()->addKeyListener( callback );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Input::AddCharListener( const CharListenerPtr callback )
+{
+  ActiveContext->getInputController()->addCharListener( callback );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Input::AddMouseListener( const MouseListenerPtr callback )
+{
+  ActiveContext->getInputController()->addMouseListener( callback );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Input::RemoveKeyListener( const KeyListenerPtr callback )
+{
+  ActiveContext->getInputController()->removeKeyListener( callback );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Input::RemoveCharListener( const CharListenerPtr callback )
+{
+  ActiveContext->getInputController()->removeCharListener( callback );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Input::RemoveMouseListener( const MouseListenerPtr callback )
+{
+  ActiveContext->getInputController()->removeMouseListener( callback );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -145,6 +237,27 @@ void Input::GetCursorPos( int32_t& x, int32_t& y )
 bool Input::GetMouseButtonState( const MouseButton button )
 {
   return ActiveContext->getInputController()->getMouseButtonState( ActiveContext->getActiveWindow(), button );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Input::SetCursorEnabled( const bool enabled )
+{
+  ActiveContext->getInputController()->setCursorEnabled( ActiveContext->getActiveWindow(), enabled );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Input::OverrideHooks( InputHooksPtr hooks )
+{
+  ActiveContext->getInputController()->_activeHooks = hooks;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Input::ResetHooks()
+{
+  ActiveContext->getInputController()->_activeHooks = &ActiveContext->getInputController()->_hooks;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

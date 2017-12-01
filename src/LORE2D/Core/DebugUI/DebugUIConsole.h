@@ -25,59 +25,63 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Math/Math.h>
-#include <LORE2D/Memory/Alloc.h>
-#include <LORE2D/Resource/Font.h>
+#include "DebugUIComponent.h"
+
+#include <LORE2D/Core/Timer.h>
+#include <LORE2D/Renderer/FrameListener/FrameListener.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore { namespace OpenGL {
+namespace Lore {
 
-  class GLFont : public Lore::Font,
-                 public Alloc<GLFont>
+  using Clock = std::chrono::high_resolution_clock;
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  class DebugUIConsole final : public DebugUIComponent,
+                               public FrameListener
   {
 
   public:
 
-    struct Glyph
-    {
-      GLuint textureID;
-      GLuint advance;
-      IVec2 size;
-      IVec2 bearing;
-    };
+    DebugUIConsole();
+    virtual ~DebugUIConsole() override;
 
-  public:
+    void setCommandStr( const string& cmd );
+    void appendChar( const char c );
+    void backspace();
+    void onDelete();
+    void cursorLeft();
+    void cursorRight();
+    void cursorHome();
+    void cursorEnd();
+    void execute();
+    void clear();
 
-    GLFont() = default;
-
-    virtual ~GLFont() override = default;
-
-    virtual void loadFromFile( const string& file, const uint32_t size ) override;
-
-    virtual VertexBuffer::Vertices generateVertices( const char c,
-                                                     const real x,
-                                                     const real y,
-                                                     const real scale ) override;
-
-    virtual void bindTexture( const char c ) override;
-
-    virtual real advanceGlyphX( const char c, const real x, const real scale ) override;
-
-    virtual real getWidth( const char c ) override;
+    virtual void frameStarted( const FrameEvent& e ) override;
 
   private:
 
-    virtual void _reset() override;
+    UIPanelPtr _panel { nullptr };
+    UIElementPtr _consoleElement { nullptr };
+    TextboxPtr _consoleTextbox { nullptr };
+    BoxPtr _consoleBox { nullptr };
+    UIElementPtr _consoleBoxElement { nullptr };
+    UIElementPtr _consoleHistoryElement { nullptr };
+    TextboxPtr _consoleHistoryTextbox { nullptr };
+    UIElementPtr _backgroundElement { nullptr };
+    EntityPtr _backgroundEntity { nullptr };
 
-  private:
+    UIElementPtr _cursorElement { nullptr };
+    EntityPtr _cursorEntity { nullptr };
 
-    using GlyphMap = std::map<GLchar, Glyph>;
+    Clock::time_point _time;
 
-    GlyphMap _glyphs {};
+    string _command {};
+    uint32_t _cursorIdx { 0 };
 
   };
 
-}}
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

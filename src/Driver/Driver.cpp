@@ -46,6 +46,26 @@ static void OnChar( const char c );
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+class CharHandler : public Lore::CharListener
+{
+public:
+  CharHandler()
+  {
+    Lore::Input::AddCharListener( this );
+  }
+  ~CharHandler()
+  {
+    Lore::Input::RemoveCharListener( this );
+  }
+
+  virtual void onChar( const char c ) override
+  {
+    printf( "onChar: %c\n", c );
+  }
+};
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 int main( int argc, char** argv )
 {
   auto context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
@@ -73,6 +93,9 @@ int main( int argc, char** argv )
 
   Lore::ScenePtr scene = context->createScene( "Default" );
   scene->setBackgroundColor( Lore::StockColor::Black );
+
+  // Hack.
+  Lore::CLI::SetActiveScene( scene );
 
   Lore::Viewport vp( 0.f, 0.f, 1.f, 1.f );
   Lore::CameraPtr camera = Lore::Resource::CreateCamera( "cam1" );
@@ -121,7 +144,7 @@ int main( int argc, char** argv )
 
   // Create some blended boxes.
 
-  auto boxEntity = Lore::Resource::CreateEntity( "boxeuler.z", Lore::MeshType::Quad );
+  auto boxEntity = Lore::Resource::CreateEntity( "box", Lore::MeshType::Quad );
   boxEntity->getMaterial()->blendingMode.enabled = true;
   boxEntity->getMaterial()->diffuse = Lore::Color( 0.1f, 0.4f, 0.8f, 0.95f );
   for ( int i = 0; i < 5; ++i ) {
@@ -247,7 +270,7 @@ int main( int argc, char** argv )
   auto panel = rv.ui->createPanel( "P-1" );
   auto fpsElement = panel->createElement( "FPS" );
   auto fpsTextbox = Lore::Resource::CreateTextbox( "fps" );
-  fpsElement->setTextbox( fpsTextbox );
+  fpsElement->attachTextbox( fpsTextbox );
   fpsElement->setPosition( -1.f, 0.92f );
   fpsTextbox->setText( "Calculating..." );
   fpsTextbox->setTextColor( Lore::StockColor::Green );
@@ -256,6 +279,7 @@ int main( int argc, char** argv )
   __sonic = sonicNode;
   Lore::Input::SetKeyCallback( OnKeyChanged );
   Lore::Input::SetCharCallback( OnChar );
+  auto ch = new CharHandler();
 
   //sonicNode = doges[0];
   float f = 0.f;
@@ -285,31 +309,30 @@ int main( int argc, char** argv )
     }*/
 
     auto root = scene->getRootNode();
-    auto it = root->getChildNodeIterator();
-    while ( it.hasMore() ) {
-      auto node = it.getNext();
-      if ( node == sonicNode ) {
-        continue;
-      }
-      if ( sonicNode->intersects( node ) ) {
-        sonicNode->getAABB()->getBox()->setFillColor( Lore::Color( 1.f, 0.f, 0.f, 0.3f ) );
-        //printf( "Collision with %s\n", node->getName().c_str() );
-        /*auto r1 = sonicNode->getAABB()->getRect();
-        auto r2 = node->getAABB()->getRect();
-        printf( "Sonic: %.2f, %.2f, %.2f, %.2f\n", r1.x, r1.y, r1.w, r1.h );
-        printf( "%s: %.2f, %.2f, %.2f, %.2f\n", node->getName().c_str(), r2.x, r2.y, r2.w, r2.h );*/
-        break;
-      }
-      auto it2 = node->getChildNodeIterator();
-      while ( it2.hasMore() ) {
-        auto node2 = it2.getNext();
-        if ( sonicNode->intersects( node2 ) || sonicNode->intersects( scene->getNode("dogen2") ) || sonicNode->intersects( scene->getNode( "dogen3" ) ) ) {
-          sonicNode->getAABB()->getBox()->setFillColor( Lore::Color( 1.f, 0.f, 0.f, 0.3f ) );
-        }
-      }
-    }
-    auto pos = scene->getNode( "dogen2" )->getDerivedPosition();
-    printf( "dogen2: %.2f, %.2f, %.2f\n", pos.x, pos.y );
+    //auto it = root->getChildNodeIterator();
+    //while ( it.hasMore() ) {
+    //  auto node = it.getNext();
+    //  if ( node == sonicNode ) {
+    //    continue;
+    //  }
+    //  if ( sonicNode->intersects( node ) ) {
+    //    sonicNode->getAABB()->getBox()->setFillColor( Lore::Color( 1.f, 0.f, 0.f, 0.3f ) );
+    //    //printf( "Collision with %s\n", node->getName().c_str() );
+    //    /*auto r1 = sonicNode->getAABB()->getRect();
+    //    auto r2 = node->getAABB()->getRect();
+    //    printf( "Sonic: %.2f, %.2f, %.2f, %.2f\n", r1.x, r1.y, r1.w, r1.h );
+    //    printf( "%s: %.2f, %.2f, %.2f, %.2f\n", node->getName().c_str(), r2.x, r2.y, r2.w, r2.h );*/
+    //    break;
+    //  }
+    //  auto it2 = node->getChildNodeIterator();
+    //  while ( it2.hasMore() ) {
+    //    auto node2 = it2.getNext();
+    //    if ( sonicNode->intersects( node2 ) || sonicNode->intersects( scene->getNode("dogen2") ) || sonicNode->intersects( scene->getNode( "dogen3" ) ) ) {
+    //      sonicNode->getAABB()->getBox()->setFillColor( Lore::Color( 1.f, 0.f, 0.f, 0.3f ) );
+    //    }
+    //  }
+    //}
+
     //node->translate( 0.01f * std::sinf( f ), 0.01f * std::cosf( f ) );
     f += 0.0005f;
     //sonicNode->scale( 10.05f * std::sinf( f ) );
@@ -444,6 +467,12 @@ static void OnKeyChanged( const Lore::Keycode key, const bool state )
       static bool enabled = true;
       enabled = !enabled;
       Lore::Input::SetCursorEnabled( enabled );
+    }
+    break;
+
+  case Lore::Keycode::GraveAccent:
+    if ( state ) {
+      Lore::DebugUI::DisplayConsole();
     }
     break;
   }

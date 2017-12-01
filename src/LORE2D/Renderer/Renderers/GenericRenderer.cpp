@@ -26,6 +26,7 @@
 
 #include "GenericRenderer.h"
 
+#include <LORE2D/Core/DebugUI/DebugUI.h>
 #include <LORE2D/Config/Config.h>
 #include <LORE2D/Math/Math.h>
 #include <LORE2D/Resource/Entity.h>
@@ -234,7 +235,12 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
 
   // Render UI.
   if ( rv.ui ) {
-    renderUI( rv, aspectRatio, projection );
+    renderUI( rv.ui, rv.scene, aspectRatio, projection );
+  }
+
+  // Render debug UI if enabled.
+  if ( DebugUI::IsConsoleEnabled() ) {
+    renderUI( DebugUI::GetConsoleUI(), rv.scene, aspectRatio, projection );
   }
 
   if ( rv.renderTarget ) {
@@ -498,7 +504,7 @@ void GenericRenderer::renderBoxes( RenderQueue::BoxList& boxes,
     program->setUniformVar( "borderColor", box->getBorderColor() );
     program->setUniformVar( "fillColor", box->getFillColor() );
     program->setUniformVar( "borderWidth", box->getBorderWidth() );
-    program->setUniformVar( "scale", box->getSize() );
+    program->setUniformVar( "scale", Vec2( data.model[0][0], data.model[1][1] ) * box->getSize() );
 
     // Apply box scaling to final transform.
     data.model[0][0] *= box->getWidth();
@@ -561,13 +567,16 @@ void GenericRenderer::renderTextboxes( RenderQueue::TextboxList& textboxes,
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GenericRenderer::renderUI( const RenderView& rv,
+void GenericRenderer::renderUI( const Lore::UIPtr ui,
+                                const Lore::ScenePtr scene,
                                 const real aspectRatio,
                                 const Matrix4& proj ) const
 {
-  auto panelIt = rv.ui->getPanelIterator();
+  auto panelIt = ui->getPanelIterator();
 
-  RenderQueue::EntityDataMap entityDataMap;
+  RenderQueue::EntityDataMap solids;
+  RenderQueue::TransparentDataMap transparents;
+  RenderQueue::BoxList boxes;
   RenderQueue::TextboxList textboxes;
   constexpr const real DepthOffset = -1101.f;
 
@@ -580,20 +589,48 @@ void GenericRenderer::renderUI( const RenderView& rv,
     auto elementIt = panel->getElementIterator();
     while ( elementIt.hasMore() ) {
       auto element = elementIt.getNext();
+      if ( !element->isVisible() ) {
+        continue;
+      }
+
       auto elementPos = panelOrigin + element->getPosition();
+      auto elementDimensions = element->getDimensions();
       elementPos.x *= aspectRatio;
+      elementDimensions.x *= aspectRatio;
 
       // Build list of entity data and textboxes to render.
       auto entity = element->getEntity();
       if ( entity ) {
-        RenderQueue::EntityData entityData;
-        entityData.material = entity->getMaterial();
-        entityData.vertexBuffer = entity->getMesh()->getVertexBuffer();
+        auto mat = entity->getMaterial();
 
         RenderQueue::RenderData rd;
-        rd.model = Math::CreateTransformationMatrix( elementPos, Quaternion(), element->getDimensions() );
+        rd.model = Math::CreateTransformationMatrix( elementPos, Quaternion(), elementDimensions );
         rd.model[3][2] = element->getDepth() + DepthOffset; // Offset UI element depth beyond scene node depth.
-        entityDataMap[entityData].push_back( rd );
+
+        if ( mat->blendingMode.enabled ) {
+          RenderQueue::Transparent t;
+          t.material = entity->getMaterial();
+          t.vertexBuffer = entity->getMesh()->getVertexBuffer();
+          t.model = rd.model;
+
+          transparents.insert( { t.model[3][2], t } );
+        }
+        else {
+          RenderQueue::EntityData entityData;
+          entityData.material = mat;
+          entityData.vertexBuffer = entity->getMesh()->getVertexBuffer();
+
+          solids[entityData].push_back( rd );
+        }
+      }
+
+      auto box = element->getBox();
+      if ( box ) {
+        RenderQueue::BoxData bd;
+        bd.box = box;
+        bd.model = Math::CreateTransformationMatrix( elementPos, Quaternion(), elementDimensions );
+        bd.model[3][2] = element->getDepth() + DepthOffset;
+        boxes.push_back( bd );
       }
 
       auto textbox = element->getTextbox();
@@ -608,8 +645,12 @@ void GenericRenderer::renderUI( const RenderView& rv,
   }
 
   // Now render the UI elements.
-  renderMaterialMap( rv.scene, entityDataMap, proj );
+  renderMaterialMap( scene, solids, proj );
+  renderTransparents( scene, transparents, proj );
+  renderBoxes( boxes, proj );
   renderTextboxes( textboxes, proj );
+
+  _api->setBlendingEnabled( false );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

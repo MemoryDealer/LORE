@@ -40,12 +40,22 @@ namespace LocalNS {
   static void GLFWKeyCallback( GLFWwindow* window, int key, int scancode, int action, int mods )
   {
     Lore::KeyCallback callback = InputControllerInstance->getKeyCallback();
-    if ( callback ) {
-      const auto loreKey = static_cast< Lore::Keycode >( key );
-      const bool pressed = ( action > 0 ) ? true : false;
+    const auto loreKey = static_cast< Lore::Keycode >( key );
+    const bool pressed = ( action > 0 ) ? true : false;
 
+    if ( callback ) {
       // Trigger developer-provided callback.
       callback( loreKey, pressed );
+    }
+
+    const auto& listeners = InputControllerInstance->getKeyListeners();
+    for ( auto listener : listeners ) {
+      if ( pressed ) {
+        listener->onKeyDown( loreKey );
+      }
+      else {
+        listener->onKeyUp( loreKey );
+      }
     }
 
     // Set modifier bits.
@@ -63,6 +73,11 @@ namespace LocalNS {
     if ( callback ) {
       callback( static_cast<char>( codepoint ) );
     }
+
+    const auto& listeners = InputControllerInstance->getCharListeners();
+    for ( auto listener : listeners ) {
+      listener->onChar( static_cast< char >( codepoint ) );
+    }
   }
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -71,7 +86,12 @@ namespace LocalNS {
   {
     Lore::MousePosCallback callback = InputControllerInstance->getMousePosCallback();
     if ( callback ) {
-      callback( static_cast<int32_t>( x ), static_cast<int32_t>( y ) );
+      callback( static_cast<const int32_t>( x ), static_cast<const int32_t>( y ) );
+    }
+
+    const auto& listeners = InputControllerInstance->getMouseListeners();
+    for ( auto listener : listeners ) {
+      listener->onMouseMoved( static_cast< const int32_t >( x ), static_cast< const int32_t >( y ) );
     }
   }
 
@@ -80,24 +100,33 @@ namespace LocalNS {
   static void GLFWMouseButtonCallback( GLFWwindow* window, int button, int action, int mods )
   {
     Lore::MouseButtonCallback callback = InputControllerInstance->getMouseButtonCallback();
+    const bool pressed = ( action > 0 ) ? true : false;
+    static const std::map<int, Lore::MouseButton> MouseButtonMap = {
+      { GLFW_MOUSE_BUTTON_LEFT, Lore::MouseButton::Left },
+      { GLFW_MOUSE_BUTTON_MIDDLE, Lore::MouseButton::Middle },
+      { GLFW_MOUSE_BUTTON_RIGHT, Lore::MouseButton::Right }
+    };
+
+    Lore::MouseButton loreButton;
+    auto it = MouseButtonMap.find( button );
+    if ( MouseButtonMap.end() != it ) {
+      loreButton = it->second;
+    }
+    else {
+      loreButton = static_cast< Lore::MouseButton >( button );
+    }
+
     if ( callback ) {
-      const bool pressed = ( action > 0 ) ? true : false;
-      switch ( button ) {
-      case GLFW_MOUSE_BUTTON_LEFT:
-        callback( Lore::MouseButton::Left, pressed );
-        break;
+      callback( loreButton, pressed );
+    }
 
-      case GLFW_MOUSE_BUTTON_MIDDLE:
-        callback( Lore::MouseButton::Middle, pressed );
-        break;
-
-      case GLFW_MOUSE_BUTTON_RIGHT:
-        callback( Lore::MouseButton::Right, pressed );
-        break;
-
-      default:
-        callback( static_cast< Lore::MouseButton >( button ), pressed );
-        break;
+    const auto& listeners = InputControllerInstance->getMouseListeners();
+    for ( auto listener : listeners ) {
+      if ( pressed ) {
+        listener->onMouseButtonDown( loreButton );
+      }
+      else {
+        listener->onMouseButtonUp( loreButton );
       }
     }
   }
@@ -109,6 +138,11 @@ namespace LocalNS {
     Lore::MouseScrollCallback callback = InputControllerInstance->getMouseScrollCallback();
     if ( callback ) {
       callback( xOffset, yOffset );
+    }
+
+    const auto& listeners = InputControllerInstance->getMouseListeners();
+    for ( auto listener : listeners ) {
+      listener->onMouseScroll( xOffset, yOffset );
     }
   }
 
@@ -148,6 +182,11 @@ void GLInputController::createCallbacks( Lore::WindowPtr window )
 
 bool GLInputController::getKeyState( Lore::WindowPtr window, const Lore::Keycode key )
 {
+  const auto hooked = ( _activeHooks != &_hooks );
+  if ( hooked ) {
+    return false;
+  }
+
   GLFWwindow* glfwWindow = static_cast<GLWindow*>( window )->getInternalWindow();
   return glfwGetKey( glfwWindow, static_cast< int >( key ) );
 }
@@ -156,6 +195,11 @@ bool GLInputController::getKeyState( Lore::WindowPtr window, const Lore::Keycode
 
 bool GLInputController::getKeymodState( const Lore::Keymod key )
 {
+  const auto hooked = ( _activeHooks != &_hooks );
+  if ( hooked ) {
+    return false;
+  }
+
   return KeymodStates[key];
 }
 
@@ -163,6 +207,13 @@ bool GLInputController::getKeymodState( const Lore::Keymod key )
 
 void GLInputController::getCursorPos( Lore::WindowPtr window, int32_t& x, int32_t& y )
 {
+  const auto hooked = ( _activeHooks != &_hooks );
+  if ( hooked ) {
+    x = 0;
+    y = 0;
+    return;
+  }
+
   GLFWwindow* glfwWindow = static_cast<GLWindow*>( window )->getInternalWindow();
   double _x, _y;
   glfwGetCursorPos( glfwWindow, &_x, &_y );
@@ -174,6 +225,11 @@ void GLInputController::getCursorPos( Lore::WindowPtr window, int32_t& x, int32_
 
 bool GLInputController::getMouseButtonState( Lore::WindowPtr window, const Lore::MouseButton button )
 {
+  const auto hooked = ( _activeHooks != &_hooks );
+  if ( hooked ) {
+    return false;
+  }
+
   GLFWwindow* glfwWindow = static_cast<GLWindow*>( window )->getInternalWindow();
   int glfwBtn = -1;
   switch ( button ) {

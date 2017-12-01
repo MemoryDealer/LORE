@@ -25,59 +25,34 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Math/Math.h>
-#include <LORE2D/Memory/Alloc.h>
-#include <LORE2D/Resource/Font.h>
+#include <LORE2D/Input/Input.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore { namespace OpenGL {
+namespace Lore {
 
-  class GLFont : public Lore::Font,
-                 public Alloc<GLFont>
+  class DebugUIComponent
   {
 
   public:
 
-    struct Glyph
-    {
-      GLuint textureID;
-      GLuint advance;
-      IVec2 size;
-      IVec2 bearing;
-    };
+    const string DebugUIResourceGroupName = "DebugUI";
 
   public:
 
-    GLFont() = default;
+    DebugUIComponent() = default;
+    virtual ~DebugUIComponent() = default;
 
-    virtual ~GLFont() override = default;
+    InputHooksPtr getInputHooks() { return &_hooks; }
+    UIPtr getUI() const { return _ui; }
 
-    virtual void loadFromFile( const string& file, const uint32_t size ) override;
+  protected:
 
-    virtual VertexBuffer::Vertices generateVertices( const char c,
-                                                     const real x,
-                                                     const real y,
-                                                     const real scale ) override;
-
-    virtual void bindTexture( const char c ) override;
-
-    virtual real advanceGlyphX( const char c, const real x, const real scale ) override;
-
-    virtual real getWidth( const char c ) override;
-
-  private:
-
-    virtual void _reset() override;
-
-  private:
-
-    using GlyphMap = std::map<GLchar, Glyph>;
-
-    GlyphMap _glyphs {};
+    UIPtr _ui { nullptr };
+    InputHooks _hooks;
 
   };
 
-}}
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

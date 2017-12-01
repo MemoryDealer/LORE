@@ -66,17 +66,32 @@ namespace Lore {
       return _entity;
     }
 
+    inline BoxPtr getBox() const
+    {
+      return _box;
+    }
+
     inline TextboxPtr getTextbox() const
     {
       return _textbox;
     }
 
+    inline bool isVisible() const
+    {
+      return _visible;
+    }
+
     //
-    // Setters.
+    // Modifiers.
 
     inline void setPosition( const real x, const real y )
     {
       _pos = Vec2( x, y );
+    }
+
+    inline void translate( const real x, const real y )
+    {
+      _pos += Vec2( x, y );
     }
 
     inline void setDimensions( const real w, const real h )
@@ -90,14 +105,24 @@ namespace Lore {
       _depth = depth;
     }
 
-    inline void setEntity( const EntityPtr entity )
+    inline void attachEntity( const EntityPtr entity )
     {
       _entity = entity;
     }
 
-    inline void setTextbox( const TextboxPtr textbox )
+    inline void attachBox( const BoxPtr box )
+    {
+      _box = box;
+    }
+
+    inline void attachTextbox( const TextboxPtr textbox )
     {
       _textbox = textbox;
+    }
+
+    inline void setVisible( const bool visible )
+    {
+      _visible = visible;
     }
 
   protected:
@@ -110,7 +135,9 @@ namespace Lore {
     Vec2 _dimensions { 0.1f, 0.1f };
     real _depth { 0.f };
     EntityPtr _entity { nullptr };
+    BoxPtr _box { nullptr };
     TextboxPtr _textbox { nullptr };
+    bool _visible { true };
 
   };
 

@@ -26,58 +26,72 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 #include <LORE2D/Math/Math.h>
-#include <LORE2D/Memory/Alloc.h>
-#include <LORE2D/Resource/Font.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore { namespace OpenGL {
+namespace Lore {
 
-  class GLFont : public Lore::Font,
-                 public Alloc<GLFont>
+  class LORE_EXPORT CLI
   {
 
   public:
 
-    struct Glyph
+    struct Command
     {
-      GLuint textureID;
-      GLuint advance;
-      IVec2 size;
-      IVec2 bearing;
+
+      virtual string execute( string& args )
+      {
+        return string( "Invalid arguments: " + args );
+      }
+      virtual void undo() { }
+
     };
+    using CommandPtr = Command*;
 
   public:
 
-    GLFont() = default;
+    static void Init();
 
-    virtual ~GLFont() override = default;
+    static ContextPtr GetContext();
 
-    virtual void loadFromFile( const string& file, const uint32_t size ) override;
+    static string Execute( const string& command );
 
-    virtual VertexBuffer::Vertices generateVertices( const char c,
-                                                     const real x,
-                                                     const real y,
-                                                     const real scale ) override;
+    static bool RegisterCommand( CommandPtr command, const uint32_t count, ... );
 
-    virtual void bindTexture( const char c ) override;
+    static string GetPreviousCommand();
 
-    virtual real advanceGlyphX( const char c, const real x, const real scale ) override;
+    static string GetNextCommand();
 
-    virtual real getWidth( const char c ) override;
+    static void ResetCommandHistoryIndex();
+
+    static ScenePtr GetActiveScene() { return ActiveScene; }
+
+    static void SetActiveScene( ScenePtr scene ) { ActiveScene = scene; }
+
+    // String processing.
+
+    // Returns next isolated string, and removes it from str.
+    static string ExtractNextArg( string& str );
+
+    static uint32_t GetNumArgs( const string& str );
+
+    // Conversion.
+
+    static Vec2 ToVec2( const string& str );
+
+    static Vec4 ToVec4( const string& str );
 
   private:
 
-    virtual void _reset() override;
+    friend class Context;
+    static void AssignContext( ContextPtr context );
 
   private:
 
-    using GlyphMap = std::map<GLchar, Glyph>;
-
-    GlyphMap _glyphs {};
+    static ScenePtr ActiveScene;
 
   };
 
-}}
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -225,6 +225,10 @@ namespace Lore {
     /// \brief Unregisters previously registered FrameEndedCallback functor.
     static void UnregisterFrameEndedCallback( FrameListenerController::FrameEndedCallback callback );
 
+    ///
+    /// \brief Returns active window.
+    static WindowPtr GetActiveWindow();
+
     //
     // Deleted functions/operators.
 

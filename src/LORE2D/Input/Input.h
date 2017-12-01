@@ -32,11 +32,70 @@
 
 namespace Lore {
 
+  //
+  // Listener classes.
+
+  class KeyListener
+  {
+
+  public:
+
+    virtual void onKeyDown( const Keycode code ) { }
+    virtual void onKeyUp( const Keycode code ) { }
+
+  };
+
+  class CharListener
+  {
+
+  public:
+
+    virtual void onChar( const char c ) { }
+
+  };
+
+  class MouseListener
+  {
+
+  public:
+
+    virtual void onMouseMoved( const int32_t x, const int32_t y ) { }
+    virtual void onMouseButtonDown( const MouseButton button ) { }
+    virtual void onMouseButtonUp( const MouseButton button ) { }
+    virtual void onMouseScroll( const double xOffset, const double yOffset ) { }
+
+  };
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
   using KeyCallback = void(*)( const Keycode, const bool );
   using CharCallback = void(*)( const char c );
   using MouseButtonCallback = void(*)( const MouseButton, const bool );
   using MousePosCallback = void(*)( const int32_t x, const int32_t y );
   using MouseScrollCallback = void(*)( const double xOffset, const double yOffset );
+
+  using KeyListenerPtr = KeyListener*;
+  using CharListenerPtr = CharListener*;
+  using MouseListenerPtr = MouseListener*;
+  using KeyListenerList = std::vector<KeyListenerPtr>;
+  using CharListenerList = std::vector<CharListenerPtr>;
+  using MouseListenerList = std::vector<MouseListenerPtr>;
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  struct InputHooks
+  {
+    KeyCallback keyCallback { nullptr };
+    CharCallback charCallback { nullptr };
+    MouseButtonCallback mouseButtonCallback { nullptr };
+    MousePosCallback mousePosCallback { nullptr };
+    MouseScrollCallback mouseScrollCallback { nullptr };
+
+    KeyListenerList keyListeners { };
+    CharListenerList charListeners { };
+    MouseListenerList mouseListeners { };
+  };
+  using InputHooksPtr = InputHooks*;
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -54,6 +113,13 @@ namespace Lore {
     void setMouseMovedCallback( const MousePosCallback callback );
     void setMouseScrollCallback( const MouseScrollCallback callback );
 
+    void addKeyListener( const KeyListenerPtr listener );
+    void addCharListener( const CharListenerPtr listener );
+    void addMouseListener( const MouseListenerPtr listener );
+    void removeKeyListener( const KeyListenerPtr listener );
+    void removeCharListener( const CharListenerPtr listener );
+    void removeMouseListener( const MouseListenerPtr listener );
+
     virtual void createCallbacks( WindowPtr window ) = 0;
 
     virtual bool getKeyState( WindowPtr window, const Keycode key ) = 0;
@@ -65,11 +131,12 @@ namespace Lore {
 
   protected:
 
-    KeyCallback _keyCallback { nullptr };
-    CharCallback _charCallback { nullptr };
-    MouseButtonCallback _mouseButtonCallback { nullptr };
-    MousePosCallback _mousePosCallback { nullptr };
-    MouseScrollCallback _mouseScrollCallback { nullptr };
+    InputHooks _hooks;
+    InputHooksPtr _activeHooks { &_hooks };
+
+  private:
+
+    friend class Input;
 
   };
 
@@ -85,12 +152,22 @@ namespace Lore {
     static void SetMouseButtonCallback( const MouseButtonCallback callback );
     static void SetMouseMovedCallback( const MousePosCallback callback );
     static void SetMouseScrollCallback( const MouseScrollCallback callback );
-    static void SetCursorEnabled( const bool enabled );
+
+    static void AddKeyListener( const KeyListenerPtr listener );
+    static void AddCharListener( const CharListenerPtr listener );
+    static void AddMouseListener( const MouseListenerPtr listener );
+    static void RemoveKeyListener( const KeyListenerPtr listener );
+    static void RemoveCharListener( const CharListenerPtr listener );
+    static void RemoveMouseListener( const MouseListenerPtr listener );
 
     static bool GetKeyState( const Keycode key );
     static bool GetKeymodState( const Keymod mod );
     static void GetCursorPos( int32_t& x, int32_t& y );
     static bool GetMouseButtonState( const MouseButton button );
+    static void SetCursorEnabled( const bool enabled );
+
+    static void OverrideHooks( InputHooksPtr hooks );
+    static void ResetHooks();
 
   private:
 

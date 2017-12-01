@@ -160,3 +160,11 @@ void GLFont::_reset()
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+real GLFont::getWidth( const char c )
+{
+  const Glyph& glyph = _glyphs.at( c );
+  return static_cast< float >( glyph.advance >> 6 ) * ScaleFactor + 0.005f;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -150,7 +150,7 @@ namespace Lore {
                                                       const Vec2& scale )
     {
       // This function only supports uniform scaling.
-      assert( scale.x == scale.y );
+      //assert( scale.x == scale.y );
 
       Matrix4 m;
       Matrix3 rot3x3 = orientation.createRotationMatrix();

@@ -1,13 +1,17 @@
 --- Features ---
 -Fix gl 1282 regression
+-Also a regression in math tests for vector division, introduced somewhere during AABBs
 -Rename resource controller to ResourceCenter?
 -Debug tools - view memory pools for each type, hover over to view details
 -Resource file location indexing for easy reloading (see ResourceController.h).
 -Sprites! - rename Texture to Sprite; textures will become a sprite with a single texture/frame
 -Re-organize to include/src directories
 -RTT (add priority to renderview, RTTs are automatically rendered before window framebuffers)
+-Config: https://nlohmann.github.io/json/
 -Multi-texturing
 -Instanced rendering - for static objects (maybe static nodes - StaticNodeBlock)
+-Make UI code more convenient, for example in DebugUIConsole, it requires so much code to do basic setup.
+  There needs to be pair structs for elements and their attachments, and factory functions to create them.
 -Polish resource cloning
 -Normal mapping
 -Resource configuration files - materials, scenes, textures all loaded into group via .rsrc file.
@@ -16,6 +20,7 @@
 -Camera tracks - key frames
   Animation system for nodes with key frames
 -Self-illumination for all lights
+-Replace current boxes with regular rect and line drawing?
 -CPU Particle systems
 -Camera zooming should affect background scale
 -Proper cleanup of resources
@@ -24,10 +29,12 @@
 -Modify memory pool to use raw uint8_t buffers, get rid of reset() functions; use default copy for each pool
 -Box select of AABBs
 -OOBBs
+-Line rendering
 -Post-processing effect factory to create entities to use render targets, provide helper functions to setup in one call
 -Exception handling, all functions that do not throw should be noexcept
 -Grid rendering
 -Finish unit tests
+-External CLI through pipe, optional and off by default
 
 --- Optimization ---
 -TODO: Optimize text rendering to use a single texture, allow unicode.
