@@ -25,55 +25,55 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include "SerializerValue.h"
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 namespace Lore {
 
-    ///
-    /// \class Exception
-    /// \brief The core Lore exception object. Specialized exceptions should
-    /// derive from this class.
-    class Exception : public std::exception
+  class SerializerComponent;
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  ///
+  /// \class Serializer
+  /// \brief For serializing/deserializing any provided data to a file or buffer.
+  class LORE_EXPORT Serializer final
+  {
+
+  public:
+
+    enum class Mode
     {
-
-    protected:
-
-        string _what = "Unknown exception";
-        
-    public:
-
-        explicit Exception( const string& what )
-        : _what( what )
-        {
-          log_error( "[EXCEPTION] " + what );
-        }
-
-        virtual string getDescription() const
-        {
-          return _what;
-        }
-
+      Json,
+      Binary,
+      Buffer
     };
 
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+  public:
+
+    Serializer();
+    Serializer( const Mode mode );
+    ~Serializer();
 
     ///
-    /// \class ItemIdentityException
-    /// \brief Thrown when attempting to access an item by name that doesn't exist.
-    class ItemIdentityException : public Exception
-    {
+    /// \brief Changes how serialization is carried out.
+    void setMode( const Mode mode );
 
-    public:
+    void serialize( const string& file );
 
-        explicit ItemIdentityException( const string& what )
-        : Exception( what )
-        {
-        }
+    void deserialize( const string& file );
 
-        virtual string getDescription() const override
-        {
-          return string( "ItemIdentityException: " + _what );
-        }
+    //
+    // Values.
 
-    };
+    SerializerValue& getValue( const string& key );
+
+  private:
+
+    std::unique_ptr<SerializerComponent> _component { nullptr };
+
+  };
 
 }
 

@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,56 +24,76 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+#include "Serializer.h"
 
-    ///
-    /// \class Exception
-    /// \brief The core Lore exception object. Specialized exceptions should
-    /// derive from this class.
-    class Exception : public std::exception
-    {
+#include <LORE2D/Serializer/Components/JsonComponent.h>
 
-    protected:
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        string _what = "Unknown exception";
-        
-    public:
+using namespace Lore;
 
-        explicit Exception( const string& what )
-        : _what( what )
-        {
-          log_error( "[EXCEPTION] " + what );
-        }
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        virtual string getDescription() const
-        {
-          return _what;
-        }
+Serializer::Serializer()
+{
+  setMode( Mode::Json );
+}
 
-    };
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+Serializer::Serializer( const Mode mode )
+{
+  setMode( mode );
+}
 
-    ///
-    /// \class ItemIdentityException
-    /// \brief Thrown when attempting to access an item by name that doesn't exist.
-    class ItemIdentityException : public Exception
-    {
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    public:
+Serializer::~Serializer()
+{
 
-        explicit ItemIdentityException( const string& what )
-        : Exception( what )
-        {
-        }
+}
 
-        virtual string getDescription() const override
-        {
-          return string( "ItemIdentityException: " + _what );
-        }
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    };
+void Serializer::setMode( const Mode mode )
+{
+  _component.reset();
 
+  switch ( mode ) {
+  default:
+  case Mode::Json:
+    _component = std::make_unique<JsonSerializerComponent>();
+    break;
+
+  case Mode::Binary:
+
+    break;
+
+  case Mode::Buffer:
+
+    break;
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Serializer::serialize( const string& file )
+{
+
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Serializer::deserialize( const string& file )
+{
+  _component->deserialize( file );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+SerializerValue& Serializer::getValue( const string& key )
+{
+  return _component->getValue( key );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

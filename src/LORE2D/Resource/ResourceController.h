@@ -141,6 +141,8 @@ namespace Lore {
 
     virtual ~ResourceController();
 
+    void indexResourceFile( const string& file );
+
     //
     // Groups.
 
@@ -148,7 +150,7 @@ namespace Lore {
 
     void destroyGroup( const string& name );
 
-    void addResourceLocation( const string& directory, const bool recursive = false, const string& groupName = DefaultGroupName );
+    void addResourceLocation( const string& directory, const bool recursive = false );
 
     void loadGroup( const string& name );
 

@@ -7,7 +7,7 @@ objdir "../bin/%{cfg.buildcfg}/Obj"
 debugdir "../bin/%{cfg.buildcfg}/Run"
 
 includedirs { ".", "%{prj.location}", "%{sln.location}/Plugins/ThirdParty", "%{sln.location}/External",
-               "%{sln.location}/External/freetype2" }
+               "%{sln.location}/External/freetype2", "%{sln.location}/External/rapidjson/include" }
 libdirs { "../lib/x64/%{cfg.buildcfg}" }
 architecture "x86_64"
 characterset ( "MBCS" )
@@ -90,6 +90,6 @@ project "UnitTests"
     defines { "_HAS_CXX17" }
     forceincludes { "UnitTests.h" }
     files {
-        "UnitTests/**.h", "UnitTests/**.hpp", "UnitTests/**.cpp"
+        "UnitTests/**.h", "UnitTests/**.hpp", "UnitTests/**.cpp", "UnitTests/**.json"
     }
     links { "LORE2D" }

@@ -27,53 +27,95 @@
 
 namespace Lore {
 
-    ///
-    /// \class Exception
-    /// \brief The core Lore exception object. Specialized exceptions should
-    /// derive from this class.
-    class Exception : public std::exception
+  class SerializerValue final
+  {
+
+  public:
+
+    enum class Type
     {
-
-    protected:
-
-        string _what = "Unknown exception";
-        
-    public:
-
-        explicit Exception( const string& what )
-        : _what( what )
-        {
-          log_error( "[EXCEPTION] " + what );
-        }
-
-        virtual string getDescription() const
-        {
-          return _what;
-        }
-
+      Null,
+      Bool,
+      Array,
+      String,
+      Int,
+      Real
     };
 
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-    ///
-    /// \class ItemIdentityException
-    /// \brief Thrown when attempting to access an item by name that doesn't exist.
-    class ItemIdentityException : public Exception
+    Type getType() const
     {
+      if ( std::holds_alternative<bool>( _value ) ) {
+        return Type::Bool;
+      }
+      if ( std::holds_alternative<string>( _value ) ) {
+        return Type::String;
+      }
+      if ( std::holds_alternative<int>( _value ) ) {
+        return Type::Int;
+      }
+      if ( std::holds_alternative<real>( _value ) ) {
+        return Type::Real;
+      }
 
-    public:
+      return Type::Null;
+    }
 
-        explicit ItemIdentityException( const string& what )
-        : Exception( what )
-        {
-        }
+    bool getBool() const
+    {
+      return std::get<bool>( _value );
+    }
 
-        virtual string getDescription() const override
-        {
-          return string( "ItemIdentityException: " + _what );
-        }
+    string getString() const
+    {
+      return std::get<string>( _value );
+    }
 
-    };
+    int getInt() const
+    {
+      return std::get<int>( _value );
+    }
+
+    real getReal() const
+    {
+      return std::get<real>( _value );
+    }
+
+    //
+    // Setters.
+
+    void setValue( const bool value )
+    {
+      _value = value;
+    }
+
+    void setValue( const char* value )
+    {
+      _value = string( value );
+    }
+
+    void setValue( const string& value )
+    {
+      _value = value;
+    }
+
+    void setValue( const int value )
+    {
+      _value = value;
+    }
+
+    void setValue( const real value )
+    {
+      _value = value;
+    }
+
+  private:
+
+    using Value = std::variant<bool, string, int, real>;
+    Value _value;
+
+  };
+
+  using SerializerValueMap = std::unordered_map<string, SerializerValue>;
 
 }
 
