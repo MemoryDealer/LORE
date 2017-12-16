@@ -70,7 +70,7 @@ void JsonSerializerComponent::deserialize( const string& file )
     throw Lore::Exception( "Parse error for JSON document: " + std::to_string( doc.GetParseError() ) );
   }
 
-  for ( auto it = doc.MemberBegin(); it != doc.MemberEnd(); ++it ) {
+  std::function<void(rapidjson::Value::ConstMemberIterator, SerializerValue&)> HandleValue = [&] ( rapidjson::Value::ConstMemberIterator it, SerializerValue& serializerValue ) {
     const auto& key = it->name;
     const auto& value = it->value;
 
@@ -84,34 +84,78 @@ void JsonSerializerComponent::deserialize( const string& file )
       break;
 
     case rapidjson::Type::kFalseType:
-      _values[key.GetString()].setValue( false );
+      serializerValue[key.GetString()] = false;
       break;
 
     case rapidjson::Type::kTrueType:
-      _values[key.GetString()].setValue( true );
+      serializerValue[key.GetString()] = true;
       break;
 
-    case rapidjson::Type::kObjectType:
+    case rapidjson::Type::kObjectType: {
+      auto object = value.GetObjectA();
+      for ( auto objectIt = object.MemberBegin(); objectIt != object.MemberEnd(); ++objectIt ) {
+        auto& objectValue = serializerValue[key.GetString()];
+        HandleValue( objectIt, objectValue );
+      }
+    } break;
 
-      break;
+    case rapidjson::Type::kArrayType: {
+      SerializerValue::Array values;
+      for ( auto arrayIt = value.Begin(); arrayIt != value.End(); ++arrayIt ) {
+        SerializerValue v;
+        switch ( arrayIt->GetType() ) {
+        case rapidjson::Type::kFalseType:
+          v = false;
+          break;
 
-    case rapidjson::Type::kArrayType:
+        case rapidjson::Type::kTrueType:
+          v = true;
+          break;
 
-      break;
+        case rapidjson::Type::kObjectType:
+        {
+          auto object = value.GetObjectA();
+          for ( auto objectIt = object.MemberBegin(); objectIt != object.MemberEnd(); ++objectIt ) {
+            auto& objectValue = v[key.GetString()];
+            HandleValue( objectIt, objectValue );
+          }
+        } break;
+
+        case rapidjson::Type::kStringType:
+          v = string( arrayIt->GetString() );
+          break;
+
+        case rapidjson::Type::kNumberType:
+          if ( arrayIt->IsInt() ) {
+            v = arrayIt->GetInt();
+          }
+          else if ( arrayIt->IsFloat() ) {
+            v = arrayIt->GetFloat();
+          }
+          break;
+        }
+        values.push_back( v );
+      }
+      serializerValue[key.GetString()] = values;
+    } break;
 
     case rapidjson::Type::kStringType:
-      _values[key.GetString()].setValue( value.GetString() );
+      serializerValue[key.GetString()] = string( value.GetString() );
       break;
 
     case rapidjson::Type::kNumberType:
       if ( value.IsInt() ) {
-        _values[key.GetString()].setValue( value.GetInt() );
+        serializerValue[key.GetString()] = value.GetInt();
       }
       else if ( value.IsFloat() ) {
-        _values[key.GetString()].setValue( value.GetFloat() );
+        serializerValue[key.GetString()] = value.GetFloat();
       }
       break;
     }
+  };
+
+  for ( auto it = doc.MemberBegin(); it != doc.MemberEnd(); ++it ) {
+    HandleValue( it, _values );
   }
 
   stream.close();

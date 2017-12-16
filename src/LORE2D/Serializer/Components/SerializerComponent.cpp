@@ -34,12 +34,7 @@ using namespace Lore;
 
 SerializerValue& SerializerComponent::getValue( const string& key )
 {
-  auto lookup = _values.find( key );
-  if ( _values.end() == lookup ) {
-    throw Lore::Exception( "Value " + key + " does not exist in serializer values" );
-  }
-
-  return lookup->second;
+  return _values[key];
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

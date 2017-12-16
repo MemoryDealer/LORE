@@ -71,6 +71,30 @@ TEST_CASE( "Complex JSON values correctly deserialized", "[serializer]" )
   serializer.deserialize( "TestData/Serializer/Complex.json" );
 
   auto object1 = serializer.getValue( "Object1" );
+  {
+    auto value1 = object1.get( "A" );
+    REQUIRE( 1 == value1.getInt() );
+
+    auto value2 = object1.get( "B" );
+    REQUIRE( 3.14f == value2.getReal() );
+
+    auto value3 = object1.get( "C" );
+    REQUIRE( "Hello!" == value3.getString() );
+  }
+
+  auto object2 = serializer.getValue( "Object2" );
+  {
+    auto value1 = object2.get( "A" );
+    {
+      auto& valueArray = value1.getArray();
+      for ( int i = 0; i < 5; ++i ) {
+        REQUIRE( i == valueArray[i].getInt() );
+      }
+    }
+
+    auto value2 = object2.get( "B" );
+    REQUIRE( "Hello 2!" == value2.getString() );
+  }
 
   TEST_DESTROY_CONTEXT();
 }

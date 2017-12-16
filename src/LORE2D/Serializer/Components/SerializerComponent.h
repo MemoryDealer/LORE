@@ -49,7 +49,7 @@ namespace Lore {
 
   protected:
 
-    SerializerValueMap _values {};
+    SerializerValue _values {};
 
   };
 

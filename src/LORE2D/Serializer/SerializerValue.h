@@ -27,7 +27,7 @@
 
 namespace Lore {
 
-  class SerializerValue final
+  class LORE_EXPORT SerializerValue final
   {
 
   public:
@@ -41,6 +41,8 @@ namespace Lore {
       Int,
       Real
     };
+
+    using Array = std::vector<SerializerValue>;
 
     Type getType() const
     {
@@ -56,8 +58,44 @@ namespace Lore {
       if ( std::holds_alternative<real>( _value ) ) {
         return Type::Real;
       }
+      if ( std::holds_alternative<Array>( _value ) ) {
+        return Type::Array;
+      }
 
       return Type::Null;
+    }
+
+  public:
+
+    SerializerValue() = default;
+    ~SerializerValue() = default;
+
+    SerializerValue& operator[]( const string& key )
+    {
+      auto it = _values.find( key );
+      if ( _values.end() == it ) {
+        SerializerValue v;
+        auto iit = _values.insert( { key, v } );
+        return iit.first->second;
+      }
+      return it->second;
+    }
+
+    const SerializerValue& operator[]( const string& key ) const
+    {
+      return get( key );
+    }
+
+    //
+    // Getters.
+
+    const SerializerValue& get( const string& key ) const
+    {
+      auto it = _values.find( key );
+      if ( _values.end() == it ) {
+        throw Lore::Exception( "Non-existent key lookup on const SerializerValue" );
+      }
+      return it->second;
     }
 
     bool getBool() const
@@ -80,42 +118,51 @@ namespace Lore {
       return std::get<real>( _value );
     }
 
+    Array getArray() const
+    {
+      return std::get<Array>( _value );
+    }
+
     //
     // Setters.
 
-    void setValue( const bool value )
+    void operator = ( const bool value )
     {
       _value = value;
     }
 
-    void setValue( const char* value )
-    {
-      _value = string( value );
-    }
-
-    void setValue( const string& value )
+    void operator = ( const string& value )
     {
       _value = value;
     }
 
-    void setValue( const int value )
+    void operator = ( const int value )
     {
       _value = value;
     }
 
-    void setValue( const real value )
+    void operator = ( const real value )
+    {
+      _value = value;
+    }
+
+    void operator = ( const Array& value )
     {
       _value = value;
     }
 
   private:
 
-    using Value = std::variant<bool, string, int, real>;
-    Value _value;
+    using Values = std::unordered_map<string, SerializerValue>;
+    using ValueHolder = std::variant<bool, string, int, real, Array>; // TODO: Add arrays.
+
+  private:
+
+    string _key { };
+    ValueHolder _value {};
+    Values _values {};
 
   };
-
-  using SerializerValueMap = std::unordered_map<string, SerializerValue>;
 
 }
 
