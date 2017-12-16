@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,23 +24,55 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "TestHelpers.h"
+#include "catch.hpp"
+#include "UnitTests.h"
+#include <LORE2D/Lore.h>
+#include <LORE2D/Serializer/Serializer.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Platform define:
+TEST_CASE( "Basic JSON values correctly deserialized", "[serializer]" )
+{
+  TEST_CREATE_CONTEXT();
 
-#define LORE_WINDOWS 0
-#define LORE_LINUX 1
-#define LORE_APPLE 2
+  Lore::Serializer serializer;
 
-#if defined( WIN32 ) || defined( _WIN32 )
-#define LORE_PLATFORM LORE_WINDOWS
-#elif defined( LINUX ) || defined( _LINUX )
-#define LORE_PLATFORM LORE_LINUX
-#elif defined( APPLE ) || defined( _APPLE )
-#define LORE_PLATFORM LORE_APPLE
-#endif
+  serializer.deserialize( "TestData/Serializer/Simple.json" );
+  auto value1 = serializer.getValue( "A" );
+  REQUIRE( Lore::SerializerValue::Type::Int == value1.getType() );
+  REQUIRE( 234 == value1.getInt() );
+
+  auto value2 = serializer.getValue( "B" );
+  REQUIRE( Lore::SerializerValue::Type::String == value2.getType() );
+  REQUIRE( "Hello!" == value2.getString() );
+
+  auto value3 = serializer.getValue( "C" );
+  REQUIRE( Lore::SerializerValue::Type::Real == value3.getType() );
+  REQUIRE( 66.6f == value3.getReal() );
+
+  auto value4 = serializer.getValue( "D" );
+  REQUIRE( Lore::SerializerValue::Type::Bool == value4.getType() );
+  REQUIRE( true == value4.getBool() );
+
+  auto value5 = serializer.getValue( "E" );
+  REQUIRE( Lore::SerializerValue::Type::Bool == value5.getType() );
+  REQUIRE( false == value5.getBool() );
+
+  TEST_DESTROY_CONTEXT();
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+TEST_CASE( "Complex JSON values correctly deserialized", "[serializer]" )
+{
+  TEST_CREATE_CONTEXT();
+
+  Lore::Serializer serializer;
+  serializer.deserialize( "TestData/Serializer/Complex.json" );
+
+  auto object1 = serializer.getValue( "Object1" );
+
+  TEST_DESTROY_CONTEXT();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
