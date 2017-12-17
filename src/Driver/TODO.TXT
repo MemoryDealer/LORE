@@ -7,7 +7,6 @@
 -Sprites! - rename Texture to Sprite; textures will become a sprite with a single texture/frame
 -Re-organize to include/src directories
 -RTT (add priority to renderview, RTTs are automatically rendered before window framebuffers)
--Config: https://nlohmann.github.io/json/
 -Multi-texturing
 -Instanced rendering - for static objects (maybe static nodes - StaticNodeBlock)
 -Make UI code more convenient, for example in DebugUIConsole, it requires so much code to do basic setup.
@@ -35,6 +34,8 @@
 -Grid rendering
 -Finish unit tests
 -External CLI through pipe, optional and off by default
+
+-Move ALL header function implementations to source files to stay consistent
 
 --- Optimization ---
 -TODO: Optimize text rendering to use a single texture, allow unicode.

@@ -112,7 +112,7 @@ int main( int argc, char** argv )
   auto sonicNode = scene->createNode( "sonic" );
   sonicNode->setDepth( -50.f );
   auto sonicEntity = Lore::Resource::CreateEntity( "sonic", Lore::MeshType::TexturedQuad );
-  auto sonicTexture = Lore::Resource::LoadTexture( "sonic-mobile", "H:\\sonic-mobile.png" );
+  auto sonicTexture = Lore::Resource::LoadTexture( "sonic-mobile", "res/images/sonic-mobile.png" );
   sonicEntity->setTexture( sonicTexture );
   //sonicEntity->getMaterial()->getPass().blendingMode.enabled = true;
   sonicEntity->getMaterial()->diffuse.a = 0.5f;
@@ -126,7 +126,7 @@ int main( int argc, char** argv )
   // Create some doges.
 
   auto dogeEntity = Lore::Resource::CreateEntity( "doge", Lore::MeshType::TexturedQuad );
-  auto dogeTexture = Lore::Resource::LoadTexture( "doge", "H:\\doge.jpg" );
+  auto dogeTexture = Lore::Resource::LoadTexture( "doge", "res/images/doge.jpg" );
   std::vector<Lore::NodePtr> doges;
   dogeEntity->setTexture( dogeTexture );
   for ( int i = 0; i < 5; ++i ) {
@@ -165,8 +165,8 @@ int main( int argc, char** argv )
   //
   // Create background.
 
-  Lore::Resource::LoadTexture( "bg_city", "H:\\clouds.jpg" );
-  Lore::Resource::LoadTexture( "death-egg", "H:\\bg.png" );
+  Lore::Resource::LoadTexture( "bg_city", "res/images/clouds.jpg" );
+  Lore::Resource::LoadTexture( "death-egg", "res/images/bg.png" );
   auto bg = scene->getBackground();
   auto& layer = bg->addLayer( "1" );
   layer.setTexture( Lore::Resource::GetTexture( "bg_city" ) );
@@ -182,7 +182,7 @@ int main( int argc, char** argv )
   layer2.getMaterial()->setTextureSampleRegion( Lore::Rect( 0.0f, 0.0f, 0.55f, 0.55f ) );
   //layer.getMaterial()->getPass().setTextureSampleRegion( 0.15f, 0.05f, 0.08f, 0.58f );
 
-  //Lore::Resource::LoadTexture( "bg_default", "C:\\clouds.jpg" );
+  //Lore::Resource::LoadTexture( "bg_default", "res/images/clouds.jpg" );
   //Lore::BackgroundPtr bg = scene->getBackground();
   //Lore::Background::Layer& layer = bg->addLayer( "default" );
   //layer.setTexture( Lore::Resource::GetTexture( "bg_default" ) );
@@ -190,7 +190,7 @@ int main( int argc, char** argv )
   //layer.setDepth( 950.f );
 
   //auto& layer2 = bg->addLayer( "face" );
-  //layer2.setTexture( Lore::Resource::LoadTexture( "bg_face", "C:\\awesomeface.png" ) );
+  //layer2.setTexture( Lore::Resource::LoadTexture( "bg_face", "res/images/awesomeface.png" ) );
   //layer2.setScrollSpeed( Lore::Vec2( -0.002f, 0.001f ) );
   //layer2.setDepth( 500.f );
 

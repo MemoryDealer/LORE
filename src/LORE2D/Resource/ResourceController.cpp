@@ -72,6 +72,17 @@ ResourceController::~ResourceController()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void ResourceController::indexResourceFile( const string& file )
+{
+  // Parse JSON.
+  // ...
+
+  // Add each to group.
+  // Have static methods to index resource files and load groups after
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void ResourceController::createGroup( const string& name )
 {
   auto rg = std::make_unique<ResourceGroup>( name );
@@ -92,7 +103,7 @@ void ResourceController::destroyGroup( const string& name )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void ResourceController::addResourceLocation( const string& file, const bool recursive, const string& groupName )
+void ResourceController::addResourceLocation( const string& file, const bool recursive )
 {
   // Platform specific directory traversal.
   // ...

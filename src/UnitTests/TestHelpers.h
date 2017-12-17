@@ -25,56 +25,15 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+//
+// Object creation/setup.
 
-    ///
-    /// \class Exception
-    /// \brief The core Lore exception object. Specialized exceptions should
-    /// derive from this class.
-    class Exception : public std::exception
-    {
+// Creates a Lore context with the OpenGL renderer.
+#define TEST_CREATE_CONTEXT()\
+std::unique_ptr<Lore::Context> context;\
+context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );\
+REQUIRE( context.get() != nullptr );
 
-    protected:
-
-        string _what = "Unknown exception";
-        
-    public:
-
-        explicit Exception( const string& what )
-        : _what( what )
-        {
-          log_error( "[EXCEPTION] " + what );
-        }
-
-        virtual string getDescription() const
-        {
-          return _what;
-        }
-
-    };
-
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-    ///
-    /// \class ItemIdentityException
-    /// \brief Thrown when attempting to access an item by name that doesn't exist.
-    class ItemIdentityException : public Exception
-    {
-
-    public:
-
-        explicit ItemIdentityException( const string& what )
-        : Exception( what )
-        {
-        }
-
-        virtual string getDescription() const override
-        {
-          return string( "ItemIdentityException: " + _what );
-        }
-
-    };
-
-}
+#define TEST_DESTROY_CONTEXT() DestroyLoreContext( context )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

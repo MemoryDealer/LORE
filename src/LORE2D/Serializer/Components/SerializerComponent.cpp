@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,56 +24,38 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+#include "SerializerComponent.h"
 
-    ///
-    /// \class Exception
-    /// \brief The core Lore exception object. Specialized exceptions should
-    /// derive from this class.
-    class Exception : public std::exception
-    {
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    protected:
+using namespace Lore;
 
-        string _what = "Unknown exception";
-        
-    public:
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        explicit Exception( const string& what )
-        : _what( what )
-        {
-          log_error( "[EXCEPTION] " + what );
-        }
+SerializerComponent::SerializerComponent()
+: _values( "root" )
+{ }
 
-        virtual string getDescription() const
-        {
-          return _what;
-        }
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    };
+SerializerValue& SerializerComponent::getValue( const string& key )
+{
+  return _values[key];
+}
 
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    ///
-    /// \class ItemIdentityException
-    /// \brief Thrown when attempting to access an item by name that doesn't exist.
-    class ItemIdentityException : public Exception
-    {
+SerializerValue& SerializerComponent::addValue( const string& key )
+{
+  auto it = _values._values.insert( { key, SerializerValue( key ) } );
+  return it.first->second;
+}
 
-    public:
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        explicit ItemIdentityException( const string& what )
-        : Exception( what )
-        {
-        }
-
-        virtual string getDescription() const override
-        {
-          return string( "ItemIdentityException: " + _what );
-        }
-
-    };
-
+void SerializerComponent::addValue( const SerializerValue& value )
+{
+  _values._values[value.getKey()] = value;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

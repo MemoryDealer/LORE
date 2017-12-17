@@ -29,14 +29,16 @@
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+constexpr const auto Epsilon = 0.01f;
+
 #define REQUIRE_V2( v, f )\
-    REQUIRE( v.x == Approx( f ) );\
-    REQUIRE( v.y == Approx( f ) )
+    REQUIRE( v.x == Approx( f ).epsilon(Epsilon) );\
+    REQUIRE( v.y == Approx( f ).epsilon(Epsilon) )
 
 #define REQUIRE_V3( v, f )\
-    REQUIRE( v.x == Approx( f ) );\
-    REQUIRE( v.y == Approx( f ) );\
-    REQUIRE( v.z == Approx( f ) )
+    REQUIRE( v.x == Approx( f ).epsilon(Epsilon) );\
+    REQUIRE( v.y == Approx( f ).epsilon(Epsilon) );\
+    REQUIRE( v.z == Approx( f ).epsilon(Epsilon) )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 

@@ -7,19 +7,19 @@ objdir "../bin/%{cfg.buildcfg}/Obj"
 debugdir "../bin/%{cfg.buildcfg}/Run"
 
 includedirs { ".", "%{prj.location}", "%{sln.location}/Plugins/ThirdParty", "%{sln.location}/External",
-               "%{sln.location}/External/freetype2" }
+               "%{sln.location}/External/freetype2", "%{sln.location}/External/rapidjson/include" }
 libdirs { "../lib/x64/%{cfg.buildcfg}" }
 architecture "x86_64"
 characterset ( "MBCS" )
 
-    
+
 -- Solution
 
 solution "LORE2D"
     configurations { "Debug", "Release" }
     startproject "Driver"
-    
-    
+
+
 -- Configurations
 
 filter "configurations:Debug"
@@ -30,7 +30,7 @@ filter "configurations:Release"
     defines { "NDEBUG" }
     optimize "On"
 
--- Use latest C++ standard for all projects
+-- Use latest C++ standard for all projects (using _HAS_CXX17 for now).
 --buildoptions { "/std:c++latest" }
 
 
@@ -48,7 +48,6 @@ project "LORE2D"
         "LORE2D/**.h", "LORE2D/**.cpp"
     }
 
-    
 project "Plugin_OpenGL"
     location "Plugins/OpenGL"
     kind "SharedLib"
@@ -62,7 +61,7 @@ project "Plugin_OpenGL"
         "Plugins/OpenGL/**.h", "Plugins/OpenGL/**.cpp",
     }
     links { "LORE2D", "glfw3dll", "glad", "freetype" }
-    postbuildcommands { "xcopy ..\\..\\..\\lib\\x64\\%{cfg.buildcfg}\\*.dll ..\\..\\..\\bin\\%{cfg.buildcfg}\\Run\\ /Y" }
+    postbuildcommands { "{COPY} ../../../lib/x64/%{cfg.buildcfg}/*.dll ../../../bin/%{cfg.buildcfg}/Run/" }
     
 project "glad"
     location "Plugins/ThirdParty/glad"
@@ -82,7 +81,7 @@ project "Driver"
         "Driver/TODO.TXT"
     }
     links { "LORE2D" }
-    
+
 project "UnitTests"
     location "UnitTests"
     kind "ConsoleApp"
@@ -90,6 +89,7 @@ project "UnitTests"
     defines { "_HAS_CXX17" }
     forceincludes { "UnitTests.h" }
     files {
-        "UnitTests/**.h", "UnitTests/**.hpp", "UnitTests/**.cpp"
+        "UnitTests/**.h", "UnitTests/**.hpp", "UnitTests/**.cpp", "UnitTests/**.json"
     }
     links { "LORE2D" }
+    postbuildcommands { "{COPY} data/ ../../bin/%{cfg.buildcfg}/Run/TestData/" }

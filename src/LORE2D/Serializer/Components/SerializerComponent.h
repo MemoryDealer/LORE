@@ -25,55 +25,39 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Serializer/SerializerValue.h>
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 namespace Lore {
 
-    ///
-    /// \class Exception
-    /// \brief The core Lore exception object. Specialized exceptions should
-    /// derive from this class.
-    class Exception : public std::exception
-    {
+  class SerializerComponent
+  {
 
-    protected:
+  public:
 
-        string _what = "Unknown exception";
-        
-    public:
+    SerializerComponent();
 
-        explicit Exception( const string& what )
-        : _what( what )
-        {
-          log_error( "[EXCEPTION] " + what );
-        }
+    virtual ~SerializerComponent() = default;
 
-        virtual string getDescription() const
-        {
-          return _what;
-        }
+    virtual void serialize( const string& file ) { }
 
-    };
+    virtual void deserialize( const string& file ) { }
 
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    //
+    // Values.
 
-    ///
-    /// \class ItemIdentityException
-    /// \brief Thrown when attempting to access an item by name that doesn't exist.
-    class ItemIdentityException : public Exception
-    {
+    SerializerValue& getValue( const string& key );
 
-    public:
+    SerializerValue& addValue( const string& key );
 
-        explicit ItemIdentityException( const string& what )
-        : Exception( what )
-        {
-        }
+    void addValue( const SerializerValue& value );
 
-        virtual string getDescription() const override
-        {
-          return string( "ItemIdentityException: " + _what );
-        }
+  protected:
 
-    };
+    SerializerValue _values;
+
+  };
 
 }
 
