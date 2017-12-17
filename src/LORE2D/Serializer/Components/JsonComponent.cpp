@@ -26,7 +26,9 @@
 
 #include "JsonComponent.h"
 
+#define RAPIDJSON_HAS_STDSTRING 1
 #include <rapidjson/document.h>
+#include <rapidjson/prettywriter.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -36,14 +38,126 @@ using namespace Lore;
 
 JsonSerializerComponent::~JsonSerializerComponent()
 {
-
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void JsonSerializerComponent::serialize( const string& file )
 {
+  std::ofstream stream( file, std::ofstream::out );
+  if ( !stream.is_open() ) {
+    throw Lore::Exception( "Failed to open file for " + file + " for writing" );
+  }
 
+  // Create RapidJSON document and add existing values to it.
+  rapidjson::Document doc( rapidjson::kObjectType );
+
+  std::function<void( const SerializerValue&, rapidjson::Value& )> AddValues =
+    [&] ( const SerializerValue& value, rapidjson::Value& root ) {
+    auto& allocator = doc.GetAllocator();
+    rapidjson::Value key( value.getKey(), allocator );
+    rapidjson::Value newValue;
+
+    switch ( value.getType() ) {
+    default:
+      break;
+
+    case SerializerValue::Type::Container:
+      newValue.SetObject();
+      for ( auto& childValue : value._values ) {
+        AddValues( childValue.second, newValue );
+      }
+      root.AddMember( key, newValue, allocator );
+      break;
+
+    case SerializerValue::Type::Bool:
+      newValue = value.getBool();
+      root.AddMember( key, newValue, allocator );
+      break;
+
+    case SerializerValue::Type::Array: {
+      newValue.SetArray();
+      auto& arrayValues = value.getArray();
+      for ( const auto& arrayValue : arrayValues ) {
+        switch ( arrayValue.getType() ) {
+        case SerializerValue::Type::Container:
+        {
+          rapidjson::Value newArrayValue( rapidjson::kObjectType );
+          for ( auto& childValue : arrayValue._values ) {
+            AddValues( childValue.second, newArrayValue );
+          }
+          newValue.PushBack( newArrayValue, allocator );
+        } break;
+
+        case SerializerValue::Type::Bool: {
+          rapidjson::Value newArrayValue;
+          newArrayValue = arrayValue.getBool();
+          newValue.PushBack( newArrayValue, allocator );
+        } break;
+
+        case SerializerValue::Type::String: {
+          rapidjson::Value newArrayValue;
+          newArrayValue.SetString( arrayValue.getString().c_str(),
+                              static_cast<rapidjson::SizeType>( arrayValue.getString().length() ),
+                              allocator );
+          newValue.PushBack( newArrayValue, allocator );
+        } break;
+
+        case SerializerValue::Type::Int:
+        {
+          rapidjson::Value newArrayValue;
+          newArrayValue = arrayValue.getInt();
+          newValue.PushBack( newArrayValue, allocator );
+        } break;
+
+        case SerializerValue::Type::Real:
+        {
+          rapidjson::Value newArrayValue;
+          newArrayValue = arrayValue.getReal();
+          newValue.PushBack( newArrayValue, allocator );
+        } break;
+
+        }
+      }
+      root.AddMember( key, newValue, allocator );
+    } break;
+
+    case SerializerValue::Type::String:
+      newValue.SetString( value.getString().c_str(),
+                          static_cast<rapidjson::SizeType>( value.getString().length() ),
+                          allocator );
+      root.AddMember( key, newValue, allocator );
+      break;
+
+    case SerializerValue::Type::Int:
+      newValue = value.getInt();
+      root.AddMember( key, newValue, allocator );
+      break;
+
+    case SerializerValue::Type::Real:
+      newValue = value.getReal();
+      root.AddMember( key, newValue, allocator );
+      break;
+    }
+  };
+
+  // Recurse serializer values and add to RapidJSON value.
+  rapidjson::Value root( rapidjson::kObjectType );
+  for ( auto& childValue : _values._values ) {
+    AddValues( childValue.second, root );
+  }
+
+  // Copy root value to entire document.
+  doc.CopyFrom( root, doc.GetAllocator() );
+
+  // Generate the JSON pretty-formatted string.
+  rapidjson::StringBuffer sb;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer( sb );
+  doc.Accept( writer );
+
+  // Write string to file.
+  stream << sb.GetString();
+  stream.close();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -52,7 +166,7 @@ void JsonSerializerComponent::deserialize( const string& file )
 {
   std::ifstream stream( file );
   if ( !stream.is_open() ) {
-    throw Lore::Exception( "Failed to open file " + file );
+    throw Lore::Exception( "Failed to open file " + file + " for reading" );
   }
 
   // Read file contents into buffer.
@@ -70,7 +184,8 @@ void JsonSerializerComponent::deserialize( const string& file )
     throw Lore::Exception( "Parse error for JSON document: " + std::to_string( doc.GetParseError() ) );
   }
 
-  std::function<void(rapidjson::Value::ConstMemberIterator, SerializerValue&)> HandleValue = [&] ( rapidjson::Value::ConstMemberIterator it, SerializerValue& serializerValue ) {
+  std::function<void(rapidjson::Value::ConstMemberIterator, SerializerValue&)> HandleValue =
+    [&] ( rapidjson::Value::ConstMemberIterator it, SerializerValue& serializerValue ) {
     const auto& key = it->name;
     const auto& value = it->value;
 
@@ -101,8 +216,9 @@ void JsonSerializerComponent::deserialize( const string& file )
 
     case rapidjson::Type::kArrayType: {
       SerializerValue::Array values;
+      // Add all array values.
       for ( auto arrayIt = value.Begin(); arrayIt != value.End(); ++arrayIt ) {
-        SerializerValue v;
+        SerializerValue v( key.GetString() );
         switch ( arrayIt->GetType() ) {
         case rapidjson::Type::kFalseType:
           v = false;
@@ -112,12 +228,10 @@ void JsonSerializerComponent::deserialize( const string& file )
           v = true;
           break;
 
-        case rapidjson::Type::kObjectType:
-        {
-          auto object = value.GetObjectA();
+        case rapidjson::Type::kObjectType: {
+          auto object = arrayIt->GetObjectA();
           for ( auto objectIt = object.MemberBegin(); objectIt != object.MemberEnd(); ++objectIt ) {
-            auto& objectValue = v[key.GetString()];
-            HandleValue( objectIt, objectValue );
+            HandleValue( objectIt, v );
           }
         } break;
 

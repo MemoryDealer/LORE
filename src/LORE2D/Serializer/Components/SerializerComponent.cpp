@@ -32,9 +32,30 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+SerializerComponent::SerializerComponent()
+: _values( "root" )
+{ }
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 SerializerValue& SerializerComponent::getValue( const string& key )
 {
   return _values[key];
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+SerializerValue& SerializerComponent::addValue( const string& key )
+{
+  auto it = _values._values.insert( { key, SerializerValue( key ) } );
+  return it.first->second;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void SerializerComponent::addValue( const SerializerValue& value )
+{
+  _values._values[value.getKey()] = value;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

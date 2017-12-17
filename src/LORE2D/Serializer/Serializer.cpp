@@ -79,7 +79,7 @@ void Serializer::setMode( const Mode mode )
 
 void Serializer::serialize( const string& file )
 {
-
+  _component->serialize( file );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -94,6 +94,20 @@ void Serializer::deserialize( const string& file )
 SerializerValue& Serializer::getValue( const string& key )
 {
   return _component->getValue( key );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+SerializerValue& Serializer::addValue( const string& key )
+{
+  return _component->addValue( key );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Serializer::addValue( const SerializerValue& value )
+{
+  _component->addValue( value );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

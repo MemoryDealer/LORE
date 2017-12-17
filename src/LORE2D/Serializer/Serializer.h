@@ -69,6 +69,10 @@ namespace Lore {
 
     SerializerValue& getValue( const string& key );
 
+    SerializerValue& addValue( const string& key );
+
+    void addValue( const SerializerValue& value );
+
   private:
 
     std::unique_ptr<SerializerComponent> _component { nullptr };

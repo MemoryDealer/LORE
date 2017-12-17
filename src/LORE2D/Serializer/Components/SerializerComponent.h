@@ -36,6 +36,8 @@ namespace Lore {
 
   public:
 
+    SerializerComponent();
+
     virtual ~SerializerComponent() = default;
 
     virtual void serialize( const string& file ) { }
@@ -47,9 +49,13 @@ namespace Lore {
 
     SerializerValue& getValue( const string& key );
 
+    SerializerValue& addValue( const string& key );
+
+    void addValue( const SerializerValue& value );
+
   protected:
 
-    SerializerValue _values {};
+    SerializerValue _values;
 
   };
 

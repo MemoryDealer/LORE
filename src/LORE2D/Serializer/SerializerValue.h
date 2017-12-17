@@ -34,7 +34,7 @@ namespace Lore {
 
     enum class Type
     {
-      Null,
+      Container,
       Bool,
       Array,
       String,
@@ -62,19 +62,20 @@ namespace Lore {
         return Type::Array;
       }
 
-      return Type::Null;
+      return Type::Container;
     }
 
   public:
 
-    SerializerValue() = default;
+    SerializerValue() : _key() {}
+    SerializerValue( const string& key ) : _key( key ) {}
     ~SerializerValue() = default;
 
     SerializerValue& operator[]( const string& key )
     {
       auto it = _values.find( key );
       if ( _values.end() == it ) {
-        SerializerValue v;
+        SerializerValue v( key );
         auto iit = _values.insert( { key, v } );
         return iit.first->second;
       }
@@ -88,6 +89,11 @@ namespace Lore {
 
     //
     // Getters.
+
+    string getKey() const
+    {
+      return _key;
+    }
 
     const SerializerValue& get( const string& key ) const
     {
@@ -136,6 +142,11 @@ namespace Lore {
       _value = value;
     }
 
+    void operator = ( const char* value )
+    {
+      _value = string( value );
+    }
+
     void operator = ( const int value )
     {
       _value = value;
@@ -153,8 +164,13 @@ namespace Lore {
 
   private:
 
+    friend class SerializerComponent;
+    friend class JsonSerializerComponent;
+
+  private:
+
     using Values = std::unordered_map<string, SerializerValue>;
-    using ValueHolder = std::variant<bool, string, int, real, Array>; // TODO: Add arrays.
+    using ValueHolder = std::variant<std::monostate, bool, string, int, real, Array>; // TODO: Add arrays.
 
   private:
 
