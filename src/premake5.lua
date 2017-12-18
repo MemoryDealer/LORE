@@ -81,6 +81,7 @@ project "Driver"
         "Driver/TODO.TXT"
     }
     links { "LORE2D" }
+    postbuildcommands { "{COPY} ../../res/ ../../bin/%{cfg.buildcfg}/Run/res/" }
 
 project "UnitTests"
     location "UnitTests"
