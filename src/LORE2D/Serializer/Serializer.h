@@ -67,6 +67,8 @@ namespace Lore {
     //
     // Values.
 
+    bool valueExists( const string& key ) const;
+
     SerializerValue& getValue( const string& key );
 
     SerializerValue& addValue( const string& key );

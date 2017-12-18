@@ -24,9 +24,10 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Serializer.h"
+#include "ResourceFileProcessor.h"
 
-#include <LORE2D/Serializer/Components/JsonComponent.h>
+#include <LORE2D/Core/Util.h>
+#include <LORE2D/Resource/ResourceController.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -34,87 +35,59 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Serializer::Serializer()
+ResourceFileProcessor::ResourceFileProcessor( const string& file ) : _file( file )
 {
-  setMode( Mode::Json );
+  process();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Serializer::Serializer( const Mode mode )
+void ResourceFileProcessor::process()
 {
-  setMode( mode );
+  _serializer.deserialize( _file );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Serializer::~Serializer()
+string ResourceFileProcessor::getName() const
 {
-
+  return _serializer.getValue( "name" ).getString();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Serializer::setMode( const Mode mode )
+ResourceType ResourceFileProcessor::getType() const
 {
-  _component.reset();
+  // Get type of resource.
+  const static std::map<string, ResourceType> ResourceTypeMap = {
+    { "sprite", ResourceType::Sprite }
+  };
 
-  switch ( mode ) {
-  default:
-  case Mode::Json:
-    _component = std::make_unique<JsonSerializerComponent>();
-    break;
-
-  case Mode::Binary:
-
-    break;
-
-  case Mode::Buffer:
-
-    break;
+  const auto resourceTypeValue = _serializer.getValue( "type" );
+  auto resourceTypeName = resourceTypeValue.getString();
+  Util::ToLower( resourceTypeName );
+  const auto resourceTypeIt = ResourceTypeMap.find( resourceTypeValue.getString() );
+  if ( ResourceTypeMap.end() == resourceTypeIt ) {
+    throw Lore::Exception( "Invalid resource type " + resourceTypeValue.getString() );
   }
+
+  return resourceTypeIt->second;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Serializer::serialize( const string& file )
+void ResourceFileProcessor::load( const string& groupName, ResourceControllerPtr resourceController )
 {
-  _component->serialize( file );
-}
+  switch ( getType() ) {
+  default:
+    break;
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+  case ResourceType::Sprite: {
+    auto image = _serializer.getValue( "image" ).getString();
+    resourceController->loadTexture( getName(), image, groupName );
+  } break;
 
-void Serializer::deserialize( const string& file )
-{
-  _component->deserialize( file );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-bool Serializer::valueExists( const string& key ) const
-{
-  return _component->valueExists( key );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-SerializerValue& Serializer::getValue( const string& key )
-{
-  return _component->getValue( key );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-SerializerValue& Serializer::addValue( const string& key )
-{
-  return _component->addValue( key );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Serializer::addValue( const SerializerValue& value )
-{
-  _component->addValue( value );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

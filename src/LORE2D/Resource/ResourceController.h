@@ -33,6 +33,7 @@
 #include <LORE2D/Resource/Registry.h>
 #include <LORE2D/Resource/Renderable/Texture.h>
 #include <LORE2D/Resource/ResourceIndexer.h>
+#include <LORE2D/Resource/ResourceType.h>
 #include <LORE2D/Scene/Camera.h>
 #include <LORE2D/Shader/GPUProgram.h>
 #include <LORE2D/Shader/Shader.h>
@@ -47,13 +48,6 @@ namespace Lore {
   struct LORE_EXPORT ResourceGroup
   {
 
-    enum class ResourceType
-    {
-      Texture,
-      Shader,
-      GPUProgram
-    };
-
     struct IndexedResource
     {
       ResourceType type;
@@ -64,7 +58,7 @@ namespace Lore {
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     using ShaderRegistry = Registry<std::unordered_map, Shader>;
-    using ResourceIndex = std::map<string, IndexedResource>;
+    using ResourceIndex = std::multimap<string, IndexedResource>;
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -141,20 +135,20 @@ namespace Lore {
 
     virtual ~ResourceController();
 
-    void indexResourceFile( const string& file );
+    void indexResourceFile( const string& file, const string& groupName = DefaultGroupName );
 
     //
     // Groups.
 
-    void createGroup( const string& name );
+    void createGroup( const string& groupName );
 
-    void destroyGroup( const string& name );
+    void destroyGroup( const string& groupName );
 
-    void addResourceLocation( const string& directory, const bool recursive = false );
+    void indexResourceLocation( const string& directory, const string& groupName = DefaultGroupName, const bool recursive = false );
 
-    void loadGroup( const string& name );
+    void loadGroup( const string& groupName );
 
-    void unloadGroup( const string& name );
+    void unloadGroup( const string& groupName );
 
     //
     // Loading.
@@ -229,7 +223,7 @@ namespace Lore {
 
   protected:
 
-    using ResourceGroupMap = std::unordered_map<std::string, std::unique_ptr<ResourceGroup>>;
+    using ResourceGroupMap = std::unordered_map<std::string, std::shared_ptr<ResourceGroup>>; // TODO: Use unique_ptr (shared_ptr for now to avoid very difficult compilation error).
     using VertexBufferTable = Util::HashTable<MeshType, VertexBufferPtr>;
 
   protected:
@@ -238,11 +232,10 @@ namespace Lore {
 
   protected:
 
-    ResourceGroupMap _groups;
-    ResourceGroupPtr _defaultGroup;
-    std::unique_ptr<ResourceIndexer> _indexer;
+    ResourceGroupMap _groups {};
+    ResourceGroupPtr _defaultGroup { nullptr };
 
-    VertexBufferTable _vertexBufferTable;
+    VertexBufferTable _vertexBufferTable {}; // HACK
 
   };
 
@@ -252,6 +245,10 @@ namespace Lore {
   {
 
   public:
+
+    static void IndexResourceLocation( const string& directory, const string& groupName = ResourceController::DefaultGroupName, const bool recursive = false );
+
+    static void LoadGroup( const string& groupName );
 
     //
     // Loading.

@@ -73,6 +73,10 @@ int main( int argc, char** argv )
   Lore::WindowPtr window = context->createWindow( "Test", 640, 480 );
   window->setActive();
 
+  // TODO: Add another layer which defines groups and their associated resource locations in a single file.
+  Lore::Resource::IndexResourceLocation( "res/sprites" );
+  Lore::Resource::LoadGroup( Lore::ResourceController::DefaultGroupName );
+
   /*
   To load on a thread:
 
@@ -112,7 +116,8 @@ int main( int argc, char** argv )
   auto sonicNode = scene->createNode( "sonic" );
   sonicNode->setDepth( -50.f );
   auto sonicEntity = Lore::Resource::CreateEntity( "sonic", Lore::MeshType::TexturedQuad );
-  auto sonicTexture = Lore::Resource::LoadTexture( "sonic-mobile", "res/images/sonic-mobile.png" );
+  //auto sonicTexture = Lore::Resource::LoadTexture( "sonic-mobile", "res/images/sonic-mobile.png" );
+  auto sonicTexture = Lore::Resource::GetTexture( "sonic-mobile" );
   sonicEntity->setTexture( sonicTexture );
   //sonicEntity->getMaterial()->getPass().blendingMode.enabled = true;
   sonicEntity->getMaterial()->diffuse.a = 0.5f;

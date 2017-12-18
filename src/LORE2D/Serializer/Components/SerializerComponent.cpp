@@ -38,8 +38,20 @@ SerializerComponent::SerializerComponent()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+bool SerializerComponent::valueExists( const string& key )
+{
+  _lastLookup = _values._values.find( key );
+  return ( _values._values.end() != _lastLookup );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 SerializerValue& SerializerComponent::getValue( const string& key )
 {
+  // Avoid second lookup if previous call to valueExists was for the same key.
+  if ( _lastLookup != _values._values.end() && key == _lastLookup->first ) {
+    return _lastLookup->second;
+  }
   return _values[key];
 }
 

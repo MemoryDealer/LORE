@@ -25,41 +25,15 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Serializer/SerializerValue.h>
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 namespace Lore {
 
-  class SerializerComponent
+  enum class ResourceType
   {
-
-  public:
-
-    SerializerComponent();
-
-    virtual ~SerializerComponent() = default;
-
-    virtual void serialize( const string& file ) { }
-
-    virtual void deserialize( const string& file ) { }
-
-    //
-    // Values.
-
-    bool valueExists( const string& key );
-
-    SerializerValue& getValue( const string& key );
-
-    SerializerValue& addValue( const string& key );
-
-    void addValue( const SerializerValue& value );
-
-  protected:
-
-    SerializerValue _values;
-    SerializerValue::Values::iterator _lastLookup  { _values._values.end() };
-
+    Entity,
+    Material,
+    Shader,
+    Sprite,
+    GPUProgram
   };
 
 }

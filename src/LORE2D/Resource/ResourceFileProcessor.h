@@ -25,40 +25,33 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Serializer/SerializerValue.h>
+#include <LORE2D/Resource/ResourceType.h>
+#include <LORE2D/Serializer/Serializer.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-  class SerializerComponent
+  class ResourceFileProcessor final
   {
 
   public:
 
-    SerializerComponent();
+    ResourceFileProcessor( const string& file );
+    ~ResourceFileProcessor() = default;
 
-    virtual ~SerializerComponent() = default;
+    void process();
 
-    virtual void serialize( const string& file ) { }
+    string getName() const;
 
-    virtual void deserialize( const string& file ) { }
+    ResourceType getType() const;
 
-    //
-    // Values.
+    void load( const string& groupName, ResourceControllerPtr resourceController );
 
-    bool valueExists( const string& key );
+  private:
 
-    SerializerValue& getValue( const string& key );
-
-    SerializerValue& addValue( const string& key );
-
-    void addValue( const SerializerValue& value );
-
-  protected:
-
-    SerializerValue _values;
-    SerializerValue::Values::iterator _lastLookup  { _values._values.end() };
+    string _file {};
+    mutable Serializer _serializer {};
 
   };
 

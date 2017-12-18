@@ -28,6 +28,7 @@
 
 #include <LORE2D/Core/Context.h>
 #include <LORE2D/Resource/Entity.h>
+#include <LORE2D/Resource/ResourceFileProcessor.h>
 #include <LORE2D/Resource/StockResource.h>
 #include <LORE2D/Resource/Renderable/Box.h>
 #include <LORE2D/Resource/Renderable/Textbox.h>
@@ -52,15 +53,12 @@ const string ResourceController::DefaultGroupName = "Default";
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 ResourceController::ResourceController()
-  : _groups()
-  , _defaultGroup( nullptr )
-  , _indexer( nullptr )
 {
   // Create default resource group.
-  auto rg = std::make_unique<ResourceGroup>( DefaultGroupName );
+  auto rg = std::make_shared<ResourceGroup>( DefaultGroupName );
 
   // Store and set to active group.
-  _groups.insert( { DefaultGroupName, std::move( rg ) } );
+  _groups.insert( { DefaultGroupName, rg } );
   _defaultGroup = rg.get();
 }
 
@@ -72,53 +70,71 @@ ResourceController::~ResourceController()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void ResourceController::indexResourceFile( const string& file )
+void ResourceController::indexResourceFile( const string& file, const string& groupName )
 {
-  // Parse JSON.
-  // ...
+  // Validate file type.
+  if ( string::npos == file.rfind( ".json" ) ) {
+    throw Lore::Exception( "Invalid resource file " + file + " - should be a .json file" );
+  }
 
-  // Add each to group.
-  // Have static methods to index resource files and load groups after
+  ResourceFileProcessor processor( file );
+
+  ResourceGroup::IndexedResource index;
+  index.file = file;
+  index.type = processor.getType();
+  index.loaded = false;
+
+  auto group = _getGroup( groupName );
+  group->index.insert( { processor.getName(), index } );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void ResourceController::createGroup( const string& name )
+void ResourceController::createGroup( const string& groupName )
 {
-  auto rg = std::make_unique<ResourceGroup>( name );
+  auto rg = std::make_shared<ResourceGroup>( groupName );
 
-  _groups.insert( { name, std::move( rg ) } );
+  _groups.insert( { groupName, rg } );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void ResourceController::destroyGroup( const string& name )
+void ResourceController::destroyGroup( const string& groupName )
 {
-  auto group = _getGroup( name );
+  auto group = _getGroup( groupName );
   if ( DefaultGroupName != group->name ) {
-    unloadGroup( name );
-    _groups.erase( _groups.find( name ) );
+    unloadGroup( groupName );
+    _groups.erase( _groups.find( groupName ) );
   }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void ResourceController::addResourceLocation( const string& file, const bool recursive )
+void ResourceController::indexResourceLocation( const string& directory, const string& groupName, const bool recursive )
 {
-  // Platform specific directory traversal.
-  // ...
+  // Index all resource files.
+  ResourceIndexer indexer( groupName );
+  indexer.traverseDirectory( directory, this, recursive );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void ResourceController::loadGroup( const string& name )
+void ResourceController::loadGroup( const string& groupName )
 {
-
+  auto group = _getGroup( groupName );
+  for ( auto it = group->index.begin(); it != group->index.end(); ++it ) {
+    auto& index = it->second;
+    if ( !index.loaded ) {
+      ResourceFileProcessor processor( index.file );
+      processor.load( groupName, this );
+      index.loaded = true;
+    }
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void ResourceController::unloadGroup( const string& name )
+void ResourceController::unloadGroup( const string& groupName )
 {
 
 }
@@ -308,6 +324,20 @@ ResourceGroupPtr ResourceController::_getGroup( const string& groupName )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Resource::IndexResourceLocation( const string& directory, const string& groupName, const bool recursive )
+{
+  return ActiveContext->getResourceController()->indexResourceLocation( directory, groupName, recursive );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Resource::LoadGroup( const string& groupName )
+{
+  return ActiveContext->getResourceController()->loadGroup( groupName );
+}
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 TexturePtr Resource::LoadTexture( const string& name, const string& file, const string& groupName )

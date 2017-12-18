@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,43 +24,53 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Serializer/SerializerValue.h>
+#if LORE_PLATFORM == LORE_WINDOWS
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+#include <LORE2D/Resource/ResourceIndexer.h>
 
-  class SerializerComponent
-  {
+#include <LORE2D/Resource/ResourceController.h>
 
-  public:
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    SerializerComponent();
+using namespace Lore;
 
-    virtual ~SerializerComponent() = default;
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    virtual void serialize( const string& file ) { }
+void ResourceIndexer::traverseDirectory( const string& directory, ResourceControllerPtr resourceController, const bool recursive )
+{
+  WIN32_FIND_DATA fd { 0 };
+  HANDLE hFind { nullptr };
 
-    virtual void deserialize( const string& file ) { }
+  // Replace all forward slashes with backslashes.
+  string windowsDirectory = directory;
+  std::replace( windowsDirectory.begin(), windowsDirectory.end(), '/', '\\' );
 
-    //
-    // Values.
+  const string wildcard( "\\*.*" );
+  windowsDirectory.append( wildcard );
+  char buf[MAX_PATH] = { 0 };
+  strcpy( buf, windowsDirectory.c_str() );
 
-    bool valueExists( const string& key );
+  hFind = FindFirstFile( buf, &fd );
+  do {
+    if ( strncmp( fd.cFileName, ".", 1 ) == 0 ||
+         strncmp( fd.cFileName, "..", 2 ) == 0 ) {
+      continue;
+    }
 
-    SerializerValue& getValue( const string& key );
+    if ( fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) {
+      // TODO: Recurse.
+    }
 
-    SerializerValue& addValue( const string& key );
-
-    void addValue( const SerializerValue& value );
-
-  protected:
-
-    SerializerValue _values;
-    SerializerValue::Values::iterator _lastLookup  { _values._values.end() };
-
-  };
-
+    string file = directory + "/" + fd.cFileName;
+    resourceController->indexResourceFile( file );
+  } while ( FindNextFile( hFind, &fd ) );
+  FindClose( hFind );
 }
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+#endif
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
