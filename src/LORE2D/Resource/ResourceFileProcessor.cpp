@@ -52,7 +52,7 @@ void ResourceFileProcessor::process()
 
 string ResourceFileProcessor::getName() const
 {
-  return _serializer.getValue( "name" ).getString();
+  return _serializer.getValue( "name" ).toString();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -61,16 +61,16 @@ ResourceType ResourceFileProcessor::getType() const
 {
   // Get type of resource.
   const static std::map<string, ResourceType> ResourceTypeMap = {
+    { "font", ResourceType::Font },
     { "material", ResourceType::Material },
     { "sprite", ResourceType::Sprite }
   };
 
   const auto resourceTypeValue = _serializer.getValue( "type" );
-  auto resourceTypeName = resourceTypeValue.getString();
-  Util::ToLower( resourceTypeName );
-  const auto resourceTypeIt = ResourceTypeMap.find( resourceTypeValue.getString() );
+  auto resourceTypeName = Util::ToLower( resourceTypeValue.toString() );
+  const auto resourceTypeIt = ResourceTypeMap.find( resourceTypeValue.toString() );
   if ( ResourceTypeMap.end() == resourceTypeIt ) {
-    throw Lore::Exception( "Invalid resource type " + resourceTypeValue.getString() );
+    throw Lore::Exception( "Invalid resource type " + resourceTypeValue.toString() );
   }
 
   return resourceTypeIt->second;
@@ -84,6 +84,12 @@ void ResourceFileProcessor::load( const string& groupName, ResourceControllerPtr
   default:
     break;
 
+  case ResourceType::Font: {
+    const auto file = _serializer.getValue( "file" ).toString();
+    const auto size = _serializer.getValue( "size" ).toInt();
+    resourceController->loadFont( getName(), file, size, groupName );
+  } break;
+
   case ResourceType::Material:
   {
     auto material = resourceController->createMaterial( getName(), groupName );
@@ -91,7 +97,7 @@ void ResourceFileProcessor::load( const string& groupName, ResourceControllerPtr
   } break;
 
   case ResourceType::Sprite: {
-    auto image = _serializer.getValue( "image" ).getString();
+    const auto image = _serializer.getValue( "image" ).toString();
     resourceController->loadTexture( getName(), image, groupName );
   } break;
 
@@ -110,9 +116,9 @@ void ResourceFileProcessor::loadConfiguration( const string& file, ResourceContr
     const string& resourceGroup = value.first;
 
     // Within each JSON object should be a single array of directories.
-    const auto& directories = value.second.getArray();
+    const auto& directories = value.second.toArray();
     for ( const auto& directoryValue : directories ) {
-      const string& directory = directoryValue.getString();
+      const string& directory = directoryValue.toString();
       resourceController->indexResourceLocation( directory, resourceGroup );
     }
   }
@@ -127,26 +133,25 @@ void ResourceFileProcessor::processMaterial( MaterialPtr material, const Seriali
     string setting = Util::ToLower( value.first );
 
     if ( "sprite" == setting ) {
-      material->texture = resourceController->getTexture( value.second.getString() );
+      material->texture = resourceController->getTexture( value.second.toString() );
     }
     else if ( "program" == setting ) {
       try {
-        material->program = resourceController->getGPUProgram( value.second.getString() );
+        material->program = resourceController->getGPUProgram( value.second.toString() );
       }
       catch ( Lore::ItemIdentityException& ) {
-        material->program = StockResource::GetGPUProgram( value.second.getString() );
+        material->program = StockResource::GetGPUProgram( value.second.toString() );
       }
     }
     else if ( "diffuse" == setting ) {
-      auto& color = value.second.getArray();
-      material->diffuse = Color( color[0].getReal(), color[1].getReal(), color[2].getReal(), color[3].getReal() );
+      material->diffuse = value.second.toVec4();
     }
     else if ( "blend" == setting ) {
-      material->blendingMode.enabled = value.second.getBool();
+      material->blendingMode.enabled = value.second.toBool();
     }
     else if ( "sampleregion" == setting ) {
-      auto& region = value.second.getArray();
-      material->setTextureSampleRegion( region[0].getReal(), region[1].getReal(), region[2].getReal(), region[3].getReal() );
+      auto region = value.second.toRect();
+      material->setTextureSampleRegion( region );
     }
   }
 }

@@ -117,7 +117,7 @@ int main( int argc, char** argv )
   auto sonicEntity = Lore::Resource::CreateEntity( "sonic", Lore::MeshType::TexturedQuad );
   auto sonicTexture = Lore::Resource::GetTexture( "sonic-mobile" );
   sonicEntity->setTexture( sonicTexture );
-  //sonicEntity->getMaterial()->getPass().blendingMode.enabled = true;
+  //sonicEntity->getMaterial()->blendingMode.enabled = true;
   sonicEntity->getMaterial()->diffuse.a = 0.5f;
   sonicNode->attachObject( sonicEntity );
 
@@ -160,7 +160,7 @@ int main( int argc, char** argv )
 
   auto textNode = scene->createNode( "text1" );
   auto textbox = Lore::Resource::CreateTextbox( "text1" );
-  auto font = Lore::Resource::LoadFont( "Sega", "res/fonts/sega.ttf", 14 );
+  auto font = Lore::Resource::GetFont( "sega" );
   textbox->setFont( font );
   textbox->setText( "SEGA" );
   textNode->attachObject( textbox );

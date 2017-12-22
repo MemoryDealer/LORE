@@ -25,6 +25,10 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Math/Math.h>
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 namespace Lore {
 
   class LORE_EXPORT SerializerValue final
@@ -110,29 +114,49 @@ namespace Lore {
       return _values;
     }
 
-    bool getBool() const
+    bool toBool() const
     {
       return std::get<bool>( _value );
     }
 
-    string getString() const
+    const string& toString() const
     {
       return std::get<string>( _value );
     }
 
-    int getInt() const
+    int toInt() const
     {
       return std::get<int>( _value );
     }
 
-    real getReal() const
+    real toReal() const
     {
       return std::get<real>( _value );
     }
 
-    Array getArray() const
+    const Array& toArray() const
     {
       return std::get<Array>( _value );
+    }
+
+    Vec4 toVec4() const
+    {
+      if ( Type::Array == getType() ) {
+        const auto& values = toArray();
+        assert( 4 == values.size() );
+        return Vec4( values[0].toReal(), values[1].toReal(), values[2].toReal(), values[3].toReal() );
+      }
+      throw Lore::Exception( "Value not array type" );
+    }
+
+    Rect toRect() const
+    {
+      if ( Type::Array == getType() ) {
+        const auto& values = toArray();
+        assert( 4 == values.size() );
+        return Rect( values[0].toReal(), values[1].toReal(), values[2].toReal(), values[3].toReal() );
+      }
+      throw Lore::Exception( "Value not array type" );
     }
 
     //
@@ -175,7 +199,7 @@ namespace Lore {
 
   private:
 
-    using ValueHolder = std::variant<std::monostate, bool, string, int, real, Array>; // TODO: Add arrays.
+    using ValueHolder = std::variant<std::monostate, bool, string, int, real, Array>;
 
   private:
 

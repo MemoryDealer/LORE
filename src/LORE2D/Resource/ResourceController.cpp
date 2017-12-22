@@ -82,7 +82,8 @@ void ResourceController::indexResourceFile( const string& file, const string& gr
 {
   // Validate file type.
   if ( string::npos == file.rfind( ".json" ) ) {
-    throw Lore::Exception( "Invalid resource file " + file + " - should be a .json file" );
+    log_warning( "Not indexing file " + file + ", not a valid file type" );
+    return;
   }
 
   ResourceFileProcessor processor( file );
@@ -154,6 +155,7 @@ void ResourceController::loadGroup( const string& groupName )
   std::vector<ResourceType> typeOrder = { ResourceType::Sprite,
                                           ResourceType::Shader,
                                           ResourceType::GPUProgram,
+                                          ResourceType::Font,
                                           ResourceType::Material };
   for ( const auto& type : typeOrder ) {
     LoadResourcesByType( type );

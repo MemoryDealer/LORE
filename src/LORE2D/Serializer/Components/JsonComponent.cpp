@@ -71,13 +71,13 @@ void JsonSerializerComponent::serialize( const string& file )
       break;
 
     case SerializerValue::Type::Bool:
-      newValue = value.getBool();
+      newValue = value.toBool();
       root.AddMember( key, newValue, allocator );
       break;
 
     case SerializerValue::Type::Array: {
       newValue.SetArray();
-      auto& arrayValues = value.getArray();
+      auto& arrayValues = value.toArray();
       for ( const auto& arrayValue : arrayValues ) {
         switch ( arrayValue.getType() ) {
         case SerializerValue::Type::Container:
@@ -91,14 +91,14 @@ void JsonSerializerComponent::serialize( const string& file )
 
         case SerializerValue::Type::Bool: {
           rapidjson::Value newArrayValue;
-          newArrayValue = arrayValue.getBool();
+          newArrayValue = arrayValue.toBool();
           newValue.PushBack( newArrayValue, allocator );
         } break;
 
         case SerializerValue::Type::String: {
           rapidjson::Value newArrayValue;
-          newArrayValue.SetString( arrayValue.getString().c_str(),
-                              static_cast<rapidjson::SizeType>( arrayValue.getString().length() ),
+          newArrayValue.SetString( arrayValue.toString().c_str(),
+                              static_cast<rapidjson::SizeType>( arrayValue.toString().length() ),
                               allocator );
           newValue.PushBack( newArrayValue, allocator );
         } break;
@@ -106,14 +106,14 @@ void JsonSerializerComponent::serialize( const string& file )
         case SerializerValue::Type::Int:
         {
           rapidjson::Value newArrayValue;
-          newArrayValue = arrayValue.getInt();
+          newArrayValue = arrayValue.toInt();
           newValue.PushBack( newArrayValue, allocator );
         } break;
 
         case SerializerValue::Type::Real:
         {
           rapidjson::Value newArrayValue;
-          newArrayValue = arrayValue.getReal();
+          newArrayValue = arrayValue.toReal();
           newValue.PushBack( newArrayValue, allocator );
         } break;
 
@@ -123,19 +123,19 @@ void JsonSerializerComponent::serialize( const string& file )
     } break;
 
     case SerializerValue::Type::String:
-      newValue.SetString( value.getString().c_str(),
-                          static_cast<rapidjson::SizeType>( value.getString().length() ),
+      newValue.SetString( value.toString().c_str(),
+                          static_cast<rapidjson::SizeType>( value.toString().length() ),
                           allocator );
       root.AddMember( key, newValue, allocator );
       break;
 
     case SerializerValue::Type::Int:
-      newValue = value.getInt();
+      newValue = value.toInt();
       root.AddMember( key, newValue, allocator );
       break;
 
     case SerializerValue::Type::Real:
-      newValue = value.getReal();
+      newValue = value.toReal();
       root.AddMember( key, newValue, allocator );
       break;
     }
