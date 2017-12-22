@@ -26,12 +26,13 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 #include <LORE2D/Core/Iterator.h>
+#include <LORE2D/Core/Util.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-  using id = string;
+  using ID = string;
 
   ///
   /// \class Registry
@@ -52,25 +53,27 @@ namespace Lore {
     {
     }
 
-    void insert( const id& id_, T* resource )
+    void insert( const ID& id, T* resource )
     {
-      if ( _container.find( id_ ) != _container.end() ) {
-        throw Lore::Exception( "Resource with id " + id_ + " already exists" );
+      const auto transformedID = Util::ToLower( id );
+      if ( _container.find( transformedID ) != _container.end() ) {
+        throw Lore::Exception( "Resource with id " + transformedID + " already exists" );
       }
 
       auto it = _container.begin();
-      _container.insert( it, std::pair<id, T*>( id_, resource ) );
+      _container.insert( it, std::pair<ID, T*>( transformedID, resource ) );
     }
 
-    void remove( const id& id_ )
+    void remove( const ID& id )
     {
-      auto lookup = _container.find( id_ );
+      const auto transformedID = Util::ToLower( id );
+      auto lookup = _container.find( transformedID );
       if ( _container.end() == lookup ) {
-        log_warning( "Tried to remove resource with id " + id_ + " which does not exist" );
+        log_warning( "Tried to remove resource with id " + transformedID + " which does not exist" );
         return;
       }
 
-      _container.erase( id_ );
+      _container.erase( transformedID );
     }
 
     void clear()
@@ -78,19 +81,20 @@ namespace Lore {
       _container.clear();
     }
 
-    T* get( const id& id ) const
+    T* get( const ID& id ) const
     {
-      auto lookup = _container.find( id );
+      const auto transformedID = Util::ToLower( id );
+      auto lookup = _container.find( transformedID );
       if ( _container.end() == lookup ) {
-        throw Lore::ItemIdentityException( "Resource with id " + id + " does not exist" );
+        throw Lore::ItemIdentityException( "Resource with id " + transformedID + " does not exist" );
       }
 
       return lookup->second;
     }
 
-    bool exists( const id& id ) const
+    bool exists( const ID& id ) const
     {
-      return ( _container.find( id ) != _container.end() );
+      return ( _container.find( Util::ToLower( id ) ) != _container.end() );
     }
 
     size_t size() const

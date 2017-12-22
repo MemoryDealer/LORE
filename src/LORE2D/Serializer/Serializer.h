@@ -71,6 +71,8 @@ namespace Lore {
 
     SerializerValue& getValue( const string& key );
 
+    const SerializerValue::Values& getValues() const;
+
     SerializerValue& addValue( const string& key );
 
     void addValue( const SerializerValue& value );

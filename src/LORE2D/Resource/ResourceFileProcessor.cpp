@@ -28,6 +28,7 @@
 
 #include <LORE2D/Core/Util.h>
 #include <LORE2D/Resource/ResourceController.h>
+#include <LORE2D/Resource/StockResource.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -60,6 +61,7 @@ ResourceType ResourceFileProcessor::getType() const
 {
   // Get type of resource.
   const static std::map<string, ResourceType> ResourceTypeMap = {
+    { "material", ResourceType::Material },
     { "sprite", ResourceType::Sprite }
   };
 
@@ -82,11 +84,70 @@ void ResourceFileProcessor::load( const string& groupName, ResourceControllerPtr
   default:
     break;
 
+  case ResourceType::Material:
+  {
+    auto material = resourceController->createMaterial( getName(), groupName );
+    processMaterial( material, _serializer.getValue( "settings" ), resourceController );
+  } break;
+
   case ResourceType::Sprite: {
     auto image = _serializer.getValue( "image" ).getString();
     resourceController->loadTexture( getName(), image, groupName );
   } break;
 
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void ResourceFileProcessor::loadConfiguration( const string& file, ResourceControllerPtr resourceController )
+{
+  Serializer serializer;
+  serializer.deserialize( file );
+
+  // Each JSON object should contain a group.
+  for ( const auto& value : serializer.getValues() ) {
+    const string& resourceGroup = value.first;
+
+    // Within each JSON object should be a single array of directories.
+    const auto& directories = value.second.getArray();
+    for ( const auto& directoryValue : directories ) {
+      const string& directory = directoryValue.getString();
+      resourceController->indexResourceLocation( directory, resourceGroup );
+    }
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void ResourceFileProcessor::processMaterial( MaterialPtr material, const SerializerValue& settings, ResourceControllerPtr resourceController )
+{
+  for ( const auto& value : settings.getValues() ) {
+    string setting = Util::ToLower( value.first );
+
+    if ( "sprite" == setting ) {
+      material->texture = resourceController->getTexture( value.second.getString() );
+    }
+    else if ( "program" == setting ) {
+      try {
+        material->program = resourceController->getGPUProgram( value.second.getString() );
+      }
+      catch ( Lore::ItemIdentityException& ) {
+        material->program = StockResource::GetGPUProgram( value.second.getString() );
+      }
+    }
+    else if ( "diffuse" == setting ) {
+      auto& color = value.second.getArray();
+      material->diffuse = Color( color[0].getReal(), color[1].getReal(), color[2].getReal(), color[3].getReal() );
+    }
+    else if ( "blend" == setting ) {
+      material->blendingMode.enabled = value.second.getBool();
+    }
+    else if ( "sampleregion" == setting ) {
+      auto& region = value.second.getArray();
+      material->setTextureSampleRegion( region[0].getReal(), region[1].getReal(), region[2].getReal(), region[3].getReal() );
+    }
   }
 }
 

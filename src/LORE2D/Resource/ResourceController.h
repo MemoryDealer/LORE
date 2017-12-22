@@ -144,6 +144,8 @@ namespace Lore {
 
     void destroyGroup( const string& groupName );
 
+    void loadResourceConfiguration( const string& file );
+
     void indexResourceLocation( const string& directory, const string& groupName = DefaultGroupName, const bool recursive = false );
 
     void loadGroup( const string& groupName );
@@ -245,6 +247,8 @@ namespace Lore {
   {
 
   public:
+
+    static void LoadResourceConfiguration( const string& file );
 
     static void IndexResourceLocation( const string& directory, const string& groupName = ResourceController::DefaultGroupName, const bool recursive = false );
 

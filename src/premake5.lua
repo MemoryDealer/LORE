@@ -47,6 +47,7 @@ project "LORE2D"
     files {
         "LORE2D/**.h", "LORE2D/**.cpp"
     }
+    postbuildcommands { "{COPY} ../../res/ ../../bin/%{cfg.buildcfg}/Run/res/" }
 
 project "Plugin_OpenGL"
     location "Plugins/OpenGL"
@@ -62,6 +63,7 @@ project "Plugin_OpenGL"
     }
     links { "LORE2D", "glfw3dll", "glad", "freetype" }
     postbuildcommands { "{COPY} ../../../lib/x64/%{cfg.buildcfg}/*.dll ../../../bin/%{cfg.buildcfg}/Run/" }
+    postbuildcommands { "{COPY} ../../res/ ../../bin/%{cfg.buildcfg}/Run/res/" }
     
 project "glad"
     location "Plugins/ThirdParty/glad"

@@ -32,6 +32,9 @@ namespace Lore {
 
   public:
 
+    using Array = std::vector<SerializerValue>;
+    using Values = std::unordered_map<string, SerializerValue>;
+
     enum class Type
     {
       Container,
@@ -41,8 +44,6 @@ namespace Lore {
       Int,
       Real
     };
-
-    using Array = std::vector<SerializerValue>;
 
     Type getType() const
     {
@@ -102,6 +103,11 @@ namespace Lore {
         throw Lore::Exception( "Non-existent key lookup on const SerializerValue" );
       }
       return it->second;
+    }
+
+    const Values& getValues() const
+    {
+      return _values;
     }
 
     bool getBool() const
@@ -169,7 +175,6 @@ namespace Lore {
 
   private:
 
-    using Values = std::unordered_map<string, SerializerValue>;
     using ValueHolder = std::variant<std::monostate, bool, string, int, real, Array>; // TODO: Add arrays.
 
   private:

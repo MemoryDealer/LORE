@@ -37,6 +37,7 @@ namespace Lore {
 
   public:
 
+    ResourceFileProcessor() = default;
     ResourceFileProcessor( const string& file );
     ~ResourceFileProcessor() = default;
 
@@ -47,6 +48,12 @@ namespace Lore {
     ResourceType getType() const;
 
     void load( const string& groupName, ResourceControllerPtr resourceController );
+
+    void loadConfiguration( const string& file, ResourceControllerPtr resourceController );
+
+  private:
+
+    void processMaterial( MaterialPtr material, const SerializerValue& settings, ResourceControllerPtr resourceController );
 
   private:
 

@@ -105,6 +105,13 @@ SerializerValue& Serializer::getValue( const string& key )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+const SerializerValue::Values& Serializer::getValues() const
+{
+  return _component->getValues();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 SerializerValue& Serializer::addValue( const string& key )
 {
   return _component->addValue( key );

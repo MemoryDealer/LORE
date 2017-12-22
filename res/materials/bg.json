@@ -1,0 +1,11 @@
+{
+  "type":"material",
+  "name":"bg",
+  "settings": {
+    "sprite":"bg",
+    "program":"background",
+    "diffuse":[1.0, 1.0, 1.0, 0.75],
+    "blend":true,
+    "sampleregion":[0.0, 0.0, 0.55, 0.55]
+  }
+}

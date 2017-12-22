@@ -73,8 +73,7 @@ int main( int argc, char** argv )
   Lore::WindowPtr window = context->createWindow( "Test", 640, 480 );
   window->setActive();
 
-  // TODO: Add another layer which defines groups and their associated resource locations in a single file.
-  Lore::Resource::IndexResourceLocation( "res/sprites" );
+  Lore::Resource::LoadResourceConfiguration( "res/resources.json" );
   Lore::Resource::LoadGroup( Lore::ResourceController::DefaultGroupName );
 
   /*
@@ -179,9 +178,7 @@ int main( int argc, char** argv )
   auto& layer2 = bg->addLayer( "2" );
   layer2.setTexture( Lore::Resource::GetTexture( "bg" ) );
   layer2.setParallax( Lore::Vec2(0.1f, 0.1f) );
-  layer2.getMaterial()->blendingMode.enabled = true;
-  layer2.getMaterial()->diffuse.a = 0.75f;
-  layer2.getMaterial()->setTextureSampleRegion( Lore::Rect( 0.0f, 0.0f, 0.55f, 0.55f ) );
+  layer2.setMaterial( Lore::Resource::GetMaterial( "bg" ) );
   //layer.getMaterial()->getPass().setTextureSampleRegion( 0.15f, 0.05f, 0.08f, 0.58f );
 
   //Lore::Resource::LoadTexture( "bg_default", "res/images/clouds.jpg" );

@@ -57,6 +57,13 @@ SerializerValue& SerializerComponent::getValue( const string& key )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+const SerializerValue::Values& SerializerComponent::getValues() const
+{
+  return _values._values;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 SerializerValue& SerializerComponent::addValue( const string& key )
 {
   auto it = _values._values.insert( { key, SerializerValue( key ) } );

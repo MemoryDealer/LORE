@@ -67,9 +67,16 @@ namespace Lore {
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    static void ToLower( std::string& str )
+    static void ToLower( string& str )
     {
       std::transform( str.begin(), str.end(), str.begin(), ::tolower );
+    }
+
+    static string ToLower( const string& str )
+    {
+      string lower( str );
+      ToLower( lower );
+      return lower;
     }
 
   };

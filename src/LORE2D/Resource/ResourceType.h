@@ -33,7 +33,9 @@ namespace Lore {
     Material,
     Shader,
     Sprite,
-    GPUProgram
+    GPUProgram,
+
+    Count
   };
 
 }

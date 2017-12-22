@@ -48,7 +48,7 @@ using namespace LocalNS;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-const string ResourceController::DefaultGroupName = "Default";
+const string ResourceController::DefaultGroupName = "Core";
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -70,6 +70,14 @@ ResourceController::~ResourceController()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void ResourceController::loadResourceConfiguration( const string& file )
+{
+  ResourceFileProcessor processor;
+  processor.loadConfiguration( file, this );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void ResourceController::indexResourceFile( const string& file, const string& groupName )
 {
   // Validate file type.
@@ -79,11 +87,13 @@ void ResourceController::indexResourceFile( const string& file, const string& gr
 
   ResourceFileProcessor processor( file );
 
+  // Store location of this resource file and its type.
   ResourceGroup::IndexedResource index;
   index.file = file;
   index.type = processor.getType();
   index.loaded = false;
 
+  // Insert index into resource group. This can be loaded/unloaded at will.
   auto group = _getGroup( groupName );
   group->index.insert( { processor.getName(), index } );
 }
@@ -121,14 +131,32 @@ void ResourceController::indexResourceLocation( const string& directory, const s
 
 void ResourceController::loadGroup( const string& groupName )
 {
+  // Place indexed resources into queue so they can be loaded in the correct order.
+  std::vector<ResourceGroup::IndexedResource*> loadQueues[static_cast<int>( ResourceType::Count )];
   auto group = _getGroup( groupName );
   for ( auto it = group->index.begin(); it != group->index.end(); ++it ) {
     auto& index = it->second;
     if ( !index.loaded ) {
-      ResourceFileProcessor processor( index.file );
-      processor.load( groupName, this );
-      index.loaded = true;
+      loadQueues[static_cast<int>( index.type )].push_back( &index );
     }
+  }
+
+  auto LoadResourcesByType = [&, this] ( const ResourceType type ) {
+    auto& queue = loadQueues[static_cast< int >( type )];
+    for ( auto& index : queue ) {
+      ResourceFileProcessor processor( index->file );
+      processor.load( groupName, this );
+      index->loaded = true;
+    }
+  };
+
+  // Load resource types in correct order so dependencies are ready.
+  std::vector<ResourceType> typeOrder = { ResourceType::Sprite,
+                                          ResourceType::Shader,
+                                          ResourceType::GPUProgram,
+                                          ResourceType::Material };
+  for ( const auto& type : typeOrder ) {
+    LoadResourcesByType( type );
   }
 }
 
@@ -324,6 +352,13 @@ ResourceGroupPtr ResourceController::_getGroup( const string& groupName )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Resource::LoadResourceConfiguration( const string& file )
+{
+  return ActiveContext->getResourceController()->loadResourceConfiguration( file );
+}
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Resource::IndexResourceLocation( const string& directory, const string& groupName, const bool recursive )
