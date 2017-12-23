@@ -24,7 +24,13 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "SerializerComponent.h"
+#if LORE_PLATFORM == LORE_WINDOWS
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+#include <LORE2D/Resource/ResourceIndexer.h>
+
+#include <LORE2D/Resource/ResourceController.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -32,49 +38,40 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-SerializerComponent::SerializerComponent()
-: _values( "root" )
-{ }
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-bool SerializerComponent::valueExists( const string& key )
+void ResourceIndexer::traverseDirectory( const string& directory, ResourceControllerPtr resourceController, const bool recursive )
 {
-  _lastLookup = _values._values.find( key );
-  return ( _values._values.end() != _lastLookup );
+  WIN32_FIND_DATA fd { 0 };
+  HANDLE hFind { nullptr };
+
+  // Replace all forward slashes with backslashes.
+  string windowsDirectory = directory;
+  std::replace( windowsDirectory.begin(), windowsDirectory.end(), '/', '\\' );
+
+  const string wildcard( "\\*.*" );
+  windowsDirectory.append( wildcard );
+  char buf[MAX_PATH] = { 0 };
+  strcpy( buf, windowsDirectory.c_str() );
+
+  hFind = FindFirstFile( buf, &fd );
+  do {
+    if ( strncmp( fd.cFileName, ".", 1 ) == 0 ||
+         strncmp( fd.cFileName, "..", 2 ) == 0 ) {
+      continue;
+    }
+
+    if ( fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) {
+      // TODO: Recurse.
+      continue;
+    }
+
+    string file = directory + "/" + fd.cFileName;
+    resourceController->indexResourceFile( file );
+  } while ( FindNextFile( hFind, &fd ) );
+  FindClose( hFind );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-SerializerValue& SerializerComponent::getValue( const string& key )
-{
-  // Avoid second lookup if previous call to valueExists was for the same key.
-  if ( _lastLookup != _values._values.end() && key == _lastLookup->first ) {
-    return _lastLookup->second;
-  }
-  return _values[key];
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-const SerializerValue::Values& SerializerComponent::getValues() const
-{
-  return _values._values;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-SerializerValue& SerializerComponent::addValue( const string& key )
-{
-  auto it = _values._values.insert( { key, SerializerValue( key ) } );
-  return it.first->second;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void SerializerComponent::addValue( const SerializerValue& value )
-{
-  _values._values[value.getKey()] = value;
-}
+#endif
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

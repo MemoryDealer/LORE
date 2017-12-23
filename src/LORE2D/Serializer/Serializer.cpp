@@ -91,9 +91,23 @@ void Serializer::deserialize( const string& file )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+bool Serializer::valueExists( const string& key ) const
+{
+  return _component->valueExists( key );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 SerializerValue& Serializer::getValue( const string& key )
 {
   return _component->getValue( key );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+const SerializerValue::Values& Serializer::getValues() const
+{
+  return _component->getValues();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

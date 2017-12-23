@@ -27,20 +27,22 @@
 
 namespace Lore {
 
-    class ResourceIndexer
-    {
+  class ResourceIndexer
+  {
 
-    public:
+  public:
 
-        virtual ~ResourceIndexer() = 0;
+    ResourceIndexer( const string& resourceGroupName ) : _resourceGroupName( resourceGroupName ) {}
 
-    };
+    virtual ~ResourceIndexer() = default;
 
-    static std::unique_ptr<ResourceIndexer> CreateResourceIndexer()
-    {
+    void traverseDirectory( const string& directory, ResourceControllerPtr resourceController, const bool recursive );
 
+  private:
 
-    }
+    string _resourceGroupName;
+
+  };
 
 }
 

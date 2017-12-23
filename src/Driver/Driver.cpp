@@ -73,6 +73,9 @@ int main( int argc, char** argv )
   Lore::WindowPtr window = context->createWindow( "Test", 640, 480 );
   window->setActive();
 
+  Lore::Resource::LoadResourceConfiguration( "res/resources.json" );
+  Lore::Resource::LoadGroup( Lore::ResourceController::DefaultGroupName );
+
   /*
   To load on a thread:
 
@@ -112,9 +115,9 @@ int main( int argc, char** argv )
   auto sonicNode = scene->createNode( "sonic" );
   sonicNode->setDepth( -50.f );
   auto sonicEntity = Lore::Resource::CreateEntity( "sonic", Lore::MeshType::TexturedQuad );
-  auto sonicTexture = Lore::Resource::LoadTexture( "sonic-mobile", "res/images/sonic-mobile.png" );
+  auto sonicTexture = Lore::Resource::GetTexture( "sonic-mobile" );
   sonicEntity->setTexture( sonicTexture );
-  //sonicEntity->getMaterial()->getPass().blendingMode.enabled = true;
+  //sonicEntity->getMaterial()->blendingMode.enabled = true;
   sonicEntity->getMaterial()->diffuse.a = 0.5f;
   sonicNode->attachObject( sonicEntity );
 
@@ -126,7 +129,7 @@ int main( int argc, char** argv )
   // Create some doges.
 
   auto dogeEntity = Lore::Resource::CreateEntity( "doge", Lore::MeshType::TexturedQuad );
-  auto dogeTexture = Lore::Resource::LoadTexture( "doge", "res/images/doge.jpg" );
+  auto dogeTexture = Lore::Resource::GetTexture( "doge" );
   std::vector<Lore::NodePtr> doges;
   dogeEntity->setTexture( dogeTexture );
   for ( int i = 0; i < 5; ++i ) {
@@ -157,7 +160,7 @@ int main( int argc, char** argv )
 
   auto textNode = scene->createNode( "text1" );
   auto textbox = Lore::Resource::CreateTextbox( "text1" );
-  auto font = Lore::Resource::LoadFont( "Sega", "res/fonts/sega.ttf", 14 );
+  auto font = Lore::Resource::GetFont( "sega" );
   textbox->setFont( font );
   textbox->setText( "SEGA" );
   textNode->attachObject( textbox );
@@ -165,21 +168,17 @@ int main( int argc, char** argv )
   //
   // Create background.
 
-  Lore::Resource::LoadTexture( "bg_city", "res/images/clouds.jpg" );
-  Lore::Resource::LoadTexture( "death-egg", "res/images/bg.png" );
   auto bg = scene->getBackground();
   auto& layer = bg->addLayer( "1" );
-  layer.setTexture( Lore::Resource::GetTexture( "bg_city" ) );
+  layer.setTexture( Lore::Resource::GetTexture( "clouds" ) );
   layer.setScrollSpeed( Lore::Vec2( 0.0008f, 0.0004f ) );
   layer.setParallax( Lore::Vec2( 0.05f, 0.05f ) );
   layer.setDepth( 1001.f );
 
   auto& layer2 = bg->addLayer( "2" );
-  layer2.setTexture( Lore::Resource::GetTexture( "death-egg" ) );
+  layer2.setTexture( Lore::Resource::GetTexture( "bg" ) );
   layer2.setParallax( Lore::Vec2(0.1f, 0.1f) );
-  layer2.getMaterial()->blendingMode.enabled = true;
-  layer2.getMaterial()->diffuse.a = 0.75f;
-  layer2.getMaterial()->setTextureSampleRegion( Lore::Rect( 0.0f, 0.0f, 0.55f, 0.55f ) );
+  layer2.setMaterial( Lore::Resource::GetMaterial( "bg" ) );
   //layer.getMaterial()->getPass().setTextureSampleRegion( 0.15f, 0.05f, 0.08f, 0.58f );
 
   //Lore::Resource::LoadTexture( "bg_default", "res/images/clouds.jpg" );

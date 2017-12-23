@@ -1,3 +1,4 @@
+#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -24,57 +25,46 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "SerializerComponent.h"
+#include <LORE2D/Resource/ResourceType.h>
+#include <LORE2D/Serializer/Serializer.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-using namespace Lore;
+namespace Lore {
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+  class ResourceFileProcessor final
+  {
 
-SerializerComponent::SerializerComponent()
-: _values( "root" )
-{ }
+  public:
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    static void LoadConfiguration( const string& file, ResourceControllerPtr resourceController );
+    static ResourceType GetResourceFileType( const string& file );
 
-bool SerializerComponent::valueExists( const string& key )
-{
-  _lastLookup = _values._values.find( key );
-  return ( _values._values.end() != _lastLookup );
-}
+  public:
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    ResourceFileProcessor( const string& file, const ResourceType type );
+    ~ResourceFileProcessor() = default;
 
-SerializerValue& SerializerComponent::getValue( const string& key )
-{
-  // Avoid second lookup if previous call to valueExists was for the same key.
-  if ( _lastLookup != _values._values.end() && key == _lastLookup->first ) {
-    return _lastLookup->second;
-  }
-  return _values[key];
-}
+    void process();
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    string getName() const;
 
-const SerializerValue::Values& SerializerComponent::getValues() const
-{
-  return _values._values;
-}
+    ResourceType getType() const;
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    void load( const string& groupName, ResourceControllerPtr resourceController );
 
-SerializerValue& SerializerComponent::addValue( const string& key )
-{
-  auto it = _values._values.insert( { key, SerializerValue( key ) } );
-  return it.first->second;
-}
+  private:
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    void processMaterial( MaterialPtr material, const SerializerValue& settings, ResourceControllerPtr resourceController );
 
-void SerializerComponent::addValue( const SerializerValue& value )
-{
-  _values._values[value.getKey()] = value;
+  private:
+
+    string _file {};
+    ResourceType _type {};
+    mutable Serializer _serializer {};
+
+  };
+
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
