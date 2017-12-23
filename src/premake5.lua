@@ -63,7 +63,7 @@ project "Plugin_OpenGL"
     }
     links { "LORE2D", "glfw3dll", "glad", "freetype" }
     postbuildcommands { "{COPY} ../../../lib/x64/%{cfg.buildcfg}/*.dll ../../../bin/%{cfg.buildcfg}/Run/" }
-    postbuildcommands { "{COPY} ../../res/ ../../bin/%{cfg.buildcfg}/Run/res/" }
+    postbuildcommands { "{COPY} ../../../res/ ../../../bin/%{cfg.buildcfg}/Run/res/" }
     
 project "glad"
     location "Plugins/ThirdParty/glad"
