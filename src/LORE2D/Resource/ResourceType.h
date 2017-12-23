@@ -29,10 +29,8 @@ namespace Lore {
 
   enum class ResourceType
   {
-    Entity,
     Font,
     Material,
-    Shader,
     Sprite,
     GPUProgram,
 

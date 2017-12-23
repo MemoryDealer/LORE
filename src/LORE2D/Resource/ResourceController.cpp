@@ -72,8 +72,7 @@ ResourceController::~ResourceController()
 
 void ResourceController::loadResourceConfiguration( const string& file )
 {
-  ResourceFileProcessor processor;
-  processor.loadConfiguration( file, this );
+  ResourceFileProcessor::LoadConfiguration( file, this );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -81,17 +80,18 @@ void ResourceController::loadResourceConfiguration( const string& file )
 void ResourceController::indexResourceFile( const string& file, const string& groupName )
 {
   // Validate file type.
-  if ( string::npos == file.rfind( ".json" ) ) {
+  const auto resourceType = ResourceFileProcessor::GetResourceFileType( file );
+  if ( ResourceType::Count == resourceType ) {
     log_warning( "Not indexing file " + file + ", not a valid file type" );
     return;
   }
 
-  ResourceFileProcessor processor( file );
+  ResourceFileProcessor processor( file, resourceType );
 
   // Store location of this resource file and its type.
   ResourceGroup::IndexedResource index;
   index.file = file;
-  index.type = processor.getType();
+  index.type = resourceType;
   index.loaded = false;
 
   // Insert index into resource group. This can be loaded/unloaded at will.
@@ -145,7 +145,7 @@ void ResourceController::loadGroup( const string& groupName )
   auto LoadResourcesByType = [&, this] ( const ResourceType type ) {
     auto& queue = loadQueues[static_cast< int >( type )];
     for ( auto& index : queue ) {
-      ResourceFileProcessor processor( index->file );
+      ResourceFileProcessor processor( index->file, type );
       processor.load( groupName, this );
       index->loaded = true;
     }
@@ -153,9 +153,8 @@ void ResourceController::loadGroup( const string& groupName )
 
   // Load resource types in correct order so dependencies are ready.
   std::vector<ResourceType> typeOrder = { ResourceType::Sprite,
-                                          ResourceType::Shader,
-                                          ResourceType::GPUProgram,
                                           ResourceType::Font,
+                                          ResourceType::GPUProgram,
                                           ResourceType::Material };
   for ( const auto& type : typeOrder ) {
     LoadResourcesByType( type );

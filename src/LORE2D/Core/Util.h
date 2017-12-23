@@ -79,6 +79,18 @@ namespace Lore {
       return lower;
     }
 
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    static string GetFileExtension( const string& file )
+    {
+      const auto idx = file.rfind( '.' );
+      if ( string::npos == idx ) {
+        return string( "" );
+      }
+
+      return file.substr( idx + 1, file.size() - idx );
+    }
+
   };
 
 }

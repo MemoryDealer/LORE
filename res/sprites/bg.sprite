@@ -1,5 +1,4 @@
 {
-  "type":"sprite",
   "name":"bg",
   "image":"res/images/bg.png"
 }

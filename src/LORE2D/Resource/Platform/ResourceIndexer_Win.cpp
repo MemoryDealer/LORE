@@ -61,6 +61,7 @@ void ResourceIndexer::traverseDirectory( const string& directory, ResourceContro
 
     if ( fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) {
       // TODO: Recurse.
+      continue;
     }
 
     string file = directory + "/" + fd.cFileName;
