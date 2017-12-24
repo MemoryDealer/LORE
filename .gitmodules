@@ -1,3 +1,6 @@
 [submodule "src/External/rapidjson"]
 	path = src/External/rapidjson
 	url = https://github.com/Tencent/rapidjson
+[submodule "src/External/variant"]
+	path = src/External/variant
+	url = https://github.com/mpark/variant

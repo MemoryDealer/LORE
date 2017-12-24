@@ -50,3 +50,7 @@ src/ipch
 *.db-shm
 
 *.db-wal
+
+# OSX
+*.DS_Store
+*Makefile*

@@ -203,7 +203,7 @@ namespace Lore {
     {\
         Matrix<T, C, R> re;\
         for( int i=0; i<C; ++i){\
-            r[i] = op rhs.m[i];\
+            re[i] = op rhs.m[i];\
         }\
         return re;\
     }

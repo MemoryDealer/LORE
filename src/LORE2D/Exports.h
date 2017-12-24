@@ -25,10 +25,14 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#if LORE_PLATFORM == LORE_WINDOWS
 #ifdef __Lore_Exports__
 #define LORE_EXPORT __declspec( dllexport )
 #else
 #define LORE_EXPORT __declspec ( dllimport )
+#endif
+#elif LORE_PLATFORM == LORE_APPLE
+#define LORE_EXPORT
 #endif
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

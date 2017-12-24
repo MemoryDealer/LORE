@@ -199,7 +199,11 @@ namespace Lore {
 
   private:
 
+#if LORE_PLATFORM == LORE_WINDOWS
     using ValueHolder = std::variant<std::monostate, bool, string, int, real, Array>;
+#else
+    using ValueHolder = mpark::variant<std::monostate, bool, string, int, real, Array>;
+#endif
 
   private:
 

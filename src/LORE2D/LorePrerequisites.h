@@ -35,7 +35,7 @@
 #define LORE_PLATFORM LORE_WINDOWS
 #elif defined( LINUX ) || defined( _LINUX )
 #define LORE_PLATFORM LORE_LINUX
-#elif defined( APPLE ) || defined( _APPLE )
+#elif defined( __APPLE__ ) || defined( __OSX__ )
 #define LORE_PLATFORM LORE_APPLE
 #endif
 
@@ -62,7 +62,13 @@
 #include <typeinfo>
 #include <queue>
 #include <unordered_map>
+
+#if LORE_PLATFORM == LORE_APPLE
+#include "../External/variant/include/mpark/variant.hpp"
+#else
 #include <variant>
+#endif
+
 #include <vector>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

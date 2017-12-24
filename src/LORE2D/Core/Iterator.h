@@ -111,22 +111,22 @@ namespace Lore {
 
         KeyType peekNextKey() const
         {
-            return _current->first;
+            return this->_current->first;
         }
 
         ValueType peekNextValue() const
         {
-            return _current->second;
+            return this->_current->second;
         }
 
         const PointerType peekNextValuePtr() const
         {
-            return &( _current->second );
+            return &( this->_current->second );
         }
 
         ValueType getNext()
         {
-            return ( _current++ )->second;
+            return ( this->_current++ )->second;
         }
 
     };
