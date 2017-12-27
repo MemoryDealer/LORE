@@ -47,9 +47,9 @@ using namespace Lore;
 
 namespace Local {
 
-  std::unique_ptr<IRenderPluginLoader> __rpl;
-  std::vector<Context::ErrorListener> __errorListeners;
-  Context* _activeContextPtr = nullptr;
+  static RenderPluginLoader __rpl;
+  static std::vector<Context::ErrorListener> __errorListeners;
+  static Context* _activeContextPtr = nullptr;
 
 }
 using namespace Local;
@@ -212,11 +212,7 @@ std::unique_ptr<Context> Context::Create( const RenderPlugin& renderer )
   Log::AllocateLogger();
   NotificationCenter::Initialize();
 
-  if ( __rpl.get() ) {
-    __rpl.reset();
-  }
-
-  __rpl = CreateRenderPluginLoader();
+  __rpl.free();
 
   switch ( renderer ) {
   default:
@@ -228,12 +224,12 @@ std::unique_ptr<Context> Context::Create( const RenderPlugin& renderer )
     break;
   }
 
-  if ( !__rpl->load( file ) ) {
+  if ( !__rpl.load( file ) ) {
     return nullptr;
   }
 
   // Load the context class from the plugin.
-  auto context = __rpl->createContext();
+  auto context = __rpl.createContext();
 
   CLI::AssignContext( context.get() );
   Input::AssignContext( context.get() );

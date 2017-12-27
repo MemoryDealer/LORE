@@ -37,68 +37,33 @@ namespace Lore {
     /// \class IRenderPluginLoader
     /// \brief Interface to class to dynamically load render plugins (e.g., OpenGL/Direct3D).
     ///     Used to load the Context implementation from the dynamic link library.
-    class LORE_EXPORT IRenderPluginLoader
+    class LORE_EXPORT RenderPluginLoader
     {
 
     public:
 
-        virtual ~IRenderPluginLoader() { }
+        RenderPluginLoader();
+        virtual ~RenderPluginLoader();
 
         ///
         /// \brief Loads dynamic link library, returns true if successful.
-        virtual bool load( const string& file ) = 0;
+        virtual bool load( const string& file );
+
+        ///
+        /// \brief Frees any loaded OS module(s).
+        virtual void free();
 
         ///
         /// \brief Instantiates the render plugin's implementation of the Lore Context.
-        virtual std::unique_ptr<Context> createContext() = 0;
-
-    protected:
-
-        virtual void free() = 0;
-
-    };
-
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-#if LORE_PLATFORM == LORE_WINDOWS
-#include <Windows.h>
-
-    ///
-    /// \class RenderPluginLoader
-    /// \brief Platform-specific implementation of IRenderPluginLoader.
-    class LORE_EXPORT RenderPluginLoader : public IRenderPluginLoader
-    {
+        virtual std::unique_ptr<Context> createContext();
 
     private:
 
-        HMODULE _hModule;
-
-    public:
-
-        explicit constexpr RenderPluginLoader();
-
-        virtual ~RenderPluginLoader() override;
-
-        virtual bool load( const string& file ) override;
-
-        virtual std::unique_ptr<Context> createContext() override;
-
-    protected:
-
-        virtual void free() override;
-
-    };
+#if LORE_PLATFORM == LORE_WINDOWS
+        HMODULE _hModule { nullptr };
 #endif
 
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-    ///
-    /// \brief Instantiates platform's IRenderPluginLoader implementation.
-    inline static std::unique_ptr<IRenderPluginLoader> CreateRenderPluginLoader()
-    {
-        std::unique_ptr<IRenderPluginLoader> rpl = std::make_unique<RenderPluginLoader>();
-        return rpl;
-    }
+    };
 
 }
 

@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,72 +24,66 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Platform define:
-
-#define LORE_WINDOWS 0
-#define LORE_LINUX 1
-#define LORE_APPLE 2
-
-#if defined( WIN32 ) || defined( _WIN32 )
-#define LORE_PLATFORM LORE_WINDOWS
-#elif defined( LINUX ) || defined( _LINUX )
-#define LORE_PLATFORM LORE_LINUX
-#elif defined( __APPLE__ ) || defined( __OSX__ )
-#define LORE_PLATFORM LORE_APPLE
-#endif
-
-#if LORE_PLATFORM == LORE_LINUX || LORE_PLATFORM == LORE_APPLE
-#define LORE_PLATFORM_POSIX
-#endif
+#include <LORE2D/Core/Timer.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// C/C++/STL.
-#include <algorithm>
-#include <atomic>
-#include <cassert>
-#include <cctype>
-#include <chrono>
-#include <condition_variable>
-#include <ctime>
-#include <fstream>
-#include <functional>
-#include <map>
-#include <memory>
-#include <mutex>
-#include <sstream>
-#include <stack>
-#include <string>
-#include <thread>
-#include <typeindex>
-#include <typeinfo>
-#include <queue>
-#include <unordered_map>
-
-#if LORE_PLATFORM == LORE_APPLE
-#include "../External/variant/include/mpark/variant.hpp"
-#else
-#include <variant>
-#endif
-
-#include <vector>
+using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Windows.
-#if LORE_PLATFORM == LORE_WINDOWS
-#define NOMINMAX
-#include <Windows.h>
-#endif
+#ifdef LORE_PLATFORM_POSIX
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Lore.
-#include "Exports.h"
-#include "Types.h"
-#include "Core/ClassMacros.h"
-#include "Core/Logging/Log.h"
-#include "Core/Exception.h"
-#include "Memory/MemoryAccess.h"
+Timer::Timer()
+{
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+float Timer::getDeltaTime( void ) const
+{
+  return 1.f;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+float Timer::getTotalElapsedTime( void ) const
+{
+  return 1.f;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Timer::reset( void )
+{
+  
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Timer::start( void )
+{
+  
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Timer::stop( void )
+{
+  
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Timer::tick( void )
+{
+  
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+#endif
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

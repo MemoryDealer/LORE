@@ -53,7 +53,7 @@ namespace Lore {
       return _inUse;
     }
 
-  private:
+  public: // HACK for posix.
 
     ///
     /// \brief Must be implemented by child classes to reset all internal
@@ -61,7 +61,7 @@ namespace Lore {
     ///     the memory pool.
     inline virtual void _reset() = 0;
 
-  private:
+  public: // HACK for posix.
 
     bool _inUse { false };
     T* _next { nullptr };

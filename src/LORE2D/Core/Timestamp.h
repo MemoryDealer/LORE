@@ -43,11 +43,9 @@ namespace Lore {
 
     };
 
-#if LORE_PLATFORM == LORE_WINDOWS
-
     ///
     /// \class Timestamper
-    /// \brief Windows implementation for ITimestamper.
+    /// \brief Implementation for ITimestamper.
     class Timestamper : public ITimestamper
     {
 
@@ -58,8 +56,6 @@ namespace Lore {
         virtual string generate() const override;
 
     };
-
-#endif
 
     extern void CreateTimestamper();
 

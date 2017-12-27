@@ -36,9 +36,7 @@ template<> std::unique_ptr<NotificationCenter> Singleton<NotificationCenter>::_i
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-constexpr
 NotificationCenter::NotificationCenter()
-: _subscriptions()
 {
 }
 

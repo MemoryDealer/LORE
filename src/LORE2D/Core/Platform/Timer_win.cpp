@@ -24,7 +24,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Timestamp.h"
+#include <LORE2D/Core/Timer.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -32,78 +32,113 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Local {
-
-    std::unique_ptr<ITimestamper> __timestamper;
-
-}
-using namespace Local;
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Lore::CreateTimestamper()
-{
-    if ( __timestamper.get() ) {
-        __timestamper.reset();
-    }
-
-    __timestamper = std::make_unique<Timestamper>();
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-string Lore::GenerateTimestamp()
-{
-    return __timestamper->generate();
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 #if LORE_PLATFORM == LORE_WINDOWS
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-string Timestamper::generate() const 
+Timer::Timer()
+  : mSecondsPerCount( 0.0 )
+  , mDeltaTime( -1.0 )
+  , mBaseTime( 0 )
+  , mPausedTime( 0 )
+  , mPrevTime( 0 )
+  , mCurrTime( 0 )
+  , mStopped( false )
 {
-    SYSTEMTIME st { 0 };
-
-    GetLocalTime( &st );
-    string timestamp;
-
-    // Trash "algorithm" to generate a timestamp string.
-    auto month = std::to_string( st.wMonth );
-    if ( st.wMonth < 10 ) month.insert( 0, "0" );
-    auto day = std::to_string( st.wDay );
-    if ( st.wDay < 10 ) day.insert( 0, "0" );
-    auto year = std::to_string( st.wYear );
-    auto hour = std::to_string( st.wHour );
-    if ( st.wHour < 10 ) hour.insert( 0, "0" );
-    auto minute = std::to_string( st.wMinute );
-    if ( st.wMinute < 10 ) minute.insert( 0, "0" );
-    auto second = std::to_string( st.wSecond );
-    if ( st.wSecond < 10 ) second.insert( 0, "0" );
-
-    timestamp.append( month + "/" + day + "/" + year + " " );
-    timestamp.append( hour + ":" + minute + ":" + second );
-    return timestamp;
+  // Get initial seconds per count.
+  __int64 countsPerSec;
+  QueryPerformanceFrequency(
+    reinterpret_cast<LARGE_INTEGER*>( &countsPerSec ) );
+  mSecondsPerCount = 1.0 / static_cast<double>( countsPerSec );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#elif LORE_PLATFORM == LORE_APPLE
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-string Timestamper::generate() const
+float Timer::getDeltaTime( void ) const
 {
-    string timestamp("??:??:??");
-    return timestamp;
+  return static_cast<float>( mDeltaTime );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#endif
+float Timer::getTotalElapsedTime( void ) const
+{
+  if ( mStopped ) {
+    return static_cast<float>( ( (
+      mStopTime - mPausedTime ) - mBaseTime ) * mSecondsPerCount );
+  }
+  else {
+    return static_cast<float>( ( (
+      mCurrTime - mPausedTime ) - mBaseTime ) * mSecondsPerCount );
+  }
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void Timer::reset( void )
+{
+  __int64 currTime;
+  QueryPerformanceCounter( reinterpret_cast<LARGE_INTEGER*>( &currTime ) );
 
+  mBaseTime = currTime;
+  mPrevTime = currTime;
+  mStopTime = 0;
+  mStopped = false;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Timer::start( void )
+{
+  if ( mStopped ) {
+    __int64 startTime;
+    QueryPerformanceCounter( reinterpret_cast<LARGE_INTEGER*>( &startTime ) );
+
+    mPausedTime += ( startTime - mStopTime );
+    mPrevTime = startTime;
+    mStopTime = 0;
+    mStopped = false;
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Timer::stop( void )
+{
+  if ( !mStopped ) {
+    __int64 currTime;
+    QueryPerformanceCounter( reinterpret_cast<LARGE_INTEGER*>( &currTime ) );
+
+    mStopTime = currTime;
+    mStopped = true;
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Timer::tick( void )
+{
+  if ( mStopped ) {
+    mDeltaTime = 0.0;
+    return;
+  }
+
+  __int64 currTime;
+  QueryPerformanceCounter( reinterpret_cast<LARGE_INTEGER*>( &currTime ) );
+  mCurrTime = currTime;
+
+  mDeltaTime = ( mCurrTime - mPrevTime ) * mSecondsPerCount;
+
+  mPrevTime = mCurrTime;
+
+  // Negative time possible if CPU goes into power save mode.
+  if ( mDeltaTime < 0.0 ) {
+    mDeltaTime = 0.0;
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+#endif // LORE_WINDOWS
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

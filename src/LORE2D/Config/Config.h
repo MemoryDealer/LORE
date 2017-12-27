@@ -27,11 +27,7 @@
 
 namespace Lore {
 
-#if LORE_PLATFORM == LORE_WINDOWS
-  using ConfigValue = std::variant<bool, int32_t, real, string>;
-#else
-  using ConfigValue = mpark::variant<bool, int32_t, real, string>;
-#endif
+  using ConfigValue = VARIANT<bool, int32_t, real, string>;
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 

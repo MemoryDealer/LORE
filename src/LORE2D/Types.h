@@ -104,6 +104,22 @@ namespace Lore {
   using uint = unsigned int;
   using string = std::string;
 
+#if LORE_PLATFORM == LORE_WINDOWS
+
+  #define VARIANT std::variant
+  #define GET_VARIANT std::get
+  #define HAS_VARIANT_TYPE std::holds_alternative
+  #define MONOSTATE std::monostate
+
+#elif LORE_PLATFORM == LORE_APPLE
+
+  #define VARIANT mpark::variant
+  #define GET_VARIANT mpark::get
+  #define HAS_VARIANT_TYPE mpark::holds_alternative
+  #define MONOSTATE mpark::monostate
+
+#endif
+
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
