@@ -115,7 +115,7 @@ namespace Lore {
 
 #elif LORE_PLATFORM == LORE_APPLE
 
-  #define VARIANT mpark::variant
+  #define LORE_VARIANT mpark::variant
   #define GET_VARIANT mpark::get
   #define HAS_VARIANT_TYPE mpark::holds_alternative
   #define MONOSTATE mpark::monostate
