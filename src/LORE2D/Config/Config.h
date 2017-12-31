@@ -27,7 +27,7 @@
 
 namespace Lore {
 
-  using ConfigValue = std::variant<bool, int32_t, real, string>;
+  using ConfigValue = LORE_VARIANT<bool, int32_t, real, string>;
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 

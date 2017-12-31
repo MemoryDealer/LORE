@@ -51,19 +51,19 @@ namespace Lore {
 
     Type getType() const
     {
-      if ( std::holds_alternative<bool>( _value ) ) {
+      if ( HAS_VARIANT_TYPE<bool>( _value ) ) {
         return Type::Bool;
       }
-      if ( std::holds_alternative<string>( _value ) ) {
+      if ( HAS_VARIANT_TYPE<string>( _value ) ) {
         return Type::String;
       }
-      if ( std::holds_alternative<int>( _value ) ) {
+      if ( HAS_VARIANT_TYPE<int>( _value ) ) {
         return Type::Int;
       }
-      if ( std::holds_alternative<real>( _value ) ) {
+      if ( HAS_VARIANT_TYPE<real>( _value ) ) {
         return Type::Real;
       }
-      if ( std::holds_alternative<Array>( _value ) ) {
+      if ( HAS_VARIANT_TYPE<Array>( _value ) ) {
         return Type::Array;
       }
 
@@ -116,27 +116,27 @@ namespace Lore {
 
     bool toBool() const
     {
-      return std::get<bool>( _value );
+      return GET_VARIANT<bool>( _value );
     }
 
     const string& toString() const
     {
-      return std::get<string>( _value );
+      return GET_VARIANT<string>( _value );
     }
 
     int toInt() const
     {
-      return std::get<int>( _value );
+      return GET_VARIANT<int>( _value );
     }
 
     real toReal() const
     {
-      return std::get<real>( _value );
+      return GET_VARIANT<real>( _value );
     }
 
     const Array& toArray() const
     {
-      return std::get<Array>( _value );
+      return GET_VARIANT<Array>( _value );
     }
 
     Vec4 toVec4() const
@@ -199,7 +199,7 @@ namespace Lore {
 
   private:
 
-    using ValueHolder = std::variant<std::monostate, bool, string, int, real, Array>;
+    using ValueHolder = LORE_VARIANT<MONOSTATE, bool, string, int, real, Array>;
 
   private:
 

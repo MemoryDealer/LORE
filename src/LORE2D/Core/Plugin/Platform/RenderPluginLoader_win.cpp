@@ -24,7 +24,9 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Timer.h"
+#include <LORE2D/Core/Plugin/RenderPluginLoader.h>
+
+#include <LORE2D/Core/Context.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -36,109 +38,68 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Timer::Timer()
-  : mSecondsPerCount( 0.0 )
-  , mDeltaTime( -1.0 )
-  , mBaseTime( 0 )
-  , mPausedTime( 0 )
-  , mPrevTime( 0 )
-  , mCurrTime( 0 )
-  , mStopped( false )
+RenderPluginLoader::RenderPluginLoader()
 {
-  // Get initial seconds per count.
-  __int64 countsPerSec;
-  QueryPerformanceFrequency(
-    reinterpret_cast<LARGE_INTEGER*>( &countsPerSec ) );
-  mSecondsPerCount = 1.0 / static_cast<double>( countsPerSec );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-float Timer::getDeltaTime( void ) const
+RenderPluginLoader::~RenderPluginLoader()
 {
-  return static_cast<float>( mDeltaTime );
+    free();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-float Timer::getTotalElapsedTime( void ) const
+bool RenderPluginLoader::load( const string& file )
 {
-  if ( mStopped ) {
-    return static_cast<float>( ( (
-      mStopTime - mPausedTime ) - mBaseTime ) * mSecondsPerCount );
-  }
-  else {
-    return static_cast<float>( ( (
-      mCurrTime - mPausedTime ) - mBaseTime ) * mSecondsPerCount );
-  }
+    free(); 
+
+    _hModule = LoadLibrary( file.c_str() );
+    if ( nullptr == _hModule ) {
+        log_critical( "Unable to load render plugin " + file );
+        return false;
+    }
+
+    log_debug( "Render plugin " + file + " successfully loaded" );
+
+    return true;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Timer::reset( void )
+std::unique_ptr<Context> RenderPluginLoader::createContext()
 {
-  __int64 currTime;
-  QueryPerformanceCounter( reinterpret_cast<LARGE_INTEGER*>( &currTime ) );
+    // Function pointer to create the context.
+    using CreateContextPtr = Context*( *)( );
 
-  mBaseTime = currTime;
-  mPrevTime = currTime;
-  mStopTime = 0;
-  mStopped = false;
+    // Get address of CreateContext function inside DLL.
+    CreateContextPtr ccp = reinterpret_cast< CreateContextPtr >(
+        GetProcAddress( _hModule, "CreateContext" ) );
+    if ( nullptr == ccp ) {
+        log_critical( "Unable to get CreateContext function pointer from render plugin" );
+        return nullptr;
+    }
+
+    // Call the DLL's CreateContext() - allocate the render plugin's context.
+    Context* context = ccp();
+
+    // Place Context object into unique_ptr to meet Lore's standard.
+    std::unique_ptr<Context> p( context );
+    return std::move( p );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Timer::start( void )
+void RenderPluginLoader::free()
 {
-  if ( mStopped ) {
-    __int64 startTime;
-    QueryPerformanceCounter( reinterpret_cast<LARGE_INTEGER*>( &startTime ) );
-
-    mPausedTime += ( startTime - mStopTime );
-    mPrevTime = startTime;
-    mStopTime = 0;
-    mStopped = false;
-  }
+    if ( _hModule ) {
+        FreeLibrary( _hModule );
+    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Timer::stop( void )
-{
-  if ( !mStopped ) {
-    __int64 currTime;
-    QueryPerformanceCounter( reinterpret_cast<LARGE_INTEGER*>( &currTime ) );
-
-    mStopTime = currTime;
-    mStopped = true;
-  }
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Timer::tick( void )
-{
-  if ( mStopped ) {
-    mDeltaTime = 0.0;
-    return;
-  }
-
-  __int64 currTime;
-  QueryPerformanceCounter( reinterpret_cast<LARGE_INTEGER*>( &currTime ) );
-  mCurrTime = currTime;
-
-  mDeltaTime = ( mCurrTime - mPrevTime ) * mSecondsPerCount;
-
-  mPrevTime = mCurrTime;
-
-  // Negative time possible if CPU goes into power save mode.
-  if ( mDeltaTime < 0.0 ) {
-    mDeltaTime = 0.0;
-  }
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-#endif // LORE_WINDOWS
+#endif
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -37,7 +37,7 @@ namespace Lore {
   ///
   /// \class Registry
   /// \brief Generic container class supporting multiple map types.
-  template<template <typename ...> typename MapType, typename T, typename ... MapParams>
+  template<template <typename ...> class MapType, typename T, typename ... MapParams>
   class Registry
   {
 

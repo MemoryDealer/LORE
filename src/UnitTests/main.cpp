@@ -24,6 +24,8 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/LorePlatform.h>
+
 #define CATCH_CONFIG_RUNNER
 #include "catch.hpp"
 

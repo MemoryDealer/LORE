@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,14 +24,27 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#if LORE_PLATFORM == LORE_WINDOWS
-#ifdef __Lore_Exports__
-#define LORE_EXPORT __declspec( dllexport )
-#else
-#define LORE_EXPORT __declspec ( dllimport )
-#endif
-#elif LORE_PLATFORM == LORE_APPLE
-#define LORE_EXPORT
+#if LORE_PLATFORM == LORE_APPLE
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+#include <LORE2D/Resource/ResourceIndexer.h>
+
+#include <LORE2D/Resource/ResourceController.h>
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+using namespace Lore;
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void ResourceIndexer::traverseDirectory( const string& directory, ResourceControllerPtr resourceController, const bool recursive )
+{
+  // TODO.
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 #endif
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

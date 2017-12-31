@@ -50,7 +50,7 @@ namespace Lore {
 
     public:
 
-        constexpr NotificationCenter();
+        NotificationCenter();
 
         ~NotificationCenter();
 
@@ -151,7 +151,7 @@ namespace Lore {
 
     private:
 
-        SubscriptionMap _subscriptions;
+        SubscriptionMap _subscriptions {};
 
     };
 

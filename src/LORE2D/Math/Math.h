@@ -391,6 +391,7 @@ namespace Lore {
     Degree& operator = ( const Radian& r )
     {
       _value = r.valueDegrees();
+      return *this;
     }
 
   private:

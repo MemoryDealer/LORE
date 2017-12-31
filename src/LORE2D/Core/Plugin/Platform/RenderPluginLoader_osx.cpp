@@ -24,7 +24,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "RenderPluginLoader.h"
+#include <LORE2D/Core/Plugin/RenderPluginLoader.h>
 
 #include <LORE2D/Core/Context.h>
 
@@ -34,13 +34,11 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#if LORE_PLATFORM == LORE_WINDOWS
+#if LORE_PLATFORM == LORE_APPLE
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-constexpr
 RenderPluginLoader::RenderPluginLoader()
-: _hModule( nullptr )
 {
 }
 
@@ -55,13 +53,10 @@ RenderPluginLoader::~RenderPluginLoader()
 
 bool RenderPluginLoader::load( const string& file )
 {
-    free(); 
+    free();
 
-    _hModule = LoadLibrary( file.c_str() );
-    if ( nullptr == _hModule ) {
-        log_critical( "Unable to load render plugin " + file );
-        return false;
-    }
+    // Load plugin module.
+    // ...
 
     log_debug( "Render plugin " + file + " successfully loaded" );
 
@@ -76,15 +71,10 @@ std::unique_ptr<Context> RenderPluginLoader::createContext()
     using CreateContextPtr = Context*( *)( );
 
     // Get address of CreateContext function inside DLL.
-    CreateContextPtr ccp = reinterpret_cast< CreateContextPtr >(
-        GetProcAddress( _hModule, "CreateContext" ) );
-    if ( nullptr == ccp ) {
-        log_critical( "Unable to get CreateContext function pointer from render plugin" );
-        return nullptr;
-    }
+    // ...
 
     // Call the DLL's CreateContext() - allocate the render plugin's context.
-    Context* context = ccp();
+    Context* context = nullptr;
 
     // Place Context object into unique_ptr to meet Lore's standard.
     std::unique_ptr<Context> p( context );
@@ -95,9 +85,7 @@ std::unique_ptr<Context> RenderPluginLoader::createContext()
 
 void RenderPluginLoader::free()
 {
-    if ( _hModule ) {
-        FreeLibrary( _hModule );
-    }
+    // TODO.
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

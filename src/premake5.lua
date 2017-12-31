@@ -62,14 +62,14 @@ project "Plugin_OpenGL"
         "Plugins/OpenGL/**.h", "Plugins/OpenGL/**.cpp",
     }
     links { "LORE2D", "glfw3dll", "glad", "freetype" }
-    postbuildcommands { "{COPY} ../../../lib/x64/%{cfg.buildcfg}/*.dll ../../../bin/%{cfg.buildcfg}/Run/" }
+    postbuildcommands { "{COPY} ../../../lib/x64/%{cfg.buildcfg}/ ../../../bin/%{cfg.buildcfg}/Run/" }
     postbuildcommands { "{COPY} ../../../res/ ../../../bin/%{cfg.buildcfg}/Run/res/" }
-    
+
 project "glad"
     location "Plugins/ThirdParty/glad"
     kind "StaticLib"
     language "C"
-    files { 
+    files {
         "Plugins/ThirdParty/glad/*.h", "Plugins/ThirdParty/glad/*.c"
     }
 

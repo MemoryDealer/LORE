@@ -280,7 +280,6 @@ int main( int argc, char** argv )
   Lore::Input::SetCharCallback( OnChar );
   auto ch = new CharHandler();
 
-  //sonicNode = doges[0];
   float f = 0.f;
   __timer.reset();
 
@@ -457,7 +456,7 @@ static void OnKeyChanged( const Lore::Keycode key, const bool state )
   case Lore::Keycode::B:
     if ( state ) {
       auto value = Lore::Config::GetValue( "RenderAABBs" );
-      Lore::Config::SetValue( "RenderAABBs", !std::get<bool>( value ) );
+      Lore::Config::SetValue( "RenderAABBs", !GET_VARIANT<bool>( value ) );
     }
     break;
 

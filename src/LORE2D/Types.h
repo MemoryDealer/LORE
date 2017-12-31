@@ -25,6 +25,8 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/LorePlatform.h>
+
 #include <string> // TODO: Figure out nicer way for clients to include dependencies.
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -103,6 +105,22 @@ namespace Lore {
   using real = float;
   using uint = unsigned int;
   using string = std::string;
+
+#if LORE_PLATFORM == LORE_WINDOWS
+
+  #define LORE_VARIANT std::variant
+  #define GET_VARIANT std::get
+  #define HAS_VARIANT_TYPE std::holds_alternative
+  #define MONOSTATE std::monostate
+
+#elif LORE_PLATFORM == LORE_APPLE
+
+  #define LORE_VARIANT mpark::variant
+  #define GET_VARIANT mpark::get
+  #define HAS_VARIANT_TYPE mpark::holds_alternative
+  #define MONOSTATE mpark::monostate
+
+#endif
 
 }
 

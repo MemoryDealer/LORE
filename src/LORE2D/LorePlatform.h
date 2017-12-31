@@ -25,14 +25,22 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#if LORE_PLATFORM == LORE_WINDOWS
-#ifdef __Lore_Exports__
-#define LORE_EXPORT __declspec( dllexport )
-#else
-#define LORE_EXPORT __declspec ( dllimport )
+// Provide a convenient platform define.
+
+#define LORE_WINDOWS 0
+#define LORE_LINUX 1
+#define LORE_APPLE 2
+
+#if defined( WIN32 ) || defined( _WIN32 )
+#define LORE_PLATFORM LORE_WINDOWS
+#elif defined( LINUX ) || defined( _LINUX )
+#define LORE_PLATFORM LORE_LINUX
+#elif defined( __APPLE__ ) || defined( __OSX__ )
+#define LORE_PLATFORM LORE_APPLE
 #endif
-#elif LORE_PLATFORM == LORE_APPLE
-#define LORE_EXPORT
+
+#if LORE_PLATFORM == LORE_LINUX || LORE_PLATFORM == LORE_APPLE
+#define LORE_PLATFORM_POSIX
 #endif
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -205,7 +205,7 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
 
   // AABBs.
   auto renderAABBs = Config::GetValue( "RenderAABBs" );
-  if ( std::get<bool>( renderAABBs ) ) {
+  if ( GET_VARIANT<bool>( renderAABBs ) ) {
     RenderQueue::BoxList boxes;
 
     std::function<void( NodePtr )> AddAABB = [&] ( NodePtr node ) {

@@ -80,6 +80,13 @@ namespace Lore {
 
     };
 
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+#ifdef LORE_PLATFORM_POSIX
+    template<typename T>
+    std::unique_ptr<T> Singleton<T>::_instance = nullptr;
+#endif
+
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

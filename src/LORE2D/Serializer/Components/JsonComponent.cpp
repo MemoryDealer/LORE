@@ -95,6 +95,10 @@ void JsonSerializerComponent::serialize( const string& file )
           newValue.PushBack( newArrayValue, allocator );
         } break;
 
+        case SerializerValue::Type::Array: {
+          // Do nothing with recursive arrays for now.
+        } break;
+
         case SerializerValue::Type::String: {
           rapidjson::Value newArrayValue;
           newArrayValue.SetString( arrayValue.toString().c_str(),
@@ -207,7 +211,7 @@ void JsonSerializerComponent::deserialize( const string& file )
       break;
 
     case rapidjson::Type::kObjectType: {
-      auto object = value.GetObjectA();
+      auto object = value.GetObject();
       for ( auto objectIt = object.MemberBegin(); objectIt != object.MemberEnd(); ++objectIt ) {
         auto& objectValue = serializerValue[key.GetString()];
         HandleValue( objectIt, objectValue );
@@ -220,6 +224,14 @@ void JsonSerializerComponent::deserialize( const string& file )
       for ( auto arrayIt = value.Begin(); arrayIt != value.End(); ++arrayIt ) {
         SerializerValue v( key.GetString() );
         switch ( arrayIt->GetType() ) {
+        case rapidjson::Type::kNullType:
+          // Do nothing.
+          break;
+
+        case rapidjson::Type::kArrayType:
+          // Do nothing for recursive arrays for now.
+          break;
+
         case rapidjson::Type::kFalseType:
           v = false;
           break;
@@ -229,7 +241,7 @@ void JsonSerializerComponent::deserialize( const string& file )
           break;
 
         case rapidjson::Type::kObjectType: {
-          auto object = arrayIt->GetObjectA();
+          auto object = arrayIt->GetObject();
           for ( auto objectIt = object.MemberBegin(); objectIt != object.MemberEnd(); ++objectIt ) {
             HandleValue( objectIt, v );
           }
