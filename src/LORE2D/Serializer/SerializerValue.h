@@ -199,7 +199,7 @@ namespace Lore {
 
   private:
 
-    using ValueHolder = VARIANT<MONOSTATE, bool, string, int, real, Array>;
+    using ValueHolder = LORE_VARIANT<MONOSTATE, bool, string, int, real, Array>;
 
   private:
 
