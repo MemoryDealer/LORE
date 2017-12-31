@@ -280,7 +280,6 @@ int main( int argc, char** argv )
   Lore::Input::SetCharCallback( OnChar );
   auto ch = new CharHandler();
 
-  //sonicNode = doges[0];
   float f = 0.f;
   __timer.reset();
 
