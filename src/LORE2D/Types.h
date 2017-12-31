@@ -25,6 +25,8 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/LorePlatform.h>
+
 #include <string> // TODO: Figure out nicer way for clients to include dependencies.
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
