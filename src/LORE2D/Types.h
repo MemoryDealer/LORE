@@ -108,7 +108,7 @@ namespace Lore {
 
 #if LORE_PLATFORM == LORE_WINDOWS
 
-  #define VARIANT std::variant
+  #define LORE_VARIANT std::variant
   #define GET_VARIANT std::get
   #define HAS_VARIANT_TYPE std::holds_alternative
   #define MONOSTATE std::monostate
