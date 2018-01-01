@@ -128,13 +128,42 @@ void ResourceFileProcessor::load( const string& groupName, ResourceControllerPtr
 
   case ResourceType::Sprite: {
     if ( _serializer.valueExists( "texture" ) ) {
-      // This Sprite contains a single texture, load it first.
+      // This sprite contains a single texture, load it first.
       const auto textureName = _serializer.getValue( "texture" ).toString();
       auto texture = resourceController->loadTexture( getName(), textureName, groupName );
 
       // Create a sprite and assign it the texture.
       auto sprite = resourceController->createSprite( getName(), groupName );
       sprite->addTexture( texture );
+    }
+    else if ( _serializer.valueExists( "textures" ) ) {
+      // This sprite contains multiple textures.
+      const auto value = _serializer.getValue( "textures" );
+      if ( SerializerValue::Type::Container != value.getType() ) {
+        throw Lore::Exception( "A sprite textures value must be a container" );
+      }
+
+      // Create a sprite to add the textures to.
+      auto sprite = resourceController->createSprite( getName(), groupName );
+
+      // Load each texture from array.
+      const auto& textures = value.getValues();
+      for ( const auto& texture : textures ) {
+        const auto& textureName = texture.first;
+        const auto& textureFile = texture.second.toString();
+
+        TexturePtr texture = nullptr;
+
+        // If this texture already exists, use the existing instance.
+        if ( resourceController->textureExists( textureName, groupName ) ) {
+          texture = resourceController->getTexture( textureName, groupName );
+        }
+        else {
+          texture = resourceController->loadTexture( textureName, textureFile, groupName );
+        }
+
+        sprite->addTexture( texture );
+      }
     }
   } break;
 

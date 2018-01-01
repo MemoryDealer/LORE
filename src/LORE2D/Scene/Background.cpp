@@ -98,3 +98,18 @@ void Background::Layer::setScrollSpeed( const Vec2& speed )
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+//SpriteControllerPtr Background::Layer::createSpriteController()
+//{
+//  _spriteController.reset();
+//  _spriteController = std::make_unique<SpriteController>();
+//}
+//
+//// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+//
+//SpriteControllerPtr Background::Layer::getSpriteController() const
+//{
+//  return _spriteController.get();
+//}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

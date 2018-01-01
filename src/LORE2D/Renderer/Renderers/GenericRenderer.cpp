@@ -42,6 +42,7 @@
 #include <LORE2D/Scene/Camera.h>
 #include <LORE2D/Scene/Light.h>
 #include <LORE2D/Scene/Scene.h>
+#include <LORE2D/Scene/SpriteController.h>
 #include <LORE2D/Shader/GPUProgram.h>
 #include <LORE2D/UI/UI.h>
 #include <LORE2D/Window/RenderTarget.h>
@@ -82,11 +83,18 @@ void GenericRenderer::addRenderData( Lore::EntityPtr e,
 
   RenderQueue& queue = _queues.at( queueId );
 
+  // Get the active frame if this sprite is being manipulated with a SpriteController.
+  size_t spriteFrame = 0;
+  if ( node->getSpriteController() ) {
+    spriteFrame = node->getSpriteController()->getActiveFrame();
+  }
+
   if ( blended ) {
     RenderQueue::Transparent t;
     t.material = e->getMaterial();
     t.vertexBuffer = e->getMesh()->getVertexBuffer();
     t.model = node->getFullTransform();
+    t.spriteFrame = spriteFrame;
 
     const auto depth = node->getDepth();
     t.model[3][2] = depth;
@@ -98,6 +106,7 @@ void GenericRenderer::addRenderData( Lore::EntityPtr e,
     RenderQueue::EntityData entityData;
     entityData.material = e->getMaterial();
     entityData.vertexBuffer = e->getMesh()->getVertexBuffer();
+    entityData.spriteFrame = spriteFrame;
 
     RenderQueue::RenderDataList& renderData = queue.solids[entityData];
 
@@ -297,16 +306,22 @@ void GenericRenderer::renderBackground( const Lore::RenderView& rv,
     const Background::Layer& layer = pair.second;
     MaterialPtr mat = layer.getMaterial();
 
-    GPUProgramPtr program = mat->program;
-
-    // Enable blending if set.
-    if ( mat->blendingMode.enabled ) {
-      _api->setBlendingEnabled( true );
-      _api->setBlendingFunc( mat->blendingMode.srcFactor, mat->blendingMode.dstFactor );
-    }
-
     if ( mat->sprite && mat->sprite->getTextureCount() ) {
-      TexturePtr texture = mat->sprite->getTexture( 0 ); // TODO: Replace with a mechanism to get the active texture for the sprite.
+      GPUProgramPtr program = mat->program;
+
+      // Enable blending if set.
+      if ( mat->blendingMode.enabled ) {
+        _api->setBlendingEnabled( true );
+        _api->setBlendingFunc( mat->blendingMode.srcFactor, mat->blendingMode.dstFactor );
+      }
+
+      // Get the active sprite frame for this layer.
+      size_t spriteFrame = 0;
+      /*if ( layer.getSpriteController() ) {
+        spriteFrame = layer.getSpriteController()->getActiveFrame();
+      }*/
+
+      TexturePtr texture = mat->sprite->getTexture( spriteFrame );
       program->use();
       texture->bind();
 
@@ -363,7 +378,9 @@ void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
 
     program->use();
     if ( mat->sprite && mat->sprite->getTextureCount() ) {
-      TexturePtr texture = mat->sprite->getTexture( 0 ); // TODO: Replace with a mechanism to get the active texture for the sprite.
+      const auto spriteFrame = pair.first.spriteFrame;
+      TexturePtr texture = mat->sprite->getTexture( spriteFrame );
+
       // TODO: Multi-texturing.
       texture->bind();
       program->setUniformVar( "texSampleOffset", mat->getTexCoordOffset() );
@@ -436,7 +453,9 @@ void GenericRenderer::renderTransparents( const Lore::ScenePtr scene,
 
     program->use();
     if ( mat->sprite && mat->sprite->getTextureCount() ) {
-      TexturePtr texture = mat->sprite->getTexture( 0 ); // TODO: Replace with a mechanism to get the active texture for the sprite.
+      const auto spriteFrame = it->second.spriteFrame;
+      TexturePtr texture = mat->sprite->getTexture( spriteFrame );
+
       // TODO: Multi-texturing.
       texture->bind();
       program->setUniformVar( "texSampleOffset", mat->getTexCoordOffset() );

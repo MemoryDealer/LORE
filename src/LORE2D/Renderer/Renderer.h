@@ -61,6 +61,7 @@ namespace Lore {
     {
       MaterialPtr material { nullptr };
       VertexBufferPtr vertexBuffer { nullptr };
+      size_t spriteFrame { 0 };
 
       bool operator < ( const EntityData& r ) const
       {
@@ -72,6 +73,7 @@ namespace Lore {
     {
       MaterialPtr material { nullptr };
       VertexBufferPtr vertexBuffer { nullptr };
+      size_t spriteFrame { 0 };
       Matrix4 model {};
     };
 

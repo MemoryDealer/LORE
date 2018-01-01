@@ -317,6 +317,13 @@ MaterialPtr ResourceController::cloneMaterial( const string& name, const string&
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+bool ResourceController::textureExists( const string& name, const string& groupName )
+{
+  return _getGroup( groupName )->textures.exists( name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 GPUProgramPtr ResourceController::getGPUProgram( const string& name, const string& groupName )
 {
   return _getGroup( groupName )->programs.get( name );

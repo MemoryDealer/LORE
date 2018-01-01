@@ -174,6 +174,11 @@ namespace Lore {
       _depth = depth;
     }
 
+    ///
+    /// \brief Allocates a SpriteController for this node, which can be used to animate the sprite (if one exists)
+    /// associated with this node.
+    SpriteControllerPtr createSpriteController();
+
     //
     // Getters.
 
@@ -224,6 +229,8 @@ namespace Lore {
 
     AABBPtr getAABB() const;
 
+    SpriteControllerPtr getSpriteController() const;
+
 
     //
     // Deleted functions/operators.
@@ -269,6 +276,7 @@ namespace Lore {
     // TODO: Node is getting large, consider holding node -> entity mappings somewhere else.
 
     std::unique_ptr<AABB> _aabb { nullptr };
+    std::unique_ptr<SpriteController> _spriteController { nullptr };
 
     Transform _transform {};
 

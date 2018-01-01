@@ -283,6 +283,10 @@ int main( int argc, char** argv )
   float f = 0.f;
   __timer.reset();
 
+  // Setup sprite.
+  auto spc = sonicNode->createSpriteController();
+  
+
   camera->trackNode( sonicNode );
   bool pause = true;
   while ( context->active() ) {
@@ -351,7 +355,7 @@ int main( int argc, char** argv )
     scene->getNode( "dogen" )->rotate( Lore::Degree( -.2f ) );
     scene->getNode( "dogen2" )->rotate( Lore::Degree( .2f ) );
 
-    sonicNode->rotate( Lore::Degree( .1f ) );
+    //sonicNode->rotate( Lore::Degree( .1f ) );
 
     float speed = 0.01f;
     if ( Lore::Input::GetKeymodState( Lore::Keymod::Shift ) ) {
@@ -466,6 +470,18 @@ static void OnKeyChanged( const Lore::Keycode key, const bool state )
       enabled = !enabled;
       Lore::Input::SetCursorEnabled( enabled );
     }
+    break;
+
+  case Lore::Keycode::One:
+    __sonic->getSpriteController()->setActiveFrame( 0 );
+    break;
+
+  case Lore::Keycode::Two:
+    __sonic->getSpriteController()->setActiveFrame( 1 );
+    break;
+
+  case Lore::Keycode::Three:
+    __sonic->getSpriteController()->setActiveFrame( 2 );
     break;
 
   case Lore::Keycode::GraveAccent:

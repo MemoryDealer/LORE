@@ -27,6 +27,7 @@
 
 #include <LORE2D/Memory/Alloc.h>
 #include <LORE2D/Math/Vector.h>
+#include <LORE2D/Scene/SpriteController.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -61,16 +62,7 @@ namespace Lore {
       ~Layer() = default;
 
       //
-      // Getters.
-
-      inline Vec2 getParallax() const { return _parallax; }
-
-      inline real getDepth() const { return _depth; }
-
-      inline MaterialPtr getMaterial() const { return _material; }
-
-      //
-      // Setters.
+      // Modifiers.
 
       inline void setParallax( const Vec2& parallax ) { _parallax = parallax; }
 
@@ -82,11 +74,25 @@ namespace Lore {
 
       void setScrollSpeed( const Vec2& speed );
 
+      //SpriteControllerPtr createSpriteController();
+
+      //
+      // Getters.
+
+      inline Vec2 getParallax() const { return _parallax; }
+
+      inline real getDepth() const { return _depth; }
+
+      inline MaterialPtr getMaterial() const { return _material; }
+
+//SpriteControllerPtr getSpriteController() const;
+
     private:
 
       Vec2 _parallax { 0.f, 0.f };
       real _depth { 1000.f };
       MaterialPtr _material { nullptr };
+     // std::unique_ptr<SpriteController> _spriteController { nullptr };
       string _name {};
 
     };

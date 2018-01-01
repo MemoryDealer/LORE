@@ -33,6 +33,7 @@
 #include <LORE2D/Scene/AABB.h>
 #include <LORE2D/Scene/Camera.h>
 #include <LORE2D/Scene/Scene.h>
+#include <LORE2D/Scene/SpriteController.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -268,9 +269,25 @@ void Node::scale( const real s )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+SpriteControllerPtr Node::createSpriteController()
+{
+  _spriteController.reset(); // TODO: Necessary?
+  _spriteController = std::make_unique<SpriteController>();
+  return _spriteController.get();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 AABBPtr Node::getAABB() const
 {
   return _aabb.get();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+SpriteControllerPtr Node::getSpriteController() const
+{
+  return _spriteController.get();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

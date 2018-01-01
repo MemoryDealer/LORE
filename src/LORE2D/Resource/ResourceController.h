@@ -210,6 +210,11 @@ namespace Lore {
     MaterialPtr cloneMaterial( const string& name, const string& cloneName );
 
     //
+    // Existence checkers.
+
+    bool textureExists( const string& name, const string& groupName = DefaultGroupName );
+
+    //
     // Getters.
 
     GPUProgramPtr getGPUProgram( const string& name, const string& groupName = DefaultGroupName );
