@@ -31,9 +31,9 @@
 #include <LORE2D/Resource/Material.h>
 #include <LORE2D/Resource/Mesh.h>
 #include <LORE2D/Resource/Registry.h>
-#include <LORE2D/Resource/Renderable/Texture.h>
 #include <LORE2D/Resource/ResourceIndexer.h>
 #include <LORE2D/Resource/ResourceType.h>
+#include <LORE2D/Resource/Texture.h>
 #include <LORE2D/Scene/Camera.h>
 #include <LORE2D/Shader/GPUProgram.h>
 #include <LORE2D/Shader/Shader.h>

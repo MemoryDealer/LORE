@@ -25,47 +25,52 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+#include <LORE2D/Resource/Texture.h>
 
-  class LORE_EXPORT Renderable
-  {
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    LORE_OBJECT_BODY()
+namespace Lore { namespace OpenGL {
 
-  public:
-
-    enum class Type
+    class GLTexture : public Lore::Texture,
+                      public Alloc<GLTexture>
     {
-      Unknown,
-      Texture,
-      Sprite,
-      Box,
-      Textbox
+
+    public:
+
+        GLTexture();
+
+        virtual ~GLTexture() override;
+
+        virtual void loadFromFile( const string& file ) override;
+
+        virtual void create( const uint32_t width, const uint32_t height ) override;
+
+        virtual void create( const int width, const int height, const Color& color ) override;
+
+        virtual void bind() override;
+
+        //
+        // Getters.
+
+        GLuint getID() const
+        {
+            return _id;
+        }
+
+    protected:
+
+        virtual void _reset() override;
+
+    private:
+
+        void _createGLTexture( const unsigned char* pixels, const int width, const int height, const bool genMipMaps = true );
+
+    private:
+
+        GLuint _id;
+
     };
 
-  public:
-
-    inline Renderable()
-      : _type( Type::Unknown )
-    {
-    }
-
-    inline virtual ~Renderable() = default;
-
-    // TODO: This class may not even be necessary. Flesh out a design for this.
-    virtual void bind() { }
-
-    inline Type getType() const
-    {
-      return _type;
-    }
-
-  protected:
-
-    Type _type;
-
-  };
-
-}
+}}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

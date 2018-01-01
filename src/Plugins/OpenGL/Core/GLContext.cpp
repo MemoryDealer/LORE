@@ -34,7 +34,7 @@
 #include <Plugins/OpenGL/Renderer/RenderAPI.h>
 #include <Plugins/OpenGL/Resource/GLFont.h>
 #include <Plugins/OpenGL/Resource/GLStockResource.h>
-#include <Plugins/OpenGL/Resource/Renderable/GLTexture.h>
+#include <Plugins/OpenGL/Resource/GLTexture.h>
 #include <Plugins/OpenGL/Shader/GLGPUProgram.h>
 #include <Plugins/OpenGL/Shader/GLShader.h>
 #include <Plugins/OpenGL/Shader/GLVertexBuffer.h>

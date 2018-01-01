@@ -26,7 +26,6 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 #include <LORE2D/Resource/Color.h>
-#include <LORE2D/Resource/Renderable/Renderable.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -35,23 +34,23 @@ namespace Lore {
   // TODO: How to handle multi-texturing? With current rendering pipeline,
   // it may be best to have a link to the next texture for each texture object.
   // Then let the material inform the renderer to iterate the linked list.
-  class LORE_EXPORT Texture : public Renderable
+  class LORE_EXPORT Texture
   {
+
+    LORE_OBJECT_BODY()
 
   public:
 
-    Texture()
-    {
-      _type = Renderable::Type::Texture;
-    }
-
-    virtual ~Texture() override = default;
+    Texture() = default;
+    virtual ~Texture() = default;
 
     virtual void loadFromFile( const string& file ) = 0;
 
     virtual void create( const uint32_t width, const uint32_t height ) = 0;
 
     virtual void create( const int width, const int height, const Color& color ) = 0;
+
+    virtual void bind() = 0;
 
   };
 

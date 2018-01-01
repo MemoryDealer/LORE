@@ -34,9 +34,9 @@
 #include <LORE2D/Resource/Font.h>
 #include <LORE2D/Resource/Mesh.h>
 #include <LORE2D/Resource/Renderable/Box.h>
-#include <LORE2D/Resource/Renderable/Texture.h>
 #include <LORE2D/Resource/Renderable/Textbox.h>
 #include <LORE2D/Resource/StockResource.h>
+#include <LORE2D/Resource/Texture.h>
 #include <LORE2D/Scene/AABB.h>
 #include <LORE2D/Scene/Camera.h>
 #include <LORE2D/Scene/Light.h>

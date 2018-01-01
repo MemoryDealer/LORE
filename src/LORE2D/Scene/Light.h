@@ -28,7 +28,6 @@
 #include <LORE2D/Math/Math.h>
 #include <LORE2D/Memory/Alloc.h>
 #include <LORE2D/Resource/Color.h>
-#include <LORE2D/Resource/Renderable/Renderable.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
