@@ -108,6 +108,10 @@ namespace Lore {
 
     Registry<std::unordered_map, Box> boxes {};
 
+    // Sprites.
+
+    Registry<std::unordered_map, Sprite> sprites {};
+
     // Textboxes.
 
     Registry<std::unordered_map, Textbox> textboxes {};
@@ -179,6 +183,8 @@ namespace Lore {
     //
     // Factory functions (non-virtual).
 
+    SpritePtr createSprite( const string& name, const string& groupName = DefaultGroupName );
+
     MaterialPtr createMaterial( const string& name, const string& groupName = DefaultGroupName );
 
     CameraPtr createCamera( const string& name, const string& groupName = DefaultGroupName );
@@ -207,6 +213,8 @@ namespace Lore {
     // Getters.
 
     GPUProgramPtr getGPUProgram( const string& name, const string& groupName = DefaultGroupName );
+
+    SpritePtr getSprite( const string& name, const string& groupName = DefaultGroupName );
 
     MaterialPtr getMaterial( const string& name, const string& groupName = DefaultGroupName );
 
@@ -272,6 +280,8 @@ namespace Lore {
 
     static VertexBufferPtr CreateVertexBuffer( const string& name, const MeshType& type, const string& groupName = ResourceController::DefaultGroupName );
 
+    static SpritePtr CreateSprite( const string& name, const string& groupName = ResourceController::DefaultGroupName );
+
     static MaterialPtr CreateMaterial( const string& name, const string& groupName = ResourceController::DefaultGroupName );
 
     static MeshPtr CreateMesh( const string& name, const MeshType& meshType, const string& groupName = ResourceController::DefaultGroupName );
@@ -308,6 +318,8 @@ namespace Lore {
     // Getters.
 
     static GPUProgramPtr GetGPUProgram( const string& name, const string& groupName = ResourceController::DefaultGroupName );
+
+    static SpritePtr GetSprite( const string& name, const string& groupName = ResourceController::DefaultGroupName );
 
     static MaterialPtr GetMaterial( const string& name, const string& groupName = ResourceController::DefaultGroupName );
 

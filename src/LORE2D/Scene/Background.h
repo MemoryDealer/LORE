@@ -78,7 +78,7 @@ namespace Lore {
 
       inline void setMaterial( MaterialPtr material ) { _material = material; }
 
-      void setTexture( TexturePtr texture );
+      void setSprite( SpritePtr texture );
 
       void setScrollSpeed( const Vec2& speed );
 
@@ -87,7 +87,6 @@ namespace Lore {
       Vec2 _parallax { 0.f, 0.f };
       real _depth { 1000.f };
       MaterialPtr _material { nullptr };
-      TexturePtr _texture { nullptr };
       string _name {};
 
     };

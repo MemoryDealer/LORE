@@ -36,6 +36,7 @@
 #include <LORE2D/Resource/Entity.h>
 #include <LORE2D/Resource/StockResource.h>
 #include <LORE2D/Resource/Renderable/Box.h>
+#include <LORE2D/Resource/Renderable/Sprite.h>
 #include <LORE2D/Resource/Renderable/Textbox.h>
 #include <LORE2D/UI/UI.h>
 
@@ -82,6 +83,7 @@ void Context::initConfiguration()
   _poolCluster.registerPool<Mesh>( 8 );
   _poolCluster.registerPool<Node>( 1024 );
   _poolCluster.registerPool<Scene>( 4 );
+  _poolCluster.registerPool<Sprite>( 32 );
   _poolCluster.registerPool<Textbox>( 4 );
   _poolCluster.registerPool<UI>( 4 );
   _poolCluster.registerPool<UIPanel>( 4 );

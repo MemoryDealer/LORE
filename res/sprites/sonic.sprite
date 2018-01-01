@@ -1,4 +1,4 @@
 {
   "name":"sonic-mobile",
-  "image":"res/images/sonic-mobile.png"
+  "texture":"res/images/sonic-mobile.png"
 }

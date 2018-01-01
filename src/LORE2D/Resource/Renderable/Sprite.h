@@ -1,3 +1,4 @@
+#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -24,49 +25,55 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Entity.h"
+namespace Lore {
 
-#include <LORE2D/Renderer/Renderer.h>
+  ///
+  /// \class Sprite
+  /// \brief A container of Textures which a Material can use.
+  class LORE_EXPORT Sprite final : public Lore::Alloc<Sprite>
+  {
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    LORE_OBJECT_BODY()
 
-using namespace Lore;
+  public:
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    using TextureList = std::vector<TexturePtr>;
 
-Entity::Entity()
-  : _material( nullptr )
-  , _mesh( nullptr )
-  , _renderQueue( RenderQueue::General )
-{
-}
+  public:
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    Sprite() = default;
+    ~Sprite() = default;
 
-Entity::~Entity()
-{
-}
+    //
+    // Modifiers.
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    void addTexture( const TexturePtr texture )
+    {
+      _textures.push_back( texture );
+    }
 
-void Entity::setSprite( SpritePtr sprite )
-{
-  _material->sprite = sprite;
-}
+    //
+    // Getters.
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    TexturePtr getTexture( const size_t idx ) const
+    {
+      return _textures.at( idx );
+    }
 
-void Entity::_reset()
-{
-  _material=nullptr;
-  _mesh=nullptr;
-}
+    size_t getTextureCount() const
+    {
+      return _textures.size();
+    }
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+  private:
 
-void Entity::_notifyAttached()
-{
+    virtual void _reset() override {}
+
+  private:
+
+    TextureList _textures {};
+
+  };
 
 }
 

@@ -76,7 +76,7 @@ namespace Lore {
     //
     // Helper functions.
 
-    void setTexture( TexturePtr texture );
+    void setSprite( SpritePtr sprite );
 
   private:
 

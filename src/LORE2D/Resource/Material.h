@@ -98,7 +98,7 @@ namespace Lore {
       lighting = rhs.lighting;
       ambient = rhs.ambient;
       diffuse = rhs.diffuse;
-      texture = rhs.texture;
+      sprite = rhs.sprite;
       program = rhs.program;
       blendingMode = rhs.blendingMode;
       _texCoordScrollSpeed = rhs._texCoordScrollSpeed;
@@ -117,7 +117,7 @@ namespace Lore {
     bool lighting { true };
     Color ambient { StockColor::White };
     Color diffuse { StockColor::White };
-    TexturePtr texture { nullptr };
+    SpritePtr sprite { nullptr };
     GPUProgramPtr program { nullptr };
 
     struct

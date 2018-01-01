@@ -34,6 +34,7 @@
 #include <LORE2D/Resource/Font.h>
 #include <LORE2D/Resource/Mesh.h>
 #include <LORE2D/Resource/Renderable/Box.h>
+#include <LORE2D/Resource/Renderable/Sprite.h>
 #include <LORE2D/Resource/Renderable/Textbox.h>
 #include <LORE2D/Resource/StockResource.h>
 #include <LORE2D/Resource/Texture.h>
@@ -297,7 +298,6 @@ void GenericRenderer::renderBackground( const Lore::RenderView& rv,
     MaterialPtr mat = layer.getMaterial();
 
     GPUProgramPtr program = mat->program;
-    TexturePtr texture = mat->texture;
 
     // Enable blending if set.
     if ( mat->blendingMode.enabled ) {
@@ -305,7 +305,8 @@ void GenericRenderer::renderBackground( const Lore::RenderView& rv,
       _api->setBlendingFunc( mat->blendingMode.srcFactor, mat->blendingMode.dstFactor );
     }
 
-    if ( texture ) {
+    if ( mat->sprite && mat->sprite->getTextureCount() ) {
+      TexturePtr texture = mat->sprite->getTexture( 0 ); // TODO: Replace with a mechanism to get the active texture for the sprite.
       program->use();
       texture->bind();
 
@@ -359,10 +360,10 @@ void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
     MaterialPtr mat = entityData.material;
     GPUProgramPtr program = mat->program;
     VertexBufferPtr vertexBuffer = entityData.vertexBuffer;
-    TexturePtr texture = mat->texture;
 
     program->use();
-    if ( texture ) {
+    if ( mat->sprite && mat->sprite->getTextureCount() ) {
+      TexturePtr texture = mat->sprite->getTexture( 0 ); // TODO: Replace with a mechanism to get the active texture for the sprite.
       // TODO: Multi-texturing.
       texture->bind();
       program->setUniformVar( "texSampleOffset", mat->getTexCoordOffset() );
@@ -429,13 +430,13 @@ void GenericRenderer::renderTransparents( const Lore::ScenePtr scene,
     MaterialPtr mat = t.material;
     GPUProgramPtr program = mat->program;
     VertexBufferPtr vertexBuffer = t.vertexBuffer;
-    TexturePtr texture = mat->texture;
 
     // Set blending mode using material settings.
     _api->setBlendingFunc( mat->blendingMode.srcFactor, mat->blendingMode.dstFactor );
 
     program->use();
-    if ( texture ) {
+    if ( mat->sprite && mat->sprite->getTextureCount() ) {
+      TexturePtr texture = mat->sprite->getTexture( 0 ); // TODO: Replace with a mechanism to get the active texture for the sprite.
       // TODO: Multi-texturing.
       texture->bind();
       program->setUniformVar( "texSampleOffset", mat->getTexCoordOffset() );

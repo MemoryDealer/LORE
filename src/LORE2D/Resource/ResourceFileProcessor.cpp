@@ -27,6 +27,7 @@
 #include "ResourceFileProcessor.h"
 
 #include <LORE2D/Core/Util.h>
+#include <LORE2D/Resource/Renderable/Sprite.h>
 #include <LORE2D/Resource/ResourceController.h>
 #include <LORE2D/Resource/StockResource.h>
 
@@ -126,8 +127,15 @@ void ResourceFileProcessor::load( const string& groupName, ResourceControllerPtr
   } break;
 
   case ResourceType::Sprite: {
-    const auto image = _serializer.getValue( "image" ).toString();
-    resourceController->loadTexture( getName(), image, groupName );
+    if ( _serializer.valueExists( "texture" ) ) {
+      // This Sprite contains a single texture, load it first.
+      const auto textureName = _serializer.getValue( "texture" ).toString();
+      auto texture = resourceController->loadTexture( getName(), textureName, groupName );
+
+      // Create a sprite and assign it the texture.
+      auto sprite = resourceController->createSprite( getName(), groupName );
+      sprite->addTexture( texture );
+    }
   } break;
 
   }
@@ -142,7 +150,7 @@ void ResourceFileProcessor::processMaterial( MaterialPtr material, const Seriali
     string setting = Util::ToLower( value.first );
 
     if ( "sprite" == setting ) {
-      material->texture = resourceController->getTexture( value.second.toString() );
+      material->sprite = resourceController->getSprite( value.second.toString() );
     }
     else if ( "program" == setting ) {
       material->program = resourceController->getGPUProgram( value.second.toString() );

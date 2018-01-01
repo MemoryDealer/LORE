@@ -81,10 +81,10 @@ void Background::removeLayer( const string& name )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Background::Layer::setTexture( TexturePtr texture )
+void Background::Layer::setSprite( SpritePtr sprite )
 {
   if ( _material ) {
-    _material->texture = texture;
+    _material->sprite = sprite;
   }
 }
 

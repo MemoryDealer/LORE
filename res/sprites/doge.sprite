@@ -1,4 +1,4 @@
 {
   "name":"doge",
-  "image":"res/images/doge.jpg"
+  "texture":"res/images/doge.jpg"
 }

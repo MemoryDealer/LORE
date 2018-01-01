@@ -1,4 +1,4 @@
 {
   "name":"bg",
-  "image":"res/images/bg.png"
+  "texture":"res/images/bg.png"
 }

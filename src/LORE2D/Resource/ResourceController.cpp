@@ -31,6 +31,7 @@
 #include <LORE2D/Resource/ResourceFileProcessor.h>
 #include <LORE2D/Resource/StockResource.h>
 #include <LORE2D/Resource/Renderable/Box.h>
+#include <LORE2D/Resource/Renderable/Sprite.h>
 #include <LORE2D/Resource/Renderable/Textbox.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -207,6 +208,18 @@ EntityPtr ResourceController::createEntity( const string& name, const MeshType& 
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+SpritePtr ResourceController::createSprite( const string& name, const string& groupName )
+{
+  auto sprite = MemoryAccess::GetPrimaryPoolCluster()->create<Sprite>();
+  sprite->setName( name );
+  sprite->setResourceGroupName( groupName );
+
+  _getGroup( groupName )->sprites.insert( name, sprite );
+  return sprite;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 MaterialPtr ResourceController::createMaterial( const string& name, const string& groupName )
 {
   auto mat = MemoryAccess::GetPrimaryPoolCluster()->create<Material>();
@@ -307,6 +320,13 @@ MaterialPtr ResourceController::cloneMaterial( const string& name, const string&
 GPUProgramPtr ResourceController::getGPUProgram( const string& name, const string& groupName )
 {
   return _getGroup( groupName )->programs.get( name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+SpritePtr ResourceController::getSprite( const string& name, const string& groupName )
+{
+  return _getGroup( groupName )->sprites.get( name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -418,6 +438,13 @@ VertexBufferPtr Resource::CreateVertexBuffer( const string& name, const MeshType
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+SpritePtr Resource::CreateSprite( const string& name, const string& groupName )
+{
+  return ActiveContext->getResourceController()->createSprite( name, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 MaterialPtr Resource::CreateMaterial( const string& name, const string& groupName )
 {
   return ActiveContext->getResourceController()->createMaterial( name, groupName );
@@ -498,6 +525,13 @@ MaterialPtr Resource::CloneMaterial( const string& name, const string& cloneName
 GPUProgramPtr Resource::GetGPUProgram( const string& name, const string& groupName )
 {
   return ActiveContext->getResourceController()->getGPUProgram( name, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+SpritePtr Resource::GetSprite( const string& name, const string& groupName )
+{
+  return ActiveContext->getResourceController()->getSprite( name, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
