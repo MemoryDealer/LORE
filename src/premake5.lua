@@ -30,6 +30,10 @@ filter "configurations:Release"
     defines { "NDEBUG" }
     optimize "On"
 
+-- Systems
+filter "system:MacOSX"
+    cppdialect "C++14"
+
 -- Use latest C++ standard for all projects (using _HAS_CXX17 for now).
 --buildoptions { "/std:c++latest" }
 
@@ -61,7 +65,16 @@ project "Plugin_OpenGL"
     files {
         "Plugins/OpenGL/**.h", "Plugins/OpenGL/**.cpp",
     }
-    links { "LORE2D", "glfw3dll", "glad", "freetype" }
+    links { "LORE2D", "glad", "freetype" }
+
+    -- OS-specific options
+    filter { "system:Windows" }
+        links { "glfw3dll" }
+
+    filter { "system:MacOSX" }
+        links { "glfw3" }
+        linkoptions { "-framework Cocoa -framework IOKit -framework CoreVideo -framework OpenGL" }
+
     postbuildcommands { "{COPY} ../../../lib/x64/%{cfg.buildcfg}/ ../../../bin/%{cfg.buildcfg}/Run/" }
     postbuildcommands { "{COPY} ../../../res/ ../../../bin/%{cfg.buildcfg}/Run/res/" }
 
