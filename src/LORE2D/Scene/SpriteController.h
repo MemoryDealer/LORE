@@ -80,6 +80,9 @@ namespace Lore {
 
     void stopAnimation( const string& name );
 
+    void setXFlipped( const bool flipped );
+    void setYFlipped( const bool flipped );
+
     //
     // Getters.
 
@@ -94,12 +97,17 @@ namespace Lore {
 
     Animation& getActiveAnimation() const;
 
+    bool getXFlipped() const;
+    bool getYFlipped() const;
+
   private:
 
     size_t _activeFrame { 0 };
     AnimationMap _animations {};
     AnimationMap::iterator _activeAnimation { _animations.end() };
     FrameListenerController::FrameStartedCallback _animationCallback { nullptr };
+    bool _xFlipped { false };
+    bool _yFlipped { false };
 
   };
 

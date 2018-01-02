@@ -85,8 +85,13 @@ void GenericRenderer::addRenderData( Lore::EntityPtr e,
 
   // Get the active frame if this sprite is being manipulated with a SpriteController.
   size_t spriteFrame = 0;
-  if ( node->getSpriteController() ) {
-    spriteFrame = node->getSpriteController()->getActiveFrame();
+  bool xFlipped = false;
+  bool yFlipped = false;
+  const auto spc = node->getSpriteController();
+  if ( spc ) {
+    spriteFrame = spc->getActiveFrame();
+    xFlipped = spc->getXFlipped();
+    yFlipped = spc->getYFlipped();
   }
 
   if ( blended ) {
@@ -94,6 +99,8 @@ void GenericRenderer::addRenderData( Lore::EntityPtr e,
     t.material = e->getMaterial();
     t.vertexBuffer = e->getMesh()->getVertexBuffer();
     t.model = node->getFullTransform();
+    t.xFlipped = xFlipped;
+    t.yFlipped = yFlipped;
     t.spriteFrame = spriteFrame;
 
     const auto depth = node->getDepth();
@@ -114,6 +121,8 @@ void GenericRenderer::addRenderData( Lore::EntityPtr e,
     RenderQueue::RenderData rd;
     rd.model = node->getFullTransform();
     rd.model[3][2] = node->getDepth();
+    rd.xFlipped = xFlipped;
+    rd.yFlipped = yFlipped;
 
     renderData.push_back( rd );
   }
@@ -412,8 +421,18 @@ void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
     // Render each node associated with this entity data.
     for ( const RenderQueue::RenderData& rd : renderDataList ) {
 
+      Vec3 scale( 1.f, 1.f, 1.f );
+      if ( rd.xFlipped ) {
+        scale.x = -1.f;
+      }
+      if ( rd.yFlipped ) {
+        scale.y = -1.f;
+      }
+
+      const Matrix4 FlipMatrix = Math::CreateTransformationMatrix( Lore::Vec3(), Lore::Quaternion(), scale );
+
       // Calculate model-view-projection matrix for this object.
-      Matrix4 mvp = viewProjection * rd.model;
+      Matrix4 mvp = viewProjection * rd.model * FlipMatrix;
 
       program->setTransformVar( mvp );
 
@@ -486,7 +505,17 @@ void GenericRenderer::renderTransparents( const Lore::ScenePtr scene,
 
     {
       // Calculate model-view-projection matrix for this object.
-      Matrix4 mvp = viewProjection * t.model;
+      Vec3 scale( 1.f, 1.f, 1.f );
+      if ( t.xFlipped ) {
+        scale.x = -1.f;
+      }
+      if ( t.yFlipped ) {
+        scale.y = -1.f;
+      }
+
+      const Matrix4 FlipMatrix = Math::CreateTransformationMatrix( Lore::Vec3(), Lore::Quaternion(), scale );
+
+      Matrix4 mvp = viewProjection * t.model * FlipMatrix;
 
       program->setTransformVar( mvp );
 

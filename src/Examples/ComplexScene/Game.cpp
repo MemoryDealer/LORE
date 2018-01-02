@@ -92,6 +92,7 @@ void Game::loadScene()
   // In order to render our player sprite, we must create an entity, which describes
   // how to render a sprite (most of the time this is a TexturedQuad).
   Lore::EntityPtr playerEntity = Lore::Resource::CreateEntity( "player", Lore::MeshType::TexturedQuad );
+
   // Assign our player sprite to the entity so it can be rendered with it.
   // (The "player" sprite was loaded into the Core resource group in loadResources()).
   playerEntity->setSprite( Lore::Resource::GetSprite( "player" ) );
@@ -110,13 +111,32 @@ void Game::loadScene()
 
 void Game::processInput()
 {
+  // Player movement.
+  constexpr const Lore::real PlayerSpeed = 0.01f;
+  auto spc = _playerNode->getSpriteController();
+  Lore::Vec2 playerOffset;
+  if ( Lore::Input::GetKeyState( Lore::Keycode::W ) ) {
+    playerOffset.y += PlayerSpeed;
+  }
+  if ( Lore::Input::GetKeyState( Lore::Keycode::A ) ) {
+    playerOffset.x -= PlayerSpeed;
+    spc->setXFlipped( false );
+  }
+  if ( Lore::Input::GetKeyState( Lore::Keycode::S ) ) {
+    playerOffset.y -= PlayerSpeed;
+  }
+  if ( Lore::Input::GetKeyState( Lore::Keycode::D ) ) {
+    playerOffset.x += PlayerSpeed;
+    spc->setXFlipped( true );
+  }
+  _playerNode->translate( playerOffset );
 
   // Camera zooming.
   if ( Lore::Input::GetKeyState( Lore::Keycode::Z ) ) {
-    _camera->zoom( 0.01f );
+    _camera->zoom( 0.03f );
   }
   else if ( Lore::Input::GetKeyState( Lore::Keycode::X ) ) {
-    _camera->zoom( -0.01f );
+    _camera->zoom( -0.03f );
   }
 }
 

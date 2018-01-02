@@ -53,7 +53,9 @@ namespace Lore {
     // An instance of a type of Renderable attached to a node (e.g., Texture).
     struct RenderData
     {
-      Matrix4 model;
+      Matrix4 model {};
+      bool xFlipped { false };
+      bool yFlipped { false };
     };
     using RenderDataList = std::vector<RenderData>;
 
@@ -69,12 +71,14 @@ namespace Lore {
       }
     };
 
-    struct Transparent
+    struct Transparent // TODO: This is inconsistent with EntityData, clean these up.
     {
       MaterialPtr material { nullptr };
       VertexBufferPtr vertexBuffer { nullptr };
       size_t spriteFrame { 0 };
       Matrix4 model {};
+      bool xFlipped { false };
+      bool yFlipped { false };
     };
 
     struct BoxData

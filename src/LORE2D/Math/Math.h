@@ -81,7 +81,7 @@ namespace Lore {
                                                       const Quaternion& orientation,
                                                       const Vec3& scale )
     {
-      assert( ( scale.x == scale.y ) && ( scale.x == scale.z ) );
+     // assert( ( scale.x == scale.y ) && ( scale.x == scale.z ) );
 
       Matrix4 m;
       Matrix3 rot3x3 = orientation.createRotationMatrix();

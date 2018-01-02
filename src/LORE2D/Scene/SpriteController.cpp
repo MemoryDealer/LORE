@@ -86,6 +86,20 @@ SpriteController::Animation& SpriteController::getActiveAnimation() const
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+bool SpriteController::getXFlipped() const
+{
+  return _xFlipped;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+bool SpriteController::getYFlipped() const
+{
+  return _yFlipped;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void SpriteController::startAnimation( const string& name )
 {
   _activeAnimation = _animations.find( name );
@@ -132,6 +146,20 @@ void SpriteController::stopAnimation( const string& name )
   _activeAnimation = _animations.end();
   Context::UnregisterFrameStartedCallback( _animationCallback );
   _animationCallback = nullptr;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void SpriteController::setXFlipped( const bool flipped )
+{
+  _xFlipped = flipped;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void SpriteController::setYFlipped( const bool flipped )
+{
+  _yFlipped = flipped;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

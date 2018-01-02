@@ -56,13 +56,7 @@ int main( int argc, char** argv )
   auto lastTime = Time::now();
 
   while ( running ) {
-    // Process input.
-    if ( Lore::Input::GetKeyState( Lore::Keycode::Escape ) ) {
-      running = false;
-    }
-
-    game.processInput();
-
+    // Calculate delta time since last update.
     const auto now = Time::now();
     const auto dt = now - lastTime;
     lastTime = now;
@@ -73,7 +67,15 @@ int main( int argc, char** argv )
     while ( lag > timestep ) {
       lag -= timestep;
 
+      //
       // Update game/scene.
+
+      // Process input.
+      if ( Lore::Input::GetKeyState( Lore::Keycode::Escape ) ) {
+        running = false;
+      }
+
+      game.processInput();
     }
 
     // We are done updating, render a frame.
