@@ -55,6 +55,7 @@ namespace Lore {
 
   private:
 
+    void processAnimation( SpriteAnimationSetPtr animationSet, const SerializerValue& animations, ResourceControllerPtr resourceController );
     void processMaterial( MaterialPtr material, const SerializerValue& settings, ResourceControllerPtr resourceController );
 
   private:

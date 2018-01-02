@@ -30,6 +30,7 @@
 #include <LORE2D/Resource/Renderable/Sprite.h>
 #include <LORE2D/Resource/ResourceController.h>
 #include <LORE2D/Resource/StockResource.h>
+#include <LORE2D/Scene/SpriteController.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -60,6 +61,7 @@ void ResourceFileProcessor::LoadConfiguration( const string& file, ResourceContr
 ResourceType ResourceFileProcessor::GetResourceFileType( const string& file )
 {
   static const std::map<string, ResourceType> ExtensionMapping = {
+    { "animation", ResourceType::Animation },
     { "font", ResourceType::Font },
     { "material", ResourceType::Material },
     { "sprite", ResourceType::Sprite }
@@ -114,14 +116,18 @@ void ResourceFileProcessor::load( const string& groupName, ResourceControllerPtr
   default:
     break;
 
+  case ResourceType::Animation: {
+    auto animationSet = resourceController->createAnimationSet( getName(), groupName );
+    processAnimation( animationSet, _serializer.getValue( "animations" ), resourceController );
+  } break;
+
   case ResourceType::Font: {
     const auto file = _serializer.getValue( "file" ).toString();
     const auto size = _serializer.getValue( "size" ).toInt();
     resourceController->loadFont( getName(), file, size, groupName );
   } break;
 
-  case ResourceType::Material:
-  {
+  case ResourceType::Material: {
     auto material = resourceController->createMaterial( getName(), groupName );
     processMaterial( material, _serializer.getValue( "settings" ), resourceController );
   } break;
@@ -171,6 +177,31 @@ void ResourceFileProcessor::load( const string& groupName, ResourceControllerPtr
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void ResourceFileProcessor::processAnimation( SpriteAnimationSetPtr animationSet, const SerializerValue& animations, ResourceControllerPtr resourceController )
+{
+  for ( const auto& animation : animations.getValues() ) {
+    const auto& name = animation.first;
+    const auto& settings = animation.second;
+    const auto& frames = settings.get( "frames" ).toArray();
+    const auto& deltaTimes = settings.get( "deltaTimes" ).toArray();
+
+    // Create an animation to add to the animation set.
+    SpriteController::Animation animation;
+
+    // Process frames and delta times.
+    for ( const auto& frame : frames ) {
+      animation.frames.push_back( static_cast<size_t>( frame.toInt() ) );
+    }
+    for ( const auto& dt : deltaTimes ) {
+      animation.deltaTimes.push_back( static_cast< long >( dt.toInt() ) );
+    }
+
+    animationSet->addAnimation( name, animation );
+  }
+}
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void ResourceFileProcessor::processMaterial( MaterialPtr material, const SerializerValue& settings, ResourceControllerPtr resourceController )

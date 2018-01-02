@@ -112,6 +112,10 @@ namespace Lore {
 
     Registry<std::unordered_map, Sprite> sprites {};
 
+    // Animation sets.
+
+    Registry<std::unordered_map, SpriteAnimationSet> animationSets {};
+
     // Textboxes.
 
     Registry<std::unordered_map, Textbox> textboxes {};
@@ -187,6 +191,8 @@ namespace Lore {
 
     SpritePtr createSprite( const string& name, const string& groupName = DefaultGroupName );
 
+    SpriteAnimationSetPtr createAnimationSet( const string& name, const string& groupName = DefaultGroupName );
+
     MaterialPtr createMaterial( const string& name, const string& groupName = DefaultGroupName );
 
     CameraPtr createCamera( const string& name, const string& groupName = DefaultGroupName );
@@ -222,6 +228,8 @@ namespace Lore {
     GPUProgramPtr getGPUProgram( const string& name, const string& groupName = DefaultGroupName );
 
     SpritePtr getSprite( const string& name, const string& groupName = DefaultGroupName );
+
+    SpriteAnimationSetPtr getAnimationSet( const string& name, const string& groupName = DefaultGroupName );
 
     MaterialPtr getMaterial( const string& name, const string& groupName = DefaultGroupName );
 
@@ -329,6 +337,8 @@ namespace Lore {
     static GPUProgramPtr GetGPUProgram( const string& name, const string& groupName = ResourceController::DefaultGroupName );
 
     static SpritePtr GetSprite( const string& name, const string& groupName = ResourceController::DefaultGroupName );
+
+    static SpriteAnimationSetPtr GetAnimationSet( const string& name, const string& groupName = ResourceController::DefaultGroupName );
 
     static MaterialPtr GetMaterial( const string& name, const string& groupName = ResourceController::DefaultGroupName );
 

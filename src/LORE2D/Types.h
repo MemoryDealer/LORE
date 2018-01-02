@@ -57,6 +57,7 @@ namespace Lore {
   class Scene;
   class Shader;
   class Sprite;
+  class SpriteAnimationSet;
   class SpriteController;
   class StockResourceController;
   class Textbox;
@@ -91,6 +92,7 @@ namespace Lore {
   using ScenePtr = Scene*;
   using ShaderPtr = Shader*;
   using SpritePtr = Sprite*;
+  using SpriteAnimationSetPtr = SpriteAnimationSet*;
   using SpriteControllerPtr = SpriteController*;
   using StockResourceControllerPtr = StockResourceController*;
   using TextboxPtr = Textbox*;

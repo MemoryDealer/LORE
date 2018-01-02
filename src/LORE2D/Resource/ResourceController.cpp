@@ -33,6 +33,7 @@
 #include <LORE2D/Resource/Renderable/Box.h>
 #include <LORE2D/Resource/Renderable/Sprite.h>
 #include <LORE2D/Resource/Renderable/Textbox.h>
+#include <LORE2D/Scene/SpriteController.h> // TODO: This should be in resources?
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -154,6 +155,7 @@ void ResourceController::loadGroup( const string& groupName )
 
   // Load resource types in correct order so dependencies are ready.
   std::vector<ResourceType> typeOrder = { ResourceType::Sprite,
+                                          ResourceType::Animation,
                                           ResourceType::Font,
                                           ResourceType::GPUProgram,
                                           ResourceType::Material };
@@ -224,6 +226,18 @@ SpritePtr ResourceController::createSprite( const string& name, const string& gr
 
   _getGroup( groupName )->sprites.insert( name, sprite );
   return sprite;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+SpriteAnimationSetPtr ResourceController::createAnimationSet( const string& name, const string& groupName )
+{
+  auto animationSet = MemoryAccess::GetPrimaryPoolCluster()->create<SpriteAnimationSet>();
+  animationSet->setName( name );
+  animationSet->setResourceGroupName( groupName );
+
+  _getGroup( groupName )->animationSets.insert( name, animationSet );
+  return animationSet;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -342,6 +356,13 @@ GPUProgramPtr ResourceController::getGPUProgram( const string& name, const strin
 SpritePtr ResourceController::getSprite( const string& name, const string& groupName )
 {
   return _getGroup( groupName )->sprites.get( name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+SpriteAnimationSetPtr ResourceController::getAnimationSet( const string& name, const string& groupName )
+{
+  return _getGroup( groupName )->animationSets.get( name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -554,6 +575,13 @@ GPUProgramPtr Resource::GetGPUProgram( const string& name, const string& groupNa
 SpritePtr Resource::GetSprite( const string& name, const string& groupName )
 {
   return ActiveContext->getResourceController()->getSprite( name, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+SpriteAnimationSetPtr Resource::GetAnimationSet( const string& name, const string& groupName )
+{
+  return ActiveContext->getResourceController()->getAnimationSet( name, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

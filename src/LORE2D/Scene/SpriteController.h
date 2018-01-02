@@ -25,13 +25,39 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Memory/Alloc.h>
+#include <LORE2D/Renderer/FrameListener/FrameListenerController.h>
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 namespace Lore {
+
+  class SpriteAnimationSet;
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
   ///
   /// \class SpriteController
   /// \brief Provides functionality to animate sprites for a single node.
   class LORE_EXPORT SpriteController final
   {
+
+  public:
+
+    struct Animation
+    {
+      using FrameList = std::vector<size_t>;
+      using DeltaTimeList = std::vector<long>;
+
+      size_t activeFrameIndex { 0 };
+      FrameList frames {};
+      DeltaTimeList deltaTimes {};
+      std::chrono::high_resolution_clock::time_point lastTimePoint {};
+    };
+
+    using AnimationMap = std::map<string, Animation>;
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
   public:
 
@@ -46,6 +72,14 @@ namespace Lore {
       _activeFrame = frame;
     }
 
+    void useAnimationSet( const SpriteAnimationSetPtr set );
+
+    Animation& createAnimation( const string& name );
+
+    void startAnimation( const string& name );
+
+    void stopAnimation( const string& name );
+
     //
     // Getters.
 
@@ -54,9 +88,44 @@ namespace Lore {
       return _activeFrame;
     }
 
+    Animation& getAnimation( const string& name );
+
+    bool hasActiveAnimation() const;
+
+    Animation& getActiveAnimation() const;
+
   private:
 
     size_t _activeFrame { 0 };
+    AnimationMap _animations {};
+    AnimationMap::iterator _activeAnimation { _animations.end() };
+    FrameListenerController::FrameStartedCallback _animationCallback { nullptr };
+
+  };
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  class LORE_EXPORT SpriteAnimationSet : public Alloc<SpriteAnimationSet>
+  {
+
+    LORE_OBJECT_BODY()
+
+  public:
+
+    SpriteAnimationSet() = default;
+    ~SpriteAnimationSet() = default;
+
+    void addAnimation( const string& name, const SpriteController::Animation& animation );
+
+    const SpriteController::AnimationMap& getAnimations() const;
+
+  private:
+
+    virtual void _reset() override { }
+
+  private:
+
+    SpriteController::AnimationMap _animations {};
 
   };
 

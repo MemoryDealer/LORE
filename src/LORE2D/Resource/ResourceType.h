@@ -29,6 +29,7 @@ namespace Lore {
 
   enum class ResourceType
   {
+    Animation,
     Font,
     Material,
     Sprite,
