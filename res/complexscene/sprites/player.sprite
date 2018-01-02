@@ -1,0 +1,9 @@
+{
+  "name":"player",
+  "textures": {
+    "eye0":"res/complexscene/images/eye/eye0.png",
+    "eye1":"res/complexscene/images/eye/eye1.png",
+    "eye2":"res/complexscene/images/eye/eye2.png",
+    "eye3":"res/complexscene/images/eye/eye3.png"
+  }
+}

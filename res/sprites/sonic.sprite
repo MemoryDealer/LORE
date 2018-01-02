@@ -1,8 +1,0 @@
-{
-  "name":"sonic-mobile",
-  "textures": {
-    "wizard0":"res/images/wizard/wizard0.png",
-    "wizard1":"res/images/wizard/wizard1.png",
-    "wizard2":"res/images/wizard/wizard2.png"
-  }
-}

@@ -100,7 +100,7 @@ int main( int argc, char** argv )
   // Hack.
   Lore::CLI::SetActiveScene( scene );
 
-  Lore::Viewport vp( 0.f, 0.f, 1.f, 1.f );
+  Lore::Rect vp( 0.f, 0.f, 1.f, 1.f );
   Lore::CameraPtr camera = Lore::Resource::CreateCamera( "cam1" );
   __camera = camera;
   Lore::RenderView rv( "main", scene, vp );

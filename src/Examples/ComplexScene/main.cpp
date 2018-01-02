@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,71 +24,63 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Math/Rectangle.h>
-#include <LORE2D/Scene/Camera.h>
-#include <LORE2D/Scene/Scene.h>
+#include "Game.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+using namespace std::chrono_literals;
 
-  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+using Time = std::chrono::high_resolution_clock;
 
-  ///
-  /// \class RenderView
-  /// \brief Contains the information needed to render a scene to a window.
-  /// \details ...
-  struct RenderView final
-  {
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    string name {};
-    ScenePtr scene { nullptr };
-    CameraPtr camera { nullptr };
-    RenderTargetPtr renderTarget { nullptr };
-    UIPtr ui { nullptr };
+int main( int argc, char** argv )
+{
+  // Use our simple game class.
+  // The constructor will create a Lore context and a small window.
+  Game game;
 
-    Rect viewport {};
+  // Index and load resources specified in res/complexscene/resources.json.
+  game.loadResources();
 
-    // Viewports are stored in a union, so each render plugin can do the 
-    // conversion once, when the RenderView is added to a window.
-    union
-    {
+  // Add some contents to the scene.
+  game.loadScene();
 
-      struct
-      {
-        int x, y;
-        uint width, height;
-        real aspectRatio;
-      }  gl_viewport;
+  //
+  // Setup is complete, begin processing the scene.
 
-    };
+  // Start a frame rate independent game loop with a fixed timestep.
+  constexpr const std::chrono::nanoseconds timestep( 16ms );
+  bool running = true;
+  std::chrono::nanoseconds lag( 0ns );
+  auto lastTime = Time::now();
 
-    RenderView( const string& name_ )
-      : name( name_ )
-    {
+  while ( running ) {
+    // Process input.
+    if ( Lore::Input::GetKeyState( Lore::Keycode::Escape ) ) {
+      running = false;
     }
 
-    RenderView( const string& name_, ScenePtr scene_ )
-      : name( name_ )
-      , scene( scene_ )
-    {
+    game.processInput();
+
+    const auto now = Time::now();
+    const auto dt = now - lastTime;
+    lastTime = now;
+
+    // Increment our lag counter to track how much "catching up" we need to do.
+    lag += std::chrono::duration_cast< std::chrono::nanoseconds >( dt );
+
+    while ( lag > timestep ) {
+      lag -= timestep;
+
+      // Update game/scene.
     }
 
-    RenderView( const string& name_, ScenePtr scene_, const Rect& viewport_ )
-      : name( name_ )
-      , scene( scene_ )
-      , viewport( viewport_ )
-    {
-    }
+    // We are done updating, render a frame.
+    game.render();
+  }
 
-    bool operator == ( const RenderView& rhs ) const
-    {
-      // RenderView names are unique.
-      return ( name == rhs.name );
-    }
-
-  };
-
+  return 0;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -167,8 +167,8 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
     rv.renderTarget->bind();
     _api->setViewport( 0,
                        0,
-                       static_cast<uint32_t>( rv.viewport.width * rv.renderTarget->getWidth() ),
-                       static_cast<uint32_t>( rv.viewport.height * rv.renderTarget->getHeight() ) );
+                       static_cast<uint32_t>( rv.viewport.w * rv.renderTarget->getWidth() ),
+                       static_cast<uint32_t>( rv.viewport.h * rv.renderTarget->getHeight() ) );
   }
   else {
     // TODO: Get rid of gl_viewport.

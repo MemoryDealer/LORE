@@ -25,71 +25,40 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Math/Rectangle.h>
-#include <LORE2D/Scene/Camera.h>
-#include <LORE2D/Scene/Scene.h>
+#include <LORE2D/Lore.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+// A simple class to handle setup and processing for the complex scene.
+class Game final
+{
 
-  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+public:
 
-  ///
-  /// \class RenderView
-  /// \brief Contains the information needed to render a scene to a window.
-  /// \details ...
-  struct RenderView final
-  {
+  Game();
+  ~Game();
 
-    string name {};
-    ScenePtr scene { nullptr };
-    CameraPtr camera { nullptr };
-    RenderTargetPtr renderTarget { nullptr };
-    UIPtr ui { nullptr };
+  void loadResources();
 
-    Rect viewport {};
+  void loadScene();
 
-    // Viewports are stored in a union, so each render plugin can do the 
-    // conversion once, when the RenderView is added to a window.
-    union
-    {
+  void processInput();
 
-      struct
-      {
-        int x, y;
-        uint width, height;
-        real aspectRatio;
-      }  gl_viewport;
+  void render();
 
-    };
+private:
 
-    RenderView( const string& name_ )
-      : name( name_ )
-    {
-    }
+  // This class is the owner of the Lore context, so it must use a unique_ptr.
+  // Most other Lore objects are accessed via raw pointers, since they are owned
+  // inside the Lore library.
+  std::unique_ptr<Lore::Context> _context { nullptr };
+  Lore::WindowPtr _window { nullptr };
 
-    RenderView( const string& name_, ScenePtr scene_ )
-      : name( name_ )
-      , scene( scene_ )
-    {
-    }
+  Lore::ScenePtr _scene { nullptr };
+  Lore::CameraPtr _camera { nullptr };
 
-    RenderView( const string& name_, ScenePtr scene_, const Rect& viewport_ )
-      : name( name_ )
-      , scene( scene_ )
-      , viewport( viewport_ )
-    {
-    }
+  Lore::NodePtr _playerNode { nullptr };
 
-    bool operator == ( const RenderView& rhs ) const
-    {
-      // RenderView names are unique.
-      return ( name == rhs.name );
-    }
-
-  };
-
-}
+};
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

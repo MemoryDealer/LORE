@@ -17,7 +17,7 @@ characterset ( "MBCS" )
 
 solution "LORE2D"
     configurations { "Debug", "Release" }
-    startproject "Driver"
+    startproject "Example_ComplexScene"
 
 
 -- Configurations
@@ -37,8 +37,9 @@ filter "system:MacOSX"
 -- Use latest C++ standard for all projects (using _HAS_CXX17 for now).
 --buildoptions { "/std:c++latest" }
 
-
+--
 -- Project(s)
+--
 
 project "LORE2D"
     location "LORE2D"
@@ -63,7 +64,7 @@ project "Plugin_OpenGL"
     pchsource "Plugins/OpenGL/_pch.cpp"
     forceincludes { "_pch.h" }
     files {
-        "Plugins/OpenGL/**.h", "Plugins/OpenGL/**.cpp",
+        "Plugins/OpenGL/**.h", "Plugins/OpenGL/**.cpp"
     }
     links { "LORE2D", "glad", "freetype" }
 
@@ -85,6 +86,22 @@ project "glad"
     files {
         "Plugins/ThirdParty/glad/*.h", "Plugins/ThirdParty/glad/*.c"
     }
+
+--
+-- Examples
+--
+
+project "Example_ComplexScene"
+    location "Examples/ComplexScene"
+    kind "ConsoleApp"
+    language "C++"
+    defines { "_HAS_CXX17" }
+    files { 
+        "Examples/ComplexScene/**.h",
+        "Examples/ComplexScene/**.cpp"
+    }
+    links { "LORE2D" }
+    postbuildcommands { "{COPY} ../../../res/ ../../../bin/%{cfg.buildcfg}/Run/res/" }
 
 project "Driver"
     location "Driver"

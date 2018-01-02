@@ -153,7 +153,7 @@ Lore::GPUProgramPtr StockResourceController::createUberProgram( const string& na
 
   // Material.
   src += "struct Material {";
-  src += "vec3 ambient;";
+  src += "vec4 ambient;";
   src += "vec4 diffuse;";
   src += "};";
   src += "uniform Material material;";
@@ -175,7 +175,7 @@ Lore::GPUProgramPtr StockResourceController::createUberProgram( const string& na
     src += "uniform Light lights[" + std::to_string( params.maxLights ) + "];";
     src += "uniform int numLights;";
 
-    src += "uniform vec3 sceneAmbient;";
+    src += "uniform vec4 sceneAmbient;";
 
     src += "in vec2 FragPos;";
 
@@ -189,7 +189,7 @@ Lore::GPUProgramPtr StockResourceController::createUberProgram( const string& na
     src += "const float att = l.intensity / (l.constant + l.linear * d + l.quadratic * pow(d, 2.0));";
 
     src += "const vec3 lDiffuse = l.color * material.diffuse.rgb * att;";
-    src += "const vec3 lAmbient = material.ambient * sceneAmbient;";
+    src += "const vec3 lAmbient = material.ambient.rgb * sceneAmbient.rgb;";
 
     src += "return lDiffuse + lAmbient;";
 
@@ -215,7 +215,7 @@ Lore::GPUProgramPtr StockResourceController::createUberProgram( const string& na
   src += "texSample.a *= material.diffuse.a;";
 
   if ( lit ) {
-    src += "vec3 lighting = vec3(0.0, 0.0, 0.0);";
+    src += "vec3 lighting = material.ambient.rgb * sceneAmbient.rgb;";
 
     src += "for(int i=0; i<numLights; ++i){";
     src += "  lighting += CalcPointLight(lights[i]);";

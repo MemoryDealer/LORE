@@ -121,11 +121,11 @@ void GLWindow::addRenderView( const Lore::RenderView& renderView )
 {
     // Convert Viewport to gl_viewport.
     RenderView rv = renderView;
-    Viewport vp = rv.viewport;
+    Rect vp = rv.viewport;
     rv.gl_viewport.x = static_cast< int >( vp.x * static_cast<float>( _frameBufferWidth ) );
     rv.gl_viewport.y = static_cast< int >( vp.y * static_cast<float>( _frameBufferHeight ) );
-    rv.gl_viewport.width = static_cast< int >( vp.width * static_cast<float>( _frameBufferWidth ) );
-    rv.gl_viewport.height = static_cast< int >( vp.height * static_cast<float>( _frameBufferHeight ) );
+    rv.gl_viewport.width = static_cast< int >( vp.w * static_cast<float>( _frameBufferWidth ) );
+    rv.gl_viewport.height = static_cast< int >( vp.h * static_cast<float>( _frameBufferHeight ) );
 
     rv.gl_viewport.aspectRatio = static_cast< real >( rv.gl_viewport.width ) / rv.gl_viewport.height;
 
@@ -169,8 +169,8 @@ void GLWindow::updateRenderViews()
     for ( auto& rv : _renderViews ) {
         rv.gl_viewport.x = static_cast< int >( rv.viewport.x * static_cast<float>( _frameBufferWidth ) );
         rv.gl_viewport.y = static_cast< int >( rv.viewport.y * static_cast<float>( _frameBufferHeight ) );
-        rv.gl_viewport.width = static_cast< int >( rv.viewport.width * static_cast<float>( _frameBufferWidth ) );
-        rv.gl_viewport.height = static_cast< int >( rv.viewport.height * static_cast<float>( _frameBufferHeight ) );
+        rv.gl_viewport.width = static_cast< int >( rv.viewport.w * static_cast<float>( _frameBufferWidth ) );
+        rv.gl_viewport.height = static_cast< int >( rv.viewport.h * static_cast<float>( _frameBufferHeight ) );
     }
 }
 
