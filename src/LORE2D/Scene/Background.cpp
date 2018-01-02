@@ -28,6 +28,7 @@
 
 #include <LORE2D/Core/Exception.h>
 #include <LORE2D/Resource/StockResource.h>
+#include <LORE2D/Scene/SpriteController.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -99,17 +100,18 @@ void Background::Layer::setScrollSpeed( const Vec2& speed )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-//SpriteControllerPtr Background::Layer::createSpriteController()
-//{
-//  _spriteController.reset();
-//  _spriteController = std::make_unique<SpriteController>();
-//}
-//
-//// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-//
-//SpriteControllerPtr Background::Layer::getSpriteController() const
-//{
-//  return _spriteController.get();
-//}
+SpriteControllerPtr Background::Layer::createSpriteController()
+{
+  _spriteController.reset();
+  _spriteController = std::make_shared<SpriteController>();
+  return _spriteController.get();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+SpriteControllerPtr Background::Layer::getSpriteController() const
+{
+  return _spriteController.get();
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

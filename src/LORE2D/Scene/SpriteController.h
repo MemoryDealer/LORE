@@ -27,7 +27,10 @@
 
 namespace Lore {
 
-  class SpriteController final
+  ///
+  /// \class SpriteController
+  /// \brief Provides functionality to animate sprites for a single node.
+  class LORE_EXPORT SpriteController final
   {
 
   public:

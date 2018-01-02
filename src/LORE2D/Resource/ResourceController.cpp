@@ -171,6 +171,14 @@ void ResourceController::unloadGroup( const string& groupName )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void ResourceController::reloadGroup( const string& groupName )
+{
+  unloadGroup( groupName );
+  loadGroup( groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 EntityPtr ResourceController::createEntity( const string& name, const MeshType& type, const string& groupName )
 {
   auto group = _getGroup( groupName );
@@ -399,6 +407,13 @@ void Resource::IndexResourceLocation( const string& directory, const string& gro
 void Resource::LoadGroup( const string& groupName )
 {
   return ActiveContext->getResourceController()->loadGroup( groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Resource::ReloadGroup( const string& groupName )
+{
+  return ActiveContext->getResourceController()->unloadGroup( groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

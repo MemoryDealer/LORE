@@ -156,6 +156,8 @@ namespace Lore {
 
     void unloadGroup( const string& groupName );
 
+    void reloadGroup( const string& groupName );
+
     //
     // Loading.
 
@@ -266,6 +268,8 @@ namespace Lore {
     static void IndexResourceLocation( const string& directory, const string& groupName = ResourceController::DefaultGroupName, const bool recursive = false );
 
     static void LoadGroup( const string& groupName );
+
+    static void ReloadGroup( const string& groupName );
 
     //
     // Loading.

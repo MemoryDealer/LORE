@@ -317,9 +317,9 @@ void GenericRenderer::renderBackground( const Lore::RenderView& rv,
 
       // Get the active sprite frame for this layer.
       size_t spriteFrame = 0;
-      /*if ( layer.getSpriteController() ) {
+      if ( layer.getSpriteController() ) {
         spriteFrame = layer.getSpriteController()->getActiveFrame();
-      }*/
+      }
 
       TexturePtr texture = mat->sprite->getTexture( spriteFrame );
       program->use();
