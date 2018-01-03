@@ -83,7 +83,7 @@ void ResourceController::indexResourceFile( const string& file, const string& gr
 {
   // Validate file type.
   const auto resourceType = ResourceFileProcessor::GetResourceFileType( file );
-  if ( ResourceType::Count == resourceType ) {
+  if ( SerializableResource::Count == resourceType ) {
     log_warning( "Not indexing file " + file + ", not a valid file type" );
     return;
   }
@@ -135,7 +135,7 @@ void ResourceController::indexResourceLocation( const string& directory, const s
 void ResourceController::loadGroup( const string& groupName )
 {
   // Place indexed resources into queue so they can be loaded in the correct order.
-  std::vector<ResourceGroup::IndexedResource*> loadQueues[static_cast<int>( ResourceType::Count )];
+  std::vector<ResourceGroup::IndexedResource*> loadQueues[static_cast<int>( SerializableResource::Count )];
   auto group = _getGroup( groupName );
   for ( auto it = group->index.begin(); it != group->index.end(); ++it ) {
     auto& index = it->second;
@@ -144,7 +144,7 @@ void ResourceController::loadGroup( const string& groupName )
     }
   }
 
-  auto LoadResourcesByType = [&, this] ( const ResourceType type ) {
+  auto LoadResourcesByType = [&, this] ( const SerializableResource type ) {
     auto& queue = loadQueues[static_cast< int >( type )];
     for ( auto& index : queue ) {
       ResourceFileProcessor processor( index->file, type );
@@ -154,11 +154,13 @@ void ResourceController::loadGroup( const string& groupName )
   };
 
   // Load resource types in correct order so dependencies are ready.
-  std::vector<ResourceType> typeOrder = { ResourceType::Sprite,
-                                          ResourceType::Animation,
-                                          ResourceType::Font,
-                                          ResourceType::GPUProgram,
-                                          ResourceType::Material };
+  std::vector<SerializableResource> typeOrder = { SerializableResource::Texture,
+                                                  SerializableResource::Sprite,
+                                                  SerializableResource::SpriteList,
+                                                  SerializableResource::SpriteAnimation,
+                                                  SerializableResource::Font,
+                                                  SerializableResource::GPUProgram,
+                                                  SerializableResource::Material };
   for ( const auto& type : typeOrder ) {
     LoadResourcesByType( type );
   }

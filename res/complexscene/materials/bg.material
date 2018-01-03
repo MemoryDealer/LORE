@@ -1,7 +1,7 @@
 {
-  "name":"bg",
+  "name":"clouds",
   "settings": {
-    "sprite":"bg",
+    "sprite":"clouds",
     "StockProgram":"background",
     "diffuse":[1.0, 1.0, 1.0, 1.0],
     "blend":true,

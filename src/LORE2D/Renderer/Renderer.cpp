@@ -24,66 +24,19 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Game.h"
+#include "Renderer.h"
+
+#include <LORE2D/Resource/Material.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-using namespace std::chrono_literals;
-
-using Clock = std::chrono::high_resolution_clock;
+using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-int main( int argc, char** argv )
+bool Lore::RenderQueue::EntityData::operator < ( const EntityData & r ) const
 {
-  // Use our simple game class.
-  // The constructor will create a Lore context and a small window.
-  Game game;
-
-  // Index and load resources specified in res/complexscene/resources.json.
-  game.loadResources();
-
-  // Add some contents to the scene.
-  game.loadScene();
-
-  //
-  // Setup is complete, begin processing the scene.
-
-  // Start a frame rate independent game loop with a fixed timestep.
-  constexpr const std::chrono::nanoseconds timestep( 16ms );
-  bool running = true;
-  std::chrono::nanoseconds lag( 0ns );
-  auto lastTime = Clock::now();
-
-  while ( running ) {
-    // Calculate delta time since last update.
-    const auto now = Clock::now();
-    const auto dt = now - lastTime;
-    lastTime = now;
-
-    // Increment our lag counter to track how much "catching up" we need to do.
-    lag += std::chrono::duration_cast< std::chrono::nanoseconds >( dt );
-
-    while ( lag > timestep ) {
-      lag -= timestep;
-
-      //
-      // Update game/scene.
-
-      // Process input.
-      if ( Lore::Input::GetKeyState( Lore::Keycode::Escape ) ||
-           Lore::Input::GetKeyState( Lore::Keycode::End ) ) {
-        running = false;
-      }
-
-      game.processInput();
-    }
-
-    // We are done updating, render a frame.
-    game.render();
-  }
-
-  return 0;
+  return ( material->getName() < r.material->getName() );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

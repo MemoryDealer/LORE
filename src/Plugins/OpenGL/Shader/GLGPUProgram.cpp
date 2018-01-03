@@ -190,12 +190,12 @@ void GLGPUProgram::setUniformVar( const string& id, const int i )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLGPUProgram::updateLights( Lore::Scene::LightMap::ConstIterator it )
+void GLGPUProgram::updateLights( const Lore::RenderQueue::LightList& lights )
 {
   int i = 0;
-  while ( it.hasMore() ) {
-    auto l = it.getNext();
+  for( const auto& lightData : lights ) {
     const string idx( "lights[" + std::to_string( i ) + "]" );
+    const auto light = lightData.light;
 
     //
     // Update all light properties.
@@ -207,12 +207,12 @@ void GLGPUProgram::updateLights( Lore::Scene::LightMap::ConstIterator it )
     auto quadraticID = glGetUniformLocation( _program, ( idx + ".quadratic" ).c_str() );
     auto intensityID = glGetUniformLocation( _program, ( idx + ".intensity" ).c_str() );
 
-    glUniform2f( posID, l->getPosition().x, l->getPosition().y );
-    glUniform3f( colorID, l->getColor().r, l->getColor().g, l->getColor().b );
-    glUniform1f( constantID, l->getConstant() );
-    glUniform1f( linearID, l->getLinear() );
-    glUniform1f( quadraticID, l->getQuadratic() );
-    glUniform1f( intensityID, l->getIntensity() );
+    glUniform2f( posID, lightData.pos.x, lightData.pos.y );
+    glUniform3f( colorID, light->getColor().r, light->getColor().g, light->getColor().b );
+    glUniform1f( constantID, light->getConstant() );
+    glUniform1f( linearID, light->getLinear() );
+    glUniform1f( quadraticID, light->getQuadratic() );
+    glUniform1f( intensityID, light->getIntensity() );
 
     ++i;
   }

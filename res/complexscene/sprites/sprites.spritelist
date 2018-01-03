@@ -1,0 +1,16 @@
+{
+  "player":[
+    "eye0",
+    "eye1",
+    "eye2",
+    "eye3"
+  ],
+  "stone":["stone"],
+  "block":["block"],
+  "torch":[
+    "torch0",
+    "torch1",
+    "torch2",
+    "torch3"
+  ]
+}

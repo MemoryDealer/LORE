@@ -142,8 +142,11 @@ string CLI::GetNextCommand()
     return string();
   }
 
-  if ( 0 != CommandHistoryIdx ) {
+  if ( 0 < CommandHistoryIdx ) {
     --CommandHistoryIdx;
+  }
+  else if ( -1 == CommandHistoryIdx ) {
+    return string();
   }
 
   return CommandHistory[CommandHistoryIdx];

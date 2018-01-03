@@ -60,7 +60,9 @@ void ResourceIndexer::traverseDirectory( const string& directory, ResourceContro
     }
 
     if ( fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) {
-      // TODO: Recurse.
+      if ( recursive ) {
+        traverseDirectory( directory + "/" + fd.cFileName, resourceController, true );
+      }
       continue;
     }
 

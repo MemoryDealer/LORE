@@ -56,7 +56,8 @@ namespace Lore {
     using BoxListConstIterator = BoxList::ConstIterator;
     using TextboxList = Registry<std::map, Textbox>;
     using TextboxListConstIterator = TextboxList::ConstIterator;
-    using LightList = std::vector<LightPtr>;
+    using LightList = Registry<std::map, Light>;
+    using LightListConstIterator = LightList::ConstIterator;
     using CameraList = std::vector<CameraPtr>;
 
     struct Transform
@@ -133,6 +134,11 @@ namespace Lore {
     inline TextboxListConstIterator getTextboxListConstIterator() const
     {
       return _textboxes.getConstIterator();
+    }
+
+    inline LightListConstIterator getLightListConstIterator() const
+    {
+      return _lights.getConstIterator();
     }
 
     // Misc.

@@ -32,7 +32,7 @@
 #include <LORE2D/Resource/Mesh.h>
 #include <LORE2D/Resource/Registry.h>
 #include <LORE2D/Resource/ResourceIndexer.h>
-#include <LORE2D/Resource/ResourceType.h>
+#include <LORE2D/Resource/SerializableResource.h>
 #include <LORE2D/Resource/Texture.h>
 #include <LORE2D/Scene/Camera.h>
 #include <LORE2D/Shader/GPUProgram.h>
@@ -50,7 +50,7 @@ namespace Lore {
 
     struct IndexedResource
     {
-      ResourceType type;
+      SerializableResource type;
       string file;
       bool loaded;
     };
@@ -154,7 +154,7 @@ namespace Lore {
 
     void loadResourceConfiguration( const string& file );
 
-    void indexResourceLocation( const string& directory, const string& groupName = DefaultGroupName, const bool recursive = false );
+    void indexResourceLocation( const string& directory, const string& groupName = DefaultGroupName, const bool recursive = true );
 
     void loadGroup( const string& groupName );
 
@@ -273,7 +273,7 @@ namespace Lore {
 
     static void LoadResourceConfiguration( const string& file );
 
-    static void IndexResourceLocation( const string& directory, const string& groupName = ResourceController::DefaultGroupName, const bool recursive = false );
+    static void IndexResourceLocation( const string& directory, const string& groupName = ResourceController::DefaultGroupName, const bool recursive = true );
 
     static void LoadGroup( const string& groupName );
 

@@ -47,11 +47,6 @@ namespace Lore {
     //
     // Getters.
 
-    inline Vec2 getPosition() const
-    {
-      return _position;
-    }
-
     inline Color getColor() const
     {
       return _color;
@@ -119,7 +114,6 @@ namespace Lore {
 
   private:
 
-    Vec2 _position;
     Color _color;
 
     // Attenuation.

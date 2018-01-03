@@ -26,7 +26,6 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 #include <LORE2D/Window/RenderView.h>
-#include <LORE2D/Resource/Material.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -65,10 +64,7 @@ namespace Lore {
       VertexBufferPtr vertexBuffer { nullptr };
       size_t spriteFrame { 0 };
 
-      bool operator < ( const EntityData& r ) const
-      {
-        return ( material->getName() < r.material->getName() );
-      }
+      bool operator < ( const EntityData& r ) const;
     };
 
     struct Transparent // TODO: This is inconsistent with EntityData, clean these up.
@@ -93,16 +89,24 @@ namespace Lore {
       Matrix4 model {};
     };
 
+    struct LightData
+    {
+      LightPtr light { nullptr };
+      Vec2 pos {};
+    };
+
     // Every Material maps to a list of RenderData.
     using EntityDataMap = std::map<EntityData, RenderDataList>;
     using TransparentDataMap = std::multimap<real, Transparent>;
     using BoxList = std::vector<BoxData>;
     using TextboxList = std::vector<TextboxData>;
+    using LightList = std::vector<LightData>;
 
     EntityDataMap solids {};
     TransparentDataMap transparents {};
     BoxList boxes {};
     TextboxList textboxes {};
+    LightList lights {};
 
   };
 
@@ -131,6 +135,9 @@ namespace Lore {
 
     virtual void addTextbox( Lore::TextboxPtr textbox,
                              const Lore::Matrix4& transform ) = 0;
+
+    virtual void addLight( Lore::LightPtr light,
+                           const Lore::NodePtr node ) = 0;
 
     ///
     /// \brief Uses internal Renderable lists to create a frame buffer using

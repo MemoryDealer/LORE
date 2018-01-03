@@ -27,13 +27,15 @@
 
 namespace Lore {
 
-  enum class ResourceType
+  enum class SerializableResource
   {
-    Animation,
     Font,
+    GPUProgram,
     Material,
     Sprite,
-    GPUProgram,
+    SpriteAnimation,
+    SpriteList,
+    Texture,
 
     Count
   };

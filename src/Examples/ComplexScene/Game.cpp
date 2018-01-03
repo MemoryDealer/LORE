@@ -67,7 +67,8 @@ void Game::loadScene()
   // Create a scene with default background color.
   _scene = _context->createScene( "core" );
   _scene->setBackgroundColor( Lore::StockColor::White );
-  _scene->setAmbientLightColor( Lore::StockColor::White );
+  //_scene->setAmbientLightColor( Lore::Color( 0.6f, 0.6f, 0.6f, 1.f ) );
+  _scene->setAmbientLightColor( Lore::StockColor::Black );
 
   // Create a camera to view the scene.
   _camera = Lore::Resource::CreateCamera( "core" ); // TODO: Should this come from context?
@@ -91,6 +92,7 @@ void Game::loadScene()
   _playerNode = _scene->createNode( "player" );
   // Decrease its depth so it is rendered above other nodes.
   _playerNode->setDepth( -50.f );
+  _playerNode->setPosition( 0.f, 0.25f );
 
   // In order to render our player sprite, we must create an entity, which describes
   // how to render a sprite (most of the time this is a TexturedQuad).
@@ -140,6 +142,26 @@ void Game::loadScene()
     stoneNode->setDepth( 10.f );
     stoneNode->setPosition( -4.f + static_cast< Lore::real >( i * 0.4f ), 0.f );
   }
+
+  //
+  // Create some torches.
+
+  Lore::EntityPtr torchEntity = Lore::Resource::CreateEntity( "torch", Lore::MeshType::TexturedQuad );
+  torchEntity->setSprite( Lore::Resource::GetSprite( "torch" ) );
+  auto torchNode = _scene->createNode( "torch0" );
+  torchNode->attachObject( torchEntity );
+  torchNode->setPosition( 0.5f, 0.24f );
+  torchNode->scale( 0.5f );
+  auto torchSPC = torchNode->createSpriteController();
+  torchSPC->useAnimationSet( Lore::Resource::GetAnimationSet( "torch" ) );
+  torchSPC->startAnimation( "flame" );
+
+  //
+  // Add some lights to the torches.
+
+  Lore::LightPtr torchLight0 = _scene->createLight( "torch0" );
+  torchLight0->setColor( Lore::Color( 1.f, .69f, .4f, 1.f ) );
+  torchNode->attachObject( torchLight0 );
 
   //
   // Add a background to the scene.
