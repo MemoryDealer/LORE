@@ -50,6 +50,8 @@ namespace LocalNS {
 
   static void OnKeyChanged( const Keycode key, const bool pressed )
   {
+    static bool initialized = false;
+
     if ( pressed ) {
       switch ( key ) {
       default:
@@ -100,12 +102,25 @@ namespace LocalNS {
       case Keycode::End:
         ConsoleInstance->cursorEnd();
         break;
+      }
+    }
+    else {
+      switch ( key ) {
+      default:
+        break;
 
       case Keycode::GraveAccent:
       case Keycode::Escape:
-        ConsoleInstance->clear();
-        CLI::ResetCommandHistoryIndex();
-        DebugUI::HideConsole();
+        if ( initialized ) {
+          ConsoleInstance->clear();
+          CLI::ResetCommandHistoryIndex();
+          DebugUI::HideConsole();
+          initialized = false;
+        }
+        else {
+          // Detect the initial key up for GraveAccent so we don't immediately exit.
+          initialized = true;
+        }
         break;
       }
     }
@@ -168,7 +183,8 @@ DebugUIConsole::DebugUIConsole()
   // Setup colors.
   auto backgroundMat = _backgroundEntity->getMaterial();
   backgroundMat->blendingMode.enabled = true;
-  backgroundMat->diffuse = Color( 0.f, 0.f, 0.f, 0.5f );
+  backgroundMat->diffuse.a = 0.5f;
+  backgroundMat->ambient = Color( 0.f, 0.f, 0.f, 0.0f );
   _consoleBox->setFillColor( Color( 0.f, 0.f, 0.f, 0.6f ) );
   _consoleBox->setBorderColor( Color( .5f, .5f, .5f, .9f ) );
 
