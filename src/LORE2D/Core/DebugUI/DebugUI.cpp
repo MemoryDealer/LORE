@@ -27,6 +27,7 @@
 #include "DebugUI.h"
 
 #include <LORE2D/Core/DebugUI/DebugUIConsole.h>
+#include <LORE2D/Core/DebugUI/DebugUIStats.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -34,14 +35,46 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+bool DebugUI::Enabled = false;
+bool DebugUI::StatsEnabled = false;
 bool DebugUI::ConsoleEnabled = false;
+std::unique_ptr<DebugUIStats> DebugUI::Stats = nullptr;
 std::unique_ptr<DebugUIConsole> DebugUI::Console = nullptr;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void DebugUI::Init()
 {
+  Stats.reset( new DebugUIStats() );
   Console.reset( new DebugUIConsole() );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void DebugUI::Enable()
+{
+  Enabled = true;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void DebugUI::Disable()
+{
+  Enabled = false;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void DebugUI::DisplayStats()
+{
+  StatsEnabled = true;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void DebugUI::HideStats()
+{
+  StatsEnabled = false;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -58,6 +91,13 @@ void DebugUI::HideConsole()
 {
   ConsoleEnabled = false;
   Input::ResetHooks();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+UIPtr DebugUI::GetStatsUI()
+{
+  return Stats->getUI();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

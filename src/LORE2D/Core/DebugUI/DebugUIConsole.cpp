@@ -129,7 +129,7 @@ DebugUIConsole::DebugUIConsole()
 {
   // Create the console UI.
   _ui = Resource::CreateUI( "DebugUI_Console" ); // TODO: Different resource group for debug UI.
-  _panel = _ui->createPanel( "default" );
+  _panel = _ui->createPanel( "core" );
   _consoleElement = _panel->createElement( "Console" );
   _consoleBoxElement = _panel->createElement( "ConsoleBox" );
   _consoleHistoryElement = _panel->createElement( "ConsoleHistory" );

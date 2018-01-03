@@ -201,6 +201,7 @@ void StockResourceController::createStockResources()
 
   {
     _controller->loadFont( "Default", "res/stock/fonts/core.ttf", 12 );
+    _controller->loadFont( "DebugUI", "res/stock/fonts/core.ttf", 7 );
   }
 
   {

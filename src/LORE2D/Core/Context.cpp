@@ -31,6 +31,7 @@
 #include <LORE2D/Core/NotificationCenter.h>
 #include <LORE2D/Core/Timestamp.h>
 #include <LORE2D/Core/CLI/CLI.h>
+#include <LORE2D/Core/DebugUI/DebugUI.h>
 #include <LORE2D/Input/Input.h>
 #include <LORE2D/Renderer/SceneGraphVisitor.h>
 #include <LORE2D/Resource/Entity.h>
@@ -96,6 +97,8 @@ void Context::initConfiguration()
 
   // Setup CLI.
   CLI::Init();
+
+  Input::AddKeyListener( this );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -311,6 +314,39 @@ void Context::UnregisterFrameEndedCallback( FrameListenerController::FrameEndedC
 WindowPtr Context::GetActiveWindow()
 {
   return _activeContextPtr->getActiveWindow();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Context::onKeyDown( const Keycode code )
+{
+  // Process default DebugUI keys.
+  if ( DebugUI::IsEnabled() ) {
+    switch ( code ) {
+    default:
+      break;
+
+    case Keycode::GraveAccent:
+      DebugUI::DisplayConsole();
+      break;
+
+    case Keycode::B: {
+      const string value( "RenderAABBs" );
+      auto renderAABBs = Config::GetValue( value );
+      Config::SetValue( value, !GET_VARIANT<bool>( renderAABBs ) );
+    } break;
+
+    case Keycode::F: {
+      if ( DebugUI::IsStatsUIEnabled() ) {
+        DebugUI::HideStats();
+      }
+      else {
+        DebugUI::DisplayStats();
+      }
+    } break;
+
+    }
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

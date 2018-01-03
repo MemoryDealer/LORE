@@ -118,22 +118,6 @@ namespace LocalNS {
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-  struct Test : public CLI::Command
-  {
-
-    virtual string execute( string& args ) override
-    {
-      string re;
-      const auto numArgs = CLI::GetNumArgs( args );
-      for ( uint32_t i = 0; i < numArgs; ++i ) {
-        re += CLI::ExtractNextArg( args ) + " ";
-      }
-
-      return re;
-    }
-
-  };
-
 }
 using namespace LocalNS;
 
@@ -148,7 +132,6 @@ void CLI::Init()
   CLI::RegisterCommand( new SetNodePos(), 2, "SetNodePos", "SetNodePosition");
   CLI::RegisterCommand( new TranslateNode(), 2, "TranslateNode", "MoveNode" );
   CLI::RegisterCommand( new SetLightColor(), 2, "SetLightColor", "slc" );
-  CLI::RegisterCommand( new Test(), 1, "test" );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -37,6 +37,9 @@ Game::Game()
   // Create a window and set it to the active window.
   _window = _context->createWindow( "Complex Scene", 640, 480 );
   _window->setActive();
+
+  // Allow the DebugUI.
+  Lore::DebugUI::Enable();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -105,6 +108,49 @@ void Game::loadScene()
   auto spc = _playerNode->createSpriteController();
   spc->useAnimationSet( Lore::Resource::GetAnimationSet( "player" ) );
   spc->startAnimation( "idle" );
+
+  // We can make the camera automatically track the player.
+  _camera->trackNode( _playerNode );
+  // Set to a reasonable zoom so the player sprite fits well in the viewport.
+  _camera->setZoom( 2.4f );
+
+  //
+  // Add some blocks to the scene.
+
+  Lore::EntityPtr blockEntity = Lore::Resource::CreateEntity( "block", Lore::MeshType::TexturedQuad );
+  blockEntity->setSprite( Lore::Resource::GetSprite( "block" ) );
+  for ( int i = 0; i < 10; ++i ) {
+    auto blockNode = _scene->createNode( "block" + std::to_string( i ) );
+    blockNode->attachObject( blockEntity );
+
+    blockNode->scale( 0.4f );
+    blockNode->setPosition( -1.f + static_cast< Lore::real >( i * 0.2f ), 0.f );
+  }
+
+  //
+  // Add some stone walls behind the blocks.
+
+  Lore::EntityPtr stoneEntity = Lore::Resource::CreateEntity( "stone", Lore::MeshType::TexturedQuad );
+  stoneEntity->setSprite( Lore::Resource::GetSprite( "stone" ) );
+  for ( int i = 0; i < 20; ++i ) {
+    auto stoneNode = _scene->createNode( "stone" + std::to_string( i ) );
+    stoneNode->attachObject( stoneEntity );
+
+    stoneNode->scale( 2.f );
+    stoneNode->setDepth( 10.f );
+    stoneNode->setPosition( -4.f + static_cast< Lore::real >( i * 0.4f ), 0.f );
+  }
+
+  //
+  // Add a background to the scene.
+
+  Lore::BackgroundPtr background = _scene->getBackground();
+
+  // The first layer will be some scrolling clouds.
+  auto& layer = background->addLayer( "clouds" );
+  layer.setSprite( Lore::Resource::GetSprite( "clouds" ) );
+  layer.setScrollSpeed( Lore::Vec2( 0.001f, 0.00005f ) );
+  //layer.setParallax( Lore::Vec2( 0.1f, 0.1f ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

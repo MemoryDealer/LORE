@@ -27,6 +27,7 @@
 
 namespace Lore {
 
+  class DebugUIStats;
   class DebugUIConsole;
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -38,18 +39,34 @@ namespace Lore {
 
     static void Init();
 
+    // Allows default hotkeys to active DebugUI items.
+    static void Enable();
+    // Disallows default hotkeys to active DebugUI items.
+    static void Disable();
+
+    static void DisplayStats();
+    static void HideStats();
+
     static void DisplayConsole();
     static void HideConsole();
 
     //
     // Getters.
 
+    static bool IsEnabled() { return Enabled; }
+
+    static bool IsStatsUIEnabled() { return StatsEnabled; }
+    static UIPtr GetStatsUI();
+
     static bool IsConsoleEnabled() { return ConsoleEnabled; }
     static UIPtr GetConsoleUI();
 
   private:
 
+    static bool Enabled;
+    static bool StatsEnabled;
     static bool ConsoleEnabled;
+    static std::unique_ptr<DebugUIStats> Stats;
     static std::unique_ptr<DebugUIConsole> Console;
 
   };

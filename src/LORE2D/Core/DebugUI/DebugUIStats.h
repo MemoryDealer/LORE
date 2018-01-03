@@ -1,3 +1,4 @@
+#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -24,65 +25,42 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Game.h"
+#include "DebugUIComponent.h"
+
+#include <LORE2D/Core/Timer.h>
+#include <LORE2D/Renderer/FrameListener/FrameListener.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-using namespace std::chrono_literals;
+namespace Lore {
 
-using Clock = std::chrono::high_resolution_clock;
+  class DebugUIStats final : public DebugUIComponent,
+                             public FrameListener
+  {
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+  public:
 
-int main( int argc, char** argv )
-{
-  // Use our simple game class.
-  // The constructor will create a Lore context and a small window.
-  Game game;
+    DebugUIStats();
+    virtual ~DebugUIStats() override;
 
-  // Index and load resources specified in res/complexscene/resources.json.
-  game.loadResources();
+    virtual void frameStarted( const FrameEvent& e ) override;
 
-  // Add some contents to the scene.
-  game.loadScene();
+  private:
 
-  //
-  // Setup is complete, begin processing the scene.
+    UIPanelPtr _panel { nullptr };
 
-  // Start a frame rate independent game loop with a fixed timestep.
-  constexpr const std::chrono::nanoseconds timestep( 16ms );
-  bool running = true;
-  std::chrono::nanoseconds lag( 0ns );
-  auto lastTime = Clock::now();
+    UIElementPtr _frameDataElement { nullptr };
+    TextboxPtr _frameDataTextbox { nullptr };
 
-  while ( running ) {
-    // Calculate delta time since last update.
-    const auto now = Clock::now();
-    const auto dt = now - lastTime;
-    lastTime = now;
+    UIElementPtr _frameDataBoxElement { nullptr };
+    BoxPtr _frameDataBox { nullptr };
 
-    // Increment our lag counter to track how much "catching up" we need to do.
-    lag += std::chrono::duration_cast< std::chrono::nanoseconds >( dt );
+    Timer _timer {};
+    int32_t _frameCount { 0 };
+    real _elapsed { 0.f };
 
-    while ( lag > timestep ) {
-      lag -= timestep;
+  };
 
-      //
-      // Update game/scene.
-
-      // Process input.
-      if ( Lore::Input::GetKeyState( Lore::Keycode::Escape ) ) {
-        running = false;
-      }
-
-      game.processInput();
-    }
-
-    // We are done updating, render a frame.
-    game.render();
-  }
-
-  return 0;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

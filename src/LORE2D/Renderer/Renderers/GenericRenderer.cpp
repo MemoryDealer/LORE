@@ -258,6 +258,9 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
   }
 
   // Render debug UI if enabled.
+  if ( DebugUI::IsStatsUIEnabled() ) {
+    renderUI( DebugUI::GetStatsUI(), rv.scene, aspectRatio, projection );
+  }
   if ( DebugUI::IsConsoleEnabled() ) {
     renderUI( DebugUI::GetConsoleUI(), rv.scene, aspectRatio, projection );
   }

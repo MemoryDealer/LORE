@@ -35,7 +35,7 @@ namespace Lore {
   //
   // Listener classes.
 
-  class KeyListener
+  class LORE_EXPORT KeyListener
   {
 
   public:
@@ -45,7 +45,7 @@ namespace Lore {
 
   };
 
-  class CharListener
+  class LORE_EXPORT CharListener
   {
 
   public:
@@ -54,7 +54,7 @@ namespace Lore {
 
   };
 
-  class MouseListener
+  class LORE_EXPORT MouseListener
   {
 
   public:
