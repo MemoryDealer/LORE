@@ -147,10 +147,28 @@ void Game::loadScene()
   Lore::BackgroundPtr background = _scene->getBackground();
 
   // The first layer will be some scrolling clouds.
-  auto& layer = background->addLayer( "clouds" );
-  layer.setSprite( Lore::Resource::GetSprite( "clouds" ) );
-  layer.setScrollSpeed( Lore::Vec2( 0.001f, 0.00005f ) );
-  //layer.setParallax( Lore::Vec2( 0.1f, 0.1f ) );
+  auto& layerClouds = background->addLayer( "clouds" );
+  layerClouds.setSprite( Lore::Resource::GetSprite( "clouds" ) );
+  layerClouds.setScrollSpeed( Lore::Vec2( 0.001f, 0.00005f ) );
+  layerClouds.setDepth( 1000.f ); // This is the default but we are setting it here for reference.
+
+  // Add far layer with heavy parallax.
+  auto& layerFar = background->addLayer( "far" );
+  layerFar.setSprite( Lore::Resource::GetSprite( "bg-far" ) );
+  layerFar.setDepth( 990.f );
+  layerFar.setParallax( Lore::Vec2( 0.4f, 0.05f ) );
+
+  // Add middle layer with lighter parallax.
+  auto& layerMiddle = background->addLayer( "middle" );
+  layerMiddle.setSprite( Lore::Resource::GetSprite( "bg-middle" ) );
+  layerMiddle.setDepth( 980.f );
+  layerMiddle.setParallax( Lore::Vec2( .6f, .05f ) );
+
+  // Add closest layer with the least amount of parallax.
+  auto& layerForeground = background->addLayer( "foreground" );
+  layerForeground.setSprite( Lore::Resource::GetSprite( "bg-foreground" ) );
+  layerForeground.setDepth( 970.f );
+  layerForeground.setParallax( Lore::Vec2( .8f, 0.05f ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
