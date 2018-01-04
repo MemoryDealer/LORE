@@ -67,8 +67,7 @@ void Game::loadScene()
   // Create a scene with default background color.
   _scene = _context->createScene( "core" );
   _scene->setBackgroundColor( Lore::StockColor::White );
-  //_scene->setAmbientLightColor( Lore::Color( 0.6f, 0.6f, 0.6f, 1.f ) );
-  _scene->setAmbientLightColor( Lore::StockColor::Black );
+  _scene->setAmbientLightColor( Lore::Color( 0.75f, 0.75f, 0.75f, 1.f ) );
 
   // Create a camera to view the scene.
   _camera = Lore::Resource::CreateCamera( "core" ); // TODO: Should this come from context?
@@ -141,6 +140,13 @@ void Game::loadScene()
     stoneNode->scale( 2.f );
     stoneNode->setDepth( 10.f );
     stoneNode->setPosition( -4.f + static_cast< Lore::real >( i * 0.4f ), 0.f );
+
+    // Add a 2nd row that will go above the stained glass.
+    auto stoneNode2 = _scene->createNode( "stone2" + std::to_string( i ) );
+    stoneNode2->attachObject( stoneEntity );
+    stoneNode2->scale( 2.f );
+    stoneNode2->setDepth( 10.f );
+    stoneNode2->setPosition( -4.f + static_cast< Lore::real >( i * 0.4f ), .8f );
   }
 
   //
@@ -162,6 +168,18 @@ void Game::loadScene()
   Lore::LightPtr torchLight0 = _scene->createLight( "torch0" );
   torchLight0->setColor( Lore::Color( 1.f, .69f, .4f, 1.f ) );
   torchNode->attachObject( torchLight0 );
+
+  //
+  // Add blended stained glass.
+
+  Lore::EntityPtr glassEntity = Lore::Resource::CreateEntity( "glass1", Lore::MeshType::TexturedQuad );
+  glassEntity->setMaterial( Lore::Resource::GetMaterial( "glass1" ) );
+  for ( int i = 0; i < 5; ++i ) {
+    auto glassNode = _scene->createNode( "glass1" + std::to_string( i ) );
+    glassNode->attachObject( glassEntity );
+    glassNode->scale( 2.f );
+    glassNode->setPosition( -1.f + static_cast< Lore::real >( i * 0.4f ), .4f );
+  }
 
   //
   // Add a background to the scene.

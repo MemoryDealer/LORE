@@ -104,7 +104,7 @@ void GLWindow::renderFrame()
         return;
     }
 
-    glfwMakeContextCurrent( _window );
+    //glfwMakeContextCurrent( _window );
 
     // Render each Scene with the corresponding RenderView data.
     for ( const RenderView& rv : _renderViews ) {

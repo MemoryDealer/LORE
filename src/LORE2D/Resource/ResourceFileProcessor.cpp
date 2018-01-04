@@ -152,44 +152,7 @@ void ResourceFileProcessor::load( const string& groupName, ResourceControllerPtr
   } break;
 
   case SerializableResource::Sprite: {
-    if ( _serializer.valueExists( "texture" ) ) {
-      // This sprite contains a single texture, load it first.
-      const auto textureName = _serializer.getValue( "texture" ).toString();
-      auto texture = resourceController->loadTexture( getName(), textureName, groupName );
-
-      // Create a sprite and assign it the texture.
-      auto sprite = resourceController->createSprite( getName(), groupName );
-      sprite->addTexture( texture );
-    }
-    else if ( _serializer.valueExists( "textures" ) ) {
-      // This sprite contains multiple textures.
-      const auto value = _serializer.getValue( "textures" );
-      if ( SerializerValue::Type::Container != value.getType() ) {
-        throw Lore::Exception( "A sprite textures value must be a container" );
-      }
-
-      // Create a sprite to add the textures to.
-      auto sprite = resourceController->createSprite( getName(), groupName );
-
-      // Load each texture from array.
-      const auto& textures = value.getValues();
-      for ( const auto& texture : textures ) {
-        const auto& textureName = texture.first;
-        const auto& textureFile = texture.second.toString();
-
-        TexturePtr texture = nullptr;
-
-        // If this texture already exists, use the existing instance.
-        if ( resourceController->textureExists( textureName, groupName ) ) {
-          texture = resourceController->getTexture( textureName, groupName );
-        }
-        else {
-          texture = resourceController->loadTexture( textureName, textureFile, groupName );
-        }
-
-        sprite->addTexture( texture );
-      }
-    }
+    ;
   } break;
 
   case SerializableResource::SpriteList:
@@ -265,17 +228,27 @@ void ResourceFileProcessor::processSpriteList( const string& groupName, Resource
 {
   for ( const auto& spriteValue : _serializer.getValues() ) {
     const string& name = spriteValue.first;
-    const auto& textureNames = spriteValue.second.toArray();
-
-    if ( textureNames.empty() ) {
-      log_warning( "Sprite " + name + " has no textures associated with it, ignoring..." );
-      return;
-    }
 
     // Create a sprite for this entry.
     auto sprite = resourceController->createSprite( name, groupName );
-    for ( const auto& textureName : textureNames ) {
-      sprite->addTexture( resourceController->getTexture( textureName.toString(), groupName ) );
+
+    if ( SerializerValue::Type::Array == spriteValue.second.getType() ) {
+      const auto& textureNames = spriteValue.second.toArray();
+
+      if ( textureNames.empty() ) {
+        log_warning( "Sprite " + name + " has no textures associated with it, ignoring..." );
+        return;
+      }
+
+      // Retrieve all textures.
+      for ( const auto& textureName : textureNames ) {
+        sprite->addTexture( resourceController->getTexture( textureName.toString(), groupName ) );
+      }
+    }
+    else if ( SerializerValue::Type::String == spriteValue.second.getType() ) {
+      // Just a single texture.
+      const auto& textureName = spriteValue.second.toString();
+      sprite->addTexture( resourceController->getTexture( textureName, groupName ) );
     }
   }
 }

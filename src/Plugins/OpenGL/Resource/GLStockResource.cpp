@@ -189,9 +189,7 @@ Lore::GPUProgramPtr StockResourceController::createUberProgram( const string& na
     src += "const float att = l.intensity / (l.constant + l.linear * d + l.quadratic * pow(d, 2.0));";
 
     src += "const vec3 lDiffuse = l.color * material.diffuse.rgb * att;";
-    src += "const vec3 lAmbient = material.ambient.rgb * sceneAmbient.rgb;";
-
-    src += "return lDiffuse + lAmbient;";
+    src += "return lDiffuse;";
 
     src += "}";
   }
