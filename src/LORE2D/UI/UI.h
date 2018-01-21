@@ -59,10 +59,6 @@ namespace Lore {
       return _panels.getConstIterator();
     }
 
-  protected:
-
-    virtual void _reset() override { }
-
   private:
 
     PanelRegistry _panels;

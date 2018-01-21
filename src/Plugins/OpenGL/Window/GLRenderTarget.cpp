@@ -37,7 +37,8 @@ using namespace Lore::OpenGL;
 
 GLRenderTarget::~GLRenderTarget()
 {
-  _reset();
+  glDeleteRenderbuffers( 1, &_rbo );
+  glDeleteFramebuffers( 1, &_fbo );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -78,14 +79,6 @@ void GLRenderTarget::create( const uint32_t width, const uint32_t height )
 void GLRenderTarget::bind()
 {
   glBindFramebuffer( GL_FRAMEBUFFER, _fbo );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void GLRenderTarget::_reset()
-{
-  glDeleteRenderbuffers( 1, &_rbo );
-  glDeleteFramebuffers( 1, &_fbo );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

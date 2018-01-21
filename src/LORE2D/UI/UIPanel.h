@@ -67,10 +67,6 @@ namespace Lore {
       _origin = Vec2( x, y );
     }
 
-  protected:
-
-    virtual void _reset() override { }
-
   private:
 
     Vec2 _origin {};

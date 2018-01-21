@@ -56,10 +56,6 @@ namespace Lore { namespace OpenGL {
 
     private:
 
-        virtual void _reset() override;
-
-    private:
-
         GLuint _shader;
 
     };

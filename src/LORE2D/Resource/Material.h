@@ -129,10 +129,6 @@ namespace Lore {
 
   private:
 
-    virtual void _reset() override;
-
-  private:
-
     // TODO: Use linked list of materials for multi-pass rendering. The renderer
     // can pick these up and fill separate rendering queue groups for each pass.
 

@@ -244,10 +244,6 @@ namespace Lore {
     Node( const Node& rhs ) = delete;
     Node& operator = ( const Node& rhs ) = delete;
 
-  protected:
-
-    virtual void _reset() override;
-
   private:
 
     // Only scenes can construct nodes.

@@ -114,7 +114,7 @@ namespace Lore {
 
             // Reset object to default.
             alloc->_inUse = false;
-            alloc->_reset();
+            alloc->~Alloc();
 
             // Put this object at the front of the list.
             alloc->_next = _next;
@@ -131,7 +131,7 @@ namespace Lore {
             for ( int i = 0; i < _size; ++i ) {
                 Alloc<T>* alloc = _objects[i];
                 alloc->_inUse = false;
-                alloc->_reset();
+                alloc->~Alloc();
             }
         }
 

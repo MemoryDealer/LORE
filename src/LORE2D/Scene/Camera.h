@@ -78,10 +78,6 @@ namespace Lore {
 
     void updateTracking(const real aspectRatio);
 
-  protected:
-
-    virtual void _reset() override;
-
   private:
 
     void _dirty();

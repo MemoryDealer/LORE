@@ -55,10 +55,6 @@ namespace Lore { namespace OpenGL {
 
     private:
 
-        virtual void _reset() override;
-
-    private:
-
         GLuint _vbo; // Vertex buffer object.
         GLuint _vao; // Vertex array object.
         GLuint _ebo; // Element buffer object.

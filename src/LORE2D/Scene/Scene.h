@@ -136,8 +136,6 @@ namespace Lore {
 
   private:
 
-    virtual void _reset() override;
-
     void _addActiveLight( LightPtr light );
 
     friend class Node;

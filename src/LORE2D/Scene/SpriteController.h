@@ -129,10 +129,6 @@ namespace Lore {
 
   private:
 
-    virtual void _reset() override { }
-
-  private:
-
     SpriteController::AnimationMap _animations {};
 
   };

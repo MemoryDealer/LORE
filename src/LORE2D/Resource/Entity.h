@@ -84,8 +84,6 @@ namespace Lore {
 
   private:
 
-    virtual void _reset() override;
-
     void _notifyAttached();
 
   private:

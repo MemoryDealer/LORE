@@ -51,13 +51,6 @@ Material::~Material()
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Material::_reset()
-{
-  // 
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 void Material::setTextureScrollSpeed( const Vec2& scroll )
 {
   // TODO: Put all texture scrolling in a single function (e.g., pass ref to offset).

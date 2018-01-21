@@ -52,6 +52,12 @@ Camera::Camera()
 
 Camera::~Camera()
 {
+  // TODO: After memory pool refactor, remove data resets.
+  // Replace with cleanup functions that only free dynamic memory and graphics resources.
+  _position = Vec2();
+  _view = Matrix4();
+  _zoom = 1.f;
+  _viewMatrixDirty = true;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -164,18 +170,6 @@ void Camera::updateTracking( const real aspectRatio )
 
 void Camera::_dirty()
 {
-  _viewMatrixDirty = true;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Camera::_reset()
-{
-  // TODO: After memory pool refactor, remove data resets.
-  // Replace with cleanup functions that only free dynamic memory and graphics resources.
-  _position = Vec2();
-  _view = Matrix4();
-  _zoom = 1.f;
   _viewMatrixDirty = true;
 }
 

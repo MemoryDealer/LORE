@@ -205,6 +205,8 @@ void GLVertexBuffer::draw()
   glDrawElements( _mode, static_cast< GLsizei >( _indices.size() ), GL_UNSIGNED_INT, 0 );
 }
 
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void GLVertexBuffer::draw( const Lore::VertexBuffer::Vertices& verts )
 {
   assert( MeshType::Text == _type );
@@ -214,14 +216,6 @@ void GLVertexBuffer::draw( const Lore::VertexBuffer::Vertices& verts )
   glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
   glDrawArrays( GL_TRIANGLES, 0, 6 );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void GLVertexBuffer::_reset()
-{
-  // TODO:
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

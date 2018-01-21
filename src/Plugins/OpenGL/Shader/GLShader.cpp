@@ -33,7 +33,7 @@ using namespace Lore::OpenGL;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 GLShader::GLShader()
-: _shader( 0 )
+  : _shader( 0 )
 {
 }
 
@@ -41,29 +41,29 @@ GLShader::GLShader()
 
 GLShader::~GLShader()
 {
-    unload();
+  unload();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void GLShader::init( const Shader::Type& type )
 {
-    GLenum shaderType = 0;
-    switch ( type ) {
-    default:
-        log_error( "Unknown shader type requested for Shader " + _name );
-        return;
+  GLenum shaderType = 0;
+  switch ( type ) {
+  default:
+    log_error( "Unknown shader type requested for Shader " + _name );
+    return;
 
-    case Shader::Type::Vertex:
-        shaderType = GL_VERTEX_SHADER;
-        break;
+  case Shader::Type::Vertex:
+    shaderType = GL_VERTEX_SHADER;
+    break;
 
-    case Shader::Type::Fragment:
-        shaderType = GL_FRAGMENT_SHADER;
-        break;
-    }
+  case Shader::Type::Fragment:
+    shaderType = GL_FRAGMENT_SHADER;
+    break;
+  }
 
-    _shader = glCreateShader( shaderType );
+  _shader = glCreateShader( shaderType );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -71,46 +71,38 @@ void GLShader::init( const Shader::Type& type )
 bool GLShader::loadFromFile( const string& file )
 {
 
-    return false;
+  return false;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 bool GLShader::loadFromSource( const string& source )
 {
-    const char* psrc = source.c_str();
+  const char* psrc = source.c_str();
 
-    glShaderSource( _shader, 1, &psrc, nullptr );
-    glCompileShader( _shader );
+  glShaderSource( _shader, 1, &psrc, nullptr );
+  glCompileShader( _shader );
 
-    GLint success;
-    GLchar buf[512];
-    glGetShaderiv( _shader, GL_COMPILE_STATUS, &success );
-    if ( !success ) {
-        glGetShaderInfoLog( _shader, sizeof( buf ), nullptr, buf );
-        log_error( "Failed to load and compile shader " + _name + ": " + buf );
-        return false;
-    }
+  GLint success;
+  GLchar buf[512];
+  glGetShaderiv( _shader, GL_COMPILE_STATUS, &success );
+  if ( !success ) {
+    glGetShaderInfoLog( _shader, sizeof( buf ), nullptr, buf );
+    log_error( "Failed to load and compile shader " + _name + ": " + buf );
+    return false;
+  }
 
-    _loaded = true;
+  _loaded = true;
 
-    return true;
+  return true;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void GLShader::unload()
 {
-    glDeleteShader( _shader );
-    _loaded = false;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void GLShader::_reset()
-{
-    unload();
+  glDeleteShader( _shader );
+  _loaded = false;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

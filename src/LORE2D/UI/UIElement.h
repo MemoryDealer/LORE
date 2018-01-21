@@ -125,10 +125,6 @@ namespace Lore {
       _visible = visible;
     }
 
-  protected:
-
-    virtual void _reset() override { }
-
   private:
 
     Vec2 _pos {};

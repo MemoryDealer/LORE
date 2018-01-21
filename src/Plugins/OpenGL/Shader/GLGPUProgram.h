@@ -86,8 +86,6 @@ namespace Lore { namespace OpenGL {
 
         void _updateUniform( const GLint id, const Lore::Matrix4& m );
 
-        virtual void _reset() override;
-
     private:
 
         GLuint _program;

@@ -55,14 +55,6 @@ namespace Lore {
 
   public: // HACK for posix.
 
-    ///
-    /// \brief Must be implemented by child classes to reset all internal
-    ///     data to default. This is called when the object is "freed" in
-    ///     the memory pool.
-    inline virtual void _reset() = 0;
-
-  public: // HACK for posix.
-
     bool _inUse { false };
     T* _next { nullptr };
 

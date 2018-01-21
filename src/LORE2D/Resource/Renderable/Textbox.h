@@ -89,11 +89,6 @@ namespace Lore {
 
   private:
 
-    virtual void _reset() override
-    { }
-
-  private:
-
     FontPtr _font { nullptr };
     string _text {};
     Color _textColor { StockColor::White };

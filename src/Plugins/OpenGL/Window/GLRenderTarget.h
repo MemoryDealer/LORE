@@ -48,10 +48,6 @@ namespace Lore { namespace OpenGL {
 
   private:
 
-    virtual void _reset() override;
-
-  private:
-
     GLuint _fbo { 0 };
     GLuint _rbo { 0 };
 

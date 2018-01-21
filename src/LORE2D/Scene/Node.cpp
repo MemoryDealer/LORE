@@ -50,6 +50,11 @@ Node::Node()
 
 Node::~Node()
 {
+  _transform = Transform();
+  _entities.clear();
+  _scene = nullptr;
+  _parent = nullptr;
+  _childNodes.clear();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -287,17 +292,6 @@ SpriteControllerPtr Node::getSpriteController() const
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Node::_reset()
-{
-  _transform = Transform();
-  _entities.clear();
-  _scene = nullptr;
-  _parent = nullptr;
-  _childNodes.clear();
-}
-
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Node::_dirty()

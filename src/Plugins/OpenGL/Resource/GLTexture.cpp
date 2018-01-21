@@ -44,7 +44,7 @@ GLTexture::GLTexture()
 
 GLTexture::~GLTexture()
 {
-    _reset();
+  glDeleteTextures( 1, &_id );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -147,13 +147,6 @@ void GLTexture::_createGLTexture( const unsigned char* pixels, const int width, 
     if ( genMipMaps ) {
       glGenerateMipmap( GL_TEXTURE_2D );
     }
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void GLTexture::_reset()
-{
-    glDeleteTextures( 1, &_id );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

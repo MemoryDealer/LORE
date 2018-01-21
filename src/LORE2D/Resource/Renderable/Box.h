@@ -115,10 +115,6 @@ namespace Lore {
 
   private:
 
-    virtual void _reset() override {}
-
-  private:
-
     bool _fill { true };
 
     Color _borderColor { StockColor::White };

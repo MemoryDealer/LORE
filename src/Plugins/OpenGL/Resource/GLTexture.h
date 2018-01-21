@@ -57,10 +57,6 @@ namespace Lore { namespace OpenGL {
             return _id;
         }
 
-    protected:
-
-        virtual void _reset() override;
-
     private:
 
         void _createGLTexture( const unsigned char* pixels, const int width, const int height, const bool genMipMaps = true );

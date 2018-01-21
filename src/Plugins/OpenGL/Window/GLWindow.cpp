@@ -40,7 +40,7 @@ using namespace Lore::OpenGL;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 GLWindow::GLWindow()
-: _window( nullptr )
+  : _window( nullptr )
 {
 }
 
@@ -48,144 +48,136 @@ GLWindow::GLWindow()
 
 GLWindow::~GLWindow()
 {
-    _reset();
+  glfwDestroyWindow( _window );
+  _width = _height = _frameBufferWidth = _frameBufferHeight = 0;
+  _aspectRatio = 0;
+  _mode = Window::Mode::Windowed;
+  _renderViews.clear();
+  _controller.reset();
+  _stockController.reset();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void GLWindow::init( const string& title,
-                   const int width,
-                   const int height )
+                     const int width,
+                     const int height )
 {
-    _title = title;
-    _width = width;
-    _height = height;
+  _title = title;
+  _width = width;
+  _height = height;
 
-    _window = glfwCreateWindow( _width,
-                                _height,
-                                _title.c_str(),
-                                nullptr,
-                                nullptr );
+  _window = glfwCreateWindow( _width,
+                              _height,
+                              _title.c_str(),
+                              nullptr,
+                              nullptr );
 
-    // Store user pointer to Lore Window class for callbacks.
-    glfwSetWindowUserPointer( _window, reinterpret_cast< void* >( this ) );
+  // Store user pointer to Lore Window class for callbacks.
+  glfwSetWindowUserPointer( _window, reinterpret_cast< void* >( this ) );
 
-    // Store frame buffer size.
-    glfwGetFramebufferSize( _window, &_frameBufferWidth, &_frameBufferHeight );
-    _aspectRatio = static_cast< float >( _frameBufferWidth ) / _frameBufferHeight;
+  // Store frame buffer size.
+  glfwGetFramebufferSize( _window, &_frameBufferWidth, &_frameBufferHeight );
+  _aspectRatio = static_cast< float >( _frameBufferWidth ) / _frameBufferHeight;
 
-    // Setup callbacks.
-    glfwSetWindowSizeCallback( _window, WindowCallbackHandler::Size );
+  // Setup callbacks.
+  glfwSetWindowSizeCallback( _window, WindowCallbackHandler::Size );
 
-    // Create a resource controller for each window.
-    _controller = std::make_unique<ResourceController>();
+  // Create a resource controller for each window.
+  _controller = std::make_unique<ResourceController>();
 
-    // Create stock resources as well (make this window's context active
-    // and then restore the previous one).
-    GLFWwindow* currentContext = glfwGetCurrentContext();
-    glfwMakeContextCurrent( _window );
+  // Create stock resources as well (make this window's context active
+  // and then restore the previous one).
+  GLFWwindow* currentContext = glfwGetCurrentContext();
+  glfwMakeContextCurrent( _window );
 
-    _stockController = std::make_unique<StockResourceController>();
-    _stockController->createStockResources();
+  _stockController = std::make_unique<StockResourceController>();
+  _stockController->createStockResources();
 
-    glfwMakeContextCurrent( currentContext );
+  glfwMakeContextCurrent( currentContext );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void GLWindow::renderFrame()
 {
-    if ( glfwWindowShouldClose( _window ) ) {
-        // Post window closed event.
-        WindowEventNotification n;
-        n.event = WindowEventNotification::Event::Closed;
-        n.window = this;
-        NotificationCenter::Post<WindowEventNotification>( n );
-        return;
-    }
+  if ( glfwWindowShouldClose( _window ) ) {
+    // Post window closed event.
+    WindowEventNotification n;
+    n.event = WindowEventNotification::Event::Closed;
+    n.window = this;
+    NotificationCenter::Post<WindowEventNotification>( n );
+    return;
+  }
 
-    //glfwMakeContextCurrent( _window );
+  //glfwMakeContextCurrent( _window );
 
-    // Render each Scene with the corresponding RenderView data.
-    for ( const RenderView& rv : _renderViews ) {
-        RendererPtr renderer = rv.scene->getRenderer();
-        renderer->present( rv, this );
-    }
+  // Render each Scene with the corresponding RenderView data.
+  for ( const RenderView& rv : _renderViews ) {
+    RendererPtr renderer = rv.scene->getRenderer();
+    renderer->present( rv, this );
+  }
 
-    glfwSwapBuffers( _window );
+  glfwSwapBuffers( _window );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void GLWindow::addRenderView( const Lore::RenderView& renderView )
 {
-    // Convert Viewport to gl_viewport.
-    RenderView rv = renderView;
-    Rect vp = rv.viewport;
-    rv.gl_viewport.x = static_cast< int >( vp.x * static_cast<float>( _frameBufferWidth ) );
-    rv.gl_viewport.y = static_cast< int >( vp.y * static_cast<float>( _frameBufferHeight ) );
-    rv.gl_viewport.width = static_cast< int >( vp.w * static_cast<float>( _frameBufferWidth ) );
-    rv.gl_viewport.height = static_cast< int >( vp.h * static_cast<float>( _frameBufferHeight ) );
+  // Convert Viewport to gl_viewport.
+  RenderView rv = renderView;
+  Rect vp = rv.viewport;
+  rv.gl_viewport.x = static_cast< int >( vp.x * static_cast< float >( _frameBufferWidth ) );
+  rv.gl_viewport.y = static_cast< int >( vp.y * static_cast< float >( _frameBufferHeight ) );
+  rv.gl_viewport.width = static_cast< int >( vp.w * static_cast< float >( _frameBufferWidth ) );
+  rv.gl_viewport.height = static_cast< int >( vp.h * static_cast< float >( _frameBufferHeight ) );
 
-    rv.gl_viewport.aspectRatio = static_cast< real >( rv.gl_viewport.width ) / rv.gl_viewport.height;
+  rv.gl_viewport.aspectRatio = static_cast< real >( rv.gl_viewport.width ) / rv.gl_viewport.height;
 
-    Lore::Window::addRenderView( rv );
+  Lore::Window::addRenderView( rv );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void GLWindow::setTitle( const string& title )
 {
-    Lore::Window::setTitle( title );
+  Lore::Window::setTitle( title );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void GLWindow::setDimensions( const int width, const int height )
 {
-    Lore::Window::setDimensions( width, height );
+  Lore::Window::setDimensions( width, height );
 
-    glfwSetWindowSize( _window, width, height );
+  glfwSetWindowSize( _window, width, height );
 
-    // Store frame buffer size.
-    glfwGetFramebufferSize( _window, &_frameBufferWidth, &_frameBufferHeight );
+  // Store frame buffer size.
+  glfwGetFramebufferSize( _window, &_frameBufferWidth, &_frameBufferHeight );
 
-    _aspectRatio = static_cast< float >( _frameBufferWidth ) / _frameBufferHeight;
+  _aspectRatio = static_cast< float >( _frameBufferWidth ) / _frameBufferHeight;
 
-    updateRenderViews();
+  updateRenderViews();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void GLWindow::setActive()
 {
-    glfwMakeContextCurrent( _window );
+  glfwMakeContextCurrent( _window );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void GLWindow::updateRenderViews()
 {
-    for ( auto& rv : _renderViews ) {
-        rv.gl_viewport.x = static_cast< int >( rv.viewport.x * static_cast<float>( _frameBufferWidth ) );
-        rv.gl_viewport.y = static_cast< int >( rv.viewport.y * static_cast<float>( _frameBufferHeight ) );
-        rv.gl_viewport.width = static_cast< int >( rv.viewport.w * static_cast<float>( _frameBufferWidth ) );
-        rv.gl_viewport.height = static_cast< int >( rv.viewport.h * static_cast<float>( _frameBufferHeight ) );
-    }
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void GLWindow::_reset()
-{
-    glfwDestroyWindow( _window );
-    _width = _height = _frameBufferWidth = _frameBufferHeight = 0;
-    _aspectRatio = 0;
-    _mode = Window::Mode::Windowed;
-    _renderViews.clear();
-    _controller.reset();
-    _stockController.reset();
+  for ( auto& rv : _renderViews ) {
+    rv.gl_viewport.x = static_cast< int >( rv.viewport.x * static_cast< float >( _frameBufferWidth ) );
+    rv.gl_viewport.y = static_cast< int >( rv.viewport.y * static_cast< float >( _frameBufferHeight ) );
+    rv.gl_viewport.width = static_cast< int >( rv.viewport.w * static_cast< float >( _frameBufferWidth ) );
+    rv.gl_viewport.height = static_cast< int >( rv.viewport.h * static_cast< float >( _frameBufferHeight ) );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

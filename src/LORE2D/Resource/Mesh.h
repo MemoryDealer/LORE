@@ -61,10 +61,6 @@ namespace Lore {
 
     private:
 
-        virtual void _reset() override;
-
-    private:
-
         VertexBufferPtr _vertexBuffer;
 
     };

@@ -67,10 +67,6 @@ namespace Lore {
 
   private:
 
-    virtual void _reset() override {}
-
-  private:
-
     TextureList _textures {};
 
   };
