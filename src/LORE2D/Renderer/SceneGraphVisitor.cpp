@@ -91,6 +91,12 @@ void SceneGraphVisitor::visit( Renderer* renderer, bool parentDirty )
     renderer->addTextbox( textbox, _node->getFullTransform() );
   }
 
+  auto lightIt = _node->getLightListConstIterator();
+  while ( lightIt.hasMore() ) {
+    LightPtr light = lightIt.getNext();
+    renderer->addLight( light, _node );
+  }
+
   // Recurse over children.
   if ( _node->hasChildNodes() ) {
     // Push this node's transform onto the stack, so the next call can

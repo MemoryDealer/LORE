@@ -31,9 +31,9 @@
 #include <LORE2D/Resource/Material.h>
 #include <LORE2D/Resource/Mesh.h>
 #include <LORE2D/Resource/Registry.h>
-#include <LORE2D/Resource/Renderable/Texture.h>
 #include <LORE2D/Resource/ResourceIndexer.h>
-#include <LORE2D/Resource/ResourceType.h>
+#include <LORE2D/Resource/SerializableResource.h>
+#include <LORE2D/Resource/Texture.h>
 #include <LORE2D/Scene/Camera.h>
 #include <LORE2D/Shader/GPUProgram.h>
 #include <LORE2D/Shader/Shader.h>
@@ -50,7 +50,7 @@ namespace Lore {
 
     struct IndexedResource
     {
-      ResourceType type;
+      SerializableResource type;
       string file;
       bool loaded;
     };
@@ -108,6 +108,14 @@ namespace Lore {
 
     Registry<std::unordered_map, Box> boxes {};
 
+    // Sprites.
+
+    Registry<std::unordered_map, Sprite> sprites {};
+
+    // Animation sets.
+
+    Registry<std::unordered_map, SpriteAnimationSet> animationSets {};
+
     // Textboxes.
 
     Registry<std::unordered_map, Textbox> textboxes {};
@@ -146,11 +154,13 @@ namespace Lore {
 
     void loadResourceConfiguration( const string& file );
 
-    void indexResourceLocation( const string& directory, const string& groupName = DefaultGroupName, const bool recursive = false );
+    void indexResourceLocation( const string& directory, const string& groupName = DefaultGroupName, const bool recursive = true );
 
     void loadGroup( const string& groupName );
 
     void unloadGroup( const string& groupName );
+
+    void reloadGroup( const string& groupName );
 
     //
     // Loading.
@@ -179,6 +189,10 @@ namespace Lore {
     //
     // Factory functions (non-virtual).
 
+    SpritePtr createSprite( const string& name, const string& groupName = DefaultGroupName );
+
+    SpriteAnimationSetPtr createAnimationSet( const string& name, const string& groupName = DefaultGroupName );
+
     MaterialPtr createMaterial( const string& name, const string& groupName = DefaultGroupName );
 
     CameraPtr createCamera( const string& name, const string& groupName = DefaultGroupName );
@@ -204,9 +218,18 @@ namespace Lore {
     MaterialPtr cloneMaterial( const string& name, const string& cloneName );
 
     //
+    // Existence checkers.
+
+    bool textureExists( const string& name, const string& groupName = DefaultGroupName );
+
+    //
     // Getters.
 
     GPUProgramPtr getGPUProgram( const string& name, const string& groupName = DefaultGroupName );
+
+    SpritePtr getSprite( const string& name, const string& groupName = DefaultGroupName );
+
+    SpriteAnimationSetPtr getAnimationSet( const string& name, const string& groupName = DefaultGroupName );
 
     MaterialPtr getMaterial( const string& name, const string& groupName = DefaultGroupName );
 
@@ -250,9 +273,11 @@ namespace Lore {
 
     static void LoadResourceConfiguration( const string& file );
 
-    static void IndexResourceLocation( const string& directory, const string& groupName = ResourceController::DefaultGroupName, const bool recursive = false );
+    static void IndexResourceLocation( const string& directory, const string& groupName = ResourceController::DefaultGroupName, const bool recursive = true );
 
     static void LoadGroup( const string& groupName );
+
+    static void ReloadGroup( const string& groupName );
 
     //
     // Loading.
@@ -271,6 +296,8 @@ namespace Lore {
     static ShaderPtr CreateFragmentShader( const string& name, const string& groupName = ResourceController::DefaultGroupName );
 
     static VertexBufferPtr CreateVertexBuffer( const string& name, const MeshType& type, const string& groupName = ResourceController::DefaultGroupName );
+
+    static SpritePtr CreateSprite( const string& name, const string& groupName = ResourceController::DefaultGroupName );
 
     static MaterialPtr CreateMaterial( const string& name, const string& groupName = ResourceController::DefaultGroupName );
 
@@ -308,6 +335,10 @@ namespace Lore {
     // Getters.
 
     static GPUProgramPtr GetGPUProgram( const string& name, const string& groupName = ResourceController::DefaultGroupName );
+
+    static SpritePtr GetSprite( const string& name, const string& groupName = ResourceController::DefaultGroupName );
+
+    static SpriteAnimationSetPtr GetAnimationSet( const string& name, const string& groupName = ResourceController::DefaultGroupName );
 
     static MaterialPtr GetMaterial( const string& name, const string& groupName = ResourceController::DefaultGroupName );
 

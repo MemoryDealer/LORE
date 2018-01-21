@@ -1,0 +1,6 @@
+{
+  "clouds":["clouds"],
+  "bg-far":["bg-far"],
+  "bg-middle":["bg-middle"],
+  "bg-foreground":["bg-foreground"]
+}

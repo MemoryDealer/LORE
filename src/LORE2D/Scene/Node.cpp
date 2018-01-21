@@ -33,6 +33,7 @@
 #include <LORE2D/Scene/AABB.h>
 #include <LORE2D/Scene/Camera.h>
 #include <LORE2D/Scene/Scene.h>
+#include <LORE2D/Scene/SpriteController.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -130,11 +131,7 @@ void Node::attachObject( EntityPtr e )
 
 void Node::attachObject( LightPtr l )
 {
-  _lights.push_back( l );
-
-  l->_position.x = _transform.world[3][0];
-  l->_position.y = _transform.world[3][1];
-  _scene->_addActiveLight( l );
+  _lights.insert( l->getName(), l );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -268,9 +265,25 @@ void Node::scale( const real s )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+SpriteControllerPtr Node::createSpriteController()
+{
+  _spriteController.reset(); // TODO: Necessary?
+  _spriteController = std::make_unique<SpriteController>();
+  return _spriteController.get();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 AABBPtr Node::getAABB() const
 {
   return _aabb.get();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+SpriteControllerPtr Node::getSpriteController() const
+{
+  return _spriteController.get();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -306,13 +319,6 @@ Matrix4 Node::_getLocalTransform()
   if ( _transform.dirty ) {
     _transform.local = Math::CreateTransformationMatrix( _transform.position,
                                                          _transform.orientation );
-
-    // Update attached light positions.
-    for ( auto& light : _lights ) {
-      light->_position.x = _transform.world[3][0];
-      light->_position.y = _transform.world[3][1];
-    }
-
     _transform.dirty = false;
   }
 

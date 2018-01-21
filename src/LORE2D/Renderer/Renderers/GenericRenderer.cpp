@@ -34,13 +34,15 @@
 #include <LORE2D/Resource/Font.h>
 #include <LORE2D/Resource/Mesh.h>
 #include <LORE2D/Resource/Renderable/Box.h>
-#include <LORE2D/Resource/Renderable/Texture.h>
+#include <LORE2D/Resource/Renderable/Sprite.h>
 #include <LORE2D/Resource/Renderable/Textbox.h>
 #include <LORE2D/Resource/StockResource.h>
+#include <LORE2D/Resource/Texture.h>
 #include <LORE2D/Scene/AABB.h>
 #include <LORE2D/Scene/Camera.h>
 #include <LORE2D/Scene/Light.h>
 #include <LORE2D/Scene/Scene.h>
+#include <LORE2D/Scene/SpriteController.h>
 #include <LORE2D/Shader/GPUProgram.h>
 #include <LORE2D/UI/UI.h>
 #include <LORE2D/Window/RenderTarget.h>
@@ -81,11 +83,25 @@ void GenericRenderer::addRenderData( Lore::EntityPtr e,
 
   RenderQueue& queue = _queues.at( queueId );
 
+  // Get the active frame if this sprite is being manipulated with a SpriteController.
+  size_t spriteFrame = 0;
+  bool xFlipped = false;
+  bool yFlipped = false;
+  const auto spc = node->getSpriteController();
+  if ( spc ) {
+    spriteFrame = spc->getActiveFrame();
+    xFlipped = spc->getXFlipped();
+    yFlipped = spc->getYFlipped();
+  }
+
   if ( blended ) {
     RenderQueue::Transparent t;
     t.material = e->getMaterial();
     t.vertexBuffer = e->getMesh()->getVertexBuffer();
     t.model = node->getFullTransform();
+    t.xFlipped = xFlipped;
+    t.yFlipped = yFlipped;
+    t.spriteFrame = spriteFrame;
 
     const auto depth = node->getDepth();
     t.model[3][2] = depth;
@@ -97,6 +113,7 @@ void GenericRenderer::addRenderData( Lore::EntityPtr e,
     RenderQueue::EntityData entityData;
     entityData.material = e->getMaterial();
     entityData.vertexBuffer = e->getMesh()->getVertexBuffer();
+    entityData.spriteFrame = spriteFrame;
 
     RenderQueue::RenderDataList& renderData = queue.solids[entityData];
 
@@ -104,6 +121,8 @@ void GenericRenderer::addRenderData( Lore::EntityPtr e,
     RenderQueue::RenderData rd;
     rd.model = node->getFullTransform();
     rd.model[3][2] = node->getDepth();
+    rd.xFlipped = xFlipped;
+    rd.yFlipped = yFlipped;
 
     renderData.push_back( rd );
   }
@@ -134,13 +153,29 @@ void GenericRenderer::addTextbox( Lore::TextboxPtr textbox,
   const uint queueId = textbox->getRenderQueue();
 
   activateQueue( queueId, _queues[queueId] );
-
   RenderQueue& queue = _queues.at( queueId );
+
   RenderQueue::TextboxData data;
   data.textbox = textbox;
   data.model = transform;
 
   queue.textboxes.push_back( data );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GenericRenderer::addLight( Lore::LightPtr light, const Lore::NodePtr node )
+{
+  const uint queueId = RenderQueue::General;
+
+  activateQueue( queueId, _queues[queueId] );
+  RenderQueue& queue = _queues.at( queueId );
+
+  RenderQueue::LightData data;
+  data.light = light;
+  data.pos = node->getDerivedPosition();
+
+  queue.lights.push_back( data );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -157,8 +192,8 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
     rv.renderTarget->bind();
     _api->setViewport( 0,
                        0,
-                       static_cast<uint32_t>( rv.viewport.width * rv.renderTarget->getWidth() ),
-                       static_cast<uint32_t>( rv.viewport.height * rv.renderTarget->getHeight() ) );
+                       static_cast<uint32_t>( rv.viewport.w * rv.renderTarget->getWidth() ),
+                       static_cast<uint32_t>( rv.viewport.h * rv.renderTarget->getHeight() ) );
   }
   else {
     // TODO: Get rid of gl_viewport.
@@ -191,22 +226,22 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
     RenderQueue& queue = activeQueue.second;
 
     // Render solids.
-    renderMaterialMap( rv.scene, queue.solids, viewProjection );
+    renderMaterialMap( rv.scene, queue, viewProjection );
 
     // Render transparents.
-    renderTransparents( rv.scene, queue.transparents, viewProjection );
+    renderTransparents( rv.scene, queue, viewProjection );
 
     // Render boxes.
-    renderBoxes( queue.boxes, viewProjection );
+    renderBoxes( queue, viewProjection );
 
     // Render text.
-    renderTextboxes( queue.textboxes, viewProjection );
+    renderTextboxes( queue, viewProjection );
   }
 
   // AABBs.
   auto renderAABBs = Config::GetValue( "RenderAABBs" );
   if ( GET_VARIANT<bool>( renderAABBs ) ) {
-    RenderQueue::BoxList boxes;
+    RenderQueue tmpQueue;
 
     std::function<void( NodePtr )> AddAABB = [&] ( NodePtr node ) {
       AABBPtr aabb = node->getAABB();
@@ -216,7 +251,7 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
         data.model = Math::CreateTransformationMatrix( node->getDerivedPosition(), Quaternion(), aabb->getDimensions() * 5.f );
         data.model[3][2] = Node::Depth::Min;
 
-        boxes.push_back( data );
+        tmpQueue.boxes.push_back( data );
       }
 
       Node::ChildNodeIterator it = node->getChildNodeIterator();
@@ -230,7 +265,7 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
     while ( it.hasMore() ) {
       AddAABB( it.getNext() );
     }
-    renderBoxes( boxes, viewProjection );
+    renderBoxes( tmpQueue, viewProjection );
   }
 
   // Render UI.
@@ -239,6 +274,9 @@ void GenericRenderer::present( const Lore::RenderView& rv, const Lore::WindowPtr
   }
 
   // Render debug UI if enabled.
+  if ( DebugUI::IsStatsUIEnabled() ) {
+    renderUI( DebugUI::GetStatsUI(), rv.scene, aspectRatio, projection );
+  }
   if ( DebugUI::IsConsoleEnabled() ) {
     renderUI( DebugUI::GetConsoleUI(), rv.scene, aspectRatio, projection );
   }
@@ -261,6 +299,7 @@ void GenericRenderer::_clearRenderQueues()
     queue.transparents.clear();
     queue.boxes.clear();
     queue.textboxes.clear();
+    queue.lights.clear();
   }
 
   // Erase all queues from the active queue list.
@@ -296,16 +335,22 @@ void GenericRenderer::renderBackground( const Lore::RenderView& rv,
     const Background::Layer& layer = pair.second;
     MaterialPtr mat = layer.getMaterial();
 
-    GPUProgramPtr program = mat->program;
-    TexturePtr texture = mat->texture;
+    if ( mat->sprite && mat->sprite->getTextureCount() ) {
+      GPUProgramPtr program = mat->program;
 
-    // Enable blending if set.
-    if ( mat->blendingMode.enabled ) {
-      _api->setBlendingEnabled( true );
-      _api->setBlendingFunc( mat->blendingMode.srcFactor, mat->blendingMode.dstFactor );
-    }
+      // Enable blending if set.
+      if ( mat->blendingMode.enabled ) {
+        _api->setBlendingEnabled( true );
+        _api->setBlendingFunc( mat->blendingMode.srcFactor, mat->blendingMode.dstFactor );
+      }
 
-    if ( texture ) {
+      // Get the active sprite frame for this layer.
+      size_t spriteFrame = 0;
+      if ( layer.getSpriteController() ) {
+        spriteFrame = layer.getSpriteController()->getActiveFrame();
+      }
+
+      TexturePtr texture = mat->sprite->getTexture( spriteFrame );
       program->use();
       texture->bind();
 
@@ -343,12 +388,12 @@ void GenericRenderer::renderBackground( const Lore::RenderView& rv,
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
-                                         Lore::RenderQueue::EntityDataMap& mm,
+                                         const RenderQueue& queue,
                                          const Lore::Matrix4& viewProjection ) const
 {
   // Iterate over render data lists for each material.
 
-  for ( auto& pair : mm ) {
+  for ( auto& pair : queue.solids ) {
 
     const RenderQueue::EntityData& entityData = pair.first;
     const RenderQueue::RenderDataList& renderDataList = pair.second;
@@ -359,10 +404,12 @@ void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
     MaterialPtr mat = entityData.material;
     GPUProgramPtr program = mat->program;
     VertexBufferPtr vertexBuffer = entityData.vertexBuffer;
-    TexturePtr texture = mat->texture;
 
     program->use();
-    if ( texture ) {
+    if ( mat->sprite && mat->sprite->getTextureCount() ) {
+      const auto spriteFrame = pair.first.spriteFrame;
+      TexturePtr texture = mat->sprite->getTexture( spriteFrame );
+
       // TODO: Multi-texturing.
       texture->bind();
       program->setUniformVar( "texSampleOffset", mat->getTexCoordOffset() );
@@ -383,9 +430,9 @@ void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
 
       // Scene.
       program->setUniformVar( "sceneAmbient", scene->getAmbientLightColor() );
-      program->setUniformVar( "numLights", scene->getLightCount() );
+      program->setUniformVar( "numLights", static_cast<int>( queue.lights.size() ) );
 
-      program->updateLights( scene->getLightConstIterator() );
+      program->updateLights( queue.lights );
 
     }
 
@@ -394,8 +441,18 @@ void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
     // Render each node associated with this entity data.
     for ( const RenderQueue::RenderData& rd : renderDataList ) {
 
+      Vec3 scale( 1.f, 1.f, 1.f );
+      if ( rd.xFlipped ) {
+        scale.x = -1.f;
+      }
+      if ( rd.yFlipped ) {
+        scale.y = -1.f;
+      }
+
+      const Matrix4 FlipMatrix = Math::CreateTransformationMatrix( Lore::Vec3(), Lore::Quaternion(), scale );
+
       // Calculate model-view-projection matrix for this object.
-      Matrix4 mvp = viewProjection * rd.model;
+      Matrix4 mvp = viewProjection * rd.model * FlipMatrix;
 
       program->setTransformVar( mvp );
 
@@ -416,26 +473,28 @@ void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void GenericRenderer::renderTransparents( const Lore::ScenePtr scene,
-                                          Lore::RenderQueue::TransparentDataMap& tm,
+                                          const RenderQueue& queue,
                                           const Lore::Matrix4& viewProjection ) const
 {
   _api->setBlendingEnabled( true );
 
   // Render in forward order, so the farthest back is rendered first.
   // (Depth values increase going farther back).
-  for ( auto it = tm.begin(); it != tm.end(); ++it ) {
+  for ( auto it = queue.transparents.begin(); it != queue.transparents.end(); ++it ) {
 
-    RenderQueue::Transparent& t = it->second;
+    const RenderQueue::Transparent& t = it->second;
     MaterialPtr mat = t.material;
     GPUProgramPtr program = mat->program;
     VertexBufferPtr vertexBuffer = t.vertexBuffer;
-    TexturePtr texture = mat->texture;
 
     // Set blending mode using material settings.
     _api->setBlendingFunc( mat->blendingMode.srcFactor, mat->blendingMode.dstFactor );
 
     program->use();
-    if ( texture ) {
+    if ( mat->sprite && mat->sprite->getTextureCount() ) {
+      const auto spriteFrame = it->second.spriteFrame;
+      TexturePtr texture = mat->sprite->getTexture( spriteFrame );
+
       // TODO: Multi-texturing.
       texture->bind();
       program->setUniformVar( "texSampleOffset", mat->getTexCoordOffset() );
@@ -456,9 +515,9 @@ void GenericRenderer::renderTransparents( const Lore::ScenePtr scene,
 
       // Scene.
       program->setUniformVar( "sceneAmbient", scene->getAmbientLightColor() );
-      program->setUniformVar( "numLights", scene->getLightCount() );
+      program->setUniformVar( "numLights", static_cast<int>( queue.lights.size() ) );
 
-      program->updateLights( scene->getLightConstIterator() );
+      program->updateLights( queue.lights );
 
     }
 
@@ -466,7 +525,17 @@ void GenericRenderer::renderTransparents( const Lore::ScenePtr scene,
 
     {
       // Calculate model-view-projection matrix for this object.
-      Matrix4 mvp = viewProjection * t.model;
+      Vec3 scale( 1.f, 1.f, 1.f );
+      if ( t.xFlipped ) {
+        scale.x = -1.f;
+      }
+      if ( t.yFlipped ) {
+        scale.y = -1.f;
+      }
+
+      const Matrix4 FlipMatrix = Math::CreateTransformationMatrix( Lore::Vec3(), Lore::Quaternion(), scale );
+
+      Matrix4 mvp = viewProjection * t.model * FlipMatrix;
 
       program->setTransformVar( mvp );
 
@@ -487,7 +556,7 @@ void GenericRenderer::renderTransparents( const Lore::ScenePtr scene,
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GenericRenderer::renderBoxes( RenderQueue::BoxList& boxes,
+void GenericRenderer::renderBoxes( const RenderQueue& queue,
                                    const Matrix4& viewProjection ) const
 {
   _api->setBlendingEnabled( true );
@@ -499,7 +568,7 @@ void GenericRenderer::renderBoxes( RenderQueue::BoxList& boxes,
   program->use();
   vb->bind();
 
-  for ( auto& data : boxes ) {
+  for ( auto& data : queue.boxes ) {
     BoxPtr box = data.box;
     program->setUniformVar( "borderColor", box->getBorderColor() );
     program->setUniformVar( "fillColor", box->getFillColor() );
@@ -520,7 +589,7 @@ void GenericRenderer::renderBoxes( RenderQueue::BoxList& boxes,
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GenericRenderer::renderTextboxes( RenderQueue::TextboxList& textboxes,
+void GenericRenderer::renderTextboxes( const RenderQueue& queue,
                                        const Matrix4& viewProjection ) const
 {
   _api->setBlendingEnabled( true );
@@ -532,7 +601,7 @@ void GenericRenderer::renderTextboxes( RenderQueue::TextboxList& textboxes,
   program->use();
   vb->bind();
 
-  for ( auto& data : textboxes ) {
+  for ( auto& data : queue.textboxes ) {
     TextboxPtr textbox = data.textbox;
     string text = textbox->getText();
     FontPtr font = textbox->getFont();
@@ -574,10 +643,7 @@ void GenericRenderer::renderUI( const Lore::UIPtr ui,
 {
   auto panelIt = ui->getPanelIterator();
 
-  RenderQueue::EntityDataMap solids;
-  RenderQueue::TransparentDataMap transparents;
-  RenderQueue::BoxList boxes;
-  RenderQueue::TextboxList textboxes;
+  RenderQueue queue;
   constexpr const real DepthOffset = -1101.f;
 
   // For each panel.
@@ -613,14 +679,14 @@ void GenericRenderer::renderUI( const Lore::UIPtr ui,
           t.vertexBuffer = entity->getMesh()->getVertexBuffer();
           t.model = rd.model;
 
-          transparents.insert( { t.model[3][2], t } );
+          queue.transparents.insert( { t.model[3][2], t } );
         }
         else {
           RenderQueue::EntityData entityData;
           entityData.material = mat;
           entityData.vertexBuffer = entity->getMesh()->getVertexBuffer();
 
-          solids[entityData].push_back( rd );
+          queue.solids[entityData].push_back( rd );
         }
       }
 
@@ -630,7 +696,7 @@ void GenericRenderer::renderUI( const Lore::UIPtr ui,
         bd.box = box;
         bd.model = Math::CreateTransformationMatrix( elementPos, Quaternion(), elementDimensions );
         bd.model[3][2] = element->getDepth() + DepthOffset;
-        boxes.push_back( bd );
+        queue.boxes.push_back( bd );
       }
 
       auto textbox = element->getTextbox();
@@ -639,16 +705,16 @@ void GenericRenderer::renderUI( const Lore::UIPtr ui,
         td.textbox = textbox;
         td.model = Math::CreateTransformationMatrix( elementPos );
         td.model[3][2] = element->getDepth() + DepthOffset;
-        textboxes.push_back( td );
+        queue.textboxes.push_back( td );
       }
     }
   }
 
   // Now render the UI elements.
-  renderMaterialMap( scene, solids, proj );
-  renderTransparents( scene, transparents, proj );
-  renderBoxes( boxes, proj );
-  renderTextboxes( textboxes, proj );
+  renderMaterialMap( scene, queue, proj );
+  renderTransparents( scene, queue, proj );
+  renderBoxes( queue, proj );
+  renderTextboxes( queue, proj );
 
   _api->setBlendingEnabled( false );
 }

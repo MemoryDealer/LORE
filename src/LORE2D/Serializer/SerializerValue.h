@@ -100,6 +100,11 @@ namespace Lore {
       return _key;
     }
 
+    bool hasValue( const string& key ) const
+    {
+      return ( _values.end() == _values.find( key ) );
+    }
+
     const SerializerValue& get( const string& key ) const
     {
       auto it = _values.find( key );

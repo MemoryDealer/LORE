@@ -25,52 +25,56 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Resource/Renderable/Texture.h>
+namespace Lore {
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+  ///
+  /// \class Sprite
+  /// \brief A container of Textures which a Material can use.
+  class LORE_EXPORT Sprite final : public Lore::Alloc<Sprite>
+  {
 
-namespace Lore { namespace OpenGL {
+    LORE_OBJECT_BODY()
 
-    class GLTexture : public Lore::Texture,
-                      public Alloc<GLTexture>
+  public:
+
+    using TextureList = std::vector<TexturePtr>;
+
+  public:
+
+    Sprite() = default;
+    ~Sprite() = default;
+
+    //
+    // Modifiers.
+
+    void addTexture( const TexturePtr texture )
     {
+      _textures.push_back( texture );
+    }
 
-    public:
+    //
+    // Getters.
 
-        GLTexture();
+    TexturePtr getTexture( const size_t idx ) const
+    {
+      return _textures.at( idx );
+    }
 
-        virtual ~GLTexture() override;
+    size_t getTextureCount() const
+    {
+      return _textures.size();
+    }
 
-        virtual void loadFromFile( const string& file ) override;
+  private:
 
-        virtual void create( const uint32_t width, const uint32_t height ) override;
+    virtual void _reset() override {}
 
-        virtual void create( const int width, const int height, const Color& color ) override;
+  private:
 
-        virtual void bind() override;
+    TextureList _textures {};
 
-        //
-        // Getters.
+  };
 
-        GLuint getID() const
-        {
-            return _id;
-        }
-
-    protected:
-
-        virtual void _reset() override;
-
-    private:
-
-        void _createGLTexture( const unsigned char* pixels, const int width, const int height, const bool genMipMaps = true );
-
-    private:
-
-        GLuint _id;
-
-    };
-
-}}
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

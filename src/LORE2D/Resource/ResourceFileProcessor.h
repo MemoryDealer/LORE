@@ -25,7 +25,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Resource/ResourceType.h>
+#include <LORE2D/Resource/SerializableResource.h>
 #include <LORE2D/Serializer/Serializer.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -38,29 +38,31 @@ namespace Lore {
   public:
 
     static void LoadConfiguration( const string& file, ResourceControllerPtr resourceController );
-    static ResourceType GetResourceFileType( const string& file );
+    static SerializableResource GetResourceFileType( const string& file );
 
   public:
 
-    ResourceFileProcessor( const string& file, const ResourceType type );
+    ResourceFileProcessor( const string& file, const SerializableResource type );
     ~ResourceFileProcessor() = default;
 
     void process();
 
     string getName() const;
 
-    ResourceType getType() const;
+    SerializableResource getType() const;
 
     void load( const string& groupName, ResourceControllerPtr resourceController );
 
   private:
 
+    void processAnimation( SpriteAnimationSetPtr animationSet, const SerializerValue& animations, ResourceControllerPtr resourceController );
     void processMaterial( MaterialPtr material, const SerializerValue& settings, ResourceControllerPtr resourceController );
+    void processSpriteList( const string& groupName, ResourceControllerPtr resourceController );
 
   private:
 
     string _file {};
-    ResourceType _type {};
+    SerializableResource _type {};
     mutable Serializer _serializer {};
 
   };

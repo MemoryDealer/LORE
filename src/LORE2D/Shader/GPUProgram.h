@@ -27,6 +27,7 @@
 
 #include <LORE2D/Math/Math.h>
 #include <LORE2D/Memory/Alloc.h>
+#include <LORE2D/Renderer/Renderer.h>
 #include <LORE2D/Scene/Scene.h>
 #include <LORE2D/Shader/Shader.h>
 #include <LORE2D/Shader/VertexBuffer.h>
@@ -35,66 +36,66 @@
 
 namespace Lore {
 
-    class LORE_EXPORT GPUProgram
-    {
+  class LORE_EXPORT GPUProgram
+  {
 
-        LORE_OBJECT_BODY()
+      LORE_OBJECT_BODY()
 
-    public:
+  public:
 
-        GPUProgram();
+      GPUProgram();
 
-        virtual ~GPUProgram();
+      virtual ~GPUProgram();
 
-        virtual void attachShader( ShaderPtr shader );
+      virtual void attachShader( ShaderPtr shader );
 
-        virtual ShaderPtr getAttachedShader( const Shader::Type& type );
+      virtual ShaderPtr getAttachedShader( const Shader::Type& type );
 
-        virtual bool link() = 0;
+      virtual bool link() = 0;
 
-        virtual void use() = 0;
+      virtual void use() = 0;
 
-        inline bool hasAttachedShader( const Shader::Type& type )
-        {
-            return ( _shaders.find( type ) != _shaders.end() );
-        }
+      inline bool hasAttachedShader( const Shader::Type& type )
+      {
+          return ( _shaders.find( type ) != _shaders.end() );
+      }
 
-        //
-        // Getters.
+      //
+      // Getters.
 
 
-        //
-        // Uniform value updating.
+      //
+      // Uniform value updating.
 
-        virtual void addTransformVar( const string& id ) = 0;
+      virtual void addTransformVar( const string& id ) = 0;
 
-        virtual void setTransformVar( const Matrix4& m ) = 0;
+      virtual void setTransformVar( const Matrix4& m ) = 0;
 
-        virtual void addUniformVar( const string& id ) = 0;
+      virtual void addUniformVar( const string& id ) = 0;
 
-        virtual void setUniformVar( const string& id, const Matrix4& m ) = 0;
+      virtual void setUniformVar( const string& id, const Matrix4& m ) = 0;
 
-        virtual void setUniformVar( const string& id, const Vec2& v ) = 0;
+      virtual void setUniformVar( const string& id, const Vec2& v ) = 0;
 
-        virtual void setUniformVar( const string& id, const Vec3& v ) = 0;
+      virtual void setUniformVar( const string& id, const Vec3& v ) = 0;
 
-        virtual void setUniformVar( const string& id, const Vec4& v ) = 0;
+      virtual void setUniformVar( const string& id, const Vec4& v ) = 0;
 
-        virtual void setUniformVar( const string& id, const real r ) = 0;
+      virtual void setUniformVar( const string& id, const real r ) = 0;
 
-        virtual void setUniformVar( const string& id, const int i ) = 0;
+      virtual void setUniformVar( const string& id, const int i ) = 0;
 
-        virtual void updateLights( Scene::LightMap::ConstIterator it ) = 0;
+      virtual void updateLights( const RenderQueue::LightList& lights ) = 0;
 
-    protected:
+  protected:
 
-        using ShaderMap = std::unordered_map<Shader::Type, ShaderPtr>;
+      using ShaderMap = std::unordered_map<Shader::Type, ShaderPtr>;
 
-    protected:
+  protected:
 
-        ShaderMap _shaders;
+      ShaderMap _shaders;
 
-    };
+  };
 
 }
 

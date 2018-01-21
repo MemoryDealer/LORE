@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,36 +24,66 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Resource/Color.h>
-#include <LORE2D/Resource/Renderable/Renderable.h>
+#include "Game.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+using namespace std::chrono_literals;
 
-  // TODO: How to handle multi-texturing? With current rendering pipeline,
-  // it may be best to have a link to the next texture for each texture object.
-  // Then let the material inform the renderer to iterate the linked list.
-  class LORE_EXPORT Texture : public Renderable
-  {
+using Clock = std::chrono::high_resolution_clock;
 
-  public:
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    Texture()
-    {
-      _type = Renderable::Type::Texture;
+int main( int argc, char** argv )
+{
+  // Use our simple game class.
+  // The constructor will create a Lore context and a small window.
+  Game game;
+
+  // Index and load resources specified in res/complexscene/resources.json.
+  game.loadResources();
+
+  // Add some contents to the scene.
+  game.loadScene();
+
+  //
+  // Setup is complete, begin processing the scene.
+
+  // Start a frame rate independent game loop with a fixed timestep.
+  constexpr const std::chrono::nanoseconds timestep( 16ms );
+  bool running = true;
+  std::chrono::nanoseconds lag( 0ns );
+  auto lastTime = Clock::now();
+
+  while ( running ) {
+    // Calculate delta time since last update.
+    const auto now = Clock::now();
+    const auto dt = now - lastTime;
+    lastTime = now;
+
+    // Increment our lag counter to track how much "catching up" we need to do.
+    lag += std::chrono::duration_cast< std::chrono::nanoseconds >( dt );
+
+    while ( lag > timestep ) {
+      lag -= timestep;
+
+      //
+      // Update game/scene.
+
+      // Process input.
+      if ( Lore::Input::GetKeyState( Lore::Keycode::Escape ) ||
+           Lore::Input::GetKeyState( Lore::Keycode::End ) ) {
+        running = false;
+      }
+
+      game.processInput();
     }
 
-    virtual ~Texture() override = default;
+    // We are done updating, render a frame.
+    game.render();
+  }
 
-    virtual void loadFromFile( const string& file ) = 0;
-
-    virtual void create( const uint32_t width, const uint32_t height ) = 0;
-
-    virtual void create( const int width, const int height, const Color& color ) = 0;
-
-  };
-
+  return 0;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

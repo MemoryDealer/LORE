@@ -56,7 +56,8 @@ namespace Lore {
     using BoxListConstIterator = BoxList::ConstIterator;
     using TextboxList = Registry<std::map, Textbox>;
     using TextboxListConstIterator = TextboxList::ConstIterator;
-    using LightList = std::vector<LightPtr>;
+    using LightList = Registry<std::map, Light>;
+    using LightListConstIterator = LightList::ConstIterator;
     using CameraList = std::vector<CameraPtr>;
 
     struct Transform
@@ -135,6 +136,11 @@ namespace Lore {
       return _textboxes.getConstIterator();
     }
 
+    inline LightListConstIterator getLightListConstIterator() const
+    {
+      return _lights.getConstIterator();
+    }
+
     // Misc.
 
     bool intersects( NodePtr rhs ) const;
@@ -173,6 +179,11 @@ namespace Lore {
       assert( depth >= -1000.f && depth <= 1000.f );
       _depth = depth;
     }
+
+    ///
+    /// \brief Allocates a SpriteController for this node, which can be used to animate the sprite (if one exists)
+    /// associated with this node.
+    SpriteControllerPtr createSpriteController();
 
     //
     // Getters.
@@ -224,6 +235,8 @@ namespace Lore {
 
     AABBPtr getAABB() const;
 
+    SpriteControllerPtr getSpriteController() const;
+
 
     //
     // Deleted functions/operators.
@@ -269,6 +282,7 @@ namespace Lore {
     // TODO: Node is getting large, consider holding node -> entity mappings somewhere else.
 
     std::unique_ptr<AABB> _aabb { nullptr };
+    std::unique_ptr<SpriteController> _spriteController { nullptr };
 
     Transform _transform {};
 

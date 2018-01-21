@@ -129,16 +129,6 @@ namespace Lore {
       return _lights.get( name );
     }
 
-    inline int getLightCount() const
-    {
-      return static_cast< int >( _activeLights.size() );
-    }
-
-    LightMap::ConstIterator getLightConstIterator() const
-    {
-      return _activeLights.getConstIterator();
-    }
-
     inline BackgroundPtr getBackground() const
     {
       return _background;
@@ -171,9 +161,6 @@ namespace Lore {
     Color _ambientLightColor { StockColor::Black };
 
     LightMap _lights {};
-
-    // Lights that are attached to a node.
-    LightMap _activeLights {};
 
     BackgroundPtr _background { nullptr };
 

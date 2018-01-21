@@ -51,11 +51,14 @@
 #include <LORE2D/Resource/Material.h>
 #include <LORE2D/Resource/StockResource.h>
 #include <LORE2D/Resource/Renderable/Box.h>
-#include <LORE2D/Resource/Renderable/Texture.h>
 #include <LORE2D/Resource/Renderable/Textbox.h>
-#include <LORE2D/Scene/AABB.h>
-#include <LORE2D/Scene/Background.h>
+#include <LORE2D/Resource/Texture.h>
 #include <LORE2D/UI/UI.h>
 #include <LORE2D/UI/UIElement.h>
+
+// Scene.
+#include <LORE2D/Scene/AABB.h>
+#include <LORE2D/Scene/Background.h>
+#include <LORE2D/Scene/SpriteController.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

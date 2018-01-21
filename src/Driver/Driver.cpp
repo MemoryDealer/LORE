@@ -100,7 +100,7 @@ int main( int argc, char** argv )
   // Hack.
   Lore::CLI::SetActiveScene( scene );
 
-  Lore::Viewport vp( 0.f, 0.f, 1.f, 1.f );
+  Lore::Rect vp( 0.f, 0.f, 1.f, 1.f );
   Lore::CameraPtr camera = Lore::Resource::CreateCamera( "cam1" );
   __camera = camera;
   Lore::RenderView rv( "main", scene, vp );
@@ -115,8 +115,8 @@ int main( int argc, char** argv )
   auto sonicNode = scene->createNode( "sonic" );
   sonicNode->setDepth( -50.f );
   auto sonicEntity = Lore::Resource::CreateEntity( "sonic", Lore::MeshType::TexturedQuad );
-  auto sonicTexture = Lore::Resource::GetTexture( "sonic-mobile" );
-  sonicEntity->setTexture( sonicTexture );
+  auto sonicSprite = Lore::Resource::GetSprite( "sonic-mobile" );
+  sonicEntity->setSprite( sonicSprite );
   //sonicEntity->getMaterial()->blendingMode.enabled = true;
   sonicEntity->getMaterial()->diffuse.a = 0.5f;
   sonicNode->attachObject( sonicEntity );
@@ -129,9 +129,9 @@ int main( int argc, char** argv )
   // Create some doges.
 
   auto dogeEntity = Lore::Resource::CreateEntity( "doge", Lore::MeshType::TexturedQuad );
-  auto dogeTexture = Lore::Resource::GetTexture( "doge" );
+  auto dogeSprite = Lore::Resource::GetSprite( "doge" );
   std::vector<Lore::NodePtr> doges;
-  dogeEntity->setTexture( dogeTexture );
+  dogeEntity->setSprite( dogeSprite );
   for ( int i = 0; i < 5; ++i ) {
     auto node = scene->createNode( "doge" + std::to_string( i ) );
     node->attachObject( dogeEntity );
@@ -170,13 +170,13 @@ int main( int argc, char** argv )
 
   auto bg = scene->getBackground();
   auto& layer = bg->addLayer( "1" );
-  layer.setTexture( Lore::Resource::GetTexture( "clouds" ) );
+  layer.setSprite( Lore::Resource::GetSprite( "clouds" ) );
   layer.setScrollSpeed( Lore::Vec2( 0.0008f, 0.0004f ) );
   layer.setParallax( Lore::Vec2( 0.05f, 0.05f ) );
   layer.setDepth( 1001.f );
 
   auto& layer2 = bg->addLayer( "2" );
-  layer2.setTexture( Lore::Resource::GetTexture( "bg" ) );
+  layer2.setSprite( Lore::Resource::GetSprite( "bg" ) );
   layer2.setParallax( Lore::Vec2(0.1f, 0.1f) );
   layer2.setMaterial( Lore::Resource::GetMaterial( "bg" ) );
   //layer.getMaterial()->getPass().setTextureSampleRegion( 0.15f, 0.05f, 0.08f, 0.58f );
@@ -283,6 +283,11 @@ int main( int argc, char** argv )
   float f = 0.f;
   __timer.reset();
 
+  // Setup sprite.
+  auto spc = sonicNode->createSpriteController();
+  spc->useAnimationSet( Lore::Resource::GetAnimationSet( "main" ) );
+  spc->startAnimation( "idle" );
+
   camera->trackNode( sonicNode );
   bool pause = true;
   while ( context->active() ) {
@@ -351,7 +356,7 @@ int main( int argc, char** argv )
     scene->getNode( "dogen" )->rotate( Lore::Degree( -.2f ) );
     scene->getNode( "dogen2" )->rotate( Lore::Degree( .2f ) );
 
-    sonicNode->rotate( Lore::Degree( .1f ) );
+    //sonicNode->rotate( Lore::Degree( .1f ) );
 
     float speed = 0.01f;
     if ( Lore::Input::GetKeymodState( Lore::Keymod::Shift ) ) {
@@ -379,7 +384,7 @@ int main( int argc, char** argv )
     if ( Lore::Input::GetKeyState( Lore::Keycode::F8 ) ) {
       static bool destroyed = false;
       if ( !destroyed ) {
-        Lore::Resource::DestroyTexture( sonicTexture );
+        //Lore::Resource::DestroyTexture( sonicTexture );
         destroyed = true;
       }
     }
@@ -466,6 +471,18 @@ static void OnKeyChanged( const Lore::Keycode key, const bool state )
       enabled = !enabled;
       Lore::Input::SetCursorEnabled( enabled );
     }
+    break;
+
+  case Lore::Keycode::One:
+    __sonic->getSpriteController()->setActiveFrame( 0 );
+    break;
+
+  case Lore::Keycode::Two:
+    __sonic->getSpriteController()->setActiveFrame( 1 );
+    break;
+
+  case Lore::Keycode::Three:
+    __sonic->getSpriteController()->setActiveFrame( 2 );
     break;
 
   case Lore::Keycode::GraveAccent:

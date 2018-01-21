@@ -28,7 +28,6 @@
 #include <LORE2D/Math/Math.h>
 #include <LORE2D/Memory/Alloc.h>
 #include <LORE2D/Resource/Color.h>
-#include <LORE2D/Resource/Renderable/Renderable.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -47,11 +46,6 @@ namespace Lore {
 
     //
     // Getters.
-
-    inline Vec2 getPosition() const
-    {
-      return _position;
-    }
 
     inline Color getColor() const
     {
@@ -120,7 +114,6 @@ namespace Lore {
 
   private:
 
-    Vec2 _position;
     Color _color;
 
     // Attenuation.

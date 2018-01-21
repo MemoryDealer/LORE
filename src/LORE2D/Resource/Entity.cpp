@@ -27,6 +27,7 @@
 #include "Entity.h"
 
 #include <LORE2D/Renderer/Renderer.h>
+#include <LORE2D/Resource/Material.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -47,9 +48,11 @@ Entity::~Entity()
 {
 }
 
-void Entity::setTexture( TexturePtr texture )
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Entity::setSprite( SpritePtr sprite )
 {
-  _material->texture = texture;
+  _material->sprite = sprite;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

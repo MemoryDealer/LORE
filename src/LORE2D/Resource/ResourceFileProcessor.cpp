@@ -27,8 +27,10 @@
 #include "ResourceFileProcessor.h"
 
 #include <LORE2D/Core/Util.h>
+#include <LORE2D/Resource/Renderable/Sprite.h>
 #include <LORE2D/Resource/ResourceController.h>
 #include <LORE2D/Resource/StockResource.h>
+#include <LORE2D/Scene/SpriteController.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -56,12 +58,17 @@ void ResourceFileProcessor::LoadConfiguration( const string& file, ResourceContr
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-ResourceType ResourceFileProcessor::GetResourceFileType( const string& file )
+SerializableResource ResourceFileProcessor::GetResourceFileType( const string& file )
 {
-  static const std::map<string, ResourceType> ExtensionMapping = {
-    { "font", ResourceType::Font },
-    { "material", ResourceType::Material },
-    { "sprite", ResourceType::Sprite }
+  static const std::multimap<string, SerializableResource> ExtensionMapping = {
+    { "spriteanimation", SerializableResource::SpriteAnimation },
+    { "font", SerializableResource::Font },
+    { "material", SerializableResource::Material },
+    { "sprite", SerializableResource::Sprite },
+    { "spritelist", SerializableResource::SpriteList },
+    { "bmp", SerializableResource::Texture },
+    { "jpg", SerializableResource::Texture },
+    { "png", SerializableResource::Texture }
   };
 
   const string extension = Util::GetFileExtension( file );
@@ -72,12 +79,12 @@ ResourceType ResourceFileProcessor::GetResourceFileType( const string& file )
     }
   }
 
-  return ResourceType::Count;
+  return SerializableResource::Count;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-ResourceFileProcessor::ResourceFileProcessor( const string& file, const ResourceType type )
+ResourceFileProcessor::ResourceFileProcessor( const string& file, const SerializableResource type )
 : _file( file )
 , _type( type )
 {
@@ -88,19 +95,34 @@ ResourceFileProcessor::ResourceFileProcessor( const string& file, const Resource
 
 void ResourceFileProcessor::process()
 {
-  _serializer.deserialize( _file );
+  switch ( _type ) {
+  default:
+    _serializer.deserialize( _file );
+    break;
+
+  case SerializableResource::Texture:
+    // Don't try to deserialize texture files.
+    break;
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 string ResourceFileProcessor::getName() const
 {
-  return _serializer.getValue( "name" ).toString();
+  switch ( _type ) {
+  default:
+    return _serializer.getValue( "name" ).toString();
+
+  case SerializableResource::SpriteList:
+  case SerializableResource::Texture:
+    return Util::GetFileName( _file );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-ResourceType ResourceFileProcessor::getType() const
+SerializableResource ResourceFileProcessor::getType() const
 {
   return _type;
 }
@@ -113,21 +135,33 @@ void ResourceFileProcessor::load( const string& groupName, ResourceControllerPtr
   default:
     break;
 
-  case ResourceType::Font: {
+  case SerializableResource::SpriteAnimation: {
+    auto animationSet = resourceController->createAnimationSet( getName(), groupName );
+    processAnimation( animationSet, _serializer.getValue( "animations" ), resourceController );
+  } break;
+
+  case SerializableResource::Font: {
     const auto file = _serializer.getValue( "file" ).toString();
     const auto size = _serializer.getValue( "size" ).toInt();
     resourceController->loadFont( getName(), file, size, groupName );
   } break;
 
-  case ResourceType::Material:
-  {
+  case SerializableResource::Material: {
     auto material = resourceController->createMaterial( getName(), groupName );
     processMaterial( material, _serializer.getValue( "settings" ), resourceController );
   } break;
 
-  case ResourceType::Sprite: {
-    const auto image = _serializer.getValue( "image" ).toString();
-    resourceController->loadTexture( getName(), image, groupName );
+  case SerializableResource::Sprite: {
+    ;
+  } break;
+
+  case SerializableResource::SpriteList:
+    processSpriteList( groupName, resourceController );
+    break;
+
+  case SerializableResource::Texture: {
+    auto textureName = Util::GetFileName( _file );
+    resourceController->loadTexture( textureName, _file, groupName );
   } break;
 
   }
@@ -136,13 +170,38 @@ void ResourceFileProcessor::load( const string& groupName, ResourceControllerPtr
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void ResourceFileProcessor::processAnimation( SpriteAnimationSetPtr animationSet, const SerializerValue& animations, ResourceControllerPtr resourceController )
+{
+  for ( const auto& animation : animations.getValues() ) {
+    const auto& name = animation.first;
+    const auto& settings = animation.second;
+    const auto& frames = settings.get( "frames" ).toArray();
+    const auto& deltaTimes = settings.get( "deltaTimes" ).toArray();
+
+    // Create an animation to add to the animation set.
+    SpriteController::Animation animation;
+
+    // Process frames and delta times.
+    for ( const auto& frame : frames ) {
+      animation.frames.push_back( static_cast<size_t>( frame.toInt() ) );
+    }
+    for ( const auto& dt : deltaTimes ) {
+      animation.deltaTimes.push_back( static_cast< long >( dt.toInt() ) );
+    }
+
+    animationSet->addAnimation( name, animation );
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void ResourceFileProcessor::processMaterial( MaterialPtr material, const SerializerValue& settings, ResourceControllerPtr resourceController )
 {
   for ( const auto& value : settings.getValues() ) {
     string setting = Util::ToLower( value.first );
 
     if ( "sprite" == setting ) {
-      material->texture = resourceController->getTexture( value.second.toString() );
+      material->sprite = resourceController->getSprite( value.second.toString() );
     }
     else if ( "program" == setting ) {
       material->program = resourceController->getGPUProgram( value.second.toString() );
@@ -159,6 +218,37 @@ void ResourceFileProcessor::processMaterial( MaterialPtr material, const Seriali
     else if ( "sampleregion" == setting ) {
       auto region = value.second.toRect();
       material->setTextureSampleRegion( region );
+    }
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void ResourceFileProcessor::processSpriteList( const string& groupName, ResourceControllerPtr resourceController )
+{
+  for ( const auto& spriteValue : _serializer.getValues() ) {
+    const string& name = spriteValue.first;
+
+    // Create a sprite for this entry.
+    auto sprite = resourceController->createSprite( name, groupName );
+
+    if ( SerializerValue::Type::Array == spriteValue.second.getType() ) {
+      const auto& textureNames = spriteValue.second.toArray();
+
+      if ( textureNames.empty() ) {
+        log_warning( "Sprite " + name + " has no textures associated with it, ignoring..." );
+        return;
+      }
+
+      // Retrieve all textures.
+      for ( const auto& textureName : textureNames ) {
+        sprite->addTexture( resourceController->getTexture( textureName.toString(), groupName ) );
+      }
+    }
+    else if ( SerializerValue::Type::String == spriteValue.second.getType() ) {
+      // Just a single texture.
+      const auto& textureName = spriteValue.second.toString();
+      sprite->addTexture( resourceController->getTexture( textureName, groupName ) );
     }
   }
 }

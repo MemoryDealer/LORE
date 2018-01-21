@@ -93,6 +93,16 @@ namespace Lore {
       return file.substr( idx + 1, file.size() - idx );
     }
 
+    ///
+    /// \brief Returns file name from a full file path.
+    static string GetFileName( const string& file )
+    {
+      const auto lastSlash = file.rfind( '/' ) + 1;
+      const auto dot = file.rfind( '.' );
+
+      return file.substr( lastSlash, dot - lastSlash );
+    }
+
   };
 
 }

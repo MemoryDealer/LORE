@@ -1,0 +1,10 @@
+{
+  "name":"clouds",
+  "settings": {
+    "sprite":"clouds",
+    "StockProgram":"background",
+    "diffuse":[1.0, 1.0, 1.0, 1.0],
+    "blend":true,
+    "sampleregion":[0.0, 0.0, 1.0, 1.0]
+  }
+}

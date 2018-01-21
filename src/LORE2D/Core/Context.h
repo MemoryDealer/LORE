@@ -28,6 +28,7 @@
 #include <LORE2D/Core/NotificationCenter.h>
 #include <LORE2D/Core/Plugin/Plugins.h>
 #include <LORE2D/Core/Plugin/RenderPluginLoader.h>
+#include <LORE2D/Input/Input.h>
 #include <LORE2D/Memory/PoolCluster.h>
 #include <LORE2D/Renderer/FrameListener/FrameListenerController.h>
 #include <LORE2D/Renderer/Renderer.h>
@@ -44,7 +45,7 @@ namespace Lore {
   ///
   /// \class Context
   /// \brief The single owner of all Lore functionality.
-  class LORE_EXPORT Context
+  class LORE_EXPORT Context : public KeyListener
   {
 
   public:
@@ -234,6 +235,10 @@ namespace Lore {
 
     Context& operator = ( const Context& rhs ) = delete;
     Context( const Context& rhs ) = delete;
+
+    ///
+    /// \brief Used for processing default keyboard shortcuts (such as for the DebugUI).
+    virtual void onKeyDown( const Keycode code );
 
   protected:
 

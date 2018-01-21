@@ -26,7 +26,6 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 #include <LORE2D/Window/RenderView.h>
-#include <LORE2D/Resource/Material.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -53,7 +52,9 @@ namespace Lore {
     // An instance of a type of Renderable attached to a node (e.g., Texture).
     struct RenderData
     {
-      Matrix4 model;
+      Matrix4 model {};
+      bool xFlipped { false };
+      bool yFlipped { false };
     };
     using RenderDataList = std::vector<RenderData>;
 
@@ -61,18 +62,19 @@ namespace Lore {
     {
       MaterialPtr material { nullptr };
       VertexBufferPtr vertexBuffer { nullptr };
+      size_t spriteFrame { 0 };
 
-      bool operator < ( const EntityData& r ) const
-      {
-        return ( material->getName() < r.material->getName() );
-      }
+      bool operator < ( const EntityData& r ) const;
     };
 
-    struct Transparent
+    struct Transparent // TODO: This is inconsistent with EntityData, clean these up.
     {
       MaterialPtr material { nullptr };
       VertexBufferPtr vertexBuffer { nullptr };
+      size_t spriteFrame { 0 };
       Matrix4 model {};
+      bool xFlipped { false };
+      bool yFlipped { false };
     };
 
     struct BoxData
@@ -87,16 +89,24 @@ namespace Lore {
       Matrix4 model {};
     };
 
+    struct LightData
+    {
+      LightPtr light { nullptr };
+      Vec2 pos {};
+    };
+
     // Every Material maps to a list of RenderData.
     using EntityDataMap = std::map<EntityData, RenderDataList>;
     using TransparentDataMap = std::multimap<real, Transparent>;
     using BoxList = std::vector<BoxData>;
     using TextboxList = std::vector<TextboxData>;
+    using LightList = std::vector<LightData>;
 
     EntityDataMap solids {};
     TransparentDataMap transparents {};
     BoxList boxes {};
     TextboxList textboxes {};
+    LightList lights {};
 
   };
 
@@ -125,6 +135,9 @@ namespace Lore {
 
     virtual void addTextbox( Lore::TextboxPtr textbox,
                              const Lore::Matrix4& transform ) = 0;
+
+    virtual void addLight( Lore::LightPtr light,
+                           const Lore::NodePtr node ) = 0;
 
     ///
     /// \brief Uses internal Renderable lists to create a frame buffer using

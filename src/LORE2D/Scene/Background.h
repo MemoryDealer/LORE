@@ -46,12 +46,13 @@ namespace Lore {
   public:
 
     // TODO: Put layer in memory pool?
-    class LORE_EXPORT Layer
+    class LORE_EXPORT Layer final
     {
 
     public:
 
       Layer() = default;
+      Layer( const Layer& rhs ) = default;
 
       Layer( const string& name )
         : _name( name )
@@ -59,6 +60,21 @@ namespace Lore {
       }
 
       ~Layer() = default;
+
+      //
+      // Modifiers.
+
+      inline void setParallax( const Vec2& parallax ) { _parallax = parallax; }
+
+      inline void setDepth( const real depth ) { _depth = depth; }
+
+      inline void setMaterial( MaterialPtr material ) { _material = material; }
+
+      void setSprite( SpritePtr texture );
+
+      void setScrollSpeed( const Vec2& speed );
+
+      SpriteControllerPtr createSpriteController();
 
       //
       // Getters.
@@ -69,25 +85,14 @@ namespace Lore {
 
       inline MaterialPtr getMaterial() const { return _material; }
 
-      //
-      // Setters.
-
-      inline void setParallax( const Vec2& parallax ) { _parallax = parallax; }
-
-      inline void setDepth( const real depth ) { _depth = depth; }
-
-      inline void setMaterial( MaterialPtr material ) { _material = material; }
-
-      void setTexture( TexturePtr texture );
-
-      void setScrollSpeed( const Vec2& speed );
+      SpriteControllerPtr getSpriteController() const;
 
     private:
 
       Vec2 _parallax { 0.f, 0.f };
       real _depth { 1000.f };
       MaterialPtr _material { nullptr };
-      TexturePtr _texture { nullptr };
+      std::shared_ptr<SpriteController> _spriteController { nullptr }; // TODO: Change to unique_ptr - using shared_ptr for now due to compile errors.
       string _name {};
 
     };

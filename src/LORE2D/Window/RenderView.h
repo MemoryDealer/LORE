@@ -25,40 +25,13 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Math/Rectangle.h>
 #include <LORE2D/Scene/Camera.h>
 #include <LORE2D/Scene/Scene.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
-
-  ///
-  /// \class Viewport
-  /// \brief Viewport dimensions in float coordinates (0.0f to 1.0f).
-  struct Viewport final
-  {
-
-    float x { 0.f };
-    float y { 0.f };
-    float width { 1.f };
-    float height { 1.f };
-
-    Viewport() = default;
-
-    Viewport( const float x_,
-              const float y_,
-              const float width_,
-              const float height_ )
-      : x( x_ )
-      , y( y_ )
-      , width( width_ )
-      , height( height_ )
-    {
-    }
-
-    ~Viewport() = default;
-
-  };
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -75,7 +48,7 @@ namespace Lore {
     RenderTargetPtr renderTarget { nullptr };
     UIPtr ui { nullptr };
 
-    Viewport viewport {};
+    Rect viewport {};
 
     // Viewports are stored in a union, so each render plugin can do the 
     // conversion once, when the RenderView is added to a window.
@@ -102,7 +75,7 @@ namespace Lore {
     {
     }
 
-    RenderView( const string& name_, ScenePtr scene_, const Viewport& viewport_ )
+    RenderView( const string& name_, ScenePtr scene_, const Rect& viewport_ )
       : name( name_ )
       , scene( scene_ )
       , viewport( viewport_ )

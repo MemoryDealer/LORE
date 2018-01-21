@@ -28,6 +28,7 @@
 
 #include <LORE2D/Core/Exception.h>
 #include <LORE2D/Resource/StockResource.h>
+#include <LORE2D/Scene/SpriteController.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -81,10 +82,10 @@ void Background::removeLayer( const string& name )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Background::Layer::setTexture( TexturePtr texture )
+void Background::Layer::setSprite( SpritePtr sprite )
 {
   if ( _material ) {
-    _material->texture = texture;
+    _material->sprite = sprite;
   }
 }
 
@@ -95,6 +96,22 @@ void Background::Layer::setScrollSpeed( const Vec2& speed )
   if ( _material ) {
     _material->setTextureScrollSpeed( speed );
   }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+SpriteControllerPtr Background::Layer::createSpriteController()
+{
+  _spriteController.reset();
+  _spriteController = std::make_shared<SpriteController>();
+  return _spriteController.get();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+SpriteControllerPtr Background::Layer::getSpriteController() const
+{
+  return _spriteController.get();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

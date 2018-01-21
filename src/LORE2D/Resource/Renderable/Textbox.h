@@ -27,26 +27,20 @@
 
 #include <LORE2D/Memory/Alloc.h>
 #include <LORE2D/Renderer/Renderer.h>
-#include <LORE2D/Resource/Renderable/Renderable.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-  class LORE_EXPORT Textbox : public Renderable,
-                              public Alloc<Textbox>
+  class LORE_EXPORT Textbox final : public Alloc<Textbox>
   {
 
     LORE_OBJECT_BODY()
 
   public:
 
-    Textbox()
-    {
-      _type = Renderable::Type::Textbox;
-    }
-
-    virtual ~Textbox() override = default;
+    Textbox() = default;
+    ~Textbox() = default;
 
     // TODO: Add "typed" text effect where each letter appears over time at certain rate.
     //   This can be an external class such as TextboxTypist. 

@@ -27,7 +27,7 @@
 #include "GLRenderTarget.h"
 
 #include <LORE2D/Core/Context.h>
-#include <Plugins/OpenGL/Resource/Renderable/GLTexture.h>
+#include <Plugins/OpenGL/Resource/GLTexture.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 

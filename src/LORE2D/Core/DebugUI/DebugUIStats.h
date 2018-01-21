@@ -25,16 +25,40 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include "DebugUIComponent.h"
+
+#include <LORE2D/Core/Timer.h>
+#include <LORE2D/Renderer/FrameListener/FrameListener.h>
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 namespace Lore {
 
-  enum class ResourceType
+  class DebugUIStats final : public DebugUIComponent,
+                             public FrameListener
   {
-    Font,
-    Material,
-    Sprite,
-    GPUProgram,
 
-    Count
+  public:
+
+    DebugUIStats();
+    virtual ~DebugUIStats() override;
+
+    virtual void frameStarted( const FrameEvent& e ) override;
+
+  private:
+
+    UIPanelPtr _panel { nullptr };
+
+    UIElementPtr _frameDataElement { nullptr };
+    TextboxPtr _frameDataTextbox { nullptr };
+
+    UIElementPtr _frameDataBoxElement { nullptr };
+    BoxPtr _frameDataBox { nullptr };
+
+    Timer _timer {};
+    int32_t _frameCount { 0 };
+    real _elapsed { 0.f };
+
   };
 
 }

@@ -27,26 +27,20 @@
 
 #include <LORE2D/Memory/Alloc.h>
 #include <LORE2D/Resource/Color.h>
-#include <LORE2D/Resource/Renderable/Renderable.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-  class LORE_EXPORT Box : public Renderable,
-                          public Alloc<Box>
+  class LORE_EXPORT Box final : public Alloc<Box>
   {
 
     LORE_OBJECT_BODY()
 
   public:
 
-    Box()
-    {
-      _type = Renderable::Type::Box;
-    }
-
-    virtual ~Box() override = default;
+    Box() = default;
+    ~Box() = default;
 
     //
     // Getters.

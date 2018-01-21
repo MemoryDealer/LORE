@@ -31,7 +31,9 @@
 #include <LORE2D/Resource/ResourceFileProcessor.h>
 #include <LORE2D/Resource/StockResource.h>
 #include <LORE2D/Resource/Renderable/Box.h>
+#include <LORE2D/Resource/Renderable/Sprite.h>
 #include <LORE2D/Resource/Renderable/Textbox.h>
+#include <LORE2D/Scene/SpriteController.h> // TODO: This should be in resources?
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -81,7 +83,7 @@ void ResourceController::indexResourceFile( const string& file, const string& gr
 {
   // Validate file type.
   const auto resourceType = ResourceFileProcessor::GetResourceFileType( file );
-  if ( ResourceType::Count == resourceType ) {
+  if ( SerializableResource::Count == resourceType ) {
     log_warning( "Not indexing file " + file + ", not a valid file type" );
     return;
   }
@@ -133,16 +135,16 @@ void ResourceController::indexResourceLocation( const string& directory, const s
 void ResourceController::loadGroup( const string& groupName )
 {
   // Place indexed resources into queue so they can be loaded in the correct order.
-  std::vector<ResourceGroup::IndexedResource*> loadQueues[static_cast<int>( ResourceType::Count )];
+  std::vector<ResourceGroup::IndexedResource*> loadQueues[static_cast<int>( SerializableResource::Count )];
   auto group = _getGroup( groupName );
-  for ( auto it = group->index.begin(); it != group->index.end(); ++it ) {
-    auto& index = it->second;
+  for (auto& it : group->index) {
+    auto& index = it.second;
     if ( !index.loaded ) {
       loadQueues[static_cast<int>( index.type )].push_back( &index );
     }
   }
 
-  auto LoadResourcesByType = [&, this] ( const ResourceType type ) {
+  auto LoadResourcesByType = [&, this] ( const SerializableResource type ) {
     auto& queue = loadQueues[static_cast< int >( type )];
     for ( auto& index : queue ) {
       ResourceFileProcessor processor( index->file, type );
@@ -152,10 +154,13 @@ void ResourceController::loadGroup( const string& groupName )
   };
 
   // Load resource types in correct order so dependencies are ready.
-  std::vector<ResourceType> typeOrder = { ResourceType::Sprite,
-                                          ResourceType::Font,
-                                          ResourceType::GPUProgram,
-                                          ResourceType::Material };
+  std::vector<SerializableResource> typeOrder = { SerializableResource::Texture,
+                                                  SerializableResource::Sprite,
+                                                  SerializableResource::SpriteList,
+                                                  SerializableResource::SpriteAnimation,
+                                                  SerializableResource::Font,
+                                                  SerializableResource::GPUProgram,
+                                                  SerializableResource::Material };
   for ( const auto& type : typeOrder ) {
     LoadResourcesByType( type );
   }
@@ -166,6 +171,14 @@ void ResourceController::loadGroup( const string& groupName )
 void ResourceController::unloadGroup( const string& groupName )
 {
 
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void ResourceController::reloadGroup( const string& groupName )
+{
+  unloadGroup( groupName );
+  loadGroup( groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -203,6 +216,30 @@ EntityPtr ResourceController::createEntity( const string& name, const MeshType& 
   // Register entity and return it.
   group->entities.insert( name, entity );
   return entity;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+SpritePtr ResourceController::createSprite( const string& name, const string& groupName )
+{
+  auto sprite = MemoryAccess::GetPrimaryPoolCluster()->create<Sprite>();
+  sprite->setName( name );
+  sprite->setResourceGroupName( groupName );
+
+  _getGroup( groupName )->sprites.insert( name, sprite );
+  return sprite;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+SpriteAnimationSetPtr ResourceController::createAnimationSet( const string& name, const string& groupName )
+{
+  auto animationSet = MemoryAccess::GetPrimaryPoolCluster()->create<SpriteAnimationSet>();
+  animationSet->setName( name );
+  animationSet->setResourceGroupName( groupName );
+
+  _getGroup( groupName )->animationSets.insert( name, animationSet );
+  return animationSet;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -304,9 +341,30 @@ MaterialPtr ResourceController::cloneMaterial( const string& name, const string&
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+bool ResourceController::textureExists( const string& name, const string& groupName )
+{
+  return _getGroup( groupName )->textures.exists( name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 GPUProgramPtr ResourceController::getGPUProgram( const string& name, const string& groupName )
 {
   return _getGroup( groupName )->programs.get( name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+SpritePtr ResourceController::getSprite( const string& name, const string& groupName )
+{
+  return _getGroup( groupName )->sprites.get( name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+SpriteAnimationSetPtr ResourceController::getAnimationSet( const string& name, const string& groupName )
+{
+  return _getGroup( groupName )->animationSets.get( name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -376,6 +434,13 @@ void Resource::LoadGroup( const string& groupName )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void Resource::ReloadGroup( const string& groupName )
+{
+  return ActiveContext->getResourceController()->unloadGroup( groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 TexturePtr Resource::LoadTexture( const string& name, const string& file, const string& groupName )
 {
   return ActiveContext->getResourceController()->loadTexture( name, file, groupName );
@@ -414,6 +479,13 @@ ShaderPtr Resource::CreateFragmentShader( const string& name, const string& grou
 VertexBufferPtr Resource::CreateVertexBuffer( const string& name, const MeshType& type, const string& groupName )
 {
   return ActiveContext->getResourceController()->createVertexBuffer( name, type, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+SpritePtr Resource::CreateSprite( const string& name, const string& groupName )
+{
+  return ActiveContext->getResourceController()->createSprite( name, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -498,6 +570,20 @@ MaterialPtr Resource::CloneMaterial( const string& name, const string& cloneName
 GPUProgramPtr Resource::GetGPUProgram( const string& name, const string& groupName )
 {
   return ActiveContext->getResourceController()->getGPUProgram( name, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+SpritePtr Resource::GetSprite( const string& name, const string& groupName )
+{
+  return ActiveContext->getResourceController()->getSprite( name, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+SpriteAnimationSetPtr Resource::GetAnimationSet( const string& name, const string& groupName )
+{
+  return ActiveContext->getResourceController()->getAnimationSet( name, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

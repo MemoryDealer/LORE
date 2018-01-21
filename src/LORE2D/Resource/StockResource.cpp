@@ -30,6 +30,7 @@
 #include <LORE2D/Resource/Material.h>
 #include <LORE2D/Resource/ResourceController.h>
 #include <LORE2D/Resource/StockResource.h>
+#include <LORE2D/Resource/Renderable/Sprite.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -96,10 +97,12 @@ void StockResourceController::createStockResources()
   }
 
   //
-  // Create stock textures.
+  // Create stock textures/sprites.
 
   {
-    _controller->createTexture( "White", 128, 128, StockColor::White );
+    auto texture = _controller->createTexture( "White", 128, 128, StockColor::White );
+    auto sprite = _controller->createSprite( "White" );
+    sprite->addTexture( texture );
   }
 
   //
@@ -109,7 +112,7 @@ void StockResourceController::createStockResources()
   {
     auto material = _controller->createMaterial( "StandardTextured" );
     material->lighting = true;
-    material->texture = _controller->getTexture( "White" );
+    material->sprite = _controller->getSprite( "White" );
     material->program = _controller->getGPUProgram( "StandardTextured" );
   }
 
@@ -123,7 +126,7 @@ void StockResourceController::createStockResources()
   {
     auto material = _controller->createMaterial( "UnlitTextured" );
     material->lighting = false;
-    material->texture = _controller->getTexture( "White" );
+    material->sprite = _controller->getSprite( "White" );
     material->program = _controller->getGPUProgram( "UnlitTextured" );
   }
 
@@ -173,7 +176,7 @@ void StockResourceController::createStockResources()
   {
     auto material = _controller->createMaterial( "Background" );
     material->lighting = false;
-    material->texture = _controller->getTexture( "White" );
+    material->sprite = _controller->getSprite( "White" );
     material->program = _controller->getGPUProgram( "Background" );
   }
 
@@ -198,6 +201,7 @@ void StockResourceController::createStockResources()
 
   {
     _controller->loadFont( "Default", "res/stock/fonts/core.ttf", 12 );
+    _controller->loadFont( "DebugUI", "res/stock/fonts/core.ttf", 7 );
   }
 
   {

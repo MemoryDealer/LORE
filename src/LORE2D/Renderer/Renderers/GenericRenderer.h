@@ -62,6 +62,9 @@ namespace Lore {
     virtual void addTextbox( Lore::TextboxPtr textbox,
                              const Lore::Matrix4& transform ) override;
 
+    virtual void addLight( Lore::LightPtr light,
+                           const Lore::NodePtr node ) override;
+
     virtual void present( const Lore::RenderView& rv,
                           const WindowPtr window ) override;
 
@@ -77,17 +80,17 @@ namespace Lore {
                             const Matrix4& proj );
 
     void renderMaterialMap( const Lore::ScenePtr scene,
-                            RenderQueue::EntityDataMap& mm,
+                            const RenderQueue& queue,
                             const Matrix4& viewProjection ) const;
 
     void renderTransparents( const Lore::ScenePtr scene,
-                              RenderQueue::TransparentDataMap& tm,
+                             const RenderQueue& queue,
                               const Matrix4& viewProjection ) const;
 
-    void renderBoxes( RenderQueue::BoxList& boxes,
+    void renderBoxes( const RenderQueue& queue,
                       const Matrix4& viewProjection ) const;
 
-    void renderTextboxes( RenderQueue::TextboxList& textboxes,
+    void renderTextboxes( const RenderQueue& queue,
                           const Matrix4& viewProjection ) const;
 
     void renderUI( const Lore::UIPtr ui,
