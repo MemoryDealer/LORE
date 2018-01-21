@@ -152,22 +152,24 @@ void Game::loadScene()
   //
   // Create some torches.
 
-  Lore::EntityPtr torchEntity = Lore::Resource::CreateEntity( "torch", Lore::MeshType::TexturedQuad );
-  torchEntity->setSprite( Lore::Resource::GetSprite( "torch" ) );
-  auto torchNode = _scene->createNode( "torch0" );
-  torchNode->attachObject( torchEntity );
-  torchNode->setPosition( 0.5f, 0.24f );
-  torchNode->scale( 0.5f );
-  auto torchSPC = torchNode->createSpriteController();
-  torchSPC->useAnimationSet( Lore::Resource::GetAnimationSet( "torch" ) );
-  torchSPC->startAnimation( "flame" );
+  for ( int i = 0; i < 3; ++i ) {
+    Lore::EntityPtr torchEntity = Lore::Resource::CreateEntity( "torch", Lore::MeshType::TexturedQuad );
+    torchEntity->setSprite( Lore::Resource::GetSprite( "torch" ) );
+    auto torchNode = _scene->createNode( "torch" + std::to_string( i ) );
+    torchNode->attachObject( torchEntity );
+    torchNode->setPosition( 0.5f - static_cast<float>(i * 2), 0.24f );
+    torchNode->scale( 0.5f );
+    auto torchSPC = torchNode->createSpriteController();
+    torchSPC->useAnimationSet( Lore::Resource::GetAnimationSet( "torch" ) );
+    torchSPC->startAnimation( "flame" );
 
-  //
-  // Add some lights to the torches.
+    //
+    // Add some lights to the torches.
 
-  Lore::LightPtr torchLight0 = _scene->createLight( "torch0" );
-  torchLight0->setColor( Lore::Color( 1.f, .69f, .4f, 1.f ) );
-  torchNode->attachObject( torchLight0 );
+    Lore::LightPtr torchLight = _scene->createLight( "torch" + std::to_string( i ) );
+    torchLight->setColor( Lore::Color( 1.f, .69f, .4f, 1.f ) );
+    torchNode->attachObject( torchLight );
+  }
 
   //
   // Add blended stained glass.

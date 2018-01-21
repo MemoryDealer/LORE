@@ -137,8 +137,8 @@ void ResourceController::loadGroup( const string& groupName )
   // Place indexed resources into queue so they can be loaded in the correct order.
   std::vector<ResourceGroup::IndexedResource*> loadQueues[static_cast<int>( SerializableResource::Count )];
   auto group = _getGroup( groupName );
-  for ( auto it = group->index.begin(); it != group->index.end(); ++it ) {
-    auto& index = it->second;
+  for (auto& it : group->index) {
+    auto& index = it.second;
     if ( !index.loaded ) {
       loadQueues[static_cast<int>( index.type )].push_back( &index );
     }
