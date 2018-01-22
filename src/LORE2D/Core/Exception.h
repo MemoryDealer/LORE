@@ -75,6 +75,28 @@ namespace Lore {
 
     };
 
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    /// 
+    /// \class MemoryException 
+    /// \brief Thrown when an error occurs in LORE's memory management system. 
+    class MemoryException : public Exception
+    {
+
+    public:
+
+      explicit MemoryException( const string& what )
+        : Exception( what )
+      {
+      }
+
+      virtual string getDescription() const override
+      {
+        return string( "MemoryException: " + _what );
+      }
+
+    };
+
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

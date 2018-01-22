@@ -69,6 +69,18 @@ Context::Context() noexcept
 Context::~Context()
 {
   NotificationUnsubscribe( WindowEventNotification, &Context::onWindowEvent );
+
+  // HACK.
+  // Manually destroy lights before destruction to avoid a strange bad_alloc crash.
+  // (This is the same code in Scene's destructor).
+  auto sceneIt = _sceneRegistry.getIterator();
+  while ( sceneIt.hasMore() ) {
+    auto scene = sceneIt.getNext();
+    auto lightIt = scene->_lights.getIterator();
+    while ( lightIt.hasMore() ) {
+      scene->destroyLight( lightIt.getNext() );
+    }
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

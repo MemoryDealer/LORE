@@ -30,6 +30,8 @@
 #include <LORE2D/Memory/Alloc.h>
 #include <LORE2D/Resource/Color.h>
 #include <LORE2D/Resource/Registry.h>
+#include <LORE2D/Scene/AABB.h>
+#include <LORE2D/Scene/SpriteController.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 

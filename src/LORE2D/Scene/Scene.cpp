@@ -141,7 +141,7 @@ void Scene::destroyLight( const string& name )
   auto light = _lights.get( name );
 
   if ( light ) {
-    destroyLight( light );
+    MemoryAccess::GetPrimaryPoolCluster()->destroy<Light>( light );
     _lights.remove( name );
   }
 }

@@ -30,10 +30,6 @@
 #include <LORE2D/Resource/ResourceController.h>
 #include <LORE2D/Resource/Renderable/Box.h>
 #include <LORE2D/Resource/Renderable/Textbox.h>
-#include <LORE2D/Scene/AABB.h>
-#include <LORE2D/Scene/Camera.h>
-#include <LORE2D/Scene/Scene.h>
-#include <LORE2D/Scene/SpriteController.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -50,11 +46,6 @@ Node::Node()
 
 Node::~Node()
 {
-  _transform = Transform();
-  _entities.clear();
-  _scene = nullptr;
-  _parent = nullptr;
-  _childNodes.clear();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -66,7 +57,7 @@ NodePtr Node::createChildNode( const string& name )
   node->setResourceGroupName( ResourceController::DefaultGroupName );
   node->_scene = _scene;
   node->_parent = this;
-  node->_aabb.reset( new AABB( node ) );
+  node->_aabb = std::make_unique<AABB>(  node  );
 
   _scene->_nodes.insert( name, node );
   _childNodes.insert( name, node );

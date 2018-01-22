@@ -238,7 +238,7 @@ namespace Lore {
 
     ///
     /// \brief Used for processing default keyboard shortcuts (such as for the DebugUI).
-    virtual void onKeyDown( const Keycode code );
+    void onKeyDown( const Keycode code ) override;
 
   protected:
 
@@ -267,12 +267,13 @@ namespace Lore {
 
   protected:
 
+    PoolCluster _poolCluster { "Primary" };
+    std::unique_ptr<FrameListenerController> _frameListenerController { std::make_unique<FrameListenerController>() };
+
     WindowRegistry _windowRegistry {};
     SceneRegistry _sceneRegistry {};
 
     WindowPtr _activeWindow { nullptr };
-    std::unique_ptr<FrameListenerController> _frameListenerController { std::make_unique<FrameListenerController>() };
-    PoolCluster _poolCluster { "Primary" };
 
     std::unique_ptr<InputController> _inputController { nullptr };
     std::unique_ptr<IRenderAPI> _renderAPI { nullptr };

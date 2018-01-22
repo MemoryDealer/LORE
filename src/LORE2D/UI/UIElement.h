@@ -38,6 +38,8 @@ namespace Lore {
   class LORE_EXPORT UIElement : public Alloc<UIElement>
   {
 
+    LORE_OBJECT_BODY()
+
   public:
 
     UIElement() = default;

@@ -37,6 +37,8 @@ namespace Lore {
   class LORE_EXPORT UIPanel final : public Alloc<UIPanel>
   {
 
+    LORE_OBJECT_BODY()
+
   public:
 
     using ElementRegistry = Registry<std::map, UIElement>;
