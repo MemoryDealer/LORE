@@ -31,7 +31,7 @@
 
 TEST_CASE( "Memory Pool", "[memory]" )
 {
-  const size_t size = 128;
+  constexpr const size_t size = 128;
   Lore::MemoryPool<Lore::Node> pool( "test", size );
 
   SECTION( "Creation/destruction" )
@@ -65,9 +65,37 @@ TEST_CASE( "Memory Pool", "[memory]" )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+TEST_CASE( "Multiple create/destroy", "[memory]" )
+{
+  constexpr const size_t size = 2;
+  Lore::MemoryPool<Lore::Entity> pool( "test", size );
+  REQUIRE( pool.getSizeInBytes() == ( sizeof( Lore::Entity ) * size ) );
+
+  SECTION( "Creation/destruction" )
+  {
+    REQUIRE( pool.getActiveObjectCount() == 0 );
+    auto e1 = pool.create();
+    auto e2 = pool.create();
+    REQUIRE( pool.getActiveObjectCount() == 2 );
+
+    pool.destroy( e1 );
+    REQUIRE( pool.getActiveObjectCount() == 1 );
+
+    e1 = pool.create();
+    REQUIRE( e1 );
+    REQUIRE( pool.getActiveObjectCount() == 2 );
+
+    pool.destroy( e2 );
+    pool.destroy( e1 );
+    REQUIRE( pool.getActiveObjectCount() == 0 );
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 TEST_CASE( "Pool Cluster", "[memory]" )
 {
-  const size_t size = 128;
+  constexpr const size_t size = 128;
   Lore::PoolCluster cluster( "test" );
   cluster.registerPool<Lore::Node>( size );
   cluster.registerPool<Lore::Camera>( size );

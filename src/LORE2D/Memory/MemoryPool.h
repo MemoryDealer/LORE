@@ -66,8 +66,6 @@ namespace Lore {
     inline MemoryPool( const string& name, const size_t size )
       : _name( name )
       , _size( size )
-      , _objects()
-      , _next( nullptr )
     {
       // Allocate pool and each object.
       _objects = new T*[_size];
@@ -106,6 +104,8 @@ namespace Lore {
       p->_inUse = true;
       _next = p->_next;
 
+      ++_activeObjectCount;
+
       return p;
     }
 
@@ -126,6 +126,10 @@ namespace Lore {
       // Put this object at the front of the list.
       alloc->_next = _next;
       _next = object;
+
+      --_activeObjectCount;
+
+      // TODO: Pass double pointer or ref to assign object to null.
     }
 
     inline virtual void resize( const size_t newSize ) override
@@ -154,9 +158,19 @@ namespace Lore {
     //
     // Information.
 
-    inline size_t getSizeInBytes()
+    inline size_t getSizeInBytes() const
     {
       return sizeof( T ) * _size;
+    }
+
+    inline size_t getActiveObjectCount() const
+    {
+      return _activeObjectCount;
+    }
+
+    inline size_t getTotalObjectCount() const
+    {
+      return _size;
     }
 
     inline void printUsage()
@@ -171,6 +185,7 @@ namespace Lore {
 
     string _name {};
     size_t _size { 0 };
+    size_t _activeObjectCount { 0 };
     List _objects {};
 
     T* _next { nullptr };
