@@ -246,8 +246,6 @@ namespace Lore {
     ResourceGroupMap _groups {};
     ResourceGroupPtr _defaultGroup { nullptr };
 
-    VertexBufferTable _vertexBufferTable {}; // HACK
-
   };
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

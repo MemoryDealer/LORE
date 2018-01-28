@@ -137,19 +137,6 @@ void StockResourceController::createStockResources()
   }
 
   //
-  // Create stock vertex buffers.
-
-  {
-    auto vb = _controller->createVertexBuffer( "TexturedQuad", MeshType::TexturedQuad );
-    vb->build();
-  }
-
-  {
-    auto vb = _controller->createVertexBuffer( "Quad", MeshType::Quad );
-    vb->build();
-  }
-
-  //
   // Create stock meshes (uses previously created vertex buffers).
 
   {

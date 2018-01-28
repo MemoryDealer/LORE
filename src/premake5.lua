@@ -115,14 +115,14 @@ project "Driver"
     links { "LORE2D" }
     postbuildcommands { "{COPY} ../../res/ ../../bin/%{cfg.buildcfg}/Run/res/" }
 
-project "UnitTests"
-    location "UnitTests"
+project "Tests"
+    location "Tests"
     kind "ConsoleApp"
     language "C++"
     defines { "_HAS_CXX17" }
-    forceincludes { "UnitTests.h" }
+    forceincludes { "TestUtils.h" }
     files {
-        "UnitTests/**.h", "UnitTests/**.hpp", "UnitTests/**.cpp", "UnitTests/**.json"
+        "Tests/**.h", "Tests/**.hpp", "Tests/**.cpp", "Tests/**.json"
     }
     links { "LORE2D" }
     postbuildcommands { "{COPY} data/ ../../bin/%{cfg.buildcfg}/Run/TestData/" }

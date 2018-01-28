@@ -40,7 +40,7 @@ namespace Lore { namespace OpenGL {
                                                  const GLchar* message,
                                                  const void* userParam )
         {
-            printf( "DBG: %s\n", message );
+            printf( "[OpenGL] %s\n", message );
             printf( "Source: " );
 
             switch ( source )

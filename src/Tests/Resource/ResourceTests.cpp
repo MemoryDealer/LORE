@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,23 +24,45 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "TestHelpers.h"
+#include "catch.hpp"
+#include "TestUtils.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Platform define:
+TEST_CASE( "Load and unload resources in code", "[resource]" )
+{
+  TEST_CREATE_CONTEXT();
 
-#define LORE_WINDOWS 0
-#define LORE_LINUX 1
-#define LORE_APPLE 2
+  // Create a window which is required for resources.
+  auto window = context->createWindow( "UnitTest", 50, 50 );
 
-#if defined( WIN32 ) || defined( _WIN32 )
-#define LORE_PLATFORM LORE_WINDOWS
-#elif defined( LINUX ) || defined( _LINUX )
-#define LORE_PLATFORM LORE_LINUX
-#elif defined( APPLE ) || defined( _APPLE )
-#define LORE_PLATFORM LORE_APPLE
-#endif
+  constexpr const size_t size = 4;
+  const std::vector<Lore::string> names = { "1", "2", "3", "4" };
+
+  for ( size_t i = 0; i < size; ++i ) {
+    REQUIRE( Lore::Resource::CreateBox( names[i] ) );
+    REQUIRE( Lore::Resource::CreateCamera( names[i] ) );
+    REQUIRE( Lore::Resource::CreateEntity( names[i], Lore::MeshType::TexturedQuad ) );
+    REQUIRE( Lore::Resource::CreateFragmentShader( names[i] ) );
+    REQUIRE( Lore::Resource::CreateGPUProgram( names[i] ) );
+    REQUIRE( Lore::Resource::CreateMaterial( names[i] ) );
+    REQUIRE( Lore::Resource::CreateMesh( names[i], Lore::MeshType::Quad ) );
+    REQUIRE( Lore::Resource::CreateRenderTarget( names[i], 640, 480 ) );
+    REQUIRE( Lore::Resource::CreateSprite( names[i] ) );
+    REQUIRE( Lore::Resource::CreateTextbox( names[i] ) );
+    REQUIRE( Lore::Resource::CreateTexture( names[i], 32, 32 ) );
+    REQUIRE( Lore::Resource::CreateUI( names[i] ) );
+    REQUIRE( Lore::Resource::CreateVertexBuffer( names[i], Lore::MeshType::Quad ) );
+    REQUIRE( Lore::Resource::CreateVertexShader( names[i] ) );
+  }
+
+  for ( size_t i = 0; i < size; ++i ) {
+    REQUIRE( Lore::Resource::GetMaterial( names[i] ) );
+  }
+
+  TEST_DESTROY_CONTEXT();
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

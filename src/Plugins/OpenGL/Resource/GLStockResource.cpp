@@ -37,7 +37,6 @@ using namespace Lore::OpenGL;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 StockResourceController::StockResourceController()
-  : Lore::StockResourceController()
 {
   _controller = std::make_unique<GLResourceController>();
 }

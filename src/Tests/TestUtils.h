@@ -25,6 +25,26 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Lore.h>
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+// Platform define:
+
+#define LORE_WINDOWS 0
+#define LORE_LINUX 1
+#define LORE_APPLE 2
+
+#if defined( WIN32 ) || defined( _WIN32 )
+#define LORE_PLATFORM LORE_WINDOWS
+#elif defined( LINUX ) || defined( _LINUX )
+#define LORE_PLATFORM LORE_LINUX
+#elif defined( APPLE ) || defined( _APPLE )
+#define LORE_PLATFORM LORE_APPLE
+#endif
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 //
 // Object creation/setup.
 
@@ -35,5 +55,6 @@ context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );\
 REQUIRE( context.get() != nullptr );
 
 #define TEST_DESTROY_CONTEXT() DestroyLoreContext( context )
+
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -99,9 +99,9 @@ void Context::initConfiguration()
   _poolCluster.registerPool<Scene>( 4 );
   _poolCluster.registerPool<Sprite>( 32 );
   _poolCluster.registerPool<SpriteAnimationSet>( 8 );
-  _poolCluster.registerPool<Textbox>( 4 );
-  _poolCluster.registerPool<UI>( 4 );
-  _poolCluster.registerPool<UIPanel>( 4 );
+  _poolCluster.registerPool<Textbox>( 8 );
+  _poolCluster.registerPool<UI>( 8 );
+  _poolCluster.registerPool<UIPanel>( 8 );
   _poolCluster.registerPool<UIElement>( 16 );
 
   // TODO: Parse pool/config settings from cfg file (Lua).

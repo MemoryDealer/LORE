@@ -43,6 +43,17 @@ using namespace Lore::OpenGL;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+GLResourceController::GLResourceController()
+{
+  auto texturedQuadVB = createVertexBuffer( "TexturedQuad", MeshType::TexturedQuad );
+  texturedQuadVB->build();
+
+  auto quadVB = createVertexBuffer( "Quad", MeshType::Quad );
+  quadVB->build();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 Lore::TexturePtr GLResourceController::loadTexture( const string& name, const string& file, const string& groupName )
 {
   auto texture = MemoryAccess::GetPrimaryPoolCluster()->create<Texture, GLTexture>();
@@ -116,22 +127,6 @@ Lore::VertexBufferPtr GLResourceController::createVertexBuffer( const string& na
   vb->init( type );
 
   _getGroup( groupName )->vertexBuffers.insert( name, vb );
-
-  // If this vertex buffer is a stock type, index it in the hash table.
-  // TODO: Clean this up, stock resources should not mix in here.
-  // (Perhaps use functions for adding to resource group, e.g., addVertexBuffer().
-  switch ( type ) {
-
-  default:
-    break;
-
-  case MeshType::Quad:
-  case MeshType::TexturedQuad:
-    _vertexBufferTable.insert( { type, vb } );
-    break;
-
-  }
-
   return vb;
 }
 

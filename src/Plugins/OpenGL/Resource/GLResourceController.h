@@ -39,7 +39,7 @@ namespace Lore { namespace OpenGL {
 
   public:
 
-    GLResourceController() = default;
+    GLResourceController();
     ~GLResourceController() override = default;
 
     //

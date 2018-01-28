@@ -392,9 +392,22 @@ MeshPtr ResourceController::createMesh( const string& name, const MeshType& mesh
   mesh->setResourceGroupName( groupName );
 
   // If this mesh type is a stock type, assign the corresponding vertex buffer.
-  if ( MeshType::Custom != meshType ) {
-    auto vb = _vertexBufferTable.at( meshType );
-    mesh->setVertexBuffer( vb );
+  switch ( meshType ) {
+  default:
+  case MeshType::Custom:
+    break;
+
+  case MeshType::Quad:
+    mesh->setVertexBuffer( getVertexBuffer( "Quad" ) );
+    break;
+
+  case MeshType::Text:
+    mesh->setVertexBuffer( getVertexBuffer( "Text" ) );
+    break;
+
+  case MeshType::TexturedQuad:
+    mesh->setVertexBuffer( getVertexBuffer( "TexturedQuad" ) );
+    break;
   }
 
   _getGroup( groupName )->meshes.insert( name, mesh );
