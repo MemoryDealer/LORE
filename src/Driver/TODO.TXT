@@ -2,9 +2,11 @@
 -Fix gl 1282 regression
 -Also a regression in math tests for vector division, introduced somewhere during AABBs (was temporarily address with higher epsilon)
 -Debug tools - view memory pools for each type, hover over to view details
+-Add frame count mode to animations rather than delta time
 -Re-organize to include/src directories
 -Instanced rendering - for static objects (maybe static nodes - StaticNodeBlock)
 -RTT (add priority to renderview, RTTs are automatically rendered before window framebuffers)
+-Move to a templated resource controller for all the duplicate code
 -Multi-texturing
 -Make UI code more convenient, for example in DebugUIConsole, it requires so much code to do basic setup.
   There needs to be pair structs for elements and their attachments, and factory functions to create them.

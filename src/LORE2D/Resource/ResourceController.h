@@ -45,6 +45,15 @@
 
 namespace Lore {
 
+  ///
+  /// \class ResourceGroup
+  /// \brief A collection of resources used for rendering and various effects.
+  /// \details The default resource group is "Core", where resources that do not
+  /// specify a resource group will go. Resource groups can be used to organize
+  /// different stages in a game, for instance. Having the resources needed for
+  /// all stages (character, UI, common items, etc.) in the core group, and
+  /// resources for specific stages in their own separate groups, which can be
+  /// loaded and unloaded as the player progresses through the game.
   struct LORE_EXPORT ResourceGroup
   {
 
@@ -55,76 +64,30 @@ namespace Lore {
       bool loaded;
     };
 
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
     using ShaderRegistry = Registry<std::unordered_map, Shader>;
     using ResourceIndex = std::multimap<string, IndexedResource>;
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    inline explicit ResourceGroup( const string& name_ )
-      : name( name_ )
-    {
-    }
-
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-    string name;
-
+    string name {};
     ResourceIndex index {};
 
     Registry<std::unordered_map, Texture> textures {};
-
-    // Shaders.
-
-    Registry<std::unordered_map, GPUProgram> programs {};
-
     ShaderRegistry vertexShaders {};
     ShaderRegistry fragmentShaders {};
-
+    Registry<std::unordered_map, GPUProgram> programs {};
     Registry<std::unordered_map, VertexBuffer> vertexBuffers {};
-
-    // Materials.
-
     Registry<std::unordered_map, Material> materials {};
-
-    // Meshes.
-
     Registry<std::unordered_map, Mesh> meshes {};
-
-    // Entities.
-
     Registry<std::unordered_map, Entity> entities {};
-
-    // Scene.
-
-    Registry<std::unordered_map, Camera> cameras {};
-
-    // Fonts.
-
     Registry<std::unordered_map, Font> fonts {};
-
-    // Boxes.
-
     Registry<std::unordered_map, Box> boxes {};
-
-    // Sprites.
-
+    Registry<std::unordered_map, Textbox> textboxes { };
     Registry<std::unordered_map, Sprite> sprites {};
-
-    // Animation sets.
-
     Registry<std::unordered_map, SpriteAnimationSet> animationSets {};
-
-    // Textboxes.
-
-    Registry<std::unordered_map, Textbox> textboxes {};
-
-    // Render targets.
     Registry<std::unordered_map, RenderTarget> renderTargets {};
-
-    // UIs.
     Registry<std::unordered_map, UI> uis {};
+    Registry<std::unordered_map, Camera> cameras { };
 
   };
 
@@ -135,127 +98,150 @@ namespace Lore {
 
   public:
 
+    using ResourceGroupMap = std::unordered_map<std::string, std::shared_ptr<ResourceGroup>>; // TODO: Use unique_ptr (shared_ptr for now to avoid very difficult compilation error).
+    using VertexBufferTable = Util::HashTable<MeshType, VertexBufferPtr>;
+
     static const string DefaultGroupName;
 
-  public:
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     ResourceController();
-
     virtual ~ResourceController();
 
+    //
+    // Resource groups, resource configuration and indexing.
+
+    void createGroup( const string& groupName );
+    void destroyGroup( const string& groupName );
+    void loadGroup( const string& groupName );
+    void unloadGroup( const string& groupName );
+    void reloadGroup( const string& groupName );
+    void loadResourceConfiguration( const string& file );
+    void indexResourceLocation( const string& directory,
+                                const string& groupName = DefaultGroupName,
+                                const bool recursive = true );
     void indexResourceFile( const string& file, const string& groupName = DefaultGroupName );
 
     //
-    // Groups.
+    // Factory functions for creation of resources (non-virtual).
 
-    void createGroup( const string& groupName );
-
-    void destroyGroup( const string& groupName );
-
-    void loadResourceConfiguration( const string& file );
-
-    void indexResourceLocation( const string& directory, const string& groupName = DefaultGroupName, const bool recursive = true );
-
-    void loadGroup( const string& groupName );
-
-    void unloadGroup( const string& groupName );
-
-    void reloadGroup( const string& groupName );
-
-    //
-    // Loading.
-
-    virtual TexturePtr loadTexture( const string& name, const string& file, const string& groupName = DefaultGroupName ) = 0;
-
-    virtual FontPtr loadFont( const string& name, const string& file, const uint32_t size, const string& groupName = ResourceController::DefaultGroupName ) = 0;
-
-    //
-    // Factory functions.
-
-    virtual GPUProgramPtr createGPUProgram( const string& name, const string& groupName = DefaultGroupName ) = 0;
-
-    virtual ShaderPtr createVertexShader( const string& name, const string& groupName = DefaultGroupName ) = 0;
-
-    virtual ShaderPtr createFragmentShader( const string& name, const string& groupName = DefaultGroupName ) = 0;
-
-    virtual VertexBufferPtr createVertexBuffer( const string& name, const MeshType& type, const string& groupName = DefaultGroupName ) = 0;
-
-    virtual TexturePtr createTexture( const string& name, const uint32_t width, const uint32_t height, const string& groupName = DefaultGroupName ) = 0;
-
-    virtual TexturePtr createTexture( const string& name, const uint32_t width, const uint32_t height, const Color& color, const string& groupName = DefaultGroupName ) = 0;
-
-    virtual RenderTargetPtr createRenderTarget( const string& name, const uint32_t width, const uint32_t height, const string& groupName = DefaultGroupName ) = 0;
+    EntityPtr createEntity( const string& name,
+                            const MeshType& meshType,
+                            const string& groupName = DefaultGroupName );
+    SpritePtr createSprite( const string& name,
+                            const string& groupName = DefaultGroupName );
+    SpriteAnimationSetPtr createAnimationSet( const string& name,
+                                              const string& groupName = DefaultGroupName );
+    MaterialPtr createMaterial( const string& name,
+                                const string& groupName = DefaultGroupName );
+    CameraPtr createCamera( const string& name,
+                            const string& groupName = DefaultGroupName );
+    BoxPtr createBox( const string& name,
+                      const string& groupName = DefaultGroupName );
+    TextboxPtr createTextbox( const string& name,
+                              const string& groupName = DefaultGroupName );
+    UIPtr createUI( const string& name,
+                    const string& groupName = DefaultGroupName );
+    MeshPtr createMesh( const string& name,
+                        const MeshType& meshType,
+                        const string& groupName = DefaultGroupName );
 
     //
-    // Factory functions (non-virtual).
+    // Cloning functions (TODO: Move cloning functions to objects with prototype pattern).
 
-    SpritePtr createSprite( const string& name, const string& groupName = DefaultGroupName );
-
-    SpriteAnimationSetPtr createAnimationSet( const string& name, const string& groupName = DefaultGroupName );
-
-    MaterialPtr createMaterial( const string& name, const string& groupName = DefaultGroupName );
-
-    CameraPtr createCamera( const string& name, const string& groupName = DefaultGroupName );
-
-    BoxPtr createBox( const string& name, const string& groupName = DefaultGroupName );
-
-    TextboxPtr createTextbox( const string& name, const string& groupName = DefaultGroupName );
-
-    UIPtr createUI( const string& name, const string& groupName = DefaultGroupName );
-
-    //
-    // Entity.
-
-    EntityPtr createEntity( const string& name, const MeshType& meshType, const string& groupName = DefaultGroupName );
-
-    EntityPtr createEntity( const string& name, const string& groupName = DefaultGroupName );
-
-    MeshPtr createMesh( const string& name, const MeshType& meshType, const string& groupName = DefaultGroupName );
-
-    //
-    // Cloning functions.
-
-    MaterialPtr cloneMaterial( const string& name, const string& cloneName );
+    MaterialPtr cloneMaterial( const string& name,
+                               const string& cloneName );
 
     //
     // Existence checkers.
 
-    bool textureExists( const string& name, const string& groupName = DefaultGroupName );
+    bool textureExists( const string& name,
+                        const string& groupName = DefaultGroupName );
 
     //
     // Getters.
 
-    GPUProgramPtr getGPUProgram( const string& name, const string& groupName = DefaultGroupName );
-
-    SpritePtr getSprite( const string& name, const string& groupName = DefaultGroupName );
-
-    SpriteAnimationSetPtr getAnimationSet( const string& name, const string& groupName = DefaultGroupName );
-
-    MaterialPtr getMaterial( const string& name, const string& groupName = DefaultGroupName );
-
-    TexturePtr getTexture( const string& name, const string& groupName = DefaultGroupName );
-
-    VertexBufferPtr getVertexBuffer( const string& name, const string& groupName = DefaultGroupName );
-
-    FontPtr getFont( const string& name, const string& groupName = DefaultGroupName );
+    GPUProgramPtr getGPUProgram( const string& name,
+                                 const string& groupName = DefaultGroupName );
+    SpritePtr getSprite( const string& name,
+                         const string& groupName = DefaultGroupName );
+    SpriteAnimationSetPtr getAnimationSet( const string& name,
+                                           const string& groupName = DefaultGroupName );
+    MaterialPtr getMaterial( const string& name,
+                             const string& groupName = DefaultGroupName );
+    TexturePtr getTexture( const string& name,
+                           const string& groupName = DefaultGroupName );
+    VertexBufferPtr getVertexBuffer( const string& name,
+                                     const string& groupName = DefaultGroupName );
+    FontPtr getFont( const string& name,
+                     const string& groupName = DefaultGroupName );
 
     //
-    // Destruction.
+    // Destruction methods (non-virtual).
+
+    void destroyMesh( MeshPtr mesh );
+    void destroyEntity( EntityPtr entity );
+    void destroyBox( BoxPtr box );
+    void destroyTextbox( TextboxPtr textbox );
+    void destroySprite( SpritePtr sprite );
+    void destroyAnimationSet( SpriteAnimationSetPtr animationSet );
+    void destroyUI( UIPtr ui );
+
+    //
+    // Functions for loading resources from the storage.
+
+    virtual TexturePtr loadTexture( const string& name,
+                                    const string& file,
+                                    const string& groupName = DefaultGroupName ) = 0;
+    virtual FontPtr loadFont( const string& name,
+                              const string& file,
+                              const uint32_t size,
+                              const string& groupName = ResourceController::DefaultGroupName ) = 0;
+
+    //
+    // Factory functions for creation of resources (implemented by render plugin).
+
+    virtual GPUProgramPtr createGPUProgram( const string& name,
+                                            const string& groupName = DefaultGroupName ) = 0;
+    virtual ShaderPtr createVertexShader( const string& name,
+                                          const string& groupName = DefaultGroupName ) = 0;
+    virtual ShaderPtr createFragmentShader( const string& name,
+                                            const string& groupName = DefaultGroupName ) = 0;
+    virtual VertexBufferPtr createVertexBuffer( const string& name,
+                                                const MeshType& type,
+                                                const string& groupName = DefaultGroupName ) = 0;
+    virtual TexturePtr createTexture( const string& name,
+                                      const uint32_t width,
+                                      const uint32_t height,
+                                      const string& groupName = DefaultGroupName ) = 0;
+    virtual TexturePtr createTexture( const string& name,
+                                      const uint32_t width,
+                                      const uint32_t height,
+                                      const Color& color,
+                                      const string& groupName = DefaultGroupName ) = 0;
+    virtual RenderTargetPtr createRenderTarget( const string& name,
+                                                const uint32_t width,
+                                                const uint32_t height,
+                                                const string& groupName = DefaultGroupName ) = 0;
+
+    //
+    // Destruction methods (implemented by render plugin).
 
     virtual void destroyTexture( TexturePtr texture ) = 0;
-
-    virtual void destroyTexture( const string& name, const string& groupName = DefaultGroupName ) = 0;
-
-  protected:
-
-    using ResourceGroupMap = std::unordered_map<std::string, std::shared_ptr<ResourceGroup>>; // TODO: Use unique_ptr (shared_ptr for now to avoid very difficult compilation error).
-    using VertexBufferTable = Util::HashTable<MeshType, VertexBufferPtr>;
+    virtual void destroyTexture( const string& name,
+                                 const string& groupName = DefaultGroupName ) = 0;
+    virtual void destroyFont( FontPtr font ) = 0;
+    virtual void destroyVertexShader( ShaderPtr vertexShader ) = 0;
+    virtual void destroyFragmentShader( ShaderPtr fragmentShader ) = 0;
+    virtual void destroyGPUProgram( GPUProgramPtr gpuProgram ) = 0;
+    virtual void destroyVertexBuffer( VertexBufferPtr vertexBuffer ) = 0;
+    virtual void destroyRenderTarget( RenderTargetPtr renderTarget ) = 0;
 
   protected:
 
     ResourceGroupPtr _getGroup( const string& groupName );
 
-  protected:
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     ResourceGroupMap _groups {};
     ResourceGroupPtr _defaultGroup { nullptr };
@@ -271,56 +257,67 @@ namespace Lore {
 
   public:
 
-    static void LoadResourceConfiguration( const string& file );
+    //
+    // Resource groups, resource configuration and indexing.
 
-    static void IndexResourceLocation( const string& directory, const string& groupName = ResourceController::DefaultGroupName, const bool recursive = true );
-
+    static void CreateGroup( const string& groupName );
     static void LoadGroup( const string& groupName );
-
+    static void UnloadGroup( const string& groupName );
     static void ReloadGroup( const string& groupName );
+    static void LoadResourceConfiguration( const string& file );
+    static void IndexResourceLocation( const string& directory,
+                                       const string& groupName = ResourceController::DefaultGroupName,
+                                       const bool recursive = true );
 
     //
-    // Loading.
+    // Functions for loading resources from the storage.
 
-    static TexturePtr LoadTexture( const string& name, const string& file, const string& groupName = ResourceController::DefaultGroupName );
-
-    static FontPtr LoadFont( const string& name, const string& file, const uint32_t size, const string& groupName = ResourceController::DefaultGroupName );
-
-    //
-    // Factory functions.
-
-    static GPUProgramPtr CreateGPUProgram( const string& name, const string& groupName = ResourceController::DefaultGroupName );
-
-    static ShaderPtr CreateVertexShader( const string& name, const string& groupName = ResourceController::DefaultGroupName );
-
-    static ShaderPtr CreateFragmentShader( const string& name, const string& groupName = ResourceController::DefaultGroupName );
-
-    static VertexBufferPtr CreateVertexBuffer( const string& name, const MeshType& type, const string& groupName = ResourceController::DefaultGroupName );
-
-    static SpritePtr CreateSprite( const string& name, const string& groupName = ResourceController::DefaultGroupName );
-
-    static MaterialPtr CreateMaterial( const string& name, const string& groupName = ResourceController::DefaultGroupName );
-
-    static MeshPtr CreateMesh( const string& name, const MeshType& meshType, const string& groupName = ResourceController::DefaultGroupName );
-
-    static TexturePtr CreateTexture( const string& name, const uint32_t width, const uint32_t height, const string& groupName = ResourceController::DefaultGroupName );
-
-    static RenderTargetPtr CreateRenderTarget( const string& name, const uint32_t width, const uint32_t height, const string& groupName = ResourceController::DefaultGroupName );
-
-    static CameraPtr CreateCamera( const string& name, const string& groupName = ResourceController::DefaultGroupName );
-
-    static BoxPtr CreateBox( const string& name, const string& groupname = ResourceController::DefaultGroupName );
-
-    static TextboxPtr CreateTextbox( const string& name, const string& groupname = ResourceController::DefaultGroupName );
-
-    static UIPtr CreateUI( const string& name, const string& groupName = ResourceController::DefaultGroupName );
+    static TexturePtr LoadTexture( const string& name,
+                                   const string& file,
+                                   const string& groupName = ResourceController::DefaultGroupName );
+    static FontPtr LoadFont( const string& name,
+                             const string& file,
+                             const uint32_t size,
+                             const string& groupName = ResourceController::DefaultGroupName );
 
     //
-    // Entity.
+    // Factory functions for creation of resources.
 
-    static EntityPtr CreateEntity( const string& name, const MeshType& meshType, const string& groupName = ResourceController::DefaultGroupName );
-
-    static EntityPtr CreateEntity( const string& name, const string& groupName = ResourceController::DefaultGroupName );
+    static EntityPtr CreateEntity( const string& name,
+                                   const MeshType& meshType,
+                                   const string& groupName = ResourceController::DefaultGroupName );
+    static GPUProgramPtr CreateGPUProgram( const string& name,
+                                           const string& groupName = ResourceController::DefaultGroupName );
+    static ShaderPtr CreateVertexShader( const string& name,
+                                         const string& groupName = ResourceController::DefaultGroupName );
+    static ShaderPtr CreateFragmentShader( const string& name,
+                                           const string& groupName = ResourceController::DefaultGroupName );
+    static VertexBufferPtr CreateVertexBuffer( const string& name,
+                                               const MeshType& type,
+                                               const string& groupName = ResourceController::DefaultGroupName );
+    static SpritePtr CreateSprite( const string& name,
+                                   const string& groupName = ResourceController::DefaultGroupName );
+    static MaterialPtr CreateMaterial( const string& name,
+                                       const string& groupName = ResourceController::DefaultGroupName );
+    static MeshPtr CreateMesh( const string& name,
+                               const MeshType& meshType,
+                               const string& groupName = ResourceController::DefaultGroupName );
+    static TexturePtr CreateTexture( const string& name,
+                                     const uint32_t width,
+                                     const uint32_t height,
+                                     const string& groupName = ResourceController::DefaultGroupName );
+    static RenderTargetPtr CreateRenderTarget( const string& name,
+                                               const uint32_t width,
+                                               const uint32_t height,
+                                               const string& groupName = ResourceController::DefaultGroupName );
+    static CameraPtr CreateCamera( const string& name,
+                                   const string& groupName = ResourceController::DefaultGroupName );
+    static BoxPtr CreateBox( const string& name,
+                             const string& groupname = ResourceController::DefaultGroupName );
+    static TextboxPtr CreateTextbox( const string& name,
+                                     const string& groupname = ResourceController::DefaultGroupName );
+    static UIPtr CreateUI( const string& name,
+                           const string& groupName = ResourceController::DefaultGroupName );
 
     //
     // Cloning functions.
@@ -329,35 +326,37 @@ namespace Lore {
     /// \brief Clones specified material and registers new material.
     /// \param name Material to clone.
     /// \param cloneName New name of the cloned material.
-    static MaterialPtr CloneMaterial( const string& name, const string& cloneName );
+    static MaterialPtr CloneMaterial( const string& name,
+                                      const string& cloneName );
 
     //
     // Getters.
 
-    static GPUProgramPtr GetGPUProgram( const string& name, const string& groupName = ResourceController::DefaultGroupName );
-
-    static SpritePtr GetSprite( const string& name, const string& groupName = ResourceController::DefaultGroupName );
-
-    static SpriteAnimationSetPtr GetAnimationSet( const string& name, const string& groupName = ResourceController::DefaultGroupName );
-
-    static MaterialPtr GetMaterial( const string& name, const string& groupName = ResourceController::DefaultGroupName );
-
-    static TexturePtr GetTexture( const string& name, const string& groupName = ResourceController::DefaultGroupName );
-
-    static FontPtr GetFont( const string& name, const string& groupName = ResourceController::DefaultGroupName );
+    static GPUProgramPtr GetGPUProgram( const string& name,
+                                        const string& groupName = ResourceController::DefaultGroupName );
+    static SpritePtr GetSprite( const string& name,
+                                const string& groupName = ResourceController::DefaultGroupName );
+    static SpriteAnimationSetPtr GetAnimationSet( const string& name,
+                                                  const string& groupName = ResourceController::DefaultGroupName );
+    static MaterialPtr GetMaterial( const string& name,
+                                    const string& groupName = ResourceController::DefaultGroupName );
+    static TexturePtr GetTexture( const string& name,
+                                  const string& groupName = ResourceController::DefaultGroupName );
+    static FontPtr GetFont( const string& name,
+                            const string& groupName = ResourceController::DefaultGroupName );
 
     //
-    // Destruction.
+    // Destruction methods.
 
     static void DestroyTexture( TexturePtr texture );
-
-    static void DestroyTexture( const string& name, const string& groupName = ResourceController::DefaultGroupName );
+    static void DestroyTexture( const string& name,
+                                const string& groupName = ResourceController::DefaultGroupName );
 
   private:
 
     friend class Context;
 
-  private:
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     static void AssignContext( ContextPtr context );
 

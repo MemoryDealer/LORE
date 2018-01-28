@@ -43,20 +43,7 @@ using namespace Lore::OpenGL;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-ResourceController::ResourceController()
-  : Lore::ResourceController()
-{
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-ResourceController::~ResourceController()
-{
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-Lore::TexturePtr ResourceController::loadTexture( const string& name, const string& file, const string& groupName )
+Lore::TexturePtr GLResourceController::loadTexture( const string& name, const string& file, const string& groupName )
 {
   auto texture = MemoryAccess::GetPrimaryPoolCluster()->create<Texture, GLTexture>();
   texture->setName( name );
@@ -69,7 +56,7 @@ Lore::TexturePtr ResourceController::loadTexture( const string& name, const stri
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::FontPtr ResourceController::loadFont( const string& name, const string& file, const uint32_t size, const string& groupName )
+Lore::FontPtr GLResourceController::loadFont( const string& name, const string& file, const uint32_t size, const string& groupName )
 {
   auto font = MemoryAccess::GetPrimaryPoolCluster()->create<Font, GLFont>();
   font->setName( name );
@@ -82,7 +69,7 @@ Lore::FontPtr ResourceController::loadFont( const string& name, const string& fi
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::GPUProgramPtr ResourceController::createGPUProgram( const string& name, const string& groupName )
+Lore::GPUProgramPtr GLResourceController::createGPUProgram( const string& name, const string& groupName )
 {
   auto program = MemoryAccess::GetPrimaryPoolCluster()->create<GPUProgram, GLGPUProgram>();
   program->setName( name );
@@ -95,7 +82,7 @@ Lore::GPUProgramPtr ResourceController::createGPUProgram( const string& name, co
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::ShaderPtr ResourceController::createVertexShader( const string& name, const string& groupName )
+Lore::ShaderPtr GLResourceController::createVertexShader( const string& name, const string& groupName )
 {
   auto shader = MemoryAccess::GetPrimaryPoolCluster()->create<Shader, GLShader>();
   shader->setName( name );
@@ -108,7 +95,7 @@ Lore::ShaderPtr ResourceController::createVertexShader( const string& name, cons
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::ShaderPtr ResourceController::createFragmentShader( const string& name, const string& groupName )
+Lore::ShaderPtr GLResourceController::createFragmentShader( const string& name, const string& groupName )
 {
   auto shader = MemoryAccess::GetPrimaryPoolCluster()->create<Shader, GLShader>();
   shader->setName( name );
@@ -121,7 +108,7 @@ Lore::ShaderPtr ResourceController::createFragmentShader( const string& name, co
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::VertexBufferPtr ResourceController::createVertexBuffer( const string& name, const Lore::MeshType& type, const string& groupName )
+Lore::VertexBufferPtr GLResourceController::createVertexBuffer( const string& name, const Lore::MeshType& type, const string& groupName )
 {
   auto vb = MemoryAccess::GetPrimaryPoolCluster()->create<VertexBuffer, GLVertexBuffer>();
   vb->setName( name );
@@ -150,7 +137,7 @@ Lore::VertexBufferPtr ResourceController::createVertexBuffer( const string& name
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::TexturePtr ResourceController::createTexture( const string& name, const uint32_t width, const uint32_t height, const string& groupName )
+Lore::TexturePtr GLResourceController::createTexture( const string& name, const uint32_t width, const uint32_t height, const string& groupName )
 {
   auto texture = MemoryAccess::GetPrimaryPoolCluster()->create<Texture, GLTexture>();
   texture->setName( name );
@@ -163,7 +150,7 @@ Lore::TexturePtr ResourceController::createTexture( const string& name, const ui
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::TexturePtr ResourceController::createTexture( const string& name, const uint32_t width, const uint32_t height, const Lore::Color& color, const string& groupName )
+Lore::TexturePtr GLResourceController::createTexture( const string& name, const uint32_t width, const uint32_t height, const Lore::Color& color, const string& groupName )
 {
   auto texture = MemoryAccess::GetPrimaryPoolCluster()->create<Texture, GLTexture>();
   texture->setName( name );
@@ -176,7 +163,7 @@ Lore::TexturePtr ResourceController::createTexture( const string& name, const ui
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::RenderTargetPtr ResourceController::createRenderTarget( const string& name, const uint32_t width, const uint32_t height, const string& groupName )
+Lore::RenderTargetPtr GLResourceController::createRenderTarget( const string& name, const uint32_t width, const uint32_t height, const string& groupName )
 {
   auto renderTarget = MemoryAccess::GetPrimaryPoolCluster()->create<RenderTarget, GLRenderTarget>();
   renderTarget->setName( name );
@@ -189,7 +176,7 @@ Lore::RenderTargetPtr ResourceController::createRenderTarget( const string& name
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void ResourceController::destroyTexture( Lore::TexturePtr texture )
+void GLResourceController::destroyTexture( Lore::TexturePtr texture )
 {
   auto groupName = texture->getResourceGroupName();
   _getGroup( groupName )->textures.remove( texture->getName() );
@@ -199,12 +186,72 @@ void ResourceController::destroyTexture( Lore::TexturePtr texture )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void ResourceController::destroyTexture( const string& name, const string& groupName )
+void GLResourceController::destroyTexture( const string& name, const string& groupName )
 {
   auto texture = _getGroup( groupName )->textures.get( name );
   if ( texture ) {
     destroyTexture( texture );
   }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLResourceController::destroyFont( Lore::FontPtr font )
+{
+  auto groupName = font->getResourceGroupName();
+  _getGroup( groupName )->fonts.remove( font->getName() );
+
+  MemoryAccess::GetPrimaryPoolCluster()->destroy<Font, GLFont>( font );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLResourceController::destroyVertexShader( Lore::ShaderPtr vertexShader )
+{
+  auto groupName = vertexShader->getResourceGroupName();
+  _getGroup( groupName )->vertexShaders.remove( vertexShader->getName() );
+
+  MemoryAccess::GetPrimaryPoolCluster()->destroy<Shader, GLShader>( vertexShader );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLResourceController::destroyFragmentShader( Lore::ShaderPtr fragmentShader )
+{
+  auto groupName = fragmentShader->getResourceGroupName();
+  _getGroup( groupName )->fragmentShaders.remove( fragmentShader->getName() );
+
+  MemoryAccess::GetPrimaryPoolCluster()->destroy<Shader, GLShader>( fragmentShader );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLResourceController::destroyGPUProgram( Lore::GPUProgramPtr gpuProgram )
+{
+  auto groupName = gpuProgram->getResourceGroupName();
+  _getGroup( groupName )->programs.remove( gpuProgram->getName() );
+
+  MemoryAccess::GetPrimaryPoolCluster()->destroy<GPUProgram, GLGPUProgram>( gpuProgram );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLResourceController::destroyVertexBuffer( Lore::VertexBufferPtr vertexBuffer )
+{
+  auto groupName = vertexBuffer->getResourceGroupName();
+  _getGroup( groupName )->vertexBuffers.remove( vertexBuffer->getName() );
+
+  MemoryAccess::GetPrimaryPoolCluster()->destroy<VertexBuffer, GLVertexBuffer>( vertexBuffer );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLResourceController::destroyRenderTarget( Lore::RenderTargetPtr renderTarget )
+{
+  auto groupName = renderTarget->getResourceGroupName();
+  _getGroup( groupName )->renderTargets.remove( renderTarget->getName() );
+
+  MemoryAccess::GetPrimaryPoolCluster()->destroy<RenderTarget, GLRenderTarget>( renderTarget );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

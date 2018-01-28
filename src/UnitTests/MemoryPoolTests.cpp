@@ -40,14 +40,14 @@ TEST_CASE( "Memory Pool", "[memory]" )
     std::vector<Lore::Node*> nodes;
     for ( int i = 0; i < size; ++i ) {
       nodes.push_back( pool.create() );
-      REQUIRE( true == nodes[i]->getInUse() );
+      REQUIRE( true == nodes[i]->isInUse() );
       nodes.back()->setPosition( 1.f, 1.f );
       nodes.back()->createSpriteController();
     }
 
     auto nodeToDestroy = nodes[50];
     pool.destroy( nodeToDestroy );
-    REQUIRE( false == nodeToDestroy->getInUse() );
+    REQUIRE( false == nodeToDestroy->isInUse() );
     REQUIRE( 0.f == nodeToDestroy->getPosition().x );
     REQUIRE( 0.f == nodeToDestroy->getPosition().y );
     REQUIRE_FALSE( nodeToDestroy->getSpriteController() );
@@ -55,7 +55,7 @@ TEST_CASE( "Memory Pool", "[memory]" )
     pool.destroyAll();
     for ( int i = 0; i < size; ++i ) {
       auto node = pool.getObjectAt( i );
-      REQUIRE( false == node->getInUse() );
+      REQUIRE( false == node->isInUse() );
       REQUIRE( 0.f == node->getPosition().x );
       REQUIRE( 0.f == node->getPosition().y );
       REQUIRE_FALSE( node->getSpriteController() );
@@ -108,14 +108,14 @@ TEST_CASE( "Pool Cluster", "[memory]" )
       nodes.push_back( cluster.create<Lore::Node>() );
       shaders.push_back( cluster.create<Lore::Camera>() );
 
-      REQUIRE( true == nodes[i]->getInUse() );
-      REQUIRE( true == shaders[i]->getInUse() );
+      REQUIRE( true == nodes[i]->isInUse() );
+      REQUIRE( true == shaders[i]->isInUse() );
     }
 
     cluster.destroy<Lore::Node>( nodes[100] );
     cluster.destroy<Lore::Camera>( shaders[100] );
-    REQUIRE( false == nodes[100]->getInUse() );
-    REQUIRE( false == shaders[100]->getInUse() );
+    REQUIRE( false == nodes[100]->isInUse() );
+    REQUIRE( false == shaders[100]->isInUse() );
   }
 
   cluster.unregisterPool<Lore::Node>();

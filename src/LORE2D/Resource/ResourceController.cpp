@@ -57,7 +57,8 @@ const string ResourceController::DefaultGroupName = "Core";
 ResourceController::ResourceController()
 {
   // Create default resource group.
-  auto rg = std::make_shared<ResourceGroup>( DefaultGroupName );
+  auto rg = std::make_shared<ResourceGroup>();
+  rg->name = DefaultGroupName;
 
   // Store and set to active group.
   _groups.insert( { DefaultGroupName, rg } );
@@ -72,9 +73,168 @@ ResourceController::~ResourceController()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void ResourceController::createGroup( const string& groupName )
+{
+  auto rg = std::make_shared<ResourceGroup>();
+  rg->name = groupName;
+
+  _groups.insert( { groupName, rg } );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void ResourceController::destroyGroup( const string& groupName )
+{
+  auto group = _getGroup( groupName );
+  if ( DefaultGroupName != group->name ) {
+    unloadGroup( groupName );
+    _groups.erase( _groups.find( groupName ) );
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void ResourceController::loadGroup( const string& groupName )
+{
+  // Place indexed resources into queue so they can be loaded in the correct order.
+  std::vector<ResourceGroup::IndexedResource*> loadQueues[static_cast< int >( SerializableResource::Count )];
+  auto group = _getGroup( groupName );
+  for ( auto& it : group->index ) {
+    auto& index = it.second;
+    if ( !index.loaded ) {
+      loadQueues[static_cast< int >( index.type )].push_back( &index );
+    }
+  }
+
+  auto LoadResourcesByType = [&, this] ( const SerializableResource type ) {
+    auto& queue = loadQueues[static_cast< int >( type )];
+    for ( auto& index : queue ) {
+      ResourceFileProcessor processor( index->file, type );
+      processor.load( groupName, this );
+      index->loaded = true;
+    }
+  };
+
+  // Load resource types in correct order so dependencies are ready.
+  std::vector<SerializableResource> typeOrder = { SerializableResource::Texture,
+    SerializableResource::Sprite,
+    SerializableResource::SpriteList,
+    SerializableResource::SpriteAnimation,
+    SerializableResource::Font,
+    SerializableResource::GPUProgram,
+    SerializableResource::Material };
+  for ( const auto& type : typeOrder ) {
+    LoadResourcesByType( type );
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void ResourceController::unloadGroup( const string& groupName )
+{
+  // Unload everything from the index and any other resources not indexed.
+  auto group = _getGroup( groupName );
+  if ( !group ) {
+    return;
+  }
+
+  // Textures.
+  auto textureIt = group->textures.getConstIterator();
+  while ( textureIt.hasMore() ) {
+    destroyTexture( textureIt.getNext() );
+  }
+
+  // Shaders, programs, and vertex buffers.
+  auto vertexShaderIt = group->vertexShaders.getConstIterator();
+  while ( vertexShaderIt.hasMore() ) {
+    destroyVertexShader( vertexShaderIt.getNext() );
+  }
+  auto fragmentShaderIt = group->fragmentShaders.getConstIterator();
+  while ( fragmentShaderIt.hasMore() ) {
+    destroyFragmentShader( fragmentShaderIt.getNext() );
+  }
+  auto programIt = group->programs.getConstIterator();
+  while ( programIt.hasMore() ) {
+    destroyGPUProgram( programIt.getNext() );
+  }
+  auto vertexBufferIt = group->vertexBuffers.getConstIterator();
+  while ( vertexBufferIt.hasMore() ) {
+    destroyVertexBuffer( vertexBufferIt.getNext() );
+  }
+
+  // Meshes and entities.
+  auto meshIt = group->meshes.getConstIterator();
+  while ( meshIt.hasMore() ) {
+    destroyMesh( meshIt.getNext() );
+  }
+  auto entityIt = group->entities.getConstIterator();
+  while ( entityIt.hasMore() ) {
+    destroyEntity( entityIt.getNext() );
+  }
+
+  // Fonts, boxes, and textboxes.
+  auto fontIt = group->fonts.getConstIterator();
+  while ( fontIt.hasMore() ) {
+    destroyFont( fontIt.getNext() );
+  }
+  auto boxIt = group->boxes.getConstIterator();
+  while ( boxIt.hasMore() ) {
+    destroyBox( boxIt.getNext() );
+  }
+  auto textboxIt = group->textboxes.getConstIterator();
+  while ( textboxIt.hasMore() ) {
+    destroyTextbox( textboxIt.getNext() );
+  }
+
+  // Sprites and animation sets.
+  auto spriteIt = group->sprites.getConstIterator();
+  while ( spriteIt.hasMore() ) {
+    destroySprite( spriteIt.getNext() );
+  }
+  auto animationSetIt = group->animationSets.getConstIterator();
+  while ( animationSetIt.hasMore() ) {
+    destroyAnimationSet( animationSetIt.getNext() );
+  }
+
+  // Render targets and UIs.
+  auto rtIt = group->renderTargets.getConstIterator();
+  while ( rtIt.hasMore() ) {
+    destroyRenderTarget( rtIt.getNext() );
+  }
+  auto uiIt = group->uis.getConstIterator();
+  while ( uiIt.hasMore() ) {
+    destroyUI( uiIt.getNext() );
+  }
+
+  // Set all indexed resources not loaded.
+  for ( auto& it : group->index ) {
+    auto& index = it.second;
+    index.loaded = false;
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void ResourceController::reloadGroup( const string& groupName )
+{
+  unloadGroup( groupName );
+  loadGroup( groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void ResourceController::loadResourceConfiguration( const string& file )
 {
   ResourceFileProcessor::LoadConfiguration( file, this );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void ResourceController::indexResourceLocation( const string& directory, const string& groupName, const bool recursive )
+{
+  // Index all resource files.
+  ResourceIndexer indexer( groupName );
+  indexer.traverseDirectory( directory, this, recursive );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -99,86 +259,6 @@ void ResourceController::indexResourceFile( const string& file, const string& gr
   // Insert index into resource group. This can be loaded/unloaded at will.
   auto group = _getGroup( groupName );
   group->index.insert( { processor.getName(), index } );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void ResourceController::createGroup( const string& groupName )
-{
-  auto rg = std::make_shared<ResourceGroup>( groupName );
-
-  _groups.insert( { groupName, rg } );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void ResourceController::destroyGroup( const string& groupName )
-{
-  auto group = _getGroup( groupName );
-  if ( DefaultGroupName != group->name ) {
-    unloadGroup( groupName );
-    _groups.erase( _groups.find( groupName ) );
-  }
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void ResourceController::indexResourceLocation( const string& directory, const string& groupName, const bool recursive )
-{
-  // Index all resource files.
-  ResourceIndexer indexer( groupName );
-  indexer.traverseDirectory( directory, this, recursive );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void ResourceController::loadGroup( const string& groupName )
-{
-  // Place indexed resources into queue so they can be loaded in the correct order.
-  std::vector<ResourceGroup::IndexedResource*> loadQueues[static_cast<int>( SerializableResource::Count )];
-  auto group = _getGroup( groupName );
-  for (auto& it : group->index) {
-    auto& index = it.second;
-    if ( !index.loaded ) {
-      loadQueues[static_cast<int>( index.type )].push_back( &index );
-    }
-  }
-
-  auto LoadResourcesByType = [&, this] ( const SerializableResource type ) {
-    auto& queue = loadQueues[static_cast< int >( type )];
-    for ( auto& index : queue ) {
-      ResourceFileProcessor processor( index->file, type );
-      processor.load( groupName, this );
-      index->loaded = true;
-    }
-  };
-
-  // Load resource types in correct order so dependencies are ready.
-  std::vector<SerializableResource> typeOrder = { SerializableResource::Texture,
-                                                  SerializableResource::Sprite,
-                                                  SerializableResource::SpriteList,
-                                                  SerializableResource::SpriteAnimation,
-                                                  SerializableResource::Font,
-                                                  SerializableResource::GPUProgram,
-                                                  SerializableResource::Material };
-  for ( const auto& type : typeOrder ) {
-    LoadResourcesByType( type );
-  }
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void ResourceController::unloadGroup( const string& groupName )
-{
-
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void ResourceController::reloadGroup( const string& groupName )
-{
-  unloadGroup( groupName );
-  loadGroup( groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -305,13 +385,6 @@ UIPtr ResourceController::createUI( const string& name, const string& groupName 
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-EntityPtr ResourceController::createEntity( const string& name, const string& groupName )
-{
-  return createEntity( name, MeshType::Custom, groupName );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 MeshPtr ResourceController::createMesh( const string& name, const MeshType& meshType, const string& groupName )
 {
   auto mesh = MemoryAccess::GetPrimaryPoolCluster()->create<Mesh>();
@@ -396,6 +469,76 @@ FontPtr ResourceController::getFont( const string& name, const string& groupName
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void ResourceController::destroyMesh( MeshPtr mesh )
+{
+  auto groupName = mesh->getResourceGroupName();
+  _getGroup( groupName )->meshes.remove( mesh->getName() );
+
+  MemoryAccess::GetPrimaryPoolCluster()->destroy<Mesh>( mesh );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void ResourceController::destroyEntity( EntityPtr entity )
+{
+  auto groupName = entity->getResourceGroupName();
+  _getGroup( groupName )->entities.remove( entity->getName() );
+
+  MemoryAccess::GetPrimaryPoolCluster()->destroy<Entity>( entity );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void ResourceController::destroyBox( BoxPtr box )
+{
+  auto groupName = box->getResourceGroupName();
+  _getGroup( groupName )->boxes.remove( box->getName() );
+
+  MemoryAccess::GetPrimaryPoolCluster()->destroy<Box>( box );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void ResourceController::destroyTextbox( TextboxPtr textbox )
+{
+  auto groupName = textbox->getResourceGroupName();
+  _getGroup( groupName )->textboxes.remove( textbox->getName() );
+
+  MemoryAccess::GetPrimaryPoolCluster()->destroy<Textbox>( textbox );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void ResourceController::destroySprite( SpritePtr sprite )
+{
+  auto groupName = sprite->getResourceGroupName();
+  _getGroup( groupName )->sprites.remove( sprite->getName() );
+
+  MemoryAccess::GetPrimaryPoolCluster()->destroy<Sprite>( sprite );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void ResourceController::destroyAnimationSet( SpriteAnimationSetPtr animationSet )
+{
+  auto groupName = animationSet->getResourceGroupName();
+  _getGroup( groupName )->animationSets.remove( animationSet->getName() );
+
+  MemoryAccess::GetPrimaryPoolCluster()->destroy<SpriteAnimationSet>( animationSet );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void ResourceController::destroyUI( UIPtr ui )
+{
+  auto groupName = ui->getResourceGroupName();
+  _getGroup( groupName )->uis.remove( ui->getName() );
+
+  MemoryAccess::GetPrimaryPoolCluster()->destroy<UI>( ui );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 ResourceGroupPtr ResourceController::_getGroup( const string& groupName )
@@ -413,6 +556,27 @@ ResourceGroupPtr ResourceController::_getGroup( const string& groupName )
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void Resource::CreateGroup( const string& groupName )
+{
+  return ActiveContext->getResourceController()->createGroup( groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Resource::LoadGroup( const string& groupName )
+{
+  return ActiveContext->getResourceController()->loadGroup( groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Resource::UnloadGroup( const string& groupName )
+{
+  return ActiveContext->getResourceController()->unloadGroup( groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void Resource::LoadResourceConfiguration( const string& file )
 {
   return ActiveContext->getResourceController()->loadResourceConfiguration( file );
@@ -423,13 +587,6 @@ void Resource::LoadResourceConfiguration( const string& file )
 void Resource::IndexResourceLocation( const string& directory, const string& groupName, const bool recursive )
 {
   return ActiveContext->getResourceController()->indexResourceLocation( directory, groupName, recursive );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Resource::LoadGroup( const string& groupName )
-{
-  return ActiveContext->getResourceController()->loadGroup( groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -549,13 +706,6 @@ UIPtr Resource::CreateUI( const string& name, const string& groupName )
 EntityPtr Resource::CreateEntity( const string& name, const MeshType& meshType, const string& groupName )
 {
   return ActiveContext->getResourceController()->createEntity( name, meshType, groupName );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-EntityPtr Resource::CreateEntity( const string& name, const string& groupName )
-{
-  return ActiveContext->getResourceController()->createEntity( name, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

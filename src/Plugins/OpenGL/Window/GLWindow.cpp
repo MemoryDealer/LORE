@@ -49,12 +49,6 @@ GLWindow::GLWindow()
 GLWindow::~GLWindow()
 {
   glfwDestroyWindow( _window );
-  _width = _height = _frameBufferWidth = _frameBufferHeight = 0;
-  _aspectRatio = 0;
-  _mode = Window::Mode::Windowed;
-  _renderViews.clear();
-  _controller.reset();
-  _stockController.reset();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -84,7 +78,7 @@ void GLWindow::init( const string& title,
   glfwSetWindowSizeCallback( _window, WindowCallbackHandler::Size );
 
   // Create a resource controller for each window.
-  _controller = std::make_unique<ResourceController>();
+  _controller = std::make_unique<GLResourceController>();
 
   // Create stock resources as well (make this window's context active
   // and then restore the previous one).

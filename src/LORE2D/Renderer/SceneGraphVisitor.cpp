@@ -27,6 +27,7 @@
 #include "SceneGraphVisitor.h"
 
 #include <LORE2D/Renderer/Renderer.h>
+#include <LORE2D/Resource/Entity.h>
 #include <LORE2D/Scene/AABB.h>
 #include <LORE2D/Scene/Node.h>
 
@@ -76,7 +77,10 @@ void SceneGraphVisitor::visit( Renderer* renderer, bool parentDirty )
   auto it = _node->getEntityListConstIterator();
   while ( it.hasMore() ) {
     EntityPtr entity = it.getNext();
-    renderer->addRenderData( entity, _node );
+    // Ensure this entity hasn't been reclaimed by the pool.
+    if ( entity->isInUse() ) {
+      renderer->addRenderData( entity, _node );
+    }
   }
 
   auto boxIt = _node->getBoxListConstIterator();

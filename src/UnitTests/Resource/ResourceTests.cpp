@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,48 +24,16 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-template<typename T>
-class MemoryPool;
+#include "catch.hpp"
+#include <LORE2D/Lore.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
-
-  ///
-  /// \class Alloc
-  /// \brief Base class for all objects managed in memory pools.
-  /// \details All classes that derive from Alloc should implement a destructor
-  /// which cleans up any outside resources (e.g., OpenGL data or internally 
-  /// created pool objects).
-  template<typename T>
-  class Alloc
-  {
-
-  public:
-
-    Alloc() = default;
-
-    virtual ~Alloc() = default;
-
-    ///
-    /// \brief Returns true if object has been requested for use in memory pool.
-    /// After it is destroyed in the memory pool, it is no longer in use.
-    bool isInUse() const
-    {
-      return _inUse;
-    }
-
-  public: // HACK for posix.
-
-    std::atomic<bool> _inUse { false };
-    T* _next { nullptr };
-
-  private:
-
-    friend class MemoryPool<T>;
-
-  };
+TEST_CASE( "Load and unload resources", "[resource]" )
+{
 
 }
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

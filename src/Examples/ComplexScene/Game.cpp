@@ -198,19 +198,19 @@ void Game::loadScene()
   auto& layerFar = background->addLayer( "far" );
   layerFar.setSprite( Lore::Resource::GetSprite( "bg-far" ) );
   layerFar.setDepth( 990.f );
-  layerFar.setParallax( Lore::Vec2( 0.4f, 0.05f ) );
+  layerFar.setParallax( Lore::Vec2( 0.3f, 0.08f ) );
 
   // Add middle layer with lighter parallax.
   auto& layerMiddle = background->addLayer( "middle" );
   layerMiddle.setSprite( Lore::Resource::GetSprite( "bg-middle" ) );
   layerMiddle.setDepth( 980.f );
-  layerMiddle.setParallax( Lore::Vec2( .6f, .05f ) );
+  layerMiddle.setParallax( Lore::Vec2( .5f, .10f ) );
 
   // Add closest layer with the least amount of parallax.
   auto& layerForeground = background->addLayer( "foreground" );
   layerForeground.setSprite( Lore::Resource::GetSprite( "bg-foreground" ) );
   layerForeground.setDepth( 970.f );
-  layerForeground.setParallax( Lore::Vec2( .8f, 0.05f ) );
+  layerForeground.setParallax( Lore::Vec2( .7f, 0.12f ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -243,6 +243,10 @@ void Game::processInput()
   }
   else if ( Lore::Input::GetKeyState( Lore::Keycode::X ) ) {
     _camera->zoom( -0.03f );
+  }
+
+  if ( Lore::Input::GetKeyState( Lore::Keycode::R ) ) {
+    Lore::Resource::UnloadGroup( "Core" );
   }
 }
 

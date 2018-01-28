@@ -31,41 +31,67 @@
 
 namespace Lore { namespace OpenGL {
 
-    class ResourceController : public Lore::ResourceController
-    {
+  ///
+  /// \class GLResourceController
+  /// \details OpenGL render plugin resource creation and loading support.
+  class GLResourceController : public Lore::ResourceController
+  {
 
-    public:
+  public:
 
-        ResourceController();
+    GLResourceController() = default;
+    ~GLResourceController() override = default;
 
-        virtual ~ResourceController() override;
+    //
+    // Functions for loading resources from the storage.
 
-        virtual TexturePtr loadTexture( const string& name, const string& file, const string& groupName = DefaultGroupName ) override;
+    TexturePtr loadTexture( const string& name,
+                            const string& file,
+                            const string& groupName = DefaultGroupName ) override;
+    FontPtr loadFont( const string& name,
+                      const string& file,
+                      const uint32_t size,
+                      const string& groupName = DefaultGroupName ) override;
 
-        virtual FontPtr loadFont( const string& name, const string& file, const uint32_t size, const string& groupName = DefaultGroupName ) override;
+    //
+    // Factory functions for creation of resources.
 
-        virtual GPUProgramPtr createGPUProgram( const string& name, const string& groupName = DefaultGroupName ) override;
+    GPUProgramPtr createGPUProgram( const string& name,
+                                    const string& groupName = DefaultGroupName ) override;
+    ShaderPtr createVertexShader( const string& name,
+                                  const string& groupName = DefaultGroupName ) override;
+    ShaderPtr createFragmentShader( const string& name,
+                                    const string& groupName = DefaultGroupName ) override;
+    VertexBufferPtr createVertexBuffer( const string& name,
+                                        const MeshType& type,
+                                        const string& groupName = DefaultGroupName ) override;
+    TexturePtr createTexture( const string& name,
+                              const uint32_t width,
+                              const uint32_t height,
+                              const string& groupName = DefaultGroupName ) override;
+    TexturePtr createTexture( const string& name,
+                              const uint32_t width,
+                              const uint32_t height,
+                              const Color& color,
+                              const string& groupName = DefaultGroupName ) override;
+    RenderTargetPtr createRenderTarget( const string& name,
+                                        const uint32_t width,
+                                        const uint32_t height,
+                                        const string& groupName = DefaultGroupName ) override;
 
-        virtual ShaderPtr createVertexShader( const string& name, const string& groupName = DefaultGroupName ) override;
+    //
+    // Destruction methods.
 
-        virtual ShaderPtr createFragmentShader( const string& name, const string& groupName = DefaultGroupName ) override;
+    void destroyTexture( TexturePtr texture ) override;
+    void destroyTexture( const string& name, const string& groupName = DefaultGroupName ) override;
+    void destroyFont( FontPtr font ) override;
+    void destroyVertexShader( ShaderPtr vertexShader ) override;
+    void destroyFragmentShader( ShaderPtr fragmentShader ) override;
+    void destroyGPUProgram( GPUProgramPtr gpuProgram ) override;
+    void destroyVertexBuffer( VertexBufferPtr vertexBuffer ) override;
+    void destroyRenderTarget( RenderTargetPtr renderTarget ) override;
 
-        virtual VertexBufferPtr createVertexBuffer( const string& name, const MeshType& type, const string& groupName = DefaultGroupName ) override;
-
-        virtual TexturePtr createTexture( const string& name, const uint32_t width, const uint32_t height, const string& groupName = DefaultGroupName ) override;
-
-        virtual TexturePtr createTexture( const string& name, const uint32_t width, const uint32_t height, const Color& color, const string& groupName = DefaultGroupName ) override;
-
-        virtual RenderTargetPtr createRenderTarget( const string& name, const uint32_t width, const uint32_t height, const string& groupName = DefaultGroupName ) override;
-
-        //
-        // Destruction.
-
-        virtual void destroyTexture( TexturePtr texture ) override;
-
-        virtual void destroyTexture( const string& name, const string& groupName = DefaultGroupName ) override;
-
-    };
+  };
 
 }}
 
