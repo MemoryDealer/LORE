@@ -365,7 +365,7 @@ void GenericRenderer::renderBackground( const Lore::RenderView& rv,
       // Apply scrolling and parallax offsets.
       Lore::Vec2 offset = mat->getTexCoordOffset();
       offset.x += camPos.x * layer.getParallax().x;
-      offset.y -= camPos.y * layer.getParallax().y;
+      offset.y += camPos.y * layer.getParallax().y;
       program->setUniformVar( "texSampleOffset", offset );
 
       Lore::Matrix4 transform = Math::CreateTransformationMatrix( Lore::Vec2( 0.f, 0.f ) );

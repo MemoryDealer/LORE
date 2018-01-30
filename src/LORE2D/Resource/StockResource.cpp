@@ -91,7 +91,7 @@ void StockResourceController::createStockResources()
     UberProgramParameters params;
 
     // When rendering to texture, don't flip Y texture coordinates.
-    params.texYCoordinateFlipped = false;
+    //params.texYCoordinateFlipped = false;
     params.maxLights = 0;
     createUberProgram( "UnlitTexturedRTT", params );
   }

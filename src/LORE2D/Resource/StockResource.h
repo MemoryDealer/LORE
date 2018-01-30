@@ -39,8 +39,6 @@ namespace Lore {
     {
         unsigned int maxLights { 4 };
         unsigned int numTextures { 1 };
-        bool texYCoordinateFlipped { true };
-        bool colorMod { true }; // Modulate final output by color, regardless of scene lighting.
     };
 
     struct BackgroundProgramParameters

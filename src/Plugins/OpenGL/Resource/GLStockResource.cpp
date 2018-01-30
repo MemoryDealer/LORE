@@ -110,12 +110,7 @@ Lore::GPUProgramPtr StockResourceController::createUberProgram( const string& na
 
   src += "gl_Position = transform * vec4(vertex, 1.0, 1.0);";
   if ( textured ) {
-    if ( params.texYCoordinateFlipped ) {
-      src += "TexCoord = vec2(texCoord.x * texSampleRegion.w + texSampleRegion.x, (1.0 - texCoord.y) * texSampleRegion.h + texSampleRegion.y);";
-    }
-    else {
-      src += "TexCoord = vec2(texCoord.x * texSampleRegion.w + texSampleRegion.x, texCoord.y * texSampleRegion.h + texSampleRegion.y);";
-    }
+    src += "TexCoord = vec2(texCoord.x * texSampleRegion.w + texSampleRegion.x, texCoord.y * texSampleRegion.h + texSampleRegion.y);";
   }
 
   if ( lit ) {
@@ -310,7 +305,7 @@ Lore::GPUProgramPtr StockResourceController::createBackgroundProgram( const stri
   src += "void main(){";
 
   src += "gl_Position = transform * vec4(vertex, transform[3][2], 1.0);";
-  src += "TexCoord = vec2(texCoord.x * texSampleRegion.w + texSampleRegion.x, (1.0 - texCoord.y) * texSampleRegion.h + texSampleRegion.y);";
+  src += "TexCoord = vec2(texCoord.x * texSampleRegion.w + texSampleRegion.x, texCoord.y * texSampleRegion.h + texSampleRegion.y);";
 
   src += "}";
 
