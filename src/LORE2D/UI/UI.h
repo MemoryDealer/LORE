@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Resource/IResource.h>
 #include <LORE2D/Resource/Registry.h>
 #include <LORE2D/UI/UIPanel.h>
 
@@ -32,10 +33,8 @@
 
 namespace Lore {
 
-  class LORE_EXPORT UI final : public Alloc<UI>
+  class LORE_EXPORT UI final : public Alloc<UI>, public IResource
   {
-
-    LORE_OBJECT_BODY()
 
   public:
 

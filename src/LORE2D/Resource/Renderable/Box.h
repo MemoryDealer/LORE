@@ -25,22 +25,20 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Memory/Alloc.h>
+#include <LORE2D/Resource/IResource.h>
 #include <LORE2D/Resource/Color.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-  class LORE_EXPORT Box final : public Alloc<Box>
+  class LORE_EXPORT Box final : public Alloc<Box>, public IResource
   {
-
-    LORE_OBJECT_BODY()
 
   public:
 
     Box() = default;
-    ~Box() = default;
+    ~Box() override = default;
 
     //
     // Getters.

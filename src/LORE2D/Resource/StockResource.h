@@ -35,114 +35,110 @@
 
 namespace Lore {
 
-    struct UberProgramParameters
+  struct UberProgramParameters
+  {
+    unsigned int maxLights { 4 };
+    unsigned int numTextures { 1 };
+  };
+
+  struct BackgroundProgramParameters
+  {
+    bool scrolling { true };
+  };
+
+  class LORE_EXPORT StockResourceController
+  {
+
+  public:
+
+    enum class GPUProgramType
     {
-        unsigned int maxLights { 4 };
-        unsigned int numTextures { 1 };
+      StandardTexturedQuad,
+      StandardTexturedTriangle
     };
 
-    struct BackgroundProgramParameters
+    enum class MaterialType
     {
-      bool scrolling { true };
+      BaseWhiteNoLighting
     };
 
-    class LORE_EXPORT StockResourceController
+  public:
+
+    StockResourceController();
+
+    virtual ~StockResourceController();
+
+    virtual void createStockResources();
+
+    virtual GPUProgramPtr createUberProgram( const string& name, const UberProgramParameters& params ) = 0;
+
+    virtual GPUProgramPtr createBackgroundProgram( const string& name, const BackgroundProgramParameters& params ) = 0;
+
+    virtual GPUProgramPtr createBoxProgram( const string& name ) = 0;
+
+    virtual GPUProgramPtr createTextProgram( const string& name ) = 0;
+
+    //
+    // Retrieval functions for each type of stock resource.
+
+    template<typename ResourceType>
+    ResourceType* get( const string& name )
     {
+      return _controller->get<ResourceType>( name );
+    }
 
-    public:
+    MeshPtr getMesh( const MeshType& type );
 
-        enum class GPUProgramType
-        {
-            StandardTexturedQuad,
-            StandardTexturedTriangle
-        };
+    //
+    // Cloning functions.
 
-        enum class MaterialType
-        {
-            BaseWhiteNoLighting
-        };
+    MaterialPtr cloneMaterial( const string& name, const string& cloneName );
 
-    public:
+  protected:
 
-        StockResourceController();
+    using MeshTable = Util::HashTable<MeshType, MeshPtr>;
 
-        virtual ~StockResourceController();
+  protected:
 
-        virtual void createStockResources();
+    std::unique_ptr<ResourceController> _controller { nullptr };
 
-        virtual GPUProgramPtr createUberProgram( const string& name, const UberProgramParameters& params ) = 0;
+    MeshTable _meshTable;
 
-        virtual GPUProgramPtr createBackgroundProgram( const string& name, const BackgroundProgramParameters& params ) = 0;
+  };
 
-        virtual GPUProgramPtr createBoxProgram( const string& name ) = 0;
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        virtual GPUProgramPtr createTextProgram( const string& name ) = 0;
+  class LORE_EXPORT StockResource final
+  {
 
-        //
-        // Retrieval functions for each type of stock resource.
+  public:
 
-        GPUProgramPtr getGPUProgram( const string& name );
+    static GPUProgramPtr GetGPUProgram( const string& name );
 
-        MaterialPtr getMaterial( const string& name );
+    static MaterialPtr GetMaterial( const string& name );
 
-        MeshPtr getMesh( const MeshType& type );
+    static MeshPtr GetMesh( const MeshType& type );
 
-        TexturePtr getTexture( const string& name );
+    static TexturePtr GetTexture( const string& name );
 
-        VertexBufferPtr getVertexBuffer( const string& name );
+    static VertexBufferPtr GetVertexBuffer( const string& name );
 
-        FontPtr getFont( const string& name );
+    static FontPtr GetFont( const string& name );
 
-        //
-        // Cloning functions.
+    //
+    // Cloning.
 
-        MaterialPtr cloneMaterial( const string& name, const string& cloneName );
+    static MaterialPtr CloneMaterial( const string& name, const string& newName );
 
-    protected:
+  private:
 
-        using MeshTable = Util::HashTable<MeshType, MeshPtr>;
+    friend class Context;
 
-    protected:
+  private:
 
-        std::unique_ptr<ResourceController> _controller;
+    static void AssignContext( ContextPtr context );
 
-        MeshTable _meshTable;
-
-    };
-
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-    class LORE_EXPORT StockResource final
-    {
-
-    public:
-
-        static GPUProgramPtr GetGPUProgram( const string& name );
-
-        static MaterialPtr GetMaterial( const string& name );
-
-        static MeshPtr GetMesh( const MeshType& type );
-
-        static TexturePtr GetTexture( const string& name );
-
-        static VertexBufferPtr GetVertexBuffer( const string& name );
-
-        static FontPtr GetFont( const string& name );
-
-        //
-        // Cloning.
-
-        static MaterialPtr CloneMaterial( const string& name, const string& newName );
-
-    private:
-
-        friend class Context;
-
-    private:
-
-        static void AssignContext( ContextPtr context );
-
-    };
+  };
 
 }
 

@@ -27,6 +27,7 @@
 
 #include <LORE2D/Memory/Alloc.h>
 #include <LORE2D/Renderer/FrameListener/FrameListenerController.h>
+#include <LORE2D/Resource/IResource.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -113,10 +114,8 @@ namespace Lore {
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-  class LORE_EXPORT SpriteAnimationSet : public Alloc<SpriteAnimationSet>
+  class LORE_EXPORT SpriteAnimationSet : public Alloc<SpriteAnimationSet>, public IResource
   {
-
-    LORE_OBJECT_BODY()
 
   public:
 

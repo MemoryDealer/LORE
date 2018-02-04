@@ -120,8 +120,8 @@ namespace Lore {
     //
     // Deleted functions/operators.
 
-    Registry& operator = ( const Registry& rhs ) = delete;
-    Registry( const Registry& rhs ) = delete;
+    Registry& operator = ( const Registry& rhs ) = default;
+    Registry( const Registry& rhs ) = default;
 
   private:
 

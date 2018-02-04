@@ -27,21 +27,20 @@
 
 #include <LORE2D/Math/Math.h>
 #include <LORE2D/Memory/Alloc.h>
+#include <LORE2D/Resource/IResource.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-  class LORE_EXPORT Camera final : public Alloc<Camera>
+  class LORE_EXPORT Camera final : public Alloc<Camera>, public IResource // TODO: Should this be a resource?
   {
-
-    LORE_OBJECT_BODY()
 
   public:
 
     Camera();
 
-    ~Camera();
+    ~Camera() override;
 
     //
     // Modifiers.

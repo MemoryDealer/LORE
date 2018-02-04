@@ -25,15 +25,17 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Resource/IResource.h>
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 namespace Lore {
 
   ///
   /// \class Sprite
   /// \brief A container of Textures which a Material can use.
-  class LORE_EXPORT Sprite final : public Lore::Alloc<Sprite>
+  class LORE_EXPORT Sprite final : public Alloc<Sprite>, public IResource
   {
-
-    LORE_OBJECT_BODY()
 
   public:
 
@@ -42,7 +44,7 @@ namespace Lore {
   public:
 
     Sprite() = default;
-    ~Sprite() = default;
+    ~Sprite() override = default;
 
     //
     // Modifiers.

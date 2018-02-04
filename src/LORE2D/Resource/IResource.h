@@ -1,3 +1,4 @@
+#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -24,61 +25,29 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Material.h"
-
-#include <LORE2D/Core/Context.h>
+#include <LORE2D/Memory/Alloc.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-using namespace Lore;
+namespace Lore {
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+  ///
+  /// \class Resource
+  /// \brief All resources that live in the ResourceController must derive from
+  /// this class.
+  class LORE_EXPORT IResource
+  {
 
-Material::Material()
-{
-}
+    LORE_OBJECT_BODY()
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+  public:
 
-Material::~Material()
-{
-  if ( _texCoordCallback ) {
-    Context::UnregisterFrameStartedCallback( _texCoordCallback );
-  }
-}
+    virtual ~IResource() = default;
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    virtual IResourcePtr clone() { return this; } // TODO: Make pure virtual.
 
-void Material::setTextureScrollSpeed( const Vec2& scroll )
-{
-  // TODO: Put all texture scrolling in a single function (e.g., pass ref to offset).
-  if ( !_texCoordCallback ) {
-    // Register a callback to update the texture coordinates per frame.
-    _texCoordCallback = [this] ( const FrameListener::FrameEvent& e ) {
-      _texCoordOffset += ( _texCoordScrollSpeed );
-    };
+  };
 
-    Context::RegisterFrameStartedCallback( _texCoordCallback );
-  }
-  _texCoordScrollSpeed = scroll;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Material::setTextureSampleRegion( const Rect& region )
-{
-  _texSampleRegion = region;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Material::setTextureSampleRegion( const real x,
-                                             const real y,
-                                             const real w,
-                                             const real h )
-{
-  setTextureSampleRegion( Rect( x, y, w, h ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -41,7 +41,7 @@ namespace Lore { namespace OpenGL {
 
         virtual ~GLVertexBuffer() override;
 
-        void init( const Lore::MeshType& type );
+        void init( const Lore::MeshType& type ) override;
 
         virtual void build() override;
 

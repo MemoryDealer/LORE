@@ -26,6 +26,7 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 #include <LORE2D/Resource/Color.h>
+#include <LORE2D/Resource/IResource.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -34,10 +35,8 @@ namespace Lore {
   // TODO: How to handle multi-texturing? With current rendering pipeline,
   // it may be best to have a link to the next texture for each texture object.
   // Then let the material inform the renderer to iterate the linked list.
-  class LORE_EXPORT Texture
+  class LORE_EXPORT Texture : public IResource
   {
-
-    LORE_OBJECT_BODY()
 
   public:
 

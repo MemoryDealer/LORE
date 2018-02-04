@@ -45,6 +45,7 @@ namespace Lore {
   class Font;
   class GPUProgram;
   class InputController;
+  class IResource;
   class Light;
   class Material;
   class Mesh;
@@ -53,7 +54,7 @@ namespace Lore {
   class Renderer;
   class RenderTarget;
   class ResourceController;
-  struct ResourceGroup;
+  class ResourceGroup;
   class Scene;
   class Shader;
   class Sprite;
@@ -80,6 +81,7 @@ namespace Lore {
   using EntityPtr = Entity*;
   using GPUProgramPtr = GPUProgram*;
   using InputControllerPtr = InputController*;
+  using IResourcePtr = IResource*;
   using LightPtr = Light*;
   using MaterialPtr = Material*;
   using MeshPtr = Mesh*;

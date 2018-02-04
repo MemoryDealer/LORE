@@ -25,9 +25,9 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Memory/Alloc.h>
 #include <LORE2D/Renderer/FrameListener/FrameListenerController.h>
 #include <LORE2D/Resource/Color.h>
+#include <LORE2D/Resource/IResource.h>
 #include <LORE2D/Shader/GPUProgram.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -39,10 +39,8 @@ namespace Lore {
   /// \brief Contains data on how to render an object, including lighting, colors,
   ///     and shader effects.
   /// \details Can have N number of passes.
-  class LORE_EXPORT Material final : public Alloc<Material>
+  class LORE_EXPORT Material final : public Alloc<Material>, public IResource
   {
-
-    LORE_OBJECT_BODY()
 
   public:
 

@@ -152,9 +152,9 @@ void Game::loadScene()
   //
   // Create some torches.
 
+  Lore::EntityPtr torchEntity = Lore::Resource::CreateEntity( "torch", Lore::MeshType::TexturedQuad );
+  torchEntity->setSprite( Lore::Resource::GetSprite( "torch" ) );
   for ( int i = 0; i < 3; ++i ) {
-    Lore::EntityPtr torchEntity = Lore::Resource::CreateEntity( "torch", Lore::MeshType::TexturedQuad );
-    torchEntity->setSprite( Lore::Resource::GetSprite( "torch" ) );
     auto torchNode = _scene->createNode( "torch" + std::to_string( i ) );
     torchNode->attachObject( torchEntity );
     torchNode->setPosition( 0.5f - static_cast<float>(i * 2), 0.24f );

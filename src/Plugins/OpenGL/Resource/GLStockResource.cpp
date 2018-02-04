@@ -120,7 +120,8 @@ Lore::GPUProgramPtr StockResourceController::createUberProgram( const string& na
   src += "}";
 
   // Compile vertex shader.
-  auto vsptr = _controller->createVertexShader( name + "_VS" );
+  auto vsptr = _controller->create<Shader>( name + "_VS" );
+  vsptr->init( Shader::Type::Vertex );
   if ( !vsptr->loadFromSource( src ) ) {
     throw Lore::Exception( "Failed to compile uber vertex shader for " + name );
   }
@@ -220,7 +221,8 @@ Lore::GPUProgramPtr StockResourceController::createUberProgram( const string& na
   src += "pixel = texSample;";
 
   src += "}";
-  auto fsptr = _controller->createFragmentShader( name + "_FS" );
+  auto fsptr = _controller->create<Shader>( name + "_FS" );
+  fsptr->init( Shader::Type::Fragment );
   if ( !fsptr->loadFromSource( src ) ) {
     throw Lore::Exception( "Failed to compile uber fragment shader for " + name );
   }
@@ -230,7 +232,8 @@ Lore::GPUProgramPtr StockResourceController::createUberProgram( const string& na
   //
   // GPU program.
 
-  auto program = _controller->createGPUProgram( name );
+  auto program = _controller->create<GPUProgram>( name );
+  program->init();
   program->attachShader( vsptr );
   program->attachShader( fsptr );
 
@@ -309,7 +312,8 @@ Lore::GPUProgramPtr StockResourceController::createBackgroundProgram( const stri
 
   src += "}";
 
-  auto vsptr = _controller->createVertexShader( name + "_VS" );
+  auto vsptr = _controller->create<Shader>( name + "_VS" );
+  vsptr->init( Shader::Type::Vertex );
   if ( !vsptr->loadFromSource( src ) ) {
     throw Lore::Exception( "Failed to compile background vertex shader for " + name );
   }
@@ -351,7 +355,8 @@ Lore::GPUProgramPtr StockResourceController::createBackgroundProgram( const stri
 
   src += "}";
 
-  auto fsptr = _controller->createFragmentShader( name + "_FS" );
+  auto fsptr = _controller->create<Shader>( name + "_FS" );
+  fsptr->init( Shader::Type::Fragment );
   if ( !fsptr->loadFromSource( src ) ) {
     throw Lore::Exception( "Failed to compile background fragment shader for " + name );
   }
@@ -361,7 +366,8 @@ Lore::GPUProgramPtr StockResourceController::createBackgroundProgram( const stri
   //
   // GPU program.
 
-  auto program = _controller->createGPUProgram( name );
+  auto program = _controller->create<Lore::GPUProgram>( name );
+  program->init();
   program->attachShader( vsptr );
   program->attachShader( fsptr );
 
@@ -420,7 +426,8 @@ Lore::GPUProgramPtr StockResourceController::createBoxProgram( const string& nam
 
   src += "}";
 
-  auto vsptr = _controller->createVertexShader( name + "_VS" );
+  auto vsptr = _controller->create<Shader>( name + "_VS" );
+  vsptr->init( Shader::Type::Vertex );
   if ( !vsptr->loadFromSource( src ) ) {
     throw Lore::Exception( "Failed to compile text vertex shader for " + name );
   }
@@ -463,7 +470,8 @@ Lore::GPUProgramPtr StockResourceController::createBoxProgram( const string& nam
 
   src += "}";
 
-  auto fsptr = _controller->createFragmentShader( name + "_FS" );
+  auto fsptr = _controller->create<Shader>( name + "_FS" );
+  fsptr->init( Shader::Type::Fragment );
   if ( !fsptr->loadFromSource( src ) ) {
     throw Lore::Exception( "Failed to compile text fragment shader for " + name );
     // TODO: Rollback vertex shaders in case of failed fragment shader.
@@ -474,7 +482,8 @@ Lore::GPUProgramPtr StockResourceController::createBoxProgram( const string& nam
   //
   // GPU program.
 
-  auto program = _controller->createGPUProgram( name );
+  auto program = _controller->create<Lore::GPUProgram>( name );
+  program->init();
   program->attachShader( vsptr );
   program->attachShader( fsptr );
 
@@ -526,7 +535,8 @@ Lore::GPUProgramPtr StockResourceController::createTextProgram( const string& na
 
   src += "}";
 
-  auto vsptr = _controller->createVertexShader( name + "_VS" );
+  auto vsptr = _controller->create<Shader>( name + "_VS" );
+  vsptr->init( Shader::Type::Vertex );
   if ( !vsptr->loadFromSource( src ) ) {
     throw Lore::Exception( "Failed to compile text vertex shader for " + name );
   }
@@ -558,7 +568,8 @@ Lore::GPUProgramPtr StockResourceController::createTextProgram( const string& na
 
   src += "}";
 
-  auto fsptr = _controller->createFragmentShader( name + "_FS" );
+  auto fsptr = _controller->create<Shader>( name + "_FS" );
+  fsptr->init( Shader::Type::Fragment );
   if ( !fsptr->loadFromSource( src ) ) {
     throw Lore::Exception( "Failed to compile text fragment shader for " + name );
     // TODO: Rollback vertex shaders in case of failed fragment shader.
@@ -569,7 +580,8 @@ Lore::GPUProgramPtr StockResourceController::createTextProgram( const string& na
   //
   // GPU program.
 
-  auto program = _controller->createGPUProgram( name );
+  auto program = _controller->create<Lore::GPUProgram>( name );
+  program->init();
   program->attachShader( vsptr );
   program->attachShader( fsptr );
 

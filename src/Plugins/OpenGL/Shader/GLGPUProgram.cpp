@@ -80,12 +80,12 @@ bool GLGPUProgram::link()
 {
   glLinkProgram( _program );
 
-  GLint success;
+  GLint success = 0;
   GLchar buf[512];
   glGetProgramiv( _program, GL_LINK_STATUS, &success );
   if ( !success ) {
     glGetProgramInfoLog( _program, sizeof( buf ), nullptr, buf );
-    log_error( "Failed to link program + " + _name + ": " + string( buf ) );
+    log_error( "Failed to link program + " + _name + "(" + std::to_string( glGetError() ) + ")" + ": " + string( buf ) );
     return false;
   }
 

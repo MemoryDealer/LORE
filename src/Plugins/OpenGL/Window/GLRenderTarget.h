@@ -39,12 +39,10 @@ namespace Lore { namespace OpenGL {
   public:
 
     GLRenderTarget() = default;
+    ~GLRenderTarget() override;
 
-    virtual ~GLRenderTarget() override;
-
-    virtual void bind() override;
-
-    void create( const uint32_t width, const uint32_t height );
+    void bind() override;
+    void init( const uint32_t width, const uint32_t height ) override;
 
   private:
 

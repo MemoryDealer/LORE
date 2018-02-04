@@ -25,14 +25,15 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Resource/IResource.h>
 #include <LORE2D/Shader/VertexBuffer.h>
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-  class LORE_EXPORT Font
+  class LORE_EXPORT Font : public IResource
   {
-
-    LORE_OBJECT_BODY()
 
   public:
 

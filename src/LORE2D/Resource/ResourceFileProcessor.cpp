@@ -136,18 +136,19 @@ void ResourceFileProcessor::load( const string& groupName, ResourceControllerPtr
     break;
 
   case SerializableResource::SpriteAnimation: {
-    auto animationSet = resourceController->createAnimationSet( getName(), groupName );
+    auto animationSet = resourceController->create<SpriteAnimationSet>( getName(), groupName );
     processAnimation( animationSet, _serializer.getValue( "animations" ), resourceController );
   } break;
 
   case SerializableResource::Font: {
     const auto file = _serializer.getValue( "file" ).toString();
     const auto size = _serializer.getValue( "size" ).toInt();
-    resourceController->loadFont( getName(), file, size, groupName );
+    auto font = resourceController->create<Font>( getName(), groupName );
+    font->loadFromFile( file, size );
   } break;
 
   case SerializableResource::Material: {
-    auto material = resourceController->createMaterial( getName(), groupName );
+    auto material = resourceController->create<Material>( getName(), groupName );
     processMaterial( material, _serializer.getValue( "settings" ), resourceController );
   } break;
 
@@ -161,7 +162,8 @@ void ResourceFileProcessor::load( const string& groupName, ResourceControllerPtr
 
   case SerializableResource::Texture: {
     auto textureName = Util::GetFileName( _file );
-    resourceController->loadTexture( textureName, _file, groupName );
+    auto texture = resourceController->create<Texture>( textureName, groupName );
+    texture->loadFromFile( _file );
   } break;
 
   }
@@ -201,10 +203,10 @@ void ResourceFileProcessor::processMaterial( MaterialPtr material, const Seriali
     string setting = Util::ToLower( value.first );
 
     if ( "sprite" == setting ) {
-      material->sprite = resourceController->getSprite( value.second.toString() );
+      material->sprite = resourceController->get<Sprite>( value.second.toString() );
     }
     else if ( "program" == setting ) {
-      material->program = resourceController->getGPUProgram( value.second.toString() );
+      material->program = resourceController->get<GPUProgram>( value.second.toString() );
     }
     else if ( "stockprogram" == setting ) {
       material->program = StockResource::GetGPUProgram( value.second.toString() );
@@ -230,7 +232,7 @@ void ResourceFileProcessor::processSpriteList( const string& groupName, Resource
     const string& name = spriteValue.first;
 
     // Create a sprite for this entry.
-    auto sprite = resourceController->createSprite( name, groupName );
+    auto sprite = resourceController->create<Sprite>( name, groupName );
 
     if ( SerializerValue::Type::Array == spriteValue.second.getType() ) {
       const auto& textureNames = spriteValue.second.toArray();
@@ -242,13 +244,13 @@ void ResourceFileProcessor::processSpriteList( const string& groupName, Resource
 
       // Retrieve all textures.
       for ( const auto& textureName : textureNames ) {
-        sprite->addTexture( resourceController->getTexture( textureName.toString(), groupName ) );
+        sprite->addTexture( resourceController->get<Texture>( textureName.toString(), groupName ) );
       }
     }
     else if ( SerializerValue::Type::String == spriteValue.second.getType() ) {
       // Just a single texture.
       const auto& textureName = spriteValue.second.toString();
-      sprite->addTexture( resourceController->getTexture( textureName, groupName ) );
+      sprite->addTexture( resourceController->get<Texture>( textureName, groupName ) );
     }
   }
 }

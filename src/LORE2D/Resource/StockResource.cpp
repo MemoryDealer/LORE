@@ -48,7 +48,6 @@ using namespace LocalNS;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 StockResourceController::StockResourceController()
-  : _controller( nullptr )
 {
 }
 
@@ -100,8 +99,9 @@ void StockResourceController::createStockResources()
   // Create stock textures/sprites.
 
   {
-    auto texture = _controller->createTexture( "White", 128, 128, StockColor::White );
-    auto sprite = _controller->createSprite( "White" );
+    auto texture = _controller->create<Texture>( "White" );
+    texture->create( 128, 128, StockColor::White );
+    auto sprite = _controller->create<Sprite>( "White" );
     sprite->addTexture( texture );
   }
 
@@ -110,42 +110,44 @@ void StockResourceController::createStockResources()
 
   // Lit materials.
   {
-    auto material = _controller->createMaterial( "StandardTextured" );
+    auto material = _controller->create<Material>( "StandardTextured" );
     material->lighting = true;
-    material->sprite = _controller->getSprite( "White" );
-    material->program = _controller->getGPUProgram( "StandardTextured" );
+    material->sprite = _controller->get<Sprite>( "White" );
+    material->program = _controller->get<GPUProgram>( "StandardTextured" );
   }
 
   {
-    auto material = _controller->createMaterial( "Standard" );
+    auto material = _controller->create<Material>( "Standard" );
     material->lighting = true;
-    material->program = _controller->getGPUProgram( "Standard" );
+    material->program = _controller->get<GPUProgram>( "Standard" );
   }
 
   // Unlit materials.
   {
-    auto material = _controller->createMaterial( "UnlitTextured" );
+    auto material = _controller->create<Material>( "UnlitTextured" );
     material->lighting = false;
-    material->sprite = _controller->getSprite( "White" );
-    material->program = _controller->getGPUProgram( "UnlitTextured" );
+    material->sprite = _controller->get<Sprite>( "White" );
+    material->program = _controller->get<GPUProgram>( "UnlitTextured" );
   }
 
   {
-    auto material = _controller->createMaterial( "UnlitStandard" );
+    auto material = _controller->create<Material>( "UnlitStandard" );
     material->lighting = false;
-    material->program = _controller->getGPUProgram( "UnlitStandard" );
+    material->program = _controller->get<GPUProgram>( "UnlitStandard" );
   }
 
   //
   // Create stock meshes (uses previously created vertex buffers).
 
   {
-    auto mesh = _controller->createMesh( "TexturedQuad", MeshType::TexturedQuad );
+    auto mesh = _controller->create<Mesh>( "TexturedQuad" );
+    mesh->setVertexBuffer( _controller->get<VertexBuffer>( "TexturedQuad" ) );
     _meshTable.insert( { MeshType::TexturedQuad, mesh } );
   }
 
   {
-    auto mesh = _controller->createMesh( "Quad", MeshType::Quad );
+    auto mesh = _controller->create<Mesh>( "Quad" );
+    mesh->setVertexBuffer( _controller->get<VertexBuffer>( "Quad" ) );
     _meshTable.insert( { MeshType::Quad, mesh } );
   }
 
@@ -161,14 +163,15 @@ void StockResourceController::createStockResources()
   }
 
   {
-    auto material = _controller->createMaterial( "Background" );
+    auto material = _controller->create<Material>( "Background" );
     material->lighting = false;
-    material->sprite = _controller->getSprite( "White" );
-    material->program = _controller->getGPUProgram( "Background" );
+    material->sprite = _controller->get<Sprite>( "White" );
+    material->program = _controller->get<GPUProgram>( "Background" );
   }
 
   {
-    auto vb = _controller->createVertexBuffer( "Background", MeshType::Background );
+    auto vb = _controller->create<VertexBuffer>( "Background" );
+    vb->init( MeshType::Background );
     vb->build();
   }
 
@@ -187,30 +190,19 @@ void StockResourceController::createStockResources()
   // Font stock resources.
 
   {
-    _controller->loadFont( "Default", "res/stock/fonts/core.ttf", 12 );
-    _controller->loadFont( "DebugUI", "res/stock/fonts/core.ttf", 7 );
+    auto defaultFont = _controller->create<Font>( "Default" );
+    defaultFont->loadFromFile( "res/stock/fonts/core.ttf", 12 );
+    auto debugUIFont = _controller->create<Font>( "DebugUI" );
+    debugUIFont->loadFromFile( "res/stock/fonts/core.ttf", 7 );
   }
 
   {
     // Generate shaders and vertex buffer for text rendering.
     createTextProgram( "StandardText" );
-    auto vb = _controller->createVertexBuffer( "StandardText", MeshType::Text );
+    auto vb = _controller->create<VertexBuffer>( "StandardText" );
+    vb->init( MeshType::Text );
     vb->build();
   }
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-GPUProgramPtr StockResourceController::getGPUProgram( const string& name )
-{
-  return _controller->getGPUProgram( name );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-MaterialPtr StockResourceController::getMaterial( const string& name )
-{
-  return _controller->getMaterial( name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -218,27 +210,6 @@ MaterialPtr StockResourceController::getMaterial( const string& name )
 MeshPtr StockResourceController::getMesh( const MeshType& type )
 {
   return _meshTable.at( type );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-TexturePtr StockResourceController::getTexture( const string& name )
-{
-  return _controller->getTexture( name );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-VertexBufferPtr StockResourceController::getVertexBuffer( const string& name )
-{
-  return _controller->getVertexBuffer( name );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-FontPtr StockResourceController::getFont( const string& name )
-{
-  return _controller->getFont( name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -254,14 +225,14 @@ MaterialPtr StockResourceController::cloneMaterial( const string& name, const st
 
 GPUProgramPtr StockResource::GetGPUProgram( const string& name )
 {
-  return ActiveContext->getStockResourceController()->getGPUProgram( name );
+  return ActiveContext->getStockResourceController()->get<GPUProgram>( name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 MaterialPtr StockResource::GetMaterial( const string& name )
 {
-  return ActiveContext->getStockResourceController()->getMaterial( name );
+  return ActiveContext->getStockResourceController()->get<Material>( name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -275,21 +246,21 @@ MeshPtr StockResource::GetMesh( const MeshType& type )
 
 TexturePtr StockResource::GetTexture( const string& name )
 {
-  return ActiveContext->getStockResourceController()->getTexture( name );
+  return ActiveContext->getStockResourceController()->get<Texture>( name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 VertexBufferPtr StockResource::GetVertexBuffer( const string& name )
 {
-  return ActiveContext->getStockResourceController()->getVertexBuffer( name );
+  return ActiveContext->getStockResourceController()->get<VertexBuffer>( name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 FontPtr StockResource::GetFont( const string& name )
 {
-  return ActiveContext->getStockResourceController()->getFont( name );
+  return ActiveContext->getStockResourceController()->get<Font>( name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

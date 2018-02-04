@@ -48,6 +48,7 @@ GLShader::~GLShader()
 
 void GLShader::init( const Shader::Type& type )
 {
+  _type = type;
   GLenum shaderType = 0;
   switch ( type ) {
   default:
@@ -83,7 +84,7 @@ bool GLShader::loadFromSource( const string& source )
   glShaderSource( _shader, 1, &psrc, nullptr );
   glCompileShader( _shader );
 
-  GLint success;
+  GLint success = 0;
   GLchar buf[512];
   glGetShaderiv( _shader, GL_COMPILE_STATUS, &success );
   if ( !success ) {

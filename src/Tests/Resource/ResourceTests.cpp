@@ -43,17 +43,17 @@ TEST_CASE( "Load and unload resources in code", "[resource]" )
     REQUIRE( Lore::Resource::CreateBox( names[i] ) );
     REQUIRE( Lore::Resource::CreateCamera( names[i] ) );
     REQUIRE( Lore::Resource::CreateEntity( names[i], Lore::MeshType::TexturedQuad ) );
-    REQUIRE( Lore::Resource::CreateFragmentShader( names[i] ) );
     REQUIRE( Lore::Resource::CreateGPUProgram( names[i] ) );
     REQUIRE( Lore::Resource::CreateMaterial( names[i] ) );
     REQUIRE( Lore::Resource::CreateMesh( names[i], Lore::MeshType::Quad ) );
     REQUIRE( Lore::Resource::CreateRenderTarget( names[i], 640, 480 ) );
+    REQUIRE( Lore::Resource::CreateShader( names[i] + "_FS", Lore::Shader::Type::Fragment ) );
+    REQUIRE( Lore::Resource::CreateShader( names[i] + "_VS", Lore::Shader::Type::Vertex ) );
     REQUIRE( Lore::Resource::CreateSprite( names[i] ) );
     REQUIRE( Lore::Resource::CreateTextbox( names[i] ) );
-    REQUIRE( Lore::Resource::CreateTexture( names[i], 32, 32 ) );
+    REQUIRE( Lore::Resource::CreateTexture( names[i], 32, 32, Lore::StockColor::White ) );
     REQUIRE( Lore::Resource::CreateUI( names[i] ) );
     REQUIRE( Lore::Resource::CreateVertexBuffer( names[i], Lore::MeshType::Quad ) );
-    REQUIRE( Lore::Resource::CreateVertexShader( names[i] ) );
   }
 
   for ( size_t i = 0; i < size; ++i ) {
