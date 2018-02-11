@@ -107,7 +107,7 @@ void Game::loadScene()
 
   // Setup animations for player sprite (this animation set was loaded from main.animation).
   auto spc = _playerNode->createSpriteController();
-  spc->useAnimationSet( Lore::Resource::GetAnimationSet( "player" ) );
+  spc->useAnimationSet( Lore::Resource::GetSpriteAnimationSet( "player" ) );
   spc->startAnimation( "idle" );
 
   // We can make the camera automatically track the player.
@@ -126,6 +126,7 @@ void Game::loadScene()
 
     blockNode->scale( 0.4f );
     blockNode->setPosition( -1.f + static_cast< Lore::real >( i * 0.2f ), 0.f );
+    _floatingBlocks.push_back( blockNode );
   }
 
   //
@@ -160,7 +161,7 @@ void Game::loadScene()
     torchNode->setPosition( 0.5f - static_cast<float>(i * 2), 0.24f );
     torchNode->scale( 0.5f );
     auto torchSPC = torchNode->createSpriteController();
-    torchSPC->useAnimationSet( Lore::Resource::GetAnimationSet( "torch" ) );
+    torchSPC->useAnimationSet( Lore::Resource::GetSpriteAnimationSet( "torch" ) );
     torchSPC->startAnimation( "flame" );
 
     //
@@ -248,6 +249,18 @@ void Game::processInput()
   if ( Lore::Input::GetKeyState( Lore::Keycode::R ) ) {
     Lore::Resource::UnloadGroup( "Core" );
   }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Game::update()
+{
+  static float blockOffset = 0.f;
+  float blockExtraOffset = 0.f;
+  for ( auto& block : _floatingBlocks ) {
+    block->setPosition( block->getPosition().x, std::sinf( blockOffset ) * 0.5f + blockExtraOffset );
+  }
+  blockOffset += 0.01f;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

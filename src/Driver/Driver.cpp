@@ -285,7 +285,7 @@ int main( int argc, char** argv )
 
   // Setup sprite.
   auto spc = sonicNode->createSpriteController();
-  spc->useAnimationSet( Lore::Resource::GetAnimationSet( "main" ) );
+  spc->useAnimationSet( Lore::Resource::GetSpriteAnimationSet( "main" ) );
   spc->startAnimation( "idle" );
 
   camera->trackNode( sonicNode );

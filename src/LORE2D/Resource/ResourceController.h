@@ -106,9 +106,11 @@ namespace Lore {
 
     const string& getName() const;
 
-    ResourceIndex& getResourceIndex();
-
   private:
+
+    friend class ResourceController;
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     template<typename T>
     void addResourceType()
@@ -132,8 +134,10 @@ namespace Lore {
   public:
 
     using ResourceGroupMap = std::unordered_map<std::string, std::shared_ptr<ResourceGroup>>; // TODO: Use unique_ptr (shared_ptr for now to avoid very difficult compilation error).
-    using PluginFunctor = std::function<IResourcePtr()>;
-    using PluginFunctorMap = std::unordered_map<std::type_index, PluginFunctor>;
+    using PluginCreationFunctor = std::function<IResourcePtr()>;
+    using PluginDestructionFunctor = std::function<void( IResourcePtr )>;
+    using PluginCreationFunctorMap = std::unordered_map<std::type_index, PluginCreationFunctor>;
+    using PluginDestructionFunctorMap = std::unordered_map<std::type_index, PluginDestructionFunctor>;
 
     static const string DefaultGroupName;
 
@@ -157,8 +161,9 @@ namespace Lore {
     void indexResourceFile( const string& file, const string& groupName = DefaultGroupName );
 
     //
-    // Factory functions for creation of resources (non-virtual).
+    // Resource management.
 
+    // Creates resources that are implemented directly in LORE2D library.
     template<typename ResourceType>
     typename std::enable_if<std::is_base_of<Alloc<ResourceType>, ResourceType>::value, ResourceType*>::type
       create( const string& name, const string& groupName = DefaultGroupName )
@@ -166,7 +171,7 @@ namespace Lore {
       static_assert( std::is_base_of<IResource, ResourceType>::value, "ResourceType must derived from IResource" );
       ResourceType* resource = nullptr;
 
-      // Allocate object directly in LORE2D lib.
+      // Allocate object directly in LORE2D library.
       resource = MemoryAccess::GetPrimaryPoolCluster()->create<ResourceType>();
       resource->setName( name );
       resource->setResourceGroupName( groupName );
@@ -174,7 +179,7 @@ namespace Lore {
       return resource;
     }
 
-    // For types created in the render plugin.
+    // Creates resources that are implemented by a render plugin, using functors the plugin provides.
     template<typename ResourceType>
     typename std::enable_if<!std::is_base_of<Alloc<ResourceType>, ResourceType>::value, ResourceType*>::type
       create( const string& name, const string& groupName = DefaultGroupName )
@@ -194,18 +199,21 @@ namespace Lore {
       return resource;
     }
 
+    // Returns true if specified resource exists.
     template<typename ResourceType>
     bool resourceExists( const string& name, const string& groupName = DefaultGroupName )
     {
       return ( _getGroup( groupName )->getResource( name ) != nullptr );
     }
 
+    // Returns pointer to specified resource. Throws ItemIdentityException if not found.
     template<typename ResourceType>
     ResourceType* get( const string& name, const string& groupName = DefaultGroupName )
     {
       return _getGroup( groupName )->getResource<ResourceType>( name );
     }
 
+    // Destroys resources that are implemented directly in LORE2D library.
     template<typename ResourceType>
     typename std::enable_if<std::is_base_of<Alloc<ResourceType>, ResourceType>::value, void>::type
       destroy( ResourceType* resource )
@@ -215,13 +223,30 @@ namespace Lore {
       MemoryAccess::GetPrimaryPoolCluster()->destroy<ResourceType>( resource );
     }
 
+    // Destroys resources that are implemented by a render plugin, using functors the plugin provides.
     template<typename ResourceType>
     typename std::enable_if<!std::is_base_of<Alloc<ResourceType>, ResourceType>::value, void>::type
       destroy( ResourceType* resource )
     {
       auto groupName = resource->getResourceGroupName();
       _getGroup( groupName )->removeResource<ResourceType>( resource->getName() );
-      // Get functor.
+      auto functor = getDestructionFunctor<ResourceType>();
+      if ( functor ) {
+        functor( resource );
+      }
+    }
+
+    // Destroys all resources of specified type in specified group.
+    template<typename ResourceType>
+    void destroyAllInGroup( const string& groupName )
+    {
+      const auto t = std::type_index( typeid( ResourceType ) );
+      auto group = _getGroup( groupName );
+      auto registry = group->_resources[t];
+      auto it = registry.getConstIterator();
+      while ( it.hasMore() ) {
+        destroy<ResourceType>( static_cast<ResourceType*>( it.getNext() ) );
+      }
     }
 
     //
@@ -234,18 +259,36 @@ namespace Lore {
     // Plugin functors.
 
     template<typename T>
-    void addCreationFunctor( PluginFunctor functor )
+    void addCreationFunctor( PluginCreationFunctor functor )
     {
       const auto t = std::type_index( typeid( T ) );
       _creationFunctors[t] = functor;
     }
 
     template<typename T>
-    PluginFunctor getCreationFunctor()
+    void addDestructionFunctor( PluginDestructionFunctor functor )
+    {
+      const auto t = std::type_index( typeid( T ) );
+      _destructionFunctors[t] = functor;
+    }
+
+    template<typename T>
+    PluginCreationFunctor getCreationFunctor()
     {
       const auto t = std::type_index( typeid( T ) );
       auto lookup = _creationFunctors.find( t );
       if ( _creationFunctors.end() != lookup ) {
+        return lookup->second;
+      }
+      return nullptr;
+    }
+
+    template<typename T>
+    PluginDestructionFunctor getDestructionFunctor()
+    {
+      const auto t = std::type_index( typeid( T ) );
+      auto lookup = _destructionFunctors.find( t );
+      if ( _destructionFunctors.end() != lookup ) {
         return lookup->second;
       }
       return nullptr;
@@ -260,8 +303,8 @@ namespace Lore {
     ResourceGroupMap _groups {};
     ResourceGroupPtr _defaultGroup { nullptr };
 
-    PluginFunctorMap _creationFunctors {};
-    PluginFunctorMap _destructionFunctors {};
+    PluginCreationFunctorMap _creationFunctors {};
+    PluginDestructionFunctorMap _destructionFunctors {};
 
   };
 
@@ -321,6 +364,8 @@ namespace Lore {
                                    const string& groupName = ResourceController::DefaultGroupName );
     static SpritePtr CreateSprite( const string& name,
                                    const string& groupName = ResourceController::DefaultGroupName );
+    static SpriteAnimationSetPtr CreateSpriteAnimationSet( const string& name,
+                                                           const string& groupName = ResourceController::DefaultGroupName );
     static TexturePtr CreateTexture( const string& name,
                                      const uint32_t width,
                                      const uint32_t height,
@@ -348,23 +393,55 @@ namespace Lore {
     //
     // Getters.
 
-    static GPUProgramPtr GetGPUProgram( const string& name,
-                                        const string& groupName = ResourceController::DefaultGroupName );
-    static SpritePtr GetSprite( const string& name,
+    static BoxPtr GetBox( const string& name,
+                          const string& groupName = ResourceController::DefaultGroupName );
+    static CameraPtr GetCamera( const string& name,
                                 const string& groupName = ResourceController::DefaultGroupName );
-    static SpriteAnimationSetPtr GetAnimationSet( const string& name,
-                                                  const string& groupName = ResourceController::DefaultGroupName );
-    static MaterialPtr GetMaterial( const string& name,
-                                    const string& groupName = ResourceController::DefaultGroupName );
-    static TexturePtr GetTexture( const string& name,
-                                  const string& groupName = ResourceController::DefaultGroupName );
+    static EntityPtr GetEntity( const string& name,
+                                const string& groupName = ResourceController::DefaultGroupName );
     static FontPtr GetFont( const string& name,
                             const string& groupName = ResourceController::DefaultGroupName );
+    static GPUProgramPtr GetGPUProgram( const string& name,
+                                        const string& groupName = ResourceController::DefaultGroupName );
+    static MaterialPtr GetMaterial( const string& name,
+                                    const string& groupName = ResourceController::DefaultGroupName );
+    static MeshPtr GetMesh( const string& name,
+                            const string& groupName = ResourceController::DefaultGroupName );
+    static RenderTargetPtr GetRenderTarget( const string& name,
+                                            const string& groupName = ResourceController::DefaultGroupName );
+    static ShaderPtr GetShader( const string& name,
+                                const string& groupName = ResourceController::DefaultGroupName );
+    static SpritePtr GetSprite( const string& name,
+                                const string& groupName = ResourceController::DefaultGroupName );
+    static SpriteAnimationSetPtr GetSpriteAnimationSet( const string& name,
+                                                        const string& groupName = ResourceController::DefaultGroupName );
+    static TexturePtr GetTexture( const string& name,
+                                  const string& groupName = ResourceController::DefaultGroupName );
+    static TextboxPtr GetTextbox( const string& name,
+                                  const string& groupName = ResourceController::DefaultGroupName );
+    static UIPtr GetUI( const string& name,
+                        const string& groupName = ResourceController::DefaultGroupName );
+    static VertexBufferPtr GetVertexBuffer( const string& name,
+                                            const string& groupName = ResourceController::DefaultGroupName );
 
     //
     // Destruction methods.
 
+    static void DestroyBox( BoxPtr box );
+    static void DestroyCamera( CameraPtr camera );
+    static void DestroyEntity( EntityPtr entity );
+    static void DestroyFont( FontPtr font );
+    static void DestroyGPUProgram( GPUProgramPtr program );
+    static void DestroyMaterial( MaterialPtr material );
+    static void DestroyMesh( MeshPtr mesh );
+    static void DestroyRenderTarget( RenderTargetPtr rt );
+    static void DestroyShader( ShaderPtr shader );
+    static void DestroySprite( SpritePtr sprite );
+    static void DestroySpriteAnimationSet( SpriteAnimationSetPtr sas );
     static void DestroyTexture( TexturePtr texture );
+    static void DestroyTextbox( TextboxPtr textbox );
+    static void DestroyUI( UIPtr ui );
+    static void DestroyVertexBuffer( VertexBufferPtr vb );
 
   private:
 

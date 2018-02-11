@@ -77,6 +77,7 @@ int main( int argc, char** argv )
       }
 
       game.processInput();
+      game.update();
     }
 
     // We are done updating, render a frame.

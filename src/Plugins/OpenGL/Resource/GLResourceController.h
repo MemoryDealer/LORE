@@ -57,13 +57,12 @@ namespace Lore { namespace OpenGL {
     //
     // Destruction functions.
 
-    void destroyTexture();
-    void destroyFont();
-    void destroyVertexShader();
-    void destroyFragmentShader();
-    void destroyGPUProgram();
-    void destroyVertexBuffer();
-    void destroyRenderTarget();
+    void destroyFont( IResourcePtr resource );
+    void destroyGPUProgram( IResourcePtr resource );
+    void destroyRenderTarget( IResourcePtr resource );
+    void destroyShader( IResourcePtr resource );
+    void destroyTexture( IResourcePtr resource );
+    void destroyVertexBuffer( IResourcePtr resource );
 
   };
 

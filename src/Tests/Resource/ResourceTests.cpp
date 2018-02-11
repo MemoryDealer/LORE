@@ -50,6 +50,7 @@ TEST_CASE( "Load and unload resources in code", "[resource]" )
     REQUIRE( Lore::Resource::CreateShader( names[i] + "_FS", Lore::Shader::Type::Fragment ) );
     REQUIRE( Lore::Resource::CreateShader( names[i] + "_VS", Lore::Shader::Type::Vertex ) );
     REQUIRE( Lore::Resource::CreateSprite( names[i] ) );
+    REQUIRE( Lore::Resource::CreateSpriteAnimationSet( names[i] ) );
     REQUIRE( Lore::Resource::CreateTextbox( names[i] ) );
     REQUIRE( Lore::Resource::CreateTexture( names[i], 32, 32, Lore::StockColor::White ) );
     REQUIRE( Lore::Resource::CreateUI( names[i] ) );
@@ -57,7 +58,42 @@ TEST_CASE( "Load and unload resources in code", "[resource]" )
   }
 
   for ( size_t i = 0; i < size; ++i ) {
+    REQUIRE( Lore::Resource::GetBox( names[i] ) );
+    REQUIRE( Lore::Resource::GetCamera( names[i] ) );
+    REQUIRE( Lore::Resource::GetEntity( names[i] ) );
+    REQUIRE( Lore::Resource::GetGPUProgram( names[i] ) );
     REQUIRE( Lore::Resource::GetMaterial( names[i] ) );
+    REQUIRE( Lore::Resource::GetMesh( names[i] ) );
+    REQUIRE( Lore::Resource::GetRenderTarget( names[i] ) );
+    REQUIRE( Lore::Resource::GetShader( names[i] + "_FS" ) );
+    REQUIRE( Lore::Resource::GetShader( names[i] + "_VS" ) );
+    REQUIRE( Lore::Resource::GetSprite( names[i] ) );
+    REQUIRE( Lore::Resource::GetSpriteAnimationSet( names[i] ) );
+    REQUIRE( Lore::Resource::GetTexture( names[i] ) );
+    REQUIRE( Lore::Resource::GetTextbox( names[i] ) );
+    REQUIRE( Lore::Resource::GetUI( names[i] ) );
+    REQUIRE( Lore::Resource::GetVertexBuffer( names[i] ) );
+  }
+
+  Lore::Resource::UnloadGroup( "Core" );
+
+  for ( size_t i = 0; i < size; ++i ) {
+    CHECK_THROWS( Lore::Resource::GetBox( names[i] ) );
+    CHECK_THROWS( Lore::Resource::GetCamera( names[i] ) );
+    CHECK_THROWS( Lore::Resource::GetEntity( names[i] ) );
+    CHECK_THROWS( Lore::Resource::GetFont( names[i] ) );
+    CHECK_THROWS( Lore::Resource::GetGPUProgram( names[i] ) );
+    CHECK_THROWS( Lore::Resource::GetMaterial( names[i] ) );
+    CHECK_THROWS( Lore::Resource::GetMesh( names[i] ) );
+    CHECK_THROWS( Lore::Resource::GetRenderTarget( names[i] ) );
+    CHECK_THROWS( Lore::Resource::GetShader( names[i] + "_FS" ) );
+    CHECK_THROWS( Lore::Resource::GetShader( names[i] + "_VS" ) );
+    CHECK_THROWS( Lore::Resource::GetSprite( names[i] ) );
+    CHECK_THROWS( Lore::Resource::GetSpriteAnimationSet( names[i] ) );
+    CHECK_THROWS( Lore::Resource::GetTexture( names[i] ) );
+    CHECK_THROWS( Lore::Resource::GetTextbox( names[i] ) );
+    CHECK_THROWS( Lore::Resource::GetUI( names[i] ) );
+    CHECK_THROWS( Lore::Resource::GetVertexBuffer( names[i] ) );
   }
 
   TEST_DESTROY_CONTEXT();

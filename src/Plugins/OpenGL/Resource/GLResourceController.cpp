@@ -45,13 +45,19 @@ using namespace Lore::OpenGL;
 
 GLResourceController::GLResourceController()
 {
-  // Add creation functors.
+  // Add creation/destruction functors.
   addCreationFunctor<Font>( std::bind( &GLResourceController::createFont, this ) );
   addCreationFunctor<GPUProgram>( std::bind( &GLResourceController::createGPUProgram, this ) );
   addCreationFunctor<RenderTarget>( std::bind( &GLResourceController::createRenderTarget, this ) );
   addCreationFunctor<Shader>( std::bind( &GLResourceController::createShader, this ) );
   addCreationFunctor<Texture>( std::bind( &GLResourceController::createTexture, this ) );
   addCreationFunctor<VertexBuffer>( std::bind( &GLResourceController::createVertexBuffer, this ) );
+  addDestructionFunctor<Font>( std::bind( &GLResourceController::destroyFont, this, std::placeholders::_1 ) );
+  addDestructionFunctor<GPUProgram>( std::bind( &GLResourceController::destroyGPUProgram, this, std::placeholders::_1 ) );
+  addDestructionFunctor<RenderTarget>( std::bind( &GLResourceController::destroyRenderTarget, this, std::placeholders::_1 ) );
+  addDestructionFunctor<Shader>( std::bind( &GLResourceController::destroyShader, this, std::placeholders::_1 ) );
+  addDestructionFunctor<Texture>( std::bind( &GLResourceController::destroyTexture, this, std::placeholders::_1 ) );
+  addDestructionFunctor<VertexBuffer>( std::bind( &GLResourceController::destroyVertexBuffer, this, std::placeholders::_1 ) );
 
   // Create default vertex buffers.
   auto texturedQuadVB = create<VertexBuffer>( "TexturedQuad" );
@@ -104,6 +110,48 @@ Lore::IResourcePtr GLResourceController::createTexture()
 Lore::IResourcePtr GLResourceController::createVertexBuffer()
 {
   return MemoryAccess::GetPrimaryPoolCluster()->create<VertexBuffer, GLVertexBuffer>();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLResourceController::destroyFont( Lore::IResourcePtr resource )
+{
+  MemoryAccess::GetPrimaryPoolCluster()->destroy<Font, GLFont>( static_cast< FontPtr >( resource ) );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLResourceController::destroyGPUProgram( Lore::IResourcePtr resource )
+{
+  MemoryAccess::GetPrimaryPoolCluster()->destroy<GPUProgram, GLGPUProgram>( static_cast< GPUProgramPtr >( resource ) );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLResourceController::destroyRenderTarget( Lore::IResourcePtr resource )
+{
+  MemoryAccess::GetPrimaryPoolCluster()->destroy<RenderTarget, GLRenderTarget>( static_cast< RenderTargetPtr >( resource ) );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLResourceController::destroyShader( Lore::IResourcePtr resource )
+{
+  MemoryAccess::GetPrimaryPoolCluster()->destroy<Shader, GLShader>( static_cast< ShaderPtr >( resource ) );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLResourceController::destroyTexture( Lore::IResourcePtr resource )
+{
+  MemoryAccess::GetPrimaryPoolCluster()->destroy<Texture, GLTexture>( static_cast< TexturePtr >( resource ) );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLResourceController::destroyVertexBuffer( Lore::IResourcePtr resource )
+{
+  MemoryAccess::GetPrimaryPoolCluster()->destroy<VertexBuffer, GLVertexBuffer>( static_cast< VertexBufferPtr >( resource ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
