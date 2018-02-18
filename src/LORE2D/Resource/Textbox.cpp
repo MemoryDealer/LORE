@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,41 +24,26 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Memory/Alloc.h>
+#include "Textbox.h"
+
+#include <LORE2D/Resource/ResourceController.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+using namespace Lore;
 
-  ///
-  /// \class Resource
-  /// \brief All resources that live in the ResourceController must derive from
-  /// this class.
-  class LORE_EXPORT IResource
-  {
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    LORE_OBJECT_BODY()
+TextboxPtr Textbox::clone( const string& name )
+{
+  auto textbox = Resource::CreateTextbox( name, getResourceGroupName() );
 
-  public:
+  textbox->_font = _font;
+  textbox->_text = _text;
+  textbox->_textColor = _textColor;
+  textbox->_renderQueue = _renderQueue;
 
-    IResource() = default;
-    virtual ~IResource() = default;
-
-    //
-    // Deleted operators/functions.
-
-    IResource& operator = ( const IResource& rhs ) = delete;
-
-  };
-
-  // Downcasts an IResource type to the desired resource type.
-  template<typename ResourceType>
-  typename std::enable_if<std::is_base_of<IResource, ResourceType>::value, ResourceType*>::type
-    ResourceCast( IResourcePtr resource )
-  {
-    return static_cast< ResourceType* >( resource );
-  }
-
+  return textbox;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

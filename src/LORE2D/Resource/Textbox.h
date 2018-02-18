@@ -25,80 +25,74 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Math/Math.h>
-#include <LORE2D/Memory/Alloc.h>
 #include <LORE2D/Resource/IResource.h>
+#include <LORE2D/Renderer/Renderer.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-  class LORE_EXPORT Camera final : public Alloc<Camera>
+  class LORE_EXPORT Textbox final : public Alloc<Textbox>, public IResource
   {
 
   public:
 
-    Camera();
-    ~Camera() override;
+    Textbox() = default;
+    ~Textbox() override = default;
+
+    TextboxPtr clone( const string& name );
+
+    // TODO: Add "typed" text effect where each letter appears over time at certain rate.
+    //   This can be an external class such as TextboxTypist. 
+    // Add solid/blended box behind text and border.
 
     //
-    // Modifiers.
+    // Setters.
 
-    void setPosition( const Vec2& pos );
+    void setText( const string& text )
+    {
+      _text = text;
+    }
 
-    void setPosition( const real x, const real y );
+    void setFont( FontPtr font )
+    {
+      _font = font;
+    }
 
-    void translate( const Vec2& offset );
-
-    void translate( const real xOffset, const real yOffset );
-
-    void zoom( const real amount );
-
-    void setZoom( const real amount );
-
-    // TODO: Set projection mode (Ortho/Persp).
+    void setTextColor( const Color& color )
+    {
+      _textColor = color;
+    }
 
     //
     // Getters.
 
-    string getName() const;
-
-    Vec2 getPosition() const;
-
-    Matrix4 getViewMatrix();
-
-    // Tracking.
-
-    enum class TrackingStyle
+    string getText() const
     {
-      Simple
-    };
+      return _text;
+    }
 
-    void trackNode( NodePtr node, const TrackingStyle& mode = TrackingStyle::Simple );
+    FontPtr getFont() const
+    {
+      return _font;
+    }
 
-    void updateTracking(const real aspectRatio);
+    Color getTextColor() const
+    {
+      return _textColor;
+    }
+
+    uint32_t getRenderQueue() const
+    {
+      return _renderQueue;
+    }
 
   private:
 
-    friend class Context;
-
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-    void _dirty();
-    void _updateViewMatrix();
-
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-    string _name {};
-
-    Vec2 _position {};
-    Matrix4 _view {};
-    real _zoom { 1.f };
-
-    bool _viewMatrixDirty { true };
-
-    NodePtr _trackingNode { nullptr };
-    TrackingStyle _trackingStyle { TrackingStyle::Simple };
+    FontPtr _font { nullptr };
+    string _text {};
+    Color _textColor { StockColor::White };
+    uint32_t _renderQueue { RenderQueue::General };
 
   };
 

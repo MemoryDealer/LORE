@@ -101,7 +101,7 @@ int main( int argc, char** argv )
   Lore::CLI::SetActiveScene( scene );
 
   Lore::Rect vp( 0.f, 0.f, 1.f, 1.f );
-  Lore::CameraPtr camera = Lore::Resource::CreateCamera( "cam1" );
+  Lore::CameraPtr camera = context->createCamera( "cam1" );
   __camera = camera;
   Lore::RenderView rv( "main", scene, vp );
   rv.camera = camera;

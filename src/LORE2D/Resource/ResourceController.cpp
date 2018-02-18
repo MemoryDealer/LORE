@@ -27,12 +27,12 @@
 #include "ResourceController.h"
 
 #include <LORE2D/Core/Context.h>
+#include <LORE2D/Resource/Box.h>
 #include <LORE2D/Resource/Entity.h>
-#include <LORE2D/Resource/ResourceFileProcessor.h>
+#include <LORE2D/Resource/IO/ResourceFileProcessor.h>
+#include <LORE2D/Resource/Sprite.h>
 #include <LORE2D/Resource/StockResource.h>
-#include <LORE2D/Resource/Renderable/Box.h>
-#include <LORE2D/Resource/Renderable/Sprite.h>
-#include <LORE2D/Resource/Renderable/Textbox.h>
+#include <LORE2D/Resource/Textbox.h>
 #include <LORE2D/Scene/SpriteController.h> // TODO: This should be in resources?
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -55,7 +55,6 @@ ResourceGroup::ResourceGroup( const string& name )
 {
   // Initialize resource registries for all resource types.
   _addResourceType<Box>();
-  _addResourceType<Camera>();
   _addResourceType<Entity>();
   _addResourceType<Font>();
   _addResourceType<Material>();
@@ -175,7 +174,6 @@ void ResourceController::unloadGroup( const string& groupName )
   }
 
   destroyAllInGroup<Box>( groupName );
-  destroyAllInGroup<Camera>( groupName );
   destroyAllInGroup<Entity>( groupName );
   destroyAllInGroup<Font>( groupName );
   destroyAllInGroup<GPUProgram>( groupName );
@@ -330,13 +328,6 @@ BoxPtr Resource::CreateBox( const string& name, const string& groupName )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-CameraPtr Resource::CreateCamera( const string& name, const string& groupName )
-{
-  return ActiveContext->getResourceController()->create<Camera>( name, groupName );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 EntityPtr Resource::CreateEntity( const string& name, const MeshType& meshType, const string& groupName )
 {
   auto entity = ActiveContext->getResourceController()->create<Entity>( name, groupName );
@@ -353,14 +344,14 @@ EntityPtr Resource::CreateEntity( const string& name, const MeshType& meshType, 
   case MeshType::Quad:
   {
     auto material = StockResource::GetMaterial( "Standard" );
-    entity->setMaterial( ResourceCast<Material>( material->clone( "Standard_" + name ) ) );
+    entity->setMaterial( material->clone( "Standard_" + name ) );
   }
     break;
 
   case MeshType::TexturedQuad:
   {
     auto material = StockResource::GetMaterial( "StandardTextured" );
-    entity->setMaterial( ResourceCast<Material>( material->clone( "StandardTextured_" + name ) ) );
+    entity->setMaterial( material->clone( "StandardTextured_" + name ) );
   }
     break;
 
@@ -492,13 +483,6 @@ BoxPtr Resource::GetBox( const string& name, const string& groupName )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-CameraPtr Resource::GetCamera( const string& name, const string& groupName )
-{
-  return ActiveContext->getResourceController()->get<Camera>( name, groupName );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 EntityPtr Resource::GetEntity( const string& name, const string& groupName )
 {
   return ActiveContext->getResourceController()->get<Entity>( name, groupName );
@@ -597,13 +581,6 @@ void Resource::DestroyBox( BoxPtr box )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Resource::DestroyCamera( CameraPtr camera )
-{
-  ActiveContext->getResourceController()->destroy<Camera>( camera );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 void Resource::DestroyEntity( EntityPtr entity )
 {
   ActiveContext->getResourceController()->destroy<Entity>( entity );
@@ -690,6 +667,13 @@ void Resource::DestroyUI( UIPtr ui )
 void Resource::DestroyVertexBuffer( VertexBufferPtr vb )
 {
   ActiveContext->getResourceController()->destroy<VertexBuffer>( vb );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+ResourceControllerPtr Resource::GetResourceController()
+{
+  return ActiveContext->getResourceController();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

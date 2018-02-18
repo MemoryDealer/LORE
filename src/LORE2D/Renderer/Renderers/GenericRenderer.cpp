@@ -29,14 +29,14 @@
 #include <LORE2D/Core/DebugUI/DebugUI.h>
 #include <LORE2D/Config/Config.h>
 #include <LORE2D/Math/Math.h>
+#include <LORE2D/Resource/Box.h>
 #include <LORE2D/Resource/Entity.h>
 #include <LORE2D/Renderer/IRenderAPI.h>
 #include <LORE2D/Resource/Font.h>
 #include <LORE2D/Resource/Mesh.h>
-#include <LORE2D/Resource/Renderable/Box.h>
-#include <LORE2D/Resource/Renderable/Sprite.h>
-#include <LORE2D/Resource/Renderable/Textbox.h>
+#include <LORE2D/Resource/Sprite.h>
 #include <LORE2D/Resource/StockResource.h>
+#include <LORE2D/Resource/Textbox.h>
 #include <LORE2D/Resource/Texture.h>
 #include <LORE2D/Scene/AABB.h>
 #include <LORE2D/Scene/Camera.h>

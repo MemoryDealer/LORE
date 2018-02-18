@@ -26,7 +26,7 @@
 
 #include "AABB.h"
 
-#include <LORE2D/Resource/Renderable/Box.h>
+#include <LORE2D/Resource/Box.h>
 #include <LORE2D/Resource/ResourceController.h>
 #include <LORE2D/Scene/Node.h>
 

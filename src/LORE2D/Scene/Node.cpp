@@ -26,10 +26,10 @@
 
 #include "Node.h"
 
+#include <LORE2D/Resource/Box.h>
 #include <LORE2D/Resource/Entity.h>
 #include <LORE2D/Resource/ResourceController.h>
-#include <LORE2D/Resource/Renderable/Box.h>
-#include <LORE2D/Resource/Renderable/Textbox.h>
+#include <LORE2D/Resource/Textbox.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -50,6 +50,44 @@ Node::~Node()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+NodePtr Node::clone( const string& name, const bool cloneChildNodes )
+{
+  if ( !_parent ) {
+    throw Lore::Exception( "Cannot clone the root node" );
+  }
+
+  auto node = MemoryAccess::GetPrimaryPoolCluster()->create<Node>();
+  node->setName( name );
+  node->setResourceGroupName( getResourceGroupName() );
+  node->_aabb = std::make_unique<AABB>( node );
+  // TODO: Clone sprite controller...
+  node->_transform = _transform;
+  node->_depth = _depth;
+  node->_entities = _entities.clone();
+  node->_boxes = _boxes.clone();
+  node->_textboxes = _textboxes.clone();
+  node->_scene = _scene;
+  node->_parent = _parent;
+  if ( cloneChildNodes ) {
+    // Clone all child nodes.
+    auto it = _childNodes.getConstIterator();
+    while ( it.hasMore() ) {
+      auto childNode = it.getNext();
+      const string childCloneName = name + "_" + childNode->getName();
+      auto clonedChild = childNode->clone( childCloneName, true );
+      node->_childNodes.insert( childCloneName, clonedChild );
+    }
+  }
+  node->_lights = _lights.clone();
+
+  _parent->_childNodes.insert( name, node );
+  _scene->_nodes.insert( name, node );
+  
+  return node;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 NodePtr Node::createChildNode( const string& name )
 {
   auto node = MemoryAccess::GetPrimaryPoolCluster()->create<Node>();
@@ -57,7 +95,7 @@ NodePtr Node::createChildNode( const string& name )
   node->setResourceGroupName( ResourceController::DefaultGroupName );
   node->_scene = _scene;
   node->_parent = this;
-  node->_aabb = std::make_unique<AABB>(  node  );
+  node->_aabb = std::make_unique<AABB>( node );
 
   _scene->_nodes.insert( name, node );
   _childNodes.insert( name, node );

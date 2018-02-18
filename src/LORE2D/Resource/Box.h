@@ -40,6 +40,8 @@ namespace Lore {
     Box() = default;
     ~Box() override = default;
 
+    BoxPtr clone( const string& name );
+
     //
     // Getters.
 

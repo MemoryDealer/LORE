@@ -29,11 +29,11 @@
 #include <LORE2D/Core/Context.h>
 #include <LORE2D/Core/CLI/CLI.h>
 #include <LORE2D/Core/DebugUI/DebugUI.h>
+#include <LORE2D/Resource/Box.h>
 #include <LORE2D/Resource/Entity.h>
-#include <LORE2D/Resource/Renderable/Box.h>
-#include <LORE2D/Resource/Renderable/Textbox.h>
 #include <LORE2D/Resource/ResourceController.h>
 #include <LORE2D/Resource/StockResource.h>
+#include <LORE2D/Resource/Textbox.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 

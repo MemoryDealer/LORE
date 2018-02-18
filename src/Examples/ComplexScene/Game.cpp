@@ -70,7 +70,7 @@ void Game::loadScene()
   _scene->setAmbientLightColor( Lore::Color( 0.75f, 0.75f, 0.75f, 1.f ) );
 
   // Create a camera to view the scene.
-  _camera = Lore::Resource::CreateCamera( "core" ); // TODO: Should this come from context?
+  _camera = _context->createCamera( "core" ); // TODO: Should this come from context?
 
   // TODO: This is a hack that should be taken care of internally.
   Lore::CLI::SetActiveScene( _scene );
@@ -248,6 +248,16 @@ void Game::processInput()
 
   if ( Lore::Input::GetKeyState( Lore::Keycode::R ) ) {
     Lore::Resource::UnloadGroup( "Core" );
+  }
+
+  // Temporary cloning test.
+  if ( Lore::Input::GetKeyState( Lore::Keycode::C ) ) {
+    static Lore::Vec2 offset { 0.f, 0.2f };
+    static int ctr = 0;
+    auto node = _scene->getNode( "block0" );
+    auto clone = node->clone( node->getName() + std::to_string( ctr++ ) );
+    clone->setPosition( offset );
+    offset.y += 0.2f;
   }
 }
 

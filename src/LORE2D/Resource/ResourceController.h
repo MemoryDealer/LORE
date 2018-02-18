@@ -30,10 +30,10 @@
 #include <LORE2D/Resource/Font.h>
 #include <LORE2D/Resource/Material.h>
 #include <LORE2D/Resource/Mesh.h>
-#include <LORE2D/Resource/Registry.h>
+#include <LORE2D/Resource/IO/ResourceIndexer.h>
+#include <LORE2D/Resource/IO/SerializableResource.h>
 #include <LORE2D/Resource/IResource.h>
-#include <LORE2D/Resource/ResourceIndexer.h>
-#include <LORE2D/Resource/SerializableResource.h>
+#include <LORE2D/Resource/Registry.h>
 #include <LORE2D/Resource/Texture.h>
 #include <LORE2D/Scene/Camera.h>
 #include <LORE2D/Shader/GPUProgram.h>
@@ -348,8 +348,6 @@ namespace Lore {
 
     static BoxPtr CreateBox( const string& name,
                              const string& groupname = ResourceController::DefaultGroupName );
-    static CameraPtr CreateCamera( const string& name,
-                                   const string& groupName = ResourceController::DefaultGroupName );
     static EntityPtr CreateEntity( const string& name,
                                    const MeshType& meshType,
                                    const string& groupName = ResourceController::DefaultGroupName );
@@ -389,8 +387,6 @@ namespace Lore {
 
     static BoxPtr GetBox( const string& name,
                           const string& groupName = ResourceController::DefaultGroupName );
-    static CameraPtr GetCamera( const string& name,
-                                const string& groupName = ResourceController::DefaultGroupName );
     static EntityPtr GetEntity( const string& name,
                                 const string& groupName = ResourceController::DefaultGroupName );
     static FontPtr GetFont( const string& name,
@@ -422,7 +418,6 @@ namespace Lore {
     // Destruction methods.
 
     static void DestroyBox( BoxPtr box );
-    static void DestroyCamera( CameraPtr camera );
     static void DestroyEntity( EntityPtr entity );
     static void DestroyFont( FontPtr font );
     static void DestroyGPUProgram( GPUProgramPtr program );
@@ -436,6 +431,14 @@ namespace Lore {
     static void DestroyTextbox( TextboxPtr textbox );
     static void DestroyUI( UIPtr ui );
     static void DestroyVertexBuffer( VertexBufferPtr vb );
+
+    //
+    // Accessors.
+
+    ///
+    /// \brief Returns resource controller of active context. It is recommended to 
+    /// use the static functions provided in the Resource class instead.
+    static ResourceControllerPtr GetResourceController();
 
   private:
 

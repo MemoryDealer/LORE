@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,75 +24,25 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Resource/IResource.h>
-#include <LORE2D/Renderer/Renderer.h>
+#include "Box.h"
+
+#include <LORE2D/Resource/ResourceController.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+using namespace Lore;
 
-  class LORE_EXPORT Textbox final : public Alloc<Textbox>, public IResource
-  {
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-  public:
+BoxPtr Box::clone( const string& name )
+{
+  auto box = Resource::CreateBox( name, getResourceGroupName() );
+  box->_fill = _fill;
+  box->_borderColor = _borderColor;
+  box->_size = _size;
+  box->_borderWidth = _borderWidth;
 
-    Textbox() = default;
-    ~Textbox() override = default;
-
-    // TODO: Add "typed" text effect where each letter appears over time at certain rate.
-    //   This can be an external class such as TextboxTypist. 
-    // Add solid/blended box behind text and border.
-
-    //
-    // Setters.
-
-    void setText( const string& text )
-    {
-      _text = text;
-    }
-
-    void setFont( FontPtr font )
-    {
-      _font = font;
-    }
-
-    void setTextColor( const Color& color )
-    {
-      _textColor = color;
-    }
-
-    //
-    // Getters.
-
-    string getText() const
-    {
-      return _text;
-    }
-
-    FontPtr getFont() const
-    {
-      return _font;
-    }
-
-    Color getTextColor() const
-    {
-      return _textColor;
-    }
-
-    uint32_t getRenderQueue() const
-    {
-      return _renderQueue;
-    }
-
-  private:
-
-    FontPtr _font { nullptr };
-    string _text {};
-    Color _textColor { StockColor::White };
-    uint32_t _renderQueue { RenderQueue::General };
-
-  };
-
+  return box;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

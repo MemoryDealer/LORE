@@ -117,6 +117,15 @@ namespace Lore {
       return ConstIterator( std::begin( _container ), std::end( _container ) );
     }
 
+    Registry clone()
+    {
+      Registry clone;
+      for ( auto pair : _container ) {
+        clone.insert( pair.first, pair.second );
+      }
+      return clone;
+    }
+
     //
     // Deleted functions/operators.
 

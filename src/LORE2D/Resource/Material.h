@@ -66,10 +66,7 @@ namespace Lore {
 
     virtual ~Material() override;
 
-    //
-    // Overrides.
-
-    IResourcePtr clone( const string& newName ) override;
+    MaterialPtr clone( const string& newName );
 
     //
     // Setters.

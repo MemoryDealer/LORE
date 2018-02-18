@@ -28,6 +28,7 @@
 
 #include <LORE2D/Renderer/Renderer.h>
 #include <LORE2D/Resource/Material.h>
+#include <LORE2D/Resource/ResourceController.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -46,8 +47,20 @@ Entity::Entity()
 
 Entity::~Entity()
 {
-  _material = nullptr;
-  _mesh = nullptr;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+EntityPtr Entity::clone( const string& name )
+{
+  auto rc = Resource::GetResourceController();
+  auto entity = rc->create<Entity>( name, getResourceGroupName() );
+
+  entity->_material = _material;
+  entity->_mesh = _mesh;
+  entity->_renderQueue = _renderQueue;
+
+  return entity;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

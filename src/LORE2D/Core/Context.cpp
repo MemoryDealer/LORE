@@ -34,11 +34,11 @@
 #include <LORE2D/Core/DebugUI/DebugUI.h>
 #include <LORE2D/Input/Input.h>
 #include <LORE2D/Renderer/SceneGraphVisitor.h>
+#include <LORE2D/Resource/Box.h>
 #include <LORE2D/Resource/Entity.h>
 #include <LORE2D/Resource/StockResource.h>
-#include <LORE2D/Resource/Renderable/Box.h>
-#include <LORE2D/Resource/Renderable/Sprite.h>
-#include <LORE2D/Resource/Renderable/Textbox.h>
+#include <LORE2D/Resource/Sprite.h>
+#include <LORE2D/Resource/Textbox.h>
 #include <LORE2D/Scene/SpriteController.h>
 #include <LORE2D/UI/UI.h>
 
@@ -158,6 +158,27 @@ void Context::destroyScene( const string& name )
 void Context::destroyScene( ScenePtr scene )
 {
   destroyScene( scene->getName() );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+CameraPtr Context::createCamera( const string& name )
+{
+  auto camera = _poolCluster.create<Camera>();
+  camera->_name = name;
+  _cameraRegistry.insert( name, camera );
+
+  return camera;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Context::destroyCamera( CameraPtr camera )
+{
+  auto name = camera->getName();
+  _cameraRegistry.remove( name );
+
+  _poolCluster.destroy<Camera>( camera );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

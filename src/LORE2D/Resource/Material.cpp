@@ -49,7 +49,7 @@ Material::~Material()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-IResourcePtr Material::clone( const string& newName )
+MaterialPtr Material::clone( const string& newName )
 {
   MaterialPtr material = Resource::CreateMaterial( newName, getResourceGroupName() );
   material->lighting = lighting;

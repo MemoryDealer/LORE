@@ -38,8 +38,7 @@ namespace Lore {
   public:
 
     Font() = default;
-
-    virtual ~Font() = default;
+    ~Font() override = default;
 
     virtual void loadFromFile( const string& file, const uint32_t size ) = 0;
 

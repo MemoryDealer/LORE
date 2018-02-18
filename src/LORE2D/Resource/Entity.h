@@ -37,8 +37,9 @@ namespace Lore {
   public:
 
     Entity();
-
     ~Entity() override;
+
+    EntityPtr clone( const string& name );
 
     //
     // Getters.

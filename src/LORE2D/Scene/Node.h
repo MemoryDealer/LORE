@@ -98,6 +98,8 @@ namespace Lore {
 
     ~Node();
 
+    NodePtr clone( const string& name, const bool cloneChildNodes = false );
+
     NodePtr createChildNode( const string& name );
 
     void attachChildNode( NodePtr child );

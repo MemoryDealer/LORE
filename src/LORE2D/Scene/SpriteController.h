@@ -120,7 +120,7 @@ namespace Lore {
   public:
 
     SpriteAnimationSet() = default;
-    ~SpriteAnimationSet() = default;
+    ~SpriteAnimationSet() override = default;
 
     void addAnimation( const string& name, const SpriteController::Animation& animation );
 

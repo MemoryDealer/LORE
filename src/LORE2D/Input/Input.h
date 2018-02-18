@@ -40,6 +40,8 @@ namespace Lore {
 
   public:
 
+    virtual ~KeyListener() = default;
+
     virtual void onKeyDown( const Keycode code ) { }
     virtual void onKeyUp( const Keycode code ) { }
 

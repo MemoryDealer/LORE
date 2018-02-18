@@ -27,7 +27,7 @@
 #include "ResourceFileProcessor.h"
 
 #include <LORE2D/Core/Util.h>
-#include <LORE2D/Resource/Renderable/Sprite.h>
+#include <LORE2D/Resource/Sprite.h>
 #include <LORE2D/Resource/ResourceController.h>
 #include <LORE2D/Resource/StockResource.h>
 #include <LORE2D/Scene/SpriteController.h>
