@@ -55,7 +55,7 @@ namespace Lore {
   /// all stages (character, UI, common items, etc.) in the core group, and
   /// resources for specific stages in their own separate groups, which can be
   /// loaded and unloaded as the player progresses through the game.
-  class LORE_EXPORT ResourceGroup
+  class LORE_EXPORT ResourceGroup final
   {
 
   public:
@@ -74,6 +74,7 @@ namespace Lore {
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     ResourceGroup( const string& name );
+    ~ResourceGroup() = default;
 
     template<typename T>
     void insertResource( T* resource )
@@ -113,7 +114,7 @@ namespace Lore {
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     template<typename T>
-    void addResourceType()
+    void _addResourceType()
     {
       _resources[std::type_index( typeid( T ) )] = ResourceRegistry();
     }
@@ -128,12 +129,18 @@ namespace Lore {
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+  ///
+  /// \class ResourceController
+  /// \brief The prime entity which controls all resource lifetime.
+  /// \details Holds all resource groups, provides creation, accessor, and destruction generic functions
+  /// which are necessary to use a resource group. Must be overriden by render plugins to provide functors
+  /// for resources that require render plugin APIs (e.g., textures, render targets, etc.).
   class LORE_EXPORT ResourceController
   {
 
   public:
 
-    using ResourceGroupMap = std::unordered_map<std::string, std::shared_ptr<ResourceGroup>>; // TODO: Use unique_ptr (shared_ptr for now to avoid very difficult compilation error).
+    using ResourceGroupMap = std::unordered_map<string, std::shared_ptr<ResourceGroup>>; // TODO: Use unique_ptr (shared_ptr for now to avoid very difficult compilation error).
     using PluginCreationFunctor = std::function<IResourcePtr()>;
     using PluginDestructionFunctor = std::function<void( IResourcePtr )>;
     using PluginCreationFunctorMap = std::unordered_map<std::type_index, PluginCreationFunctor>;
@@ -250,12 +257,6 @@ namespace Lore {
     }
 
     //
-    // Cloning functions (TODO: Move cloning functions to objects with prototype pattern).
-
-    MaterialPtr cloneMaterial( const string& name,
-                               const string& cloneName );
-
-    //
     // Plugin functors.
 
     template<typename T>
@@ -310,6 +311,10 @@ namespace Lore {
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+  ///
+  /// \class Resource
+  /// \brief A helper class with only static functions that communicate to the active ResourceController,
+  /// which is owned by the active Context.
   class LORE_EXPORT Resource final
   {
 
@@ -378,17 +383,6 @@ namespace Lore {
     static VertexBufferPtr CreateVertexBuffer( const string& name,
                                                const MeshType& type,
                                                const string& groupName = ResourceController::DefaultGroupName );
-
-
-    //
-    // Cloning functions.
-
-    ///
-    /// \brief Clones specified material and registers new material.
-    /// \param name Material to clone.
-    /// \param cloneName New name of the cloned material.
-    static MaterialPtr CloneMaterial( const string& name,
-                                      const string& cloneName );
 
     //
     // Getters.

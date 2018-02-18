@@ -213,13 +213,6 @@ MeshPtr StockResourceController::getMesh( const MeshType& type )
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-MaterialPtr StockResourceController::cloneMaterial( const string& name, const string& cloneName )
-{
-  return _controller->cloneMaterial( name, cloneName );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -261,13 +254,6 @@ VertexBufferPtr StockResource::GetVertexBuffer( const string& name )
 FontPtr StockResource::GetFont( const string& name )
 {
   return ActiveContext->getStockResourceController()->get<Font>( name );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-MaterialPtr StockResource::CloneMaterial( const string& name, const string& newName )
-{
-  return ActiveContext->getStockResourceController()->cloneMaterial( name, newName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

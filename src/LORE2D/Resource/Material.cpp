@@ -48,6 +48,28 @@ Material::~Material()
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+IResourcePtr Material::clone( const string& newName )
+{
+  MaterialPtr material = Resource::CreateMaterial( newName, getResourceGroupName() );
+  material->lighting = lighting;
+  material->ambient = ambient;
+  material->diffuse = diffuse;
+  material->sprite = sprite;
+  material->program = program;
+  material->blendingMode = blendingMode;
+  material->_texCoordScrollSpeed = _texCoordScrollSpeed;
+  material->_texCoordOffset = _texCoordOffset;
+  material->_texSampleRegion = _texSampleRegion;
+
+  // Re-assign callback for copied material.
+  if ( _texCoordCallback ) {
+    material->setTextureScrollSpeed( _texCoordScrollSpeed );
+  }
+
+  return material;
+}
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Material::setTextureScrollSpeed( const Vec2& scroll )

@@ -67,6 +67,11 @@ namespace Lore {
     virtual ~Material() override;
 
     //
+    // Overrides.
+
+    IResourcePtr clone( const string& newName ) override;
+
+    //
     // Setters.
 
     void setTextureScrollSpeed( const Vec2& scroll );
@@ -93,20 +98,7 @@ namespace Lore {
 
     Material& operator = ( const Material& rhs )
     {
-      lighting = rhs.lighting;
-      ambient = rhs.ambient;
-      diffuse = rhs.diffuse;
-      sprite = rhs.sprite;
-      program = rhs.program;
-      blendingMode = rhs.blendingMode;
-      _texCoordScrollSpeed = rhs._texCoordScrollSpeed;
-      _texCoordOffset = rhs._texCoordOffset;
-      _texSampleRegion = rhs._texSampleRegion;
-
-      // Re-assign callback for copied material.
-      if ( rhs._texCoordCallback ) {
-        setTextureScrollSpeed( _texCoordScrollSpeed );
-      }
+      
       return *this;
     }
 

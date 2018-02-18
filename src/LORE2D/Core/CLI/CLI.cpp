@@ -63,7 +63,7 @@ string CLI::Execute( const string& command )
   size_t end = command.find_first_of( ' ' );
   string commandName;
   string args;
-  if ( std::string::npos == end ) {
+  if ( string::npos == end ) {
     end = command.size(); // This command has no arguments.
     commandName = command;
   }

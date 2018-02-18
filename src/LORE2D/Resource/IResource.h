@@ -44,7 +44,7 @@ namespace Lore {
 
     virtual ~IResource() = default;
 
-    virtual IResourcePtr clone() { return this; } // TODO: Make pure virtual.
+    virtual IResourcePtr clone( const string& newName ) { return nullptr; } // TODO: Make pure virtual.
 
   };
 

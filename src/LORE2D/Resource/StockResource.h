@@ -46,6 +46,10 @@ namespace Lore {
     bool scrolling { true };
   };
 
+  ///
+  /// \class StockResourceController
+  /// \brief Holds a collection of stock resources available for common use. It wraps a ResourceController
+  /// to store the stock resources internally. This is separate from the primary ResourceController.
   class LORE_EXPORT StockResourceController
   {
 
@@ -65,21 +69,12 @@ namespace Lore {
   public:
 
     StockResourceController();
-
     virtual ~StockResourceController();
 
-    virtual void createStockResources();
-
-    virtual GPUProgramPtr createUberProgram( const string& name, const UberProgramParameters& params ) = 0;
-
-    virtual GPUProgramPtr createBackgroundProgram( const string& name, const BackgroundProgramParameters& params ) = 0;
-
-    virtual GPUProgramPtr createBoxProgram( const string& name ) = 0;
-
-    virtual GPUProgramPtr createTextProgram( const string& name ) = 0;
+    void createStockResources();
 
     //
-    // Retrieval functions for each type of stock resource.
+    // Accessor functions.
 
     template<typename ResourceType>
     ResourceType* get( const string& name )
@@ -90,9 +85,12 @@ namespace Lore {
     MeshPtr getMesh( const MeshType& type );
 
     //
-    // Cloning functions.
+    // Factory functions that must be implemented by the render plugin.
 
-    MaterialPtr cloneMaterial( const string& name, const string& cloneName );
+    virtual GPUProgramPtr createUberProgram( const string& name, const UberProgramParameters& params ) = 0;
+    virtual GPUProgramPtr createBackgroundProgram( const string& name, const BackgroundProgramParameters& params ) = 0;
+    virtual GPUProgramPtr createBoxProgram( const string& name ) = 0;
+    virtual GPUProgramPtr createTextProgram( const string& name ) = 0;
 
   protected:
 
@@ -113,22 +111,15 @@ namespace Lore {
 
   public:
 
-    static GPUProgramPtr GetGPUProgram( const string& name );
-
-    static MaterialPtr GetMaterial( const string& name );
-
-    static MeshPtr GetMesh( const MeshType& type );
-
-    static TexturePtr GetTexture( const string& name );
-
-    static VertexBufferPtr GetVertexBuffer( const string& name );
-
-    static FontPtr GetFont( const string& name );
-
     //
-    // Cloning.
+    // Accessor functions.
 
-    static MaterialPtr CloneMaterial( const string& name, const string& newName );
+    static GPUProgramPtr GetGPUProgram( const string& name );
+    static MaterialPtr GetMaterial( const string& name );
+    static MeshPtr GetMesh( const MeshType& type );
+    static TexturePtr GetTexture( const string& name );
+    static VertexBufferPtr GetVertexBuffer( const string& name );
+    static FontPtr GetFont( const string& name );
 
   private:
 

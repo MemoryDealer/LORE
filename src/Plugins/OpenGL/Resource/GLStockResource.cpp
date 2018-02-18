@@ -49,13 +49,6 @@ StockResourceController::~StockResourceController()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void StockResourceController::createStockResources()
-{
-  Lore::StockResourceController::createStockResources();
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 Lore::GPUProgramPtr StockResourceController::createUberProgram( const string& name, const Lore::UberProgramParameters& params )
 {
   const bool textured = ( params.numTextures > 0 );

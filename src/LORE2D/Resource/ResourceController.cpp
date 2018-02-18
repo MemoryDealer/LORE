@@ -53,20 +53,21 @@ using namespace LocalNS;
 ResourceGroup::ResourceGroup( const string& name )
 : _name( name )
 {
-  addResourceType<Box>();
-  addResourceType<Camera>();
-  addResourceType<Entity>();
-  addResourceType<Font>();
-  addResourceType<Material>();
-  addResourceType<Mesh>();
-  addResourceType<GPUProgram>();
-  addResourceType<RenderTarget>();
-  addResourceType<Shader>();
-  addResourceType<Textbox>();
-  addResourceType<Texture>();
-  addResourceType<SpriteAnimationSet>();
-  addResourceType<UI>();
-  addResourceType<VertexBuffer>();
+  // Initialize resource registries for all resource types.
+  _addResourceType<Box>();
+  _addResourceType<Camera>();
+  _addResourceType<Entity>();
+  _addResourceType<Font>();
+  _addResourceType<Material>();
+  _addResourceType<Mesh>();
+  _addResourceType<GPUProgram>();
+  _addResourceType<RenderTarget>();
+  _addResourceType<Shader>();
+  _addResourceType<Textbox>();
+  _addResourceType<Texture>();
+  _addResourceType<SpriteAnimationSet>();
+  _addResourceType<UI>();
+  _addResourceType<VertexBuffer>();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -245,17 +246,6 @@ void ResourceController::indexResourceFile( const string& file, const string& gr
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-MaterialPtr ResourceController::cloneMaterial( const string& name, const string& cloneName )
-{
-  auto material = get<Material>( name );
-  auto clone = create<Material>( cloneName );
-
-  *clone = *material;
-  return clone;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 ResourceGroupPtr ResourceController::_getGroup( const string& groupName )
@@ -361,11 +351,17 @@ EntityPtr Resource::CreateEntity( const string& name, const MeshType& meshType, 
     break;
 
   case MeshType::Quad:
-    entity->setMaterial( StockResource::CloneMaterial( "Standard", "Standard_" + name ) );
+  {
+    auto material = StockResource::GetMaterial( "Standard" );
+    entity->setMaterial( static_cast<MaterialPtr>( material->clone( "Standard_" + name ) ) );
+  }
     break;
 
   case MeshType::TexturedQuad:
-    entity->setMaterial( StockResource::CloneMaterial( "StandardTextured", "StandardTextured_" + name ) );
+  {
+    auto material = StockResource::GetMaterial( "StandardTextured" );
+    entity->setMaterial( static_cast<MaterialPtr>( material->clone( "StandardTextured_" + name ) ) );
+  }
     break;
 
   }
@@ -485,13 +481,6 @@ VertexBufferPtr Resource::CreateVertexBuffer( const string& name, const MeshType
   auto vb = ActiveContext->getResourceController()->create<VertexBuffer>( name, groupName );
   vb->init( type );
   return vb;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-MaterialPtr Resource::CloneMaterial( const string& name, const string& cloneName )
-{
-  return ActiveContext->getResourceController()->cloneMaterial( name, cloneName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

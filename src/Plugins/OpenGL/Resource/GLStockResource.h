@@ -37,17 +37,14 @@ namespace Lore { namespace OpenGL {
     public:
 
         StockResourceController();
-
         virtual ~StockResourceController() override;
 
-        virtual void createStockResources() override;
+        //
+        // Factory functions.
 
         virtual GPUProgramPtr createUberProgram( const string& name, const Lore::UberProgramParameters& params ) override;
-
         virtual GPUProgramPtr createBackgroundProgram( const string& name, const BackgroundProgramParameters& params ) override;
-
         virtual GPUProgramPtr createBoxProgram( const string& name ) override;
-
         virtual GPUProgramPtr createTextProgram( const string& name ) override;
 
     };

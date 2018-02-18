@@ -34,7 +34,7 @@ TEST_CASE( "Load and unload resources in code", "[resource]" )
   TEST_CREATE_CONTEXT();
 
   // Create a window which is required for resources.
-  auto window = context->createWindow( "UnitTest", 50, 50 );
+  auto window = context->createWindow( "Test", 50, 50 );
 
   constexpr const size_t size = 4;
   const std::vector<Lore::string> names = { "1", "2", "3", "4" };
@@ -100,5 +100,76 @@ TEST_CASE( "Load and unload resources in code", "[resource]" )
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+TEST_CASE( "Load and unload resources in code, different group", "[resource]" )
+{
+  TEST_CREATE_CONTEXT();
+
+  // Create a window which is required for resources.
+  auto window = context->createWindow( "Test", 50, 50 );
+
+  constexpr const size_t size = 4;
+  const std::vector<Lore::string> names = { "1", "2", "3", "4" };
+  const Lore::string groupName = "LevelOne";
+
+  for ( size_t i = 0; i < size; ++i ) {
+    REQUIRE( Lore::Resource::CreateBox( names[i], groupName ) );
+    REQUIRE( Lore::Resource::CreateCamera( names[i], groupName ) );
+    REQUIRE( Lore::Resource::CreateEntity( names[i], Lore::MeshType::TexturedQuad, groupName ) );
+    REQUIRE( Lore::Resource::CreateGPUProgram( names[i], groupName ) );
+    REQUIRE( Lore::Resource::CreateMaterial( names[i], groupName ) );
+    REQUIRE( Lore::Resource::CreateMesh( names[i], Lore::MeshType::Quad, groupName ) );
+    REQUIRE( Lore::Resource::CreateRenderTarget( names[i], 640, 480, groupName ) );
+    REQUIRE( Lore::Resource::CreateShader( names[i] + "_FS", Lore::Shader::Type::Fragment, groupName ) );
+    REQUIRE( Lore::Resource::CreateShader( names[i] + "_VS", Lore::Shader::Type::Vertex, groupName ) );
+    REQUIRE( Lore::Resource::CreateSprite( names[i], groupName ) );
+    REQUIRE( Lore::Resource::CreateSpriteAnimationSet( names[i], groupName ) );
+    REQUIRE( Lore::Resource::CreateTextbox( names[i], groupName ) );
+    REQUIRE( Lore::Resource::CreateTexture( names[i], 32, 32, Lore::StockColor::White, groupName ) );
+    REQUIRE( Lore::Resource::CreateUI( names[i], groupName ) );
+    REQUIRE( Lore::Resource::CreateVertexBuffer( names[i], Lore::MeshType::Quad, groupName ) );
+  }
+
+  for ( size_t i = 0; i < size; ++i ) {
+    REQUIRE( Lore::Resource::GetBox( names[i], groupName ) );
+    REQUIRE( Lore::Resource::GetCamera( names[i], groupName ) );
+    REQUIRE( Lore::Resource::GetEntity( names[i], groupName ) );
+    REQUIRE( Lore::Resource::GetGPUProgram( names[i], groupName ) );
+    REQUIRE( Lore::Resource::GetMaterial( names[i], groupName ) );
+    REQUIRE( Lore::Resource::GetMesh( names[i], groupName ) );
+    REQUIRE( Lore::Resource::GetRenderTarget( names[i], groupName ) );
+    REQUIRE( Lore::Resource::GetShader( names[i] + "_FS", groupName ) );
+    REQUIRE( Lore::Resource::GetShader( names[i] + "_VS", groupName ) );
+    REQUIRE( Lore::Resource::GetSprite( names[i], groupName ) );
+    REQUIRE( Lore::Resource::GetSpriteAnimationSet( names[i], groupName ) );
+    REQUIRE( Lore::Resource::GetTexture( names[i], groupName ) );
+    REQUIRE( Lore::Resource::GetTextbox( names[i], groupName ) );
+    REQUIRE( Lore::Resource::GetUI( names[i], groupName ) );
+    REQUIRE( Lore::Resource::GetVertexBuffer( names[i], groupName ) );
+  }
+
+  Lore::Resource::UnloadGroup( groupName );
+
+  for ( size_t i = 0; i < size; ++i ) {
+    CHECK_THROWS( Lore::Resource::GetBox( names[i], groupName ) );
+    CHECK_THROWS( Lore::Resource::GetCamera( names[i], groupName ) );
+    CHECK_THROWS( Lore::Resource::GetEntity( names[i], groupName ) );
+    CHECK_THROWS( Lore::Resource::GetFont( names[i], groupName ) );
+    CHECK_THROWS( Lore::Resource::GetGPUProgram( names[i], groupName ) );
+    CHECK_THROWS( Lore::Resource::GetMaterial( names[i], groupName ) );
+    CHECK_THROWS( Lore::Resource::GetMesh( names[i], groupName ) );
+    CHECK_THROWS( Lore::Resource::GetRenderTarget( names[i], groupName ) );
+    CHECK_THROWS( Lore::Resource::GetShader( names[i] + "_FS", groupName ) );
+    CHECK_THROWS( Lore::Resource::GetShader( names[i] + "_VS", groupName ) );
+    CHECK_THROWS( Lore::Resource::GetSprite( names[i], groupName ) );
+    CHECK_THROWS( Lore::Resource::GetSpriteAnimationSet( names[i], groupName ) );
+    CHECK_THROWS( Lore::Resource::GetTexture( names[i], groupName ) );
+    CHECK_THROWS( Lore::Resource::GetTextbox( names[i], groupName ) );
+    CHECK_THROWS( Lore::Resource::GetUI( names[i], groupName ) );
+    CHECK_THROWS( Lore::Resource::GetVertexBuffer( names[i], groupName ) );
+  }
+
+  TEST_DESTROY_CONTEXT();
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

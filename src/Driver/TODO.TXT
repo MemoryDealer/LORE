@@ -6,7 +6,6 @@
 -Re-organize to include/src directories
 -Instanced rendering - for static objects (maybe static nodes - StaticNodeBlock)
 -RTT (add priority to renderview, RTTs are automatically rendered before window framebuffers)
--Move to a templated resource controller for all the duplicate code
 -Multi-texturing
 -Make UI code more convenient, for example in DebugUIConsole, it requires so much code to do basic setup.
   There needs to be pair structs for elements and their attachments, and factory functions to create them.
