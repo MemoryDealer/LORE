@@ -136,10 +136,9 @@ namespace Lore {
 
   private:
 
-    virtual void _reset() override;
-
     void _addActiveLight( LightPtr light );
 
+    friend class Context; // Hack for destroying lights in ~Context.
     friend class Node;
 
   private:

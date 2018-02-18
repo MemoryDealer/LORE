@@ -41,22 +41,18 @@ namespace Lore { namespace OpenGL {
 
         virtual ~GLShader() override;
 
-        void init( const Shader::Type& type );
+        void init( const Shader::Type& type ) override;
 
-        virtual bool loadFromFile( const string& file ) override;
+        bool loadFromFile( const string& file ) override;
 
-        virtual bool loadFromSource( const string& source ) override;
+        bool loadFromSource( const string& source ) override;
 
-        virtual void unload() override;
+        void unload() override;
 
-        virtual uint getUintId() override
+        uint getUintId() override
         {
             return _shader;
         }
-
-    private:
-
-        virtual void _reset() override;
 
     private:
 

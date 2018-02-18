@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,15 +24,25 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-//
-// Object creation/setup.
+#include "Box.h"
 
-// Creates a Lore context with the OpenGL renderer.
-#define TEST_CREATE_CONTEXT()\
-std::unique_ptr<Lore::Context> context;\
-context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );\
-REQUIRE( context.get() != nullptr );
+#include <LORE2D/Resource/ResourceController.h>
 
-#define TEST_DESTROY_CONTEXT() DestroyLoreContext( context )
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+using namespace Lore;
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+BoxPtr Box::clone( const string& name )
+{
+  auto box = Resource::CreateBox( name, getResourceGroupName() );
+  box->_fill = _fill;
+  box->_borderColor = _borderColor;
+  box->_size = _size;
+  box->_borderWidth = _borderWidth;
+
+  return box;
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

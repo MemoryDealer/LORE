@@ -30,6 +30,8 @@
 #include <LORE2D/Memory/Alloc.h>
 #include <LORE2D/Resource/Color.h>
 #include <LORE2D/Resource/Registry.h>
+#include <LORE2D/Scene/AABB.h>
+#include <LORE2D/Scene/SpriteController.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -95,6 +97,8 @@ namespace Lore {
   public:
 
     ~Node();
+
+    NodePtr clone( const string& name, const bool cloneChildNodes = false );
 
     NodePtr createChildNode( const string& name );
 
@@ -243,10 +247,6 @@ namespace Lore {
 
     Node( const Node& rhs ) = delete;
     Node& operator = ( const Node& rhs ) = delete;
-
-  protected:
-
-    virtual void _reset() override;
 
   private:
 

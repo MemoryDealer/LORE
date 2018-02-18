@@ -47,11 +47,11 @@
 #include <LORE2D/Math/Math.h>
 
 // Resource.
+#include <LORE2D/Resource/Box.h>
 #include <LORE2D/Resource/Entity.h>
 #include <LORE2D/Resource/Material.h>
 #include <LORE2D/Resource/StockResource.h>
-#include <LORE2D/Resource/Renderable/Box.h>
-#include <LORE2D/Resource/Renderable/Textbox.h>
+#include <LORE2D/Resource/Textbox.h>
 #include <LORE2D/Resource/Texture.h>
 #include <LORE2D/UI/UI.h>
 #include <LORE2D/UI/UIElement.h>

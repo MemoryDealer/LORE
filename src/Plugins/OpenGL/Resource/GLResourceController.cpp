@@ -43,168 +43,115 @@ using namespace Lore::OpenGL;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-ResourceController::ResourceController()
-  : Lore::ResourceController()
+GLResourceController::GLResourceController()
 {
+  // Add creation/destruction functors.
+  addCreationFunctor<Font>( std::bind( &GLResourceController::createFont, this ) );
+  addCreationFunctor<GPUProgram>( std::bind( &GLResourceController::createGPUProgram, this ) );
+  addCreationFunctor<RenderTarget>( std::bind( &GLResourceController::createRenderTarget, this ) );
+  addCreationFunctor<Shader>( std::bind( &GLResourceController::createShader, this ) );
+  addCreationFunctor<Texture>( std::bind( &GLResourceController::createTexture, this ) );
+  addCreationFunctor<VertexBuffer>( std::bind( &GLResourceController::createVertexBuffer, this ) );
+  addDestructionFunctor<Font>( std::bind( &GLResourceController::destroyFont, this, std::placeholders::_1 ) );
+  addDestructionFunctor<GPUProgram>( std::bind( &GLResourceController::destroyGPUProgram, this, std::placeholders::_1 ) );
+  addDestructionFunctor<RenderTarget>( std::bind( &GLResourceController::destroyRenderTarget, this, std::placeholders::_1 ) );
+  addDestructionFunctor<Shader>( std::bind( &GLResourceController::destroyShader, this, std::placeholders::_1 ) );
+  addDestructionFunctor<Texture>( std::bind( &GLResourceController::destroyTexture, this, std::placeholders::_1 ) );
+  addDestructionFunctor<VertexBuffer>( std::bind( &GLResourceController::destroyVertexBuffer, this, std::placeholders::_1 ) );
+
+  // Create default vertex buffers.
+  auto texturedQuadVB = create<VertexBuffer>( "TexturedQuad" );
+  texturedQuadVB->init( MeshType::TexturedQuad );
+  texturedQuadVB->build();
+
+  auto quadVB = create<VertexBuffer>( "Quad" );
+  quadVB->init( MeshType::Quad );
+  quadVB->build();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-ResourceController::~ResourceController()
+Lore::IResourcePtr GLResourceController::createFont()
 {
+  return MemoryAccess::GetPrimaryPoolCluster()->create<Font, GLFont>();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::TexturePtr ResourceController::loadTexture( const string& name, const string& file, const string& groupName )
+Lore::IResourcePtr GLResourceController::createGPUProgram()
 {
-  auto texture = MemoryAccess::GetPrimaryPoolCluster()->create<Texture, GLTexture>();
-  texture->setName( name );
-  texture->setResourceGroupName( groupName );
-  texture->loadFromFile( file );
-
-  _getGroup( groupName )->textures.insert( name, texture );
-  return texture;
+  return MemoryAccess::GetPrimaryPoolCluster()->create<GPUProgram, GLGPUProgram>();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::FontPtr ResourceController::loadFont( const string& name, const string& file, const uint32_t size, const string& groupName )
+Lore::IResourcePtr GLResourceController::createRenderTarget()
 {
-  auto font = MemoryAccess::GetPrimaryPoolCluster()->create<Font, GLFont>();
-  font->setName( name );
-  font->setResourceGroupName( groupName );
-  font->loadFromFile( file, size );
-
-  _getGroup( groupName )->fonts.insert( name, font );
-  return font;
+  return MemoryAccess::GetPrimaryPoolCluster()->create<RenderTarget, GLRenderTarget>();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::GPUProgramPtr ResourceController::createGPUProgram( const string& name, const string& groupName )
+Lore::IResourcePtr GLResourceController::createShader()
 {
-  auto program = MemoryAccess::GetPrimaryPoolCluster()->create<GPUProgram, GLGPUProgram>();
-  program->setName( name );
-  program->setResourceGroupName( groupName );
-  program->init();
+  return MemoryAccess::GetPrimaryPoolCluster()->create<Shader, GLShader>();
+}
 
-  _getGroup( groupName )->programs.insert( name, program );
-  return program;
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Lore::IResourcePtr GLResourceController::createTexture()
+{
+  return MemoryAccess::GetPrimaryPoolCluster()->create<Texture, GLTexture>();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::ShaderPtr ResourceController::createVertexShader( const string& name, const string& groupName )
+Lore::IResourcePtr GLResourceController::createVertexBuffer()
 {
-  auto shader = MemoryAccess::GetPrimaryPoolCluster()->create<Shader, GLShader>();
-  shader->setName( name );
-  shader->setResourceGroupName( groupName );
-  shader->init( Shader::Type::Vertex );
-
-  _getGroup( groupName )->vertexShaders.insert( name, shader );
-  return shader;
+  return MemoryAccess::GetPrimaryPoolCluster()->create<VertexBuffer, GLVertexBuffer>();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::ShaderPtr ResourceController::createFragmentShader( const string& name, const string& groupName )
+void GLResourceController::destroyFont( Lore::IResourcePtr resource )
 {
-  auto shader = MemoryAccess::GetPrimaryPoolCluster()->create<Shader, GLShader>();
-  shader->setName( name );
-  shader->setResourceGroupName( groupName );
-  shader->init( Shader::Type::Fragment );
-
-  _getGroup( groupName )->fragmentShaders.insert( name, shader );
-  return shader;
+  MemoryAccess::GetPrimaryPoolCluster()->destroy<Font, GLFont>( static_cast< FontPtr >( resource ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::VertexBufferPtr ResourceController::createVertexBuffer( const string& name, const Lore::MeshType& type, const string& groupName )
+void GLResourceController::destroyGPUProgram( Lore::IResourcePtr resource )
 {
-  auto vb = MemoryAccess::GetPrimaryPoolCluster()->create<VertexBuffer, GLVertexBuffer>();
-  vb->setName( name );
-  vb->setResourceGroupName( groupName );
-  vb->init( type );
-
-  _getGroup( groupName )->vertexBuffers.insert( name, vb );
-
-  // If this vertex buffer is a stock type, index it in the hash table.
-  // TODO: Clean this up, stock resources should not mix in here.
-  // (Perhaps use functions for adding to resource group, e.g., addVertexBuffer().
-  switch ( type ) {
-
-  default:
-    break;
-
-  case MeshType::Quad:
-  case MeshType::TexturedQuad:
-    _vertexBufferTable.insert( { type, vb } );
-    break;
-
-  }
-
-  return vb;
+  MemoryAccess::GetPrimaryPoolCluster()->destroy<GPUProgram, GLGPUProgram>( static_cast< GPUProgramPtr >( resource ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::TexturePtr ResourceController::createTexture( const string& name, const uint32_t width, const uint32_t height, const string& groupName )
+void GLResourceController::destroyRenderTarget( Lore::IResourcePtr resource )
 {
-  auto texture = MemoryAccess::GetPrimaryPoolCluster()->create<Texture, GLTexture>();
-  texture->setName( name );
-  texture->setResourceGroupName( groupName );
-  texture->create( width, height );
-
-  _getGroup( groupName )->textures.insert( name, texture );
-  return texture;
+  MemoryAccess::GetPrimaryPoolCluster()->destroy<RenderTarget, GLRenderTarget>( static_cast< RenderTargetPtr >( resource ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::TexturePtr ResourceController::createTexture( const string& name, const uint32_t width, const uint32_t height, const Lore::Color& color, const string& groupName )
+void GLResourceController::destroyShader( Lore::IResourcePtr resource )
 {
-  auto texture = MemoryAccess::GetPrimaryPoolCluster()->create<Texture, GLTexture>();
-  texture->setName( name );
-  texture->setResourceGroupName( groupName );
-  texture->create( width, height, color );
-
-  _getGroup( groupName )->textures.insert( name, texture );
-  return texture;
+  MemoryAccess::GetPrimaryPoolCluster()->destroy<Shader, GLShader>( static_cast< ShaderPtr >( resource ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::RenderTargetPtr ResourceController::createRenderTarget( const string& name, const uint32_t width, const uint32_t height, const string& groupName )
+void GLResourceController::destroyTexture( Lore::IResourcePtr resource )
 {
-  auto renderTarget = MemoryAccess::GetPrimaryPoolCluster()->create<RenderTarget, GLRenderTarget>();
-  renderTarget->setName( name );
-  renderTarget->setResourceGroupName( groupName );
-  renderTarget->create( width, height );
-
-  _getGroup( groupName )->renderTargets.insert( name, renderTarget );
-  return renderTarget;
+  MemoryAccess::GetPrimaryPoolCluster()->destroy<Texture, GLTexture>( static_cast< TexturePtr >( resource ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void ResourceController::destroyTexture( Lore::TexturePtr texture )
+void GLResourceController::destroyVertexBuffer( Lore::IResourcePtr resource )
 {
-  auto groupName = texture->getResourceGroupName();
-  _getGroup( groupName )->textures.remove( texture->getName() );
-
-  MemoryAccess::GetPrimaryPoolCluster()->destroy<Texture, GLTexture>( texture );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void ResourceController::destroyTexture( const string& name, const string& groupName )
-{
-  auto texture = _getGroup( groupName )->textures.get( name );
-  if ( texture ) {
-    destroyTexture( texture );
-  }
+  MemoryAccess::GetPrimaryPoolCluster()->destroy<VertexBuffer, GLVertexBuffer>( static_cast< VertexBufferPtr >( resource ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

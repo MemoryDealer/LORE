@@ -25,53 +25,45 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Resource/IO/SerializableResource.h>
+#include <LORE2D/Serializer/Serializer.h>
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 namespace Lore {
 
-  ///
-  /// \class Sprite
-  /// \brief A container of Textures which a Material can use.
-  class LORE_EXPORT Sprite final : public Lore::Alloc<Sprite>
+  class ResourceFileProcessor final
   {
 
-    LORE_OBJECT_BODY()
+  public:
+
+    static void LoadConfiguration( const string& file, ResourceControllerPtr resourceController );
+    static SerializableResource GetResourceFileType( const string& file );
 
   public:
 
-    using TextureList = std::vector<TexturePtr>;
+    ResourceFileProcessor( const string& file, const SerializableResource type );
+    ~ResourceFileProcessor() = default;
 
-  public:
+    void process();
 
-    Sprite() = default;
-    ~Sprite() = default;
+    string getName() const;
 
-    //
-    // Modifiers.
+    SerializableResource getType() const;
 
-    void addTexture( const TexturePtr texture )
-    {
-      _textures.push_back( texture );
-    }
-
-    //
-    // Getters.
-
-    TexturePtr getTexture( const size_t idx ) const
-    {
-      return _textures.at( idx );
-    }
-
-    size_t getTextureCount() const
-    {
-      return _textures.size();
-    }
+    void load( const string& groupName, ResourceControllerPtr resourceController );
 
   private:
 
-    virtual void _reset() override {}
+    void processAnimation( SpriteAnimationSetPtr animationSet, const SerializerValue& animations, ResourceControllerPtr resourceController );
+    void processMaterial( MaterialPtr material, const SerializerValue& settings, ResourceControllerPtr resourceController );
+    void processSpriteList( const string& groupName, ResourceControllerPtr resourceController );
 
   private:
 
-    TextureList _textures {};
+    string _file {};
+    SerializableResource _type {};
+    mutable Serializer _serializer {};
 
   };
 

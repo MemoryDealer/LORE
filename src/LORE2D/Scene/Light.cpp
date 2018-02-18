@@ -46,12 +46,6 @@ Light::Light()
 
 Light::~Light()
 {
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Light::_reset()
-{
   _color = StockColor::Black;
   _range = 7.f;
   _constant = 1.f;

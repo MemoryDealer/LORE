@@ -1,3 +1,5 @@
+#include <memory>
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -51,6 +53,21 @@ Scene::Scene()
 
 Scene::~Scene()
 {
+  _bgColor = StockColor::Black;
+  _renderer = nullptr;
+
+  // Clear all nodes.
+  auto nodeIt = _nodes.getIterator();
+  while ( nodeIt.hasMore() ) {
+    destroyNode( nodeIt.getNext() );
+  }
+  _nodes.clear();
+
+  // Clear all lights.
+  auto lightIt = _lights.getIterator();
+  while ( lightIt.hasMore() ) {
+    destroyLight( lightIt.getNext() );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -62,7 +79,7 @@ NodePtr Scene::createNode( const string& name )
   node->setName( name );
   node->setResourceGroupName( ResourceController::DefaultGroupName );
   node->_scene = this;
-  node->_aabb.reset( new AABB( node ) );
+  node->_aabb = std::make_unique<AABB>(  node  );
 
   _nodes.insert( name, node );
   _root.attachChildNode( node );
@@ -86,6 +103,7 @@ void Scene::destroyNode( const string& name )
   if ( node ) {
     // Detach node from parent before destroying.
     node->detachFromParent();
+    MemoryAccess::GetPrimaryPoolCluster()->destroy<Node>( node );
     _nodes.remove( name );
   }
 }
@@ -123,7 +141,7 @@ void Scene::destroyLight( const string& name )
   auto light = _lights.get( name );
 
   if ( light ) {
-    destroyLight( light );
+    MemoryAccess::GetPrimaryPoolCluster()->destroy<Light>( light );
     _lights.remove( name );
   }
 }
@@ -135,19 +153,6 @@ void Scene::updateSceneGraph()
   // Traverse the scene graph and update object transforms.
   Lore::SceneGraphVisitor sgv( getRootNode() );
   sgv.visit( _renderer );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Scene::_reset()
-{
-  _bgColor = StockColor::Black;
-  _renderer = nullptr;
-  //_root
-  //_nodes.clear();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

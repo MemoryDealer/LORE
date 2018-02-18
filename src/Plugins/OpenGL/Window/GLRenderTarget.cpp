@@ -37,12 +37,13 @@ using namespace Lore::OpenGL;
 
 GLRenderTarget::~GLRenderTarget()
 {
-  _reset();
+  glDeleteRenderbuffers( 1, &_rbo );
+  glDeleteFramebuffers( 1, &_fbo );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLRenderTarget::create( const uint32_t width, const uint32_t height )
+void GLRenderTarget::init( const uint32_t width, const uint32_t height )
 {
   _width = width;
   _height = height;
@@ -53,7 +54,7 @@ void GLRenderTarget::create( const uint32_t width, const uint32_t height )
   glBindFramebuffer( GL_FRAMEBUFFER, _fbo );
 
   // Generate empty texture to bind to framebuffer.
-  _texture = Lore::Resource::CreateTexture( _name + "_render_target", _width, _height );
+  _texture = Lore::Resource::CreateTexture( _name + "_render_target", _width, _height, Lore::StockColor::White );
   auto glTexturePtr = static_cast< GLTexture* >( _texture );
   auto textureID = glTexturePtr->getID();
 
@@ -78,14 +79,6 @@ void GLRenderTarget::create( const uint32_t width, const uint32_t height )
 void GLRenderTarget::bind()
 {
   glBindFramebuffer( GL_FRAMEBUFFER, _fbo );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void GLRenderTarget::_reset()
-{
-  glDeleteRenderbuffers( 1, &_rbo );
-  glDeleteFramebuffers( 1, &_fbo );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

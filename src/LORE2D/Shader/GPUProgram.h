@@ -28,6 +28,7 @@
 #include <LORE2D/Math/Math.h>
 #include <LORE2D/Memory/Alloc.h>
 #include <LORE2D/Renderer/Renderer.h>
+#include <LORE2D/Resource/IResource.h>
 #include <LORE2D/Scene/Scene.h>
 #include <LORE2D/Shader/Shader.h>
 #include <LORE2D/Shader/VertexBuffer.h>
@@ -36,16 +37,15 @@
 
 namespace Lore {
 
-  class LORE_EXPORT GPUProgram
+  class LORE_EXPORT GPUProgram : public IResource
   {
-
-      LORE_OBJECT_BODY()
 
   public:
 
       GPUProgram();
-
       virtual ~GPUProgram();
+
+      virtual void init() = 0;
 
       virtual void attachShader( ShaderPtr shader );
 

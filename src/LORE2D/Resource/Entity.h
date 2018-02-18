@@ -25,22 +25,21 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Memory/Alloc.h>
+#include <LORE2D/Resource/IResource.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-  class LORE_EXPORT Entity final : public Alloc<Entity>
+  class LORE_EXPORT Entity final : public Alloc<Entity>, public IResource
   {
-
-    LORE_OBJECT_BODY()
 
   public:
 
     Entity();
+    ~Entity() override;
 
-    ~Entity();
+    EntityPtr clone( const string& name );
 
     //
     // Getters.
@@ -83,8 +82,6 @@ namespace Lore {
     friend class Node;
 
   private:
-
-    virtual void _reset() override;
 
     void _notifyAttached();
 

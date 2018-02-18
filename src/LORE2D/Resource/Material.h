@@ -25,9 +25,9 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Memory/Alloc.h>
 #include <LORE2D/Renderer/FrameListener/FrameListenerController.h>
 #include <LORE2D/Resource/Color.h>
+#include <LORE2D/Resource/IResource.h>
 #include <LORE2D/Shader/GPUProgram.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -39,10 +39,8 @@ namespace Lore {
   /// \brief Contains data on how to render an object, including lighting, colors,
   ///     and shader effects.
   /// \details Can have N number of passes.
-  class LORE_EXPORT Material final : public Alloc<Material>
+  class LORE_EXPORT Material final : public Alloc<Material>, public IResource
   {
-
-    LORE_OBJECT_BODY()
 
   public:
 
@@ -67,6 +65,8 @@ namespace Lore {
     Material();
 
     virtual ~Material() override;
+
+    MaterialPtr clone( const string& newName );
 
     //
     // Setters.
@@ -95,20 +95,7 @@ namespace Lore {
 
     Material& operator = ( const Material& rhs )
     {
-      lighting = rhs.lighting;
-      ambient = rhs.ambient;
-      diffuse = rhs.diffuse;
-      sprite = rhs.sprite;
-      program = rhs.program;
-      blendingMode = rhs.blendingMode;
-      _texCoordScrollSpeed = rhs._texCoordScrollSpeed;
-      _texCoordOffset = rhs._texCoordOffset;
-      _texSampleRegion = rhs._texSampleRegion;
-
-      // Re-assign callback for copied material.
-      if ( rhs._texCoordCallback ) {
-        setTextureScrollSpeed( _texCoordScrollSpeed );
-      }
+      
       return *this;
     }
 
@@ -126,10 +113,6 @@ namespace Lore {
       BlendFactor srcFactor { BlendFactor::SrcAlpha };
       BlendFactor dstFactor { BlendFactor::OneMinusSrcAlpha };
     } blendingMode;
-
-  private:
-
-    virtual void _reset() override;
 
   private:
 

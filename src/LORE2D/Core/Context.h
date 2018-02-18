@@ -59,7 +59,7 @@ namespace Lore {
 
     Context() noexcept;
 
-    virtual ~Context();
+    virtual ~Context() override;
 
     virtual void initConfiguration();
 
@@ -97,6 +97,14 @@ namespace Lore {
     ///
     /// \brief Destroys specified scene and all of its nodes.
     virtual void destroyScene( ScenePtr scene );
+
+    ///
+    /// \brief Creates a new camera for use with a RenderView.
+    CameraPtr createCamera( const string& name );
+
+    ///
+    /// \brief Destroys specified camera.
+    void destroyCamera( CameraPtr camera );
 
     //
     // Information.
@@ -155,6 +163,13 @@ namespace Lore {
     WindowPtr getActiveWindow() const
     {
       return _activeWindow;
+    }
+
+    ///
+    /// \brief Returns specified CameraPtr if it exists.
+    CameraPtr getCamera( const string& name )
+    {
+      return _cameraRegistry.get( name );
     }
 
     ///
@@ -238,7 +253,7 @@ namespace Lore {
 
     ///
     /// \brief Used for processing default keyboard shortcuts (such as for the DebugUI).
-    virtual void onKeyDown( const Keycode code );
+    void onKeyDown( const Keycode code ) override;
 
   protected:
 
@@ -262,17 +277,20 @@ namespace Lore {
 
   protected:
 
-    using WindowRegistry = Registry<std::map, Window>;
+    using CameraRegistry = Registry<std::unordered_map, Camera>;
     using SceneRegistry = Registry<std::unordered_map, Scene>;
+    using WindowRegistry = Registry<std::map, Window>;
 
   protected:
 
+    PoolCluster _poolCluster { "Primary" };
+    std::unique_ptr<FrameListenerController> _frameListenerController { std::make_unique<FrameListenerController>() };
+
+    CameraRegistry _cameraRegistry {};
     WindowRegistry _windowRegistry {};
     SceneRegistry _sceneRegistry {};
 
     WindowPtr _activeWindow { nullptr };
-    std::unique_ptr<FrameListenerController> _frameListenerController { std::make_unique<FrameListenerController>() };
-    PoolCluster _poolCluster { "Primary" };
 
     std::unique_ptr<InputController> _inputController { nullptr };
     std::unique_ptr<IRenderAPI> _renderAPI { nullptr };

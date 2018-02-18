@@ -131,10 +131,6 @@ namespace Lore {
 
   private:
 
-    virtual void _reset() override { }
-
-  private:
-
     LayerMap _layers { };
 
   };

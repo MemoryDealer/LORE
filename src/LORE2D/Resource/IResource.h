@@ -25,47 +25,40 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Resource/SerializableResource.h>
-#include <LORE2D/Serializer/Serializer.h>
+#include <LORE2D/Memory/Alloc.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-  class ResourceFileProcessor final
+  ///
+  /// \class Resource
+  /// \brief All resources that live in the ResourceController must derive from
+  /// this class.
+  class LORE_EXPORT IResource
   {
 
-  public:
-
-    static void LoadConfiguration( const string& file, ResourceControllerPtr resourceController );
-    static SerializableResource GetResourceFileType( const string& file );
+    LORE_OBJECT_BODY()
 
   public:
 
-    ResourceFileProcessor( const string& file, const SerializableResource type );
-    ~ResourceFileProcessor() = default;
+    IResource() = default;
+    virtual ~IResource() = default;
 
-    void process();
+    //
+    // Deleted operators/functions.
 
-    string getName() const;
-
-    SerializableResource getType() const;
-
-    void load( const string& groupName, ResourceControllerPtr resourceController );
-
-  private:
-
-    void processAnimation( SpriteAnimationSetPtr animationSet, const SerializerValue& animations, ResourceControllerPtr resourceController );
-    void processMaterial( MaterialPtr material, const SerializerValue& settings, ResourceControllerPtr resourceController );
-    void processSpriteList( const string& groupName, ResourceControllerPtr resourceController );
-
-  private:
-
-    string _file {};
-    SerializableResource _type {};
-    mutable Serializer _serializer {};
+    IResource& operator = ( const IResource& rhs ) = delete;
 
   };
+
+  // Downcasts an IResource type to the desired resource type.
+  template<typename ResourceType>
+  typename std::enable_if<std::is_base_of<IResource, ResourceType>::value, ResourceType*>::type
+    ResourceCast( IResourcePtr resource )
+  {
+    return static_cast< ResourceType* >( resource );
+  }
 
 }
 

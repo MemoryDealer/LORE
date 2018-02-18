@@ -43,7 +43,7 @@ namespace Lore { namespace OpenGL {
 
         virtual ~GLGPUProgram() override;
 
-        void init();
+        void init() override;
 
         virtual void attachShader( ShaderPtr shader ) override;
 
@@ -85,8 +85,6 @@ namespace Lore { namespace OpenGL {
         GLuint _getUniform( const string& id );
 
         void _updateUniform( const GLint id, const Lore::Matrix4& m );
-
-        virtual void _reset() override;
 
     private:
 

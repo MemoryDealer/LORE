@@ -47,7 +47,9 @@ GLGPUProgram::GLGPUProgram()
 
 GLGPUProgram::~GLGPUProgram()
 {
-  _reset();
+  glDeleteProgram( _program );
+  _uniforms.clear();
+  _transform = 0;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -78,12 +80,12 @@ bool GLGPUProgram::link()
 {
   glLinkProgram( _program );
 
-  GLint success;
+  GLint success = 0;
   GLchar buf[512];
   glGetProgramiv( _program, GL_LINK_STATUS, &success );
   if ( !success ) {
     glGetProgramInfoLog( _program, sizeof( buf ), nullptr, buf );
-    log_error( "Failed to link program + " + _name + ": " + string( buf ) );
+    log_error( "Failed to link program + " + _name + "(" + std::to_string( glGetError() ) + ")" + ": " + string( buf ) );
     return false;
   }
 
@@ -249,15 +251,6 @@ void GLGPUProgram::_updateUniform( const GLint id, const Lore::Matrix4& m )
 {
   glm::mat4x4 mm = MathConverter::LoreToGLM( m );
   glUniformMatrix4fv( id, 1, GL_FALSE, glm::value_ptr( mm ) );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void GLGPUProgram::_reset()
-{
-  glDeleteProgram( _program );
-  _uniforms.clear();
-  _transform = 0;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

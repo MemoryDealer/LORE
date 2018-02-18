@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE2D
@@ -25,30 +24,26 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+#include "Textbox.h"
 
-    class Exception : public std::exception
-    {
+#include <LORE2D/Resource/ResourceController.h>
 
-    private:
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        std::string _what;
-        
-    public:
+using namespace Lore;
 
-        explicit Exception( const std::string& what )
-        : _what( what )
-        {
-            //log_error( "(EXCEPTION) " + what );
-        }
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        virtual char const* what() const override
-        {
-            return ( !_what.empty() ) ? _what.c_str() : "Unknown exception";
-        }
+TextboxPtr Textbox::clone( const string& name )
+{
+  auto textbox = Resource::CreateTextbox( name, getResourceGroupName() );
 
-    };
+  textbox->_font = _font;
+  textbox->_text = _text;
+  textbox->_textColor = _textColor;
+  textbox->_renderQueue = _renderQueue;
 
+  return textbox;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

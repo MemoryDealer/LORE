@@ -112,7 +112,7 @@ namespace Lore {
                 TPool->destroy( static_cast<TDerived*>( object ) );
             }
             else {
-                throw Lore::Exception( "PoolCluster::create<T>: Pool of type " +
+                log_information( "PoolCluster::create<T>: Pool of type " +
                                        string( typeid( TDerived ).name() ) + " does not exist" );
             }
         }
@@ -126,13 +126,17 @@ namespace Lore {
         template<typename T>
         MemoryPoolBase* _getPool()
         {
-            auto t = std::type_index( typeid( T ) );
-            auto lookup = _pools.find( t );
-            if ( _pools.end() != lookup ) {
-                return lookup->second.get();
-            }
-
+          if ( _pools.empty() ) {
             return nullptr;
+          }
+
+          auto t = std::type_index( typeid( T ) );
+          auto lookup = _pools.find( t );
+          if ( _pools.end() != lookup ) {
+            return lookup->second.get();
+          }
+
+          return nullptr;
         }
 
     private:

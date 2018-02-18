@@ -25,13 +25,17 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Resource/IResource.h>
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 namespace Lore {
 
   ///
   /// \class RenderTarget
   /// \brief Can be rendered to instead of a window, and then sampled as a texture
   ///   in another RenderView.
-  class LORE_EXPORT RenderTarget
+  class LORE_EXPORT RenderTarget : public IResource
   {
 
     LORE_OBJECT_BODY()
@@ -41,6 +45,8 @@ namespace Lore {
     RenderTarget() = default;
 
     virtual ~RenderTarget() = default;
+
+    virtual void init( const uint32_t width, const uint32_t height ) = 0;
 
     virtual void bind() = 0;
 

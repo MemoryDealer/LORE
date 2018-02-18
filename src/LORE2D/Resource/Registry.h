@@ -117,11 +117,20 @@ namespace Lore {
       return ConstIterator( std::begin( _container ), std::end( _container ) );
     }
 
+    Registry clone()
+    {
+      Registry clone;
+      for ( auto pair : _container ) {
+        clone.insert( pair.first, pair.second );
+      }
+      return clone;
+    }
+
     //
     // Deleted functions/operators.
 
-    Registry& operator = ( const Registry& rhs ) = delete;
-    Registry( const Registry& rhs ) = delete;
+    Registry& operator = ( const Registry& rhs ) = default;
+    Registry( const Registry& rhs ) = default;
 
   private:
 

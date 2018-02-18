@@ -38,6 +38,8 @@ namespace Lore {
   class LORE_EXPORT UIElement : public Alloc<UIElement>
   {
 
+    LORE_OBJECT_BODY()
+
   public:
 
     UIElement() = default;
@@ -124,10 +126,6 @@ namespace Lore {
     {
       _visible = visible;
     }
-
-  protected:
-
-    virtual void _reset() override { }
 
   private:
 

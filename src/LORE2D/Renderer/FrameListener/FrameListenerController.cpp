@@ -91,6 +91,10 @@ void FrameListenerController::registerFrameEndedCallback( FrameEndedCallback cal
 
 void FrameListenerController::unregisterFrameListener( FrameListener* listener )
 {
+  if ( _frameListeners.empty() ) {
+    return;
+  }
+
   for ( auto it = _frameListeners.begin(); it != _frameListeners.end(); ) {
     FrameListener* currentListener = *it;
     if ( currentListener == listener ) {
@@ -104,6 +108,10 @@ void FrameListenerController::unregisterFrameListener( FrameListener* listener )
 
 void FrameListenerController::unregisterFrameStartedCallback( FrameStartedCallback callback )
 {
+  if ( _frameStartedCallbacks.empty() ) {
+    return;
+  }
+
   for ( auto it = _frameStartedCallbacks.begin(); it != _frameStartedCallbacks.end(); ) {
     FrameStartedCallback currentCallback = *it;
     if ( Util::GetFPAddress(currentCallback) == Util::GetFPAddress(callback) ) {
@@ -117,7 +125,11 @@ void FrameListenerController::unregisterFrameStartedCallback( FrameStartedCallba
 
 void FrameListenerController::unregisterFrameEndedCallback( FrameEndedCallback callback )
 {
-  for ( auto it = _frameStartedCallbacks.begin(); it != _frameStartedCallbacks.end(); ) {
+  if ( _frameEndedCallbacks.empty() ) {
+    return;
+  }
+
+  for ( auto it = _frameEndedCallbacks.begin(); it != _frameEndedCallbacks.end(); ) {
     FrameEndedCallback currentCallback = *it;
     if ( Util::GetFPAddress( currentCallback ) == Util::GetFPAddress( callback ) ) {
       _frameEndedCallbacks.erase( it );

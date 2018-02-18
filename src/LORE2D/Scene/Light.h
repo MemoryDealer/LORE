@@ -108,8 +108,6 @@ namespace Lore {
 
   private:
 
-    virtual void _reset() override;
-
     friend class Node;
 
   private:

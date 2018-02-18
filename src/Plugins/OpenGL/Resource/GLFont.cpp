@@ -154,13 +154,6 @@ real GLFont::advanceGlyphX( const char c, const real x, const real scale )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLFont::_reset()
-{
-
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 real GLFont::getWidth( const char c )
 {
   const Glyph& glyph = _glyphs.at( c );

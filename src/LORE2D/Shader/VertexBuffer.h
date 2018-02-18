@@ -27,15 +27,14 @@
 
 #include <LORE2D/Memory/Alloc.h>
 #include <LORE2D/Resource/MeshType.h>
+#include <LORE2D/Resource/IResource.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-    class LORE_EXPORT VertexBuffer
+    class LORE_EXPORT VertexBuffer : public IResource
     {
-
-        LORE_OBJECT_BODY()
 
     public:
 
@@ -50,8 +49,9 @@ namespace Lore {
     public:
 
         VertexBuffer();
+        virtual ~VertexBuffer() = default;
 
-        virtual ~VertexBuffer() { }
+        virtual void init( const Lore::MeshType& type ) = 0;
 
         void addAttribute( const AttributeType& type, const uint size );
 

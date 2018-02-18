@@ -25,106 +25,51 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Memory/Alloc.h>
-#include <LORE2D/Resource/Color.h>
+#include <LORE2D/Resource/IResource.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-  class LORE_EXPORT Box final : public Alloc<Box>
+  ///
+  /// \class Sprite
+  /// \brief A container of Textures which a Material can use.
+  class LORE_EXPORT Sprite final : public Alloc<Sprite>, public IResource
   {
-
-    LORE_OBJECT_BODY()
 
   public:
 
-    Box() = default;
-    ~Box() = default;
+    using TextureList = std::vector<TexturePtr>;
+
+  public:
+
+    Sprite() = default;
+    ~Sprite() override = default;
+
+    //
+    // Modifiers.
+
+    void addTexture( const TexturePtr texture )
+    {
+      _textures.push_back( texture );
+    }
 
     //
     // Getters.
 
-    inline Color getBorderColor() const
+    TexturePtr getTexture( const size_t idx ) const
     {
-      return _borderColor;
+      return _textures.at( idx );
     }
 
-    inline Color getFillColor() const
+    size_t getTextureCount() const
     {
-      return _fillColor;
-    }
-
-    inline real getBorderWidth() const
-    {
-      return _borderWidth;
-    }
-
-    inline real getWidth() const
-    {
-      return _size.x;
-    }
-
-    inline real getHeight() const
-    {
-      return _size.y;
-    }
-
-    inline Vec2 getSize() const
-    {
-      return _size;
-    }
-
-    //
-    // Setters.
-
-    inline void setBorderColor( const Color& color )
-    {
-      _borderColor = color;
-    }
-
-    inline void setBorderColor( const real r, const real g, const real b, const real a )
-    {
-      setBorderColor( Color( r, g, b, a ) );
-    }
-
-    inline void setFillColor( const Color& color )
-    {
-      _fillColor = color;
-    }
-
-    inline void setFillColor( const real r, const real g, const real b, const real a )
-    {
-      setFillColor( Color( r, g, b, a ) );
-    }
-
-    inline void setSize( const Vec2& size )
-    {
-      _size = size;
-    }
-
-    inline void setSize( const real w, const real h )
-    {
-      setSize( Vec2( w, h ) );
-    }
-
-    inline void setBorderWidth( const real width )
-    {
-      _borderWidth = width;
+      return _textures.size();
     }
 
   private:
 
-    virtual void _reset() override {}
-
-  private:
-
-    bool _fill { true };
-
-    Color _borderColor { StockColor::White };
-    Color _fillColor { 1.f, 1.f, 1.f, 0.3f };
-    Vec2 _size { 1.f, 1.f };
-    real _borderWidth { 0.04f };
+    TextureList _textures {};
 
   };
 

@@ -34,11 +34,11 @@
 #include <LORE2D/Core/DebugUI/DebugUI.h>
 #include <LORE2D/Input/Input.h>
 #include <LORE2D/Renderer/SceneGraphVisitor.h>
+#include <LORE2D/Resource/Box.h>
 #include <LORE2D/Resource/Entity.h>
 #include <LORE2D/Resource/StockResource.h>
-#include <LORE2D/Resource/Renderable/Box.h>
-#include <LORE2D/Resource/Renderable/Sprite.h>
-#include <LORE2D/Resource/Renderable/Textbox.h>
+#include <LORE2D/Resource/Sprite.h>
+#include <LORE2D/Resource/Textbox.h>
 #include <LORE2D/Scene/SpriteController.h>
 #include <LORE2D/UI/UI.h>
 
@@ -69,6 +69,18 @@ Context::Context() noexcept
 Context::~Context()
 {
   NotificationUnsubscribe( WindowEventNotification, &Context::onWindowEvent );
+
+  // HACK.
+  // Manually destroy lights before destruction to avoid a strange bad_alloc crash.
+  // (This is the same code in Scene's destructor).
+  auto sceneIt = _sceneRegistry.getIterator();
+  while ( sceneIt.hasMore() ) {
+    auto scene = sceneIt.getNext();
+    auto lightIt = scene->_lights.getIterator();
+    while ( lightIt.hasMore() ) {
+      scene->destroyLight( lightIt.getNext() );
+    }
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -87,9 +99,9 @@ void Context::initConfiguration()
   _poolCluster.registerPool<Scene>( 4 );
   _poolCluster.registerPool<Sprite>( 32 );
   _poolCluster.registerPool<SpriteAnimationSet>( 8 );
-  _poolCluster.registerPool<Textbox>( 4 );
-  _poolCluster.registerPool<UI>( 4 );
-  _poolCluster.registerPool<UIPanel>( 4 );
+  _poolCluster.registerPool<Textbox>( 8 );
+  _poolCluster.registerPool<UI>( 8 );
+  _poolCluster.registerPool<UIPanel>( 8 );
   _poolCluster.registerPool<UIElement>( 16 );
 
   // TODO: Parse pool/config settings from cfg file (Lua).
@@ -146,6 +158,27 @@ void Context::destroyScene( const string& name )
 void Context::destroyScene( ScenePtr scene )
 {
   destroyScene( scene->getName() );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+CameraPtr Context::createCamera( const string& name )
+{
+  auto camera = _poolCluster.create<Camera>();
+  camera->_name = name;
+  _cameraRegistry.insert( name, camera );
+
+  return camera;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Context::destroyCamera( CameraPtr camera )
+{
+  auto name = camera->getName();
+  _cameraRegistry.remove( name );
+
+  _poolCluster.destroy<Camera>( camera );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

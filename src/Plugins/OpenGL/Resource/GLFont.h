@@ -68,10 +68,6 @@ namespace Lore { namespace OpenGL {
 
   private:
 
-    virtual void _reset() override;
-
-  private:
-
     using GlyphMap = std::map<GLchar, Glyph>;
 
     GlyphMap _glyphs {};

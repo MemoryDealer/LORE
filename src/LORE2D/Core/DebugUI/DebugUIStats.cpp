@@ -27,9 +27,9 @@
 #include "DebugUIStats.h"
 
 #include <LORE2D/Core/Context.h>
-#include <LORE2D/Resource/Renderable/Box.h>
-#include <LORE2D/Resource/Renderable/Textbox.h>
+#include <LORE2D/Resource/Box.h>
 #include <LORE2D/Resource/ResourceController.h>
+#include <LORE2D/Resource/Textbox.h>
 #include <LORE2D/Resource/StockResource.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

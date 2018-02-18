@@ -75,10 +75,6 @@ namespace Lore { namespace OpenGL {
           return _window;
         }
 
-    protected:
-
-        virtual void _reset() override;
-
     };
 
 }}

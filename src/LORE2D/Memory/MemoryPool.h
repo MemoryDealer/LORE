@@ -31,142 +31,166 @@
 
 namespace Lore {
 
-    ///
-    /// \class MemoryPoolBase
-    /// \brief Non-template base class for MemoryPool, so instances can be
-    ///     stored in a map in the PoolCluster class.
-    class MemoryPoolBase
+  ///
+  /// \class MemoryPoolBase
+  /// \brief Non-template base class for MemoryPool, so instances can be
+  ///     stored in a map in the PoolCluster class.
+  class MemoryPoolBase
+  {
+
+  public:
+
+    virtual ~MemoryPoolBase() { }
+
+    virtual void resize( const size_t newSize ) = 0;
+
+    virtual void destroyAll() = 0;
+
+  };
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  ///
+  /// \class MemoryPool
+  /// \brief Generic memory pool with O(1) creation/deletion time.
+  template<typename T>
+  class MemoryPool final : public MemoryPoolBase
+  {
+
+  public:
+
+    using List = T**;
+
+  public:
+
+    inline MemoryPool( const string& name, const size_t size )
+      : _name( name )
+      , _size( size )
     {
+      // Allocate pool and each object.
+      _objects = new T*[_size];
+      for ( int i = 0; i < _size; ++i ) {
+        _objects[i] = new T();
+      }
 
-    public:
+      // Setup linked list.
+      for ( int i = 0; i < _size - 1; ++i ) {
+        _objects[i]->_next = _objects[i + 1];
+      }
 
-        virtual ~MemoryPoolBase() { }
+      // Setup head and tail.
+      _next = _objects[0];
+      _objects[_size - 1]->_next = nullptr;
+    }
 
-        virtual void resize( const size_t newSize ) = 0;
-
-        virtual void destroyAll() = 0;
-
-    };
-
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-    ///
-    /// \class MemoryPool
-    /// \brief Generic memory pool with O(1) creation/deletion time.
-    template<typename T>
-    class MemoryPool final : public MemoryPoolBase
+    inline virtual ~MemoryPool() override
     {
+      for ( int i = 0; i < _size; ++i ) {
+        delete _objects[i];
+      }
 
-    public:
+      delete[] _objects;
+    }
 
-        using List = T**;
+    inline T* create()
+    {
+      if ( !_next ) {
+        throw MemoryException( "Pool " + _name + " has reached maximum capacity" );
+        // TODO: Resize...
+      }
 
-    public:
+      T* p = _next;
+      assert( false == p->_inUse );
+      p->_inUse = true;
+      _next = p->_next;
 
-        inline MemoryPool( const string& name, const size_t size )
-        : _name( name )
-        , _size( size )
-        , _objects()
-        , _next( nullptr )
-        {
-            // Allocate pool and each object.
-            _objects = new T*[_size];
-            for ( int i = 0; i < _size; ++i ) {
-                _objects[i] = new T();
-            }
+      ++_activeObjectCount;
 
-            // Setup linked list.
-            for ( int i = 0; i < _size - 1; ++i ) {
-                _objects[i]->_next = _objects[i + 1];
-            }
+      return p;
+    }
 
-            // Setup head and tail.
-            _next = _objects[0];
-            _objects[_size - 1]->_next = nullptr;
+    inline void destroy( T* object )
+    {
+      if ( !object->_inUse ) {
+        throw Exception( "Attempting to destroy object not in use" );
+      }
+
+      Alloc<T>* alloc = object;
+
+      // Destruct and re-construct the object in-place at its known address.
+      object->~T();
+      new ( object ) T();
+
+      assert( false == alloc->_inUse );
+
+      // Put this object at the front of the list.
+      alloc->_next = _next;
+      _next = object;
+
+      --_activeObjectCount;
+
+      // TODO: Pass double pointer or ref to assign object to null.
+    }
+
+    inline virtual void resize( const size_t newSize ) override
+    {
+      //...
+    }
+
+    inline virtual void destroyAll() override
+    {
+      for ( int i = 0; i < _size; ++i ) {
+        if ( _objects[i]->_inUse ) {
+          destroy( _objects[i] );
         }
+      }
+    }
 
-        inline virtual ~MemoryPool() override
-        {
-            for ( int i = 0; i < _size; ++i ) {
-                delete _objects[i];
-            }
+    inline T* getObjectAt( const size_t idx )
+    {
+      if ( idx >= _size ) {
+        throw MemoryException( "Invalid index " + std::to_string( idx ) );
+      }
 
-            delete [] _objects;
-        }
+      return _objects[idx];
+    }
 
-        inline T* create()
-        {
-            assert( nullptr != _next ); // Pool limit reached if null.
+    //
+    // Information.
 
-            T* p = _next;
-            assert( false == p->_inUse );
-            p->_inUse = true;
-            _next = p->_next;
+    inline size_t getSizeInBytes() const
+    {
+      return sizeof( T ) * _size;
+    }
 
-            return p;
-        }
+    inline size_t getActiveObjectCount() const
+    {
+      return _activeObjectCount;
+    }
 
-        inline void destroy( T* object )
-        {
-            assert( true == object->_inUse );
+    inline size_t getTotalObjectCount() const
+    {
+      return _size;
+    }
 
-            Alloc<T>* alloc = object;
+    inline void printUsage()
+    {
+      printf( "Pool %s usage: \n\n", _name.c_str() );
+      for ( int i = 0; i < _size; ++i ) {
+        printf( "Object %d \t[%s]\n", i, ( _objects[i]->_inUse ) ? "x" : " " );
+      }
+    }
 
-            // Reset object to default.
-            alloc->_inUse = false;
-            alloc->_reset();
+  private:
 
-            // Put this object at the front of the list.
-            alloc->_next = _next;
-            _next = object;
-        }
+    string _name {};
+    size_t _size { 0 };
+    size_t _activeObjectCount { 0 };
+    List _objects {};
 
-        inline virtual void resize( const size_t newSize ) override
-        {
-            //...
-        }
+    T* _next { nullptr };
 
-        inline virtual void destroyAll() override
-        {
-            for ( int i = 0; i < _size; ++i ) {
-                Alloc<T>* alloc = _objects[i];
-                alloc->_inUse = false;
-                alloc->_reset();
-            }
-        }
-
-        inline T* getObjectAt( const size_t idx )
-        {
-            assert( idx < _size );
-
-            return _objects[idx];
-        }
-
-        //
-        // Information.
-
-        inline size_t getSizeInBytes()
-        {
-            return sizeof( T ) * _size;
-        }
-
-        inline void printUsage()
-        {
-            printf( "Pool %s usage: \n\n", _name.c_str() );
-            for ( int i = 0; i < _size; ++i ) {
-                printf( "Object %d \t[%s]\n", i, ( _objects[i]->_inUse ) ? "x" : " " );
-            }
-        }
-
-    private:
-
-        string _name;
-        size_t _size;
-        List _objects;
-
-        T* _next;
-
-    };
+  };
 
 }
 

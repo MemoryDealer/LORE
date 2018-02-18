@@ -25,7 +25,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "TestHelpers.h"
+#include <LORE2D/Lore.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -45,3 +45,16 @@
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+//
+// Object creation/setup.
+
+// Creates a Lore context with the OpenGL renderer.
+#define TEST_CREATE_CONTEXT()\
+std::unique_ptr<Lore::Context> context;\
+context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );\
+REQUIRE( context.get() != nullptr );
+
+#define TEST_DESTROY_CONTEXT() DestroyLoreContext( context )
+
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

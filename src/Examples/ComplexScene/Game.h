@@ -44,6 +44,8 @@ public:
 
   void processInput();
 
+  void update();
+
   void render();
 
 private:
@@ -58,6 +60,11 @@ private:
   Lore::CameraPtr _camera { nullptr };
 
   Lore::NodePtr _playerNode { nullptr };
+
+  //
+  // Game objects.
+
+  std::vector<Lore::NodePtr> _floatingBlocks {};
 
 };
 

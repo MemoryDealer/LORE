@@ -70,7 +70,7 @@ void Game::loadScene()
   _scene->setAmbientLightColor( Lore::Color( 0.75f, 0.75f, 0.75f, 1.f ) );
 
   // Create a camera to view the scene.
-  _camera = Lore::Resource::CreateCamera( "core" ); // TODO: Should this come from context?
+  _camera = _context->createCamera( "core" ); // TODO: Should this come from context?
 
   // TODO: This is a hack that should be taken care of internally.
   Lore::CLI::SetActiveScene( _scene );
@@ -107,7 +107,7 @@ void Game::loadScene()
 
   // Setup animations for player sprite (this animation set was loaded from main.animation).
   auto spc = _playerNode->createSpriteController();
-  spc->useAnimationSet( Lore::Resource::GetAnimationSet( "player" ) );
+  spc->useAnimationSet( Lore::Resource::GetSpriteAnimationSet( "player" ) );
   spc->startAnimation( "idle" );
 
   // We can make the camera automatically track the player.
@@ -126,6 +126,7 @@ void Game::loadScene()
 
     blockNode->scale( 0.4f );
     blockNode->setPosition( -1.f + static_cast< Lore::real >( i * 0.2f ), 0.f );
+    _floatingBlocks.push_back( blockNode );
   }
 
   //
@@ -152,15 +153,15 @@ void Game::loadScene()
   //
   // Create some torches.
 
+  Lore::EntityPtr torchEntity = Lore::Resource::CreateEntity( "torch", Lore::MeshType::TexturedQuad );
+  torchEntity->setSprite( Lore::Resource::GetSprite( "torch" ) );
   for ( int i = 0; i < 3; ++i ) {
-    Lore::EntityPtr torchEntity = Lore::Resource::CreateEntity( "torch", Lore::MeshType::TexturedQuad );
-    torchEntity->setSprite( Lore::Resource::GetSprite( "torch" ) );
     auto torchNode = _scene->createNode( "torch" + std::to_string( i ) );
     torchNode->attachObject( torchEntity );
     torchNode->setPosition( 0.5f - static_cast<float>(i * 2), 0.24f );
     torchNode->scale( 0.5f );
     auto torchSPC = torchNode->createSpriteController();
-    torchSPC->useAnimationSet( Lore::Resource::GetAnimationSet( "torch" ) );
+    torchSPC->useAnimationSet( Lore::Resource::GetSpriteAnimationSet( "torch" ) );
     torchSPC->startAnimation( "flame" );
 
     //
@@ -198,19 +199,19 @@ void Game::loadScene()
   auto& layerFar = background->addLayer( "far" );
   layerFar.setSprite( Lore::Resource::GetSprite( "bg-far" ) );
   layerFar.setDepth( 990.f );
-  layerFar.setParallax( Lore::Vec2( 0.4f, 0.05f ) );
+  layerFar.setParallax( Lore::Vec2( 0.3f, 0.08f ) );
 
   // Add middle layer with lighter parallax.
   auto& layerMiddle = background->addLayer( "middle" );
   layerMiddle.setSprite( Lore::Resource::GetSprite( "bg-middle" ) );
   layerMiddle.setDepth( 980.f );
-  layerMiddle.setParallax( Lore::Vec2( .6f, .05f ) );
+  layerMiddle.setParallax( Lore::Vec2( .5f, .10f ) );
 
   // Add closest layer with the least amount of parallax.
   auto& layerForeground = background->addLayer( "foreground" );
   layerForeground.setSprite( Lore::Resource::GetSprite( "bg-foreground" ) );
   layerForeground.setDepth( 970.f );
-  layerForeground.setParallax( Lore::Vec2( .8f, 0.05f ) );
+  layerForeground.setParallax( Lore::Vec2( .7f, 0.12f ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -244,6 +245,32 @@ void Game::processInput()
   else if ( Lore::Input::GetKeyState( Lore::Keycode::X ) ) {
     _camera->zoom( -0.03f );
   }
+
+  if ( Lore::Input::GetKeyState( Lore::Keycode::R ) ) {
+    Lore::Resource::UnloadGroup( "Core" );
+  }
+
+  // Temporary cloning test.
+  if ( Lore::Input::GetKeyState( Lore::Keycode::C ) ) {
+    static Lore::Vec2 offset { 0.f, 0.2f };
+    static int ctr = 0;
+    auto node = _scene->getNode( "block0" );
+    auto clone = node->clone( node->getName() + std::to_string( ctr++ ) );
+    clone->setPosition( offset );
+    offset.y += 0.2f;
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Game::update()
+{
+  static float blockOffset = 0.f;
+  float blockExtraOffset = 0.f;
+  for ( auto& block : _floatingBlocks ) {
+    block->setPosition( block->getPosition().x, std::sinf( blockOffset ) * 0.5f + blockExtraOffset );
+  }
+  blockOffset += 0.01f;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

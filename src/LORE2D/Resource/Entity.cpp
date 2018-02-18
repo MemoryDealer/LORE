@@ -28,6 +28,7 @@
 
 #include <LORE2D/Renderer/Renderer.h>
 #include <LORE2D/Resource/Material.h>
+#include <LORE2D/Resource/ResourceController.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -50,20 +51,26 @@ Entity::~Entity()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+EntityPtr Entity::clone( const string& name )
+{
+  auto rc = Resource::GetResourceController();
+  auto entity = rc->create<Entity>( name, getResourceGroupName() );
+
+  entity->_material = _material;
+  entity->_mesh = _mesh;
+  entity->_renderQueue = _renderQueue;
+
+  return entity;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void Entity::setSprite( SpritePtr sprite )
 {
   _material->sprite = sprite;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Entity::_reset()
-{
-  _material=nullptr;
-  _mesh=nullptr;
-}
-
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Entity::_notifyAttached()

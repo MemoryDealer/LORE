@@ -25,17 +25,15 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Memory/Alloc.h>
 #include <LORE2D/Resource/MeshType.h>
+#include <LORE2D/Resource/IResource.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-    class Mesh final : public Alloc<Mesh>
+    class Mesh final : public Alloc<Mesh>, public IResource
     {
-
-        LORE_OBJECT_BODY()
 
     public:
 
@@ -58,10 +56,6 @@ namespace Lore {
         {
             _vertexBuffer = vbptr;
         }
-
-    private:
-
-        virtual void _reset() override;
 
     private:
 

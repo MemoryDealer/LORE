@@ -25,63 +25,65 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 #include "catch.hpp"
-#include <LORE2D/Lore.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-TEST_CASE( "Memory Pool", "[memory]" )
+TEST_CASE( "Context correctly created from render plugins", "[context]" )
 {
-    const size_t size = 128;
-    Lore::MemoryPool<Lore::Node> pool( "test", size );
+    std::unique_ptr<Lore::Context> context;
 
-    SECTION( "Creation/destruction" )
+    SECTION( "OpenGL render plugin" )
     {
-        // Create some objects.
-        std::vector<Lore::Node*> nodes;
-        for ( int i = 0; i < size; ++i ) {
-            nodes.push_back( pool.create() );
-            REQUIRE( true == nodes[i]->getInUse() );
-        }
+        context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
 
-        pool.destroy( nodes[50] );
-        REQUIRE( false == nodes[50]->getInUse() );
+        REQUIRE( context.get() != nullptr );
+        REQUIRE( context->getRenderPluginName() == "OpenGL" );
 
-        pool.destroyAll();
-        for ( int i = 0; i < size; ++i ) {
-            REQUIRE( false == pool.getObjectAt( i )->getInUse() );
-        }
+        DestroyLoreContext( context );
     }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-TEST_CASE( "Pool Cluster", "[memory]" )
+TEST_CASE( "Context creation/destruction multiple times in a single run", "[context]" )
 {
-    const size_t size = 128;
-    Lore::PoolCluster cluster( "test" );
-    cluster.registerPool<Lore::Node>( size );
-    cluster.registerPool<Lore::Camera>( size );
+    std::unique_ptr<Lore::Context> context;
 
-    SECTION( "Creation/destruction" )
+    SECTION( "Twice" )
     {
-        std::vector<Lore::Node*> nodes;
-        std::vector<Lore::Camera*> shaders;
-        for ( int i = 0; i < size; ++i ) {
-            nodes.push_back( cluster.create<Lore::Node>() );
-            shaders.push_back( cluster.create<Lore::Camera>() );
+        context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
+        REQUIRE( context.get() != nullptr );
 
-            REQUIRE( true == nodes[i]->getInUse() );
-            REQUIRE( true == shaders[i]->getInUse() );
-        }
+        DestroyLoreContext( context );
+        REQUIRE( context.get() == nullptr );
 
-        cluster.destroy<Lore::Node>( nodes[100] );
-        cluster.destroy<Lore::Camera>( shaders[100] );
-        REQUIRE( false == nodes[100]->getInUse() );
-        REQUIRE( false == shaders[100]->getInUse() );
+        context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
+        REQUIRE( context.get() != nullptr );
+
+        DestroyLoreContext( context );
+        REQUIRE( context.get() == nullptr );
     }
 
-    cluster.unregisterPool<Lore::Node>();
-    cluster.unregisterPool<Lore::Camera>();
+    SECTION( "Context destruction/re-creation with window creation" )
+    {
+        context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
+
+        Lore::WindowPtr window = context->createWindow( "UnitTest", 50, 50 );
+        REQUIRE( nullptr != window );
+
+        DestroyLoreContext( context );
+        // The window object it points to should still be valid (though the render implementation resources should now be free).
+        REQUIRE( nullptr != window );
+
+        context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
+        REQUIRE( nullptr != context );
+
+        window = context->createWindow( "UnitTest2", 50, 50 );
+        REQUIRE( nullptr != window );
+
+        DestroyLoreContext( context );
+        REQUIRE( nullptr != window );
+    }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
