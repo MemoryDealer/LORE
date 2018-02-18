@@ -48,6 +48,14 @@ namespace Lore {
 
   };
 
+  // Downcasts an IResource type to the desired resource type.
+  template<typename ResourceType>
+  typename std::enable_if<std::is_base_of<IResource, ResourceType>::value, ResourceType*>::type
+    ResourceCast( IResourcePtr resource )
+  {
+    return static_cast< ResourceType* >( resource );
+  }
+
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

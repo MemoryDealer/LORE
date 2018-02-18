@@ -353,14 +353,14 @@ EntityPtr Resource::CreateEntity( const string& name, const MeshType& meshType, 
   case MeshType::Quad:
   {
     auto material = StockResource::GetMaterial( "Standard" );
-    entity->setMaterial( static_cast<MaterialPtr>( material->clone( "Standard_" + name ) ) );
+    entity->setMaterial( ResourceCast<Material>( material->clone( "Standard_" + name ) ) );
   }
     break;
 
   case MeshType::TexturedQuad:
   {
     auto material = StockResource::GetMaterial( "StandardTextured" );
-    entity->setMaterial( static_cast<MaterialPtr>( material->clone( "StandardTextured_" + name ) ) );
+    entity->setMaterial( ResourceCast<Material>( material->clone( "StandardTextured_" + name ) ) );
   }
     break;
 
