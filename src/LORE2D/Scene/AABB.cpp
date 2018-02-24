@@ -46,7 +46,7 @@ AABB::AABB( NodePtr node )
 
 AABB::~AABB()
 {
-  //Lore::Resource::DestroyBox
+  Lore::Resource::DestroyBox( _box );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

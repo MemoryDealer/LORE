@@ -70,17 +70,10 @@ Context::~Context()
 {
   NotificationUnsubscribe( WindowEventNotification, &Context::onWindowEvent );
 
-  // HACK.
-  // Manually destroy lights before destruction to avoid a strange bad_alloc crash.
-  // (This is the same code in Scene's destructor).
-  auto sceneIt = _sceneRegistry.getIterator();
-  while ( sceneIt.hasMore() ) {
-    auto scene = sceneIt.getNext();
-    auto lightIt = scene->_lights.getIterator();
-    while ( lightIt.hasMore() ) {
-      scene->destroyLight( lightIt.getNext() );
-    }
-  }
+  // Explicitly destroy Scene objects before resources, otherwise the order of destruction
+  // in the pool cluster can lead to crashes, since resources (such as Box or Light) can be destroyed
+  // before the owning object tries to delete them (AABBs for Boxes).
+  _poolCluster.unregisterPool<Scene>();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

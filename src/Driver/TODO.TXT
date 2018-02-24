@@ -23,7 +23,6 @@
 -Proper cleanup of resources
   Write a massive test for loading a huge scene, test number of "in use" memory pool items before/after destruction
 -Compositors: visualize depth buffer (https://learnopengl.com/#!Advanced-OpenGL/Depth-testing)
--Modify memory pool to use raw uint8_t buffers, get rid of reset() functions; use default copy for each pool
 -Box select of AABBs
 -OOBBs
 -Line rendering
