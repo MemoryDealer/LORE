@@ -328,27 +328,27 @@ BoxPtr Resource::CreateBox( const string& name, const string& groupName )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-EntityPtr Resource::CreateEntity( const string& name, const MeshType& meshType, const string& groupName )
+EntityPtr Resource::CreateEntity( const string& name, const VertexBuffer::Type& vbType, const string& groupName )
 {
   auto entity = ActiveContext->getResourceController()->create<Entity>( name, groupName );
 
   // Lookup stock mesh and assign it.
-  entity->setMesh( StockResource::GetMesh( meshType ) );
+  entity->setMesh( StockResource::GetMesh( vbType ) );
 
   // Set default material.
-  switch ( meshType ) {
+  switch ( vbType ) {
 
   default:
     break;
 
-  case MeshType::Quad:
+  case VertexBuffer::Type::Quad:
   {
     auto material = StockResource::GetMaterial( "Standard" );
     entity->setMaterial( material->clone( "Standard_" + name ) );
   }
     break;
 
-  case MeshType::TexturedQuad:
+  case VertexBuffer::Type::TexturedQuad:
   {
     auto material = StockResource::GetMaterial( "StandardTextured" );
     entity->setMaterial( material->clone( "StandardTextured_" + name ) );
@@ -378,26 +378,26 @@ MaterialPtr Resource::CreateMaterial( const string& name, const string& groupNam
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-MeshPtr Resource::CreateMesh( const string& name, const MeshType& meshType, const string& groupName )
+MeshPtr Resource::CreateMesh( const string& name, const VertexBuffer::Type& vbType, const string& groupName )
 {
   auto rc = ActiveContext->getResourceController();
   auto mesh = rc->create<Mesh>( name, groupName );
 
   // If this mesh type is a stock type, assign the corresponding vertex buffer.
-  switch ( meshType ) {
+  switch ( vbType ) {
   default:
-  case MeshType::Custom:
+  case VertexBuffer::Type::Custom:
     break;
 
-  case MeshType::Quad:
+  case VertexBuffer::Type::Quad:
     mesh->setVertexBuffer( rc->get<VertexBuffer>( "Quad" ) );
     break;
 
-  case MeshType::Text:
+  case VertexBuffer::Type::Text:
     mesh->setVertexBuffer( rc->get<VertexBuffer>( "Text" ) );
     break;
 
-  case MeshType::TexturedQuad:
+  case VertexBuffer::Type::TexturedQuad:
     mesh->setVertexBuffer( rc->get<VertexBuffer>( "TexturedQuad" ) );
     break;
   }
@@ -467,7 +467,7 @@ UIPtr Resource::CreateUI( const string& name, const string& groupName )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-VertexBufferPtr Resource::CreateVertexBuffer( const string& name, const MeshType& type, const string& groupName )
+VertexBufferPtr Resource::CreateVertexBuffer( const string& name, const VertexBuffer::Type& type, const string& groupName )
 {
   auto vb = ActiveContext->getResourceController()->create<VertexBuffer>( name, groupName );
   vb->init( type );

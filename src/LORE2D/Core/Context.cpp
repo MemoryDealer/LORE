@@ -82,13 +82,13 @@ void Context::initConfiguration()
 {
   // Setup default memory pool settings. (TODO: Move out of Context.cpp).
   _poolCluster.registerPool<Background>( 16 );
-  _poolCluster.registerPool<Box>( 1024 );
+  _poolCluster.registerPool<Box>( 100024 );
   _poolCluster.registerPool<Camera>( 16 );
   _poolCluster.registerPool<Entity>( 16 );
   _poolCluster.registerPool<Light>( 32 );
   _poolCluster.registerPool<Material>( 32 );
   _poolCluster.registerPool<Mesh>( 8 );
-  _poolCluster.registerPool<Node>( 1024 );
+  _poolCluster.registerPool<Node>( 10024 );
   _poolCluster.registerPool<Scene>( 4 );
   _poolCluster.registerPool<Sprite>( 32 );
   _poolCluster.registerPool<SpriteAnimationSet>( 8 );

@@ -27,6 +27,8 @@
 
 #include <LORE2D/Resource/IResource.h>
 
+#include <LORE2D/Renderer/Renderer.h>
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
@@ -40,6 +42,8 @@ namespace Lore {
     ~Entity() override;
 
     EntityPtr clone( const string& name );
+
+    void enableInstancing( const size_t max );
 
     //
     // Getters.
@@ -59,6 +63,26 @@ namespace Lore {
       return _renderQueue;
     }
 
+    inline bool isInstanced() const
+    {
+      return !!( _instancedVertexBuffer );
+    }
+
+    VertexBufferPtr getInstancedVBO() const
+    {
+      return _instancedVertexBuffer;
+    }
+
+    size_t getInstanceCount() const
+    {
+      return _instanceCount;
+    }
+
+    size_t getNextInstanceCount()
+    {
+      return _instanceCount++;
+    }
+
     //
     // Setters.
 
@@ -72,6 +96,8 @@ namespace Lore {
       _mesh = mesh;
     }
 
+    void updateInstancedMatrix( const size_t idx, const Matrix4& matrix );
+
     //
     // Helper functions.
 
@@ -81,16 +107,20 @@ namespace Lore {
 
     friend class Node;
 
-  private:
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     void _notifyAttached();
 
-  private:
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    MaterialPtr _material;
-    MeshPtr _mesh;
+    MaterialPtr _material { nullptr };
+    MeshPtr _mesh { nullptr };
 
-    uint _renderQueue;
+    // Only used if Entity is instanced.
+    VertexBufferPtr _instancedVertexBuffer { nullptr };
+    size_t _instanceCount { 0 };
+
+    uint _renderQueue { RenderQueue::General };
 
   };
 

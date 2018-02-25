@@ -95,7 +95,7 @@ void Game::loadScene()
 
   // In order to render our player sprite, we must create an entity, which describes
   // how to render a sprite (most of the time this is a TexturedQuad).
-  Lore::EntityPtr playerEntity = Lore::Resource::CreateEntity( "player", Lore::MeshType::TexturedQuad );
+  Lore::EntityPtr playerEntity = Lore::Resource::CreateEntity( "player", Lore::VertexBuffer::Type::TexturedQuad );
 
   // Assign our player sprite to the entity so it can be rendered with it.
   // (The "player" sprite was loaded into the Core resource group in loadResources()).
@@ -118,7 +118,8 @@ void Game::loadScene()
   //
   // Add some blocks to the scene.
 
-  Lore::EntityPtr blockEntity = Lore::Resource::CreateEntity( "block", Lore::MeshType::TexturedQuad );
+  Lore::EntityPtr blockEntity = Lore::Resource::CreateEntity( "block", Lore::VertexBuffer::Type::TexturedQuad );
+  blockEntity->enableInstancing( 1000 );
   blockEntity->setSprite( Lore::Resource::GetSprite( "block" ) );
   for ( int i = 0; i < 10; ++i ) {
     auto blockNode = _scene->createNode( "block" + std::to_string( i ) );
@@ -132,9 +133,15 @@ void Game::loadScene()
   //
   // Add some stone walls behind the blocks.
 
-  Lore::EntityPtr stoneEntity = Lore::Resource::CreateEntity( "stone", Lore::MeshType::TexturedQuad );
+  Lore::EntityPtr stoneEntity = Lore::Resource::CreateEntity( "stone", Lore::VertexBuffer::Type::TexturedQuad );
+#ifdef _DEBUG
+  const size_t count = 100;
+#else
+  const size_t count = 10000;
+#endif
+  stoneEntity->enableInstancing( count );
   stoneEntity->setSprite( Lore::Resource::GetSprite( "stone" ) );
-  for ( int i = 0; i < 20; ++i ) {
+  for ( int i = 0; i < count / 2; ++i ) {
     auto stoneNode = _scene->createNode( "stone" + std::to_string( i ) );
     stoneNode->attachObject( stoneEntity );
 
@@ -143,7 +150,7 @@ void Game::loadScene()
     stoneNode->setPosition( -4.f + static_cast< Lore::real >( i * 0.4f ), 0.f );
 
     // Add a 2nd row that will go above the stained glass.
-    auto stoneNode2 = _scene->createNode( "stone2" + std::to_string( i ) );
+    auto stoneNode2 = _scene->createNode( "2stone" + std::to_string( i ) );
     stoneNode2->attachObject( stoneEntity );
     stoneNode2->scale( 2.f );
     stoneNode2->setDepth( 10.f );
@@ -153,7 +160,7 @@ void Game::loadScene()
   //
   // Create some torches.
 
-  Lore::EntityPtr torchEntity = Lore::Resource::CreateEntity( "torch", Lore::MeshType::TexturedQuad );
+  Lore::EntityPtr torchEntity = Lore::Resource::CreateEntity( "torch", Lore::VertexBuffer::Type::TexturedQuad );
   torchEntity->setSprite( Lore::Resource::GetSprite( "torch" ) );
   for ( int i = 0; i < 3; ++i ) {
     auto torchNode = _scene->createNode( "torch" + std::to_string( i ) );
@@ -175,7 +182,7 @@ void Game::loadScene()
   //
   // Add blended stained glass.
 
-  Lore::EntityPtr glassEntity = Lore::Resource::CreateEntity( "glass1", Lore::MeshType::TexturedQuad );
+  Lore::EntityPtr glassEntity = Lore::Resource::CreateEntity( "glass1", Lore::VertexBuffer::Type::TexturedQuad );
   glassEntity->setMaterial( Lore::Resource::GetMaterial( "glass1" ) );
   for ( int i = 0; i < 5; ++i ) {
     auto glassNode = _scene->createNode( "glass1" + std::to_string( i ) );

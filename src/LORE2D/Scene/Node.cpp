@@ -80,6 +80,15 @@ NodePtr Node::clone( const string& name, const bool cloneChildNodes )
   }
   node->_lights = _lights.clone();
 
+  // Detect instancing.
+  auto it = _entities.getConstIterator();
+  while ( it.hasMore() ) {
+    auto entity = it.getNext();
+    if ( entity->isInstanced() ) {
+      _instanceID = entity->getNextInstanceCount();
+    }
+  }
+
   _parent->_childNodes.insert( name, node );
   _scene->_nodes.insert( name, node );
   
@@ -159,6 +168,9 @@ void Node::detachFromParent()
 void Node::attachObject( EntityPtr e )
 {
   _entities.insert( e->getName(), e );
+  if ( e->isInstanced() ) {
+    _instanceID = e->getNextInstanceCount();
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

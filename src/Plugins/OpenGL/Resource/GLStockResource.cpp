@@ -53,6 +53,7 @@ Lore::GPUProgramPtr StockResourceController::createUberProgram( const string& na
 {
   const bool textured = ( params.numTextures > 0 );
   const bool lit = ( params.maxLights > 0 );
+  const bool instanced = params.instanced;
   const string header = "#version " +
     std::to_string( APIVersion::GetMajor() ) + std::to_string( APIVersion::GetMinor() ) + "0" +
     " core\n";
@@ -65,10 +66,13 @@ Lore::GPUProgramPtr StockResourceController::createUberProgram( const string& na
   //
   // Layout.
 
-  src += "layout (location = 0) in vec2 vertex;";
-
+  uint32_t location = 0;
+  src += "layout (location = " + std::to_string( location++ ) + ") in vec2 vertex;";
   if ( textured ) {
-    src += "layout (location = 1) in vec2 texCoord;";
+    src += "layout (location = " + std::to_string( location++ ) + ") in vec2 texCoord;";
+  }
+  if ( instanced ) {
+    src += "layout (location = " + std::to_string( location++ ) + ") in mat4 instanceMatrix;";
   }
 
   //
@@ -84,7 +88,7 @@ Lore::GPUProgramPtr StockResourceController::createUberProgram( const string& na
   //
   // Uniforms and outs.
 
-  src += "uniform mat4 transform;";
+   src += "uniform mat4 transform;";
   src += "uniform Rect texSampleRegion;";
 
   if ( textured ) {
@@ -101,13 +105,23 @@ Lore::GPUProgramPtr StockResourceController::createUberProgram( const string& na
 
   src += "void main(){";
 
-  src += "gl_Position = transform * vec4(vertex, 1.0, 1.0);";
+  if ( instanced ) {
+    src += "gl_Position = transform * instanceMatrix * vec4(vertex, 1.0, 1.0);";
+  }
+  else {
+    src += "gl_Position = transform * vec4(vertex, 1.0, 1.0);";
+  }
   if ( textured ) {
     src += "TexCoord = vec2(texCoord.x * texSampleRegion.w + texSampleRegion.x, texCoord.y * texSampleRegion.h + texSampleRegion.y);";
   }
 
   if ( lit ) {
-    src += "FragPos = (model * vec4(vertex, 0.0, 1.0)).xy;";
+    if ( instanced ) {
+      src += "FragPos = (instanceMatrix * vec4(vertex, 0.0, 1.0)).xy;";
+    }
+    else {
+      src += "FragPos = (model * vec4(vertex, 0.0, 1.0)).xy;";
+    }
   }
 
   src += "}";

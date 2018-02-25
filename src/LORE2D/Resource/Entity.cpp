@@ -26,7 +26,6 @@
 
 #include "Entity.h"
 
-#include <LORE2D/Renderer/Renderer.h>
 #include <LORE2D/Resource/Material.h>
 #include <LORE2D/Resource/ResourceController.h>
 
@@ -37,9 +36,6 @@ using namespace Lore;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Entity::Entity()
-  : _material( nullptr )
-  , _mesh( nullptr )
-  , _renderQueue( RenderQueue::General )
 {
 }
 
@@ -65,9 +61,30 @@ EntityPtr Entity::clone( const string& name )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void Entity::enableInstancing( const size_t max )
+{
+  if ( isInstanced() ) {
+    throw Lore::Exception( "Instancing is already enabled" );
+  }
+
+  // Create an instanced vertex buffer.
+  auto rc = Resource::GetResourceController();
+  _instancedVertexBuffer = rc->create<VertexBuffer>( _name + "_instanced", getResourceGroupName() );
+  _instancedVertexBuffer->initInstanced( VertexBuffer::Type::TexturedQuadInstanced, max );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void Entity::setSprite( SpritePtr sprite )
 {
   _material->sprite = sprite;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Entity::updateInstancedMatrix( const size_t idx, const Matrix4& matrix )
+{
+  _instancedVertexBuffer->updateInstanced( idx, matrix );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -39,6 +39,7 @@ namespace Lore {
   {
     unsigned int maxLights { 4 };
     unsigned int numTextures { 1 };
+    bool instanced { false };
   };
 
   struct BackgroundProgramParameters
@@ -82,7 +83,7 @@ namespace Lore {
       return _controller->get<ResourceType>( name );
     }
 
-    MeshPtr getMesh( const MeshType& type );
+    MeshPtr getMesh( const VertexBuffer::Type& type );
 
     //
     // Factory functions that must be implemented by the render plugin.
@@ -94,7 +95,7 @@ namespace Lore {
 
   protected:
 
-    using MeshTable = Util::HashTable<MeshType, MeshPtr>;
+    using MeshTable = Util::HashTable<VertexBuffer::Type, MeshPtr>;
 
   protected:
 
@@ -116,7 +117,7 @@ namespace Lore {
 
     static GPUProgramPtr GetGPUProgram( const string& name );
     static MaterialPtr GetMaterial( const string& name );
-    static MeshPtr GetMesh( const MeshType& type );
+    static MeshPtr GetMesh( const VertexBuffer::Type& type );
     static TexturePtr GetTexture( const string& name );
     static VertexBufferPtr GetVertexBuffer( const string& name );
     static FontPtr GetFont( const string& name );

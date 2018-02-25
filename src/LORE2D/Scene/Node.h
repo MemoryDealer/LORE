@@ -289,6 +289,7 @@ namespace Lore {
     real _depth { Depth::Default };
 
     EntityList _entities {};
+    size_t _instanceID { 0 };
 
     BoxList _boxes {};
 

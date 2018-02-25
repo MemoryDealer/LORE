@@ -25,60 +25,74 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE2D/Math/Matrix.h>
 #include <LORE2D/Memory/Alloc.h>
-#include <LORE2D/Resource/MeshType.h>
 #include <LORE2D/Resource/IResource.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-    class LORE_EXPORT VertexBuffer : public IResource
+  class LORE_EXPORT VertexBuffer : public IResource
+  {
+
+  public:
+
+    enum class Type
     {
-
-    public:
-
-        enum class AttributeType
-        {
-            Int,
-            Float
-        };
-
-        using Vertices = std::vector<real>;
-
-    public:
-
-        VertexBuffer();
-        virtual ~VertexBuffer() = default;
-
-        virtual void init( const Lore::MeshType& type ) = 0;
-
-        void addAttribute( const AttributeType& type, const uint size );
-
-        virtual void build() = 0;
-
-        virtual void bind() = 0;
-
-        virtual void unbind() = 0;
-
-        virtual void draw() = 0;
-
-        virtual void draw( const Vertices& verts ) = 0;
-
-    private:
-
-        struct Attribute
-        {
-            AttributeType type;
-            int size;
-        };
-
-    protected:
-
-        MeshType _type;
-        std::vector<Attribute> _attributes;
-
+      Custom,
+      Quad,
+      TexturedQuad,
+      QuadInstanced,
+      TexturedQuadInstanced,
+      Background,
+      Text
     };
+
+    enum class AttributeType
+    {
+      Int,
+      Float
+    };
+
+    using Vertices = std::vector<real>;
+    using Matrices = std::vector<Matrix4>;
+
+  public:
+
+    VertexBuffer();
+    virtual ~VertexBuffer() = default;
+
+    virtual void init( const Type& type ) = 0;
+
+    virtual void initInstanced( const Type& type, const size_t maxCount ) = 0;
+
+    virtual void updateInstanced( const size_t idx, const Matrix4& matrix ) = 0;
+
+    void addAttribute( const AttributeType& type, const uint size );
+
+    virtual void bind() = 0;
+
+    virtual void unbind() = 0;
+
+    virtual void draw( const size_t instanceCount = 0 ) = 0;
+
+    virtual void draw( const Vertices& verts ) = 0;
+
+  private:
+
+    struct Attribute
+    {
+      AttributeType type;
+      int size;
+    };
+
+  protected:
+
+    Type _type;
+    std::vector<Attribute> _attributes;
+
+  };
 
 }
 

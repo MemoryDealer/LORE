@@ -109,22 +109,38 @@ void GenericRenderer::addRenderData( Lore::EntityPtr e,
     queue.transparents.insert( { depth, t } );
   }
   else {
-    // Acquire the render data list for this material/vb (or create one).
-    RenderQueue::EntityData entityData;
-    entityData.material = e->getMaterial();
-    entityData.vertexBuffer = e->getMesh()->getVertexBuffer();
-    entityData.spriteFrame = spriteFrame;
+    if ( e->isInstanced() ) {
+      if ( queue.instanced.find( e->getName() ) == queue.instanced.end() ) {
+        RenderQueue::InstancedEntityData data;
+        data.material = e->getMaterial();
+        data.vertexBuffer = e->getInstancedVBO();
+        data.program = StockResource::GetGPUProgram( "StandardTexturedInstanced" );
+        data.spriteFrame = spriteFrame;
+        data.count = e->getInstanceCount();
+        data.xFlipped = xFlipped;
+        data.yFlipped = yFlipped;
 
-    RenderQueue::RenderDataList& renderData = queue.solids[entityData];
+        queue.instanced[e->getName()] = data;
+      }
+    }
+    else {
+      // Acquire the render data list for this material/vb (or create one).
+      RenderQueue::EntityData entityData;
+      entityData.material = e->getMaterial();
+      entityData.vertexBuffer = e->getMesh()->getVertexBuffer();
+      entityData.spriteFrame = spriteFrame;
 
-    // Fill out the render data and add it to the list.
-    RenderQueue::RenderData rd;
-    rd.model = node->getFullTransform();
-    rd.model[3][2] = node->getDepth();
-    rd.xFlipped = xFlipped;
-    rd.yFlipped = yFlipped;
+      RenderQueue::RenderDataList& renderData = queue.solids[entityData];
 
-    renderData.push_back( rd );
+      // Fill out the render data and add it to the list.
+      RenderQueue::RenderData rd;
+      rd.model = node->getFullTransform();
+      rd.model[3][2] = node->getDepth();
+      rd.xFlipped = xFlipped;
+      rd.yFlipped = yFlipped;
+
+      renderData.push_back( rd );
+    }
   }
 }
 
@@ -391,8 +407,67 @@ void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
                                          const RenderQueue& queue,
                                          const Lore::Matrix4& viewProjection ) const
 {
-  // Iterate over render data lists for each material.
+  // instanced (MOVE)
 
+  for ( auto& pair : queue.instanced ) {
+    const RenderQueue::InstancedEntityData& entityData = pair.second;
+
+    MaterialPtr mat = entityData.material;
+    GPUProgramPtr program = entityData.program;
+    VertexBufferPtr vertexBuffer = entityData.vertexBuffer;
+
+    program->use();
+    if ( mat->sprite && mat->sprite->getTextureCount() ) {
+      const auto spriteFrame = entityData.spriteFrame;
+      TexturePtr texture = mat->sprite->getTexture( spriteFrame );
+
+      // TODO: Multi-texturing.
+      texture->bind();
+      program->setUniformVar( "texSampleOffset", mat->getTexCoordOffset() );
+
+      Lore::Rect sampleRegion = mat->getTexSampleRegion();
+      program->setUniformVar( "texSampleRegion.x", sampleRegion.x );
+      program->setUniformVar( "texSampleRegion.y", sampleRegion.y );
+      program->setUniformVar( "texSampleRegion.w", sampleRegion.w );
+      program->setUniformVar( "texSampleRegion.h", sampleRegion.h );
+    }
+
+    // Upload lighting data.
+    if ( mat->lighting ) {
+
+      // Material.
+      program->setUniformVar( "material.ambient", mat->ambient );
+      program->setUniformVar( "material.diffuse", mat->diffuse );
+
+      // Scene.
+      program->setUniformVar( "sceneAmbient", scene->getAmbientLightColor() );
+      program->setUniformVar( "numLights", static_cast< int >( queue.lights.size() ) );
+
+      program->updateLights( queue.lights );
+
+    }
+
+    Vec3 scale( 1.f, 1.f, 1.f );
+    if ( entityData.xFlipped ) {
+      scale.x = -1.f;
+    }
+    if ( entityData.yFlipped ) {
+      scale.y = -1.f;
+    }
+
+    const Matrix4 FlipMatrix = Math::CreateTransformationMatrix( Lore::Vec3(), Lore::Quaternion(), scale );
+
+    vertexBuffer->bind();
+    program->setTransformVar( viewProjection * FlipMatrix );
+
+    // Draw the entity.
+    vertexBuffer->draw( entityData.count );
+    vertexBuffer->unbind();
+  }
+
+  // ja;klsdjf
+
+  // Iterate over render data lists for each material.
   for ( auto& pair : queue.solids ) {
 
     const RenderQueue::EntityData& entityData = pair.first;
@@ -452,8 +527,7 @@ void GenericRenderer::renderMaterialMap( const Lore::ScenePtr scene,
       const Matrix4 FlipMatrix = Math::CreateTransformationMatrix( Lore::Vec3(), Lore::Quaternion(), scale );
 
       // Calculate model-view-projection matrix for this object.
-      Matrix4 mvp = viewProjection * rd.model * FlipMatrix;
-
+      const Matrix4 mvp = viewProjection * rd.model * FlipMatrix;
       program->setTransformVar( mvp );
 
       if ( mat->lighting ) {
@@ -615,17 +689,17 @@ void GenericRenderer::renderTextboxes( const RenderQueue& queue,
     real x = data.model[3][0];
     const real y = data.model[3][1];
     const real scale = 1.f;
-    for ( auto c = text.begin(); c != text.end(); ++c ) {
+    for (char & c : text) {
       // Generate vertices to draw glyph and bind its associated texture.
-      auto vertices = font->generateVertices( *c,
+      auto vertices = font->generateVertices( c,
                                               x,
                                               y,
                                               scale );
-      font->bindTexture( *c );
+      font->bindTexture( c );
 
       vb->draw( vertices );
 
-      x = font->advanceGlyphX( *c, x, scale );
+      x = font->advanceGlyphX( c, x, scale );
     }
 
   }

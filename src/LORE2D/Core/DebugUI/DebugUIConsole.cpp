@@ -159,12 +159,12 @@ DebugUIConsole::DebugUIConsole()
 
   // Create background for console.
   _backgroundElement = _panel->createElement( "background" );
-  _backgroundEntity = Resource::CreateEntity( "DebugUI_ConsoleBackground", MeshType::Quad );
+  _backgroundEntity = Resource::CreateEntity( "DebugUI_ConsoleBackground", VertexBuffer::Type::Quad );
   _backgroundElement->attachEntity( _backgroundEntity );
 
   // Create blinking cursor.
   _cursorElement = _panel->createElement( "DebugUI_Cursor" );
-  _cursorEntity = Resource::CreateEntity( "DebugUI_Cursor", MeshType::Quad );
+  _cursorEntity = Resource::CreateEntity( "DebugUI_Cursor", VertexBuffer::Type::Quad );
   _cursorEntity->setMaterial( StockResource::GetMaterial( "UnlitStandard" ) ); // TODO: Add parameter or overload to CreateEntity to avoid cloning default material.
   _cursorElement->attachEntity( _cursorEntity );
   _cursorElement->setDimensions( .16f, .4f );

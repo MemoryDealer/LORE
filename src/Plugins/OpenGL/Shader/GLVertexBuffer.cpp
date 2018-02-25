@@ -26,6 +26,8 @@
 
 #include "GLVertexBuffer.h"
 
+#include <Plugins/OpenGL/Math/MathConverter.h>
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 using namespace Lore::OpenGL;
@@ -33,14 +35,6 @@ using namespace Lore::OpenGL;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 GLVertexBuffer::GLVertexBuffer()
-  : Lore::VertexBuffer()
-  , _vbo( 0 )
-  , _vao( 0 )
-  , _ebo( 0 )
-  , _vertices()
-  , _indices()
-  , _mode( 0 )
-  , _glType( GL_UNSIGNED_INT )
 {
 }
 
@@ -52,68 +46,62 @@ GLVertexBuffer::~GLVertexBuffer()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLVertexBuffer::init( const Lore::MeshType& type )
+void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
 {
   _type = type;
-  switch ( _type ) {
 
-  default:
-  case MeshType::Custom:
-  case MeshType::Text:
-    _mode = GL_TRIANGLES;
-    break;
-
-  case MeshType::Quad:
-  case MeshType::TexturedQuad:
-  case MeshType::Background:
-    _mode = GL_TRIANGLE_STRIP;
-    break;
-
-  }
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void GLVertexBuffer::build()
-{
   // First generate vertices and indices.
   switch ( _type ) {
   default:
     throw Lore::Exception( "Unknown vertex buffer type" );
 
-  case MeshType::Quad:
+  case VertexBuffer::Type::QuadInstanced:
+  case VertexBuffer::Type::TexturedQuadInstanced:
+    throw Lore::Exception( "VertexBuffer::initInstanced() should be called for instanced types" );
+    break;
+
+  case VertexBuffer::Type::Custom:
+    _mode = GL_TRIANGLES;
+    // Attributes should be added by the caller.
+    break;
+
+  case VertexBuffer::Type::Quad:
+    _mode = GL_TRIANGLE_STRIP;
     _vertices = { -0.1f, -0.1f,
-                  -0.1f, 0.1f,
-                  0.1f, -0.1f,
-                  0.1f, 0.1f };
+      -0.1f, 0.1f,
+      0.1f, -0.1f,
+      0.1f, 0.1f };
     _indices = { 0, 1, 2, 3 };
 
     addAttribute( AttributeType::Float, 2 );
     break;
 
-  case MeshType::TexturedQuad:
+  case VertexBuffer::Type::TexturedQuad:
+    _mode = GL_TRIANGLE_STRIP;
     _vertices = { -0.1f, -0.1f,     0.f, 0.f,
-                  -0.1f, 0.1f,      0.f, 1.f,
-                  0.1f, -0.1f,      1.f, 0.f,
-                  0.1f, 0.1f,       1.f, 1.f };
+      -0.1f, 0.1f,      0.f, 1.f,
+      0.1f, -0.1f,      1.f, 0.f,
+      0.1f, 0.1f,       1.f, 1.f };
     _indices = { 0, 1, 2, 3 };
 
     addAttribute( AttributeType::Float, 2 );
     addAttribute( AttributeType::Float, 2 );
     break;
 
-  case MeshType::Background:
+  case VertexBuffer::Type::Background:
+    _mode = GL_TRIANGLE_STRIP;
     _vertices = { -1.f, -1.f,     0.f, 0.f,
-                  -1.f, 1.f,      0.f, 1.f,
-                  1.f, -1.f,      1.f, 0.f,
-                  1.f, 1.f,       1.f, 1.f };
+      -1.f, 1.f,      0.f, 1.f,
+      1.f, -1.f,      1.f, 0.f,
+      1.f, 1.f,       1.f, 1.f };
     _indices = { 0, 1, 2, 3 };
 
     addAttribute( AttributeType::Float, 2 );
     addAttribute( AttributeType::Float, 2 );
     break;
 
-  case MeshType::Text:
+  case VertexBuffer::Type::Text:
+    _mode = GL_TRIANGLES;
     // Text VBs are a special case and require dynamic drawing.
     glGenVertexArrays( 1, &_vao );
     glGenBuffers( 1, &_vbo );
@@ -121,7 +109,7 @@ void GLVertexBuffer::build()
     glBindBuffer( GL_ARRAY_BUFFER, _vbo );
     glBufferData( GL_ARRAY_BUFFER, sizeof( GLfloat ) * 6 * 4, nullptr, GL_DYNAMIC_DRAW );
     glEnableVertexAttribArray( 0 );
-    glVertexAttribPointer( 0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof( GLfloat ), 0 );
+    glVertexAttribPointer( 0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof( GLfloat ), nullptr );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
     glBindVertexArray( 0 );
     _attributes.clear();
@@ -186,6 +174,64 @@ void GLVertexBuffer::build()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void GLVertexBuffer::initInstanced( const Type& type, const size_t maxCount )
+{
+  // First generate vertices and indices.
+  switch ( type ) {
+  default:
+    throw Lore::Exception( "VertexBuffer type must be instanced" );
+
+  case VertexBuffer::Type::QuadInstanced:
+    init( Type::Quad );
+    break;
+
+  case VertexBuffer::Type::TexturedQuadInstanced:
+    init( Type::TexturedQuad );
+    break;
+  }
+
+  // Bind the existing vertex array to add instanced buffer data to it.
+  glBindVertexArray( _vao );
+
+  // Generate a new vertex buffer for instanced data.
+  glGenBuffers( 1, &_instancedVBO );
+  glBindBuffer( GL_ARRAY_BUFFER, _instancedVBO );
+  _instancedMatrices.resize( maxCount );
+  glBufferData( GL_ARRAY_BUFFER, _instancedMatrices.size() * sizeof( glm::mat4 ), &_instancedMatrices.data()[0], GL_STATIC_DRAW );
+
+  // Set the vertex attributes for instanced matrices.
+//   for ( GLuint attribIdx = 2; attribIdx < 6; ++attribIdx ) {
+//     glEnableVertexAttribArray( attribIdx );
+//     glVertexAttribPointer( attribIdx, 4, GL_FLOAT, GL_FALSE, sizeof( glm::mat4 ), reinterpret_cast< void* >( ( attribIdx - 2 ) * sizeof( glm::vec4 ) ) );
+//   }
+  glEnableVertexAttribArray( 2 );
+  glVertexAttribPointer( 2, 4, GL_FLOAT, GL_FALSE, sizeof( glm::mat4 ), ( void* )0 );
+  glEnableVertexAttribArray( 3 );
+  glVertexAttribPointer( 3, 4, GL_FLOAT, GL_FALSE, sizeof( glm::mat4 ), ( void* )( sizeof( glm::vec4 ) ) );
+  glEnableVertexAttribArray( 4 );
+  glVertexAttribPointer( 4, 4, GL_FLOAT, GL_FALSE, sizeof( glm::mat4 ), ( void* )( 2 * sizeof( glm::vec4 ) ) );
+  glEnableVertexAttribArray( 5 );
+  glVertexAttribPointer( 5, 4, GL_FLOAT, GL_FALSE, sizeof( glm::mat4 ), ( void* )( 3 * sizeof( glm::vec4 ) ) );
+
+  glVertexAttribDivisor( 2, 1 );
+  glVertexAttribDivisor( 3, 1 );
+  glVertexAttribDivisor( 4, 1 );
+  glVertexAttribDivisor( 5, 1 );
+
+  glBindVertexArray( 0 );
+
+  _type = type;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLVertexBuffer::updateInstanced( const size_t idx, const Lore::Matrix4& matrix )
+{
+  _instancedMatrices[idx] = MathConverter::LoreToGLM( matrix );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void GLVertexBuffer::bind()
 {
   glBindVertexArray( _vao );
@@ -200,16 +246,28 @@ void GLVertexBuffer::unbind()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLVertexBuffer::draw()
+void GLVertexBuffer::draw( const size_t instanceCount )
 {
-  glDrawElements( _mode, static_cast< GLsizei >( _indices.size() ), GL_UNSIGNED_INT, 0 );
+  switch ( _type ) {
+  default:
+    glDrawElements( _mode, static_cast< GLsizei >( _indices.size() ), GL_UNSIGNED_INT, nullptr );
+    break;
+
+  case VertexBuffer::Type::QuadInstanced:
+  case VertexBuffer::Type::TexturedQuadInstanced:
+    glBindBuffer( GL_ARRAY_BUFFER, _instancedVBO );
+    glBufferData( GL_ARRAY_BUFFER, _instancedMatrices.size() * sizeof( glm::mat4 ), &_instancedMatrices.data()[0], GL_STATIC_DRAW );
+    glDrawElementsInstanced( _mode, static_cast< GLsizei >( _indices.size() ), GL_UNSIGNED_INT, nullptr, static_cast< GLsizei >( instanceCount ) );
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    break;
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void GLVertexBuffer::draw( const Lore::VertexBuffer::Vertices& verts )
 {
-  assert( MeshType::Text == _type );
+  assert( VertexBuffer::Type::Text == _type );
 
   glBindBuffer( GL_ARRAY_BUFFER, _vbo );
   glBufferSubData( GL_ARRAY_BUFFER, 0, verts.size() * sizeof(real), verts.data() );

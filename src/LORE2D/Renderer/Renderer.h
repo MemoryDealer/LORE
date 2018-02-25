@@ -67,6 +67,14 @@ namespace Lore {
       bool operator < ( const EntityData& r ) const;
     };
 
+    struct InstancedEntityData : public EntityData
+    {
+      GPUProgramPtr program { nullptr };
+      size_t count { 0 };
+      bool xFlipped { false };
+      bool yFlipped { false };
+    };
+
     struct Transparent // TODO: This is inconsistent with EntityData, clean these up.
     {
       MaterialPtr material { nullptr };
@@ -97,12 +105,14 @@ namespace Lore {
 
     // Every Material maps to a list of RenderData.
     using EntityDataMap = std::map<EntityData, RenderDataList>;
+    using InstancedEntityDataMap = std::unordered_map<string, InstancedEntityData>;
     using TransparentDataMap = std::multimap<real, Transparent>;
     using BoxList = std::vector<BoxData>;
     using TextboxList = std::vector<TextboxData>;
     using LightList = std::vector<LightData>;
 
     EntityDataMap solids {};
+    InstancedEntityDataMap instanced {};
     TransparentDataMap transparents {};
     BoxList boxes {};
     TextboxList textboxes {};

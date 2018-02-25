@@ -349,14 +349,14 @@ namespace Lore {
     static BoxPtr CreateBox( const string& name,
                              const string& groupname = ResourceController::DefaultGroupName );
     static EntityPtr CreateEntity( const string& name,
-                                   const MeshType& meshType,
+                                   const VertexBuffer::Type& vbType,
                                    const string& groupName = ResourceController::DefaultGroupName );
     static GPUProgramPtr CreateGPUProgram( const string& name,
                                            const string& groupName = ResourceController::DefaultGroupName );
     static MaterialPtr CreateMaterial( const string& name,
                                        const string& groupName = ResourceController::DefaultGroupName );
     static MeshPtr CreateMesh( const string& name,
-                               const MeshType& meshType,
+                               const VertexBuffer::Type& vbType,
                                const string& groupName = ResourceController::DefaultGroupName );
     static RenderTargetPtr CreateRenderTarget( const string& name,
                                                const uint32_t width,
@@ -379,7 +379,7 @@ namespace Lore {
     static UIPtr CreateUI( const string& name,
                            const string& groupName = ResourceController::DefaultGroupName );
     static VertexBufferPtr CreateVertexBuffer( const string& name,
-                                               const MeshType& type,
+                                               const VertexBuffer::Type& type,
                                                const string& groupName = ResourceController::DefaultGroupName );
 
     //
