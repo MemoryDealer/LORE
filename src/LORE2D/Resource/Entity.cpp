@@ -61,6 +61,76 @@ EntityPtr Entity::clone( const string& name )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void Entity::setMaterial( MaterialPtr material )
+{
+  _material = material;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Entity::setMesh( MeshPtr mesh )
+{
+  _mesh = mesh;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+NodePtr Entity::getInstanceControllerNode() const
+{
+  return _instanceControllerNode;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Entity::setSprite( SpritePtr sprite )
+{
+  _material->sprite = sprite;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+MaterialPtr Entity::getMaterial() const
+{
+  return _material;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+MeshPtr Entity::getMesh() const
+{
+  return _mesh;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+uint Entity::getRenderQueue() const
+{
+  return _renderQueue;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+bool Entity::isInstanced() const
+{
+  return !!( _instancedVertexBuffer );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+VertexBufferPtr Entity::getInstancedVertexBuffer() const
+{
+  return _instancedVertexBuffer;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+size_t Entity::getInstanceCount() const
+{
+  return _instanceCount;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void Entity::enableInstancing( const size_t max )
 {
   if ( isInstanced() ) {
@@ -82,20 +152,6 @@ void Entity::setInstanceControllerNode( const NodePtr node )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Entity::setSprite( SpritePtr sprite )
-{
-  _material->sprite = sprite;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-NodePtr Entity::getInstanceControllerNode() const
-{
-  return _instanceControllerNode;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 void Entity::updateInstancedMatrix( const size_t idx, const Matrix4& matrix )
 {
   _instancedVertexBuffer->updateInstanced( idx, matrix );
@@ -104,9 +160,15 @@ void Entity::updateInstancedMatrix( const size_t idx, const Matrix4& matrix )
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Entity::_notifyAttached()
+void Entity::_notifyAttached( const NodePtr node )
 {
-
+  if ( isInstanced() ) {
+    node->_instanceID = _instanceCount++;
+    if ( 0 == node->_instanceID ) {
+      // First attached node becomes the instance controller node.
+      _instanceControllerNode = node;
+    }
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

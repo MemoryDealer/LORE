@@ -251,14 +251,15 @@ namespace Lore {
 
     Node( const Node& rhs )
     {
-
+      // TODO: Fill out.
     }
-    //Node& operator = ( const Node& rhs ) = delete;
+
+    Node& operator = ( const Node& rhs ) = delete;
 
   private:
 
-    // Only scenes can construct nodes.
-    friend class Scene;
+    friend class Entity;
+    friend class Scene; // Only scenes can construct nodes.
     friend class SceneGraphVisitor;
     friend class MemoryPool<Node>;
 

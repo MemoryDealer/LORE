@@ -368,7 +368,7 @@ void GenericRenderer::renderSolids( const ScenePtr scene,
   // Render instanced solids.
   for ( const auto& entity : queue.instancedSolids ) {
     MaterialPtr material = entity->getMaterial();
-    VertexBufferPtr vertexBuffer = entity->getInstancedVBO();
+    VertexBufferPtr vertexBuffer = entity->getInstancedVertexBuffer();
     GPUProgramPtr program = nullptr;
 
     const NodePtr node = entity->getInstanceControllerNode();

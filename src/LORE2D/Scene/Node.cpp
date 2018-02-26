@@ -85,7 +85,7 @@ NodePtr Node::clone( const string& name, const bool cloneChildNodes )
   while ( it.hasMore() ) {
     auto entity = it.getNext();
     if ( entity->isInstanced() ) {
-      _instanceID = entity->getNextInstanceCount();
+      //_instanceID = entity->getNextInstanceID();
     }
   }
 
@@ -165,16 +165,10 @@ void Node::detachFromParent()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Node::attachObject( EntityPtr e )
+void Node::attachObject( EntityPtr entity )
 {
-  _entities.insert( e->getName(), e );
-  if ( e->isInstanced() ) {
-    _instanceID = e->getNextInstanceCount();
-    // First attached node becomes the instance controller node.
-    if ( 0 == _instanceID ) {
-      e->setInstanceControllerNode( this );
-    }
-  }
+  _entities.insert( entity->getName(), entity );
+  entity->_notifyAttached( this );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

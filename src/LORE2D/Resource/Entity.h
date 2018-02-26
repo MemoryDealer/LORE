@@ -43,63 +43,19 @@ namespace Lore {
 
     EntityPtr clone( const string& name );
 
-    void enableInstancing( const size_t max );
-
-    void setInstanceControllerNode( const NodePtr node );
-
     //
     // Modifiers.
 
-    inline void setMaterial( MaterialPtr material )
-    {
-      _material = material;
-    }
-
-    inline void setMesh( MeshPtr mesh )
-    {
-      _mesh = mesh;
-    }
-
-    void updateInstancedMatrix( const size_t idx, const Matrix4& matrix );
+    void setMaterial( MaterialPtr material ); 
+    void setMesh( MeshPtr mesh );
 
     //
     // Accessors.
 
-    inline MaterialPtr getMaterial() const
-    {
-      return _material;
-    }
-
-    inline MeshPtr getMesh() const
-    {
-      return _mesh;
-    }
-
-    inline uint getRenderQueue() const
-    {
-      return _renderQueue;
-    }
-
-    inline bool isInstanced() const
-    {
-      return !!( _instancedVertexBuffer );
-    }
-
-    VertexBufferPtr getInstancedVBO() const
-    {
-      return _instancedVertexBuffer;
-    }
-
-    size_t getInstanceCount() const
-    {
-      return _instanceCount;
-    }
-
-    size_t getNextInstanceCount()
-    {
-      return _instanceCount++;
-    }
-
+    MaterialPtr getMaterial() const;
+    MeshPtr getMesh() const;
+    uint getRenderQueue() const;
+    bool isInstanced() const;
     NodePtr getInstanceControllerNode() const;
 
     //
@@ -107,13 +63,34 @@ namespace Lore {
 
     void setSprite( SpritePtr sprite );
 
+    //
+    // Special instancing functions.
+
+    VertexBufferPtr getInstancedVertexBuffer() const;
+    size_t getInstanceCount() const;
+
+    ///
+    /// \brief All nodes that use this Entity after a call to this function will be
+    /// rendered with instancing. 
+    void enableInstancing( const size_t max );
+
+    ///
+    /// \brief This node's properties will be used for rendering in instancing mode
+    /// (e.g., material, sprite controller settings. etc.).
+    void setInstanceControllerNode( const NodePtr node );
+
+    ///
+    /// \brief Updates the matrix entry in the instanced buffer for the specified
+    /// instance ID.
+    void updateInstancedMatrix( const size_t idx, const Matrix4& matrix );
+
   private:
 
     friend class Node;
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    void _notifyAttached();
+    void _notifyAttached( const NodePtr node );
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
