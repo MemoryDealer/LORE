@@ -200,18 +200,10 @@ void GLVertexBuffer::initInstanced( const Type& type, const size_t maxCount )
   glBufferData( GL_ARRAY_BUFFER, _instancedMatrices.size() * sizeof( glm::mat4 ), &_instancedMatrices.data()[0], GL_STATIC_DRAW );
 
   // Set the vertex attributes for instanced matrices.
-//   for ( GLuint attribIdx = 2; attribIdx < 6; ++attribIdx ) {
-//     glEnableVertexAttribArray( attribIdx );
-//     glVertexAttribPointer( attribIdx, 4, GL_FLOAT, GL_FALSE, sizeof( glm::mat4 ), reinterpret_cast< void* >( ( attribIdx - 2 ) * sizeof( glm::vec4 ) ) );
-//   }
-  glEnableVertexAttribArray( 2 );
-  glVertexAttribPointer( 2, 4, GL_FLOAT, GL_FALSE, sizeof( glm::mat4 ), ( void* )0 );
-  glEnableVertexAttribArray( 3 );
-  glVertexAttribPointer( 3, 4, GL_FLOAT, GL_FALSE, sizeof( glm::mat4 ), ( void* )( sizeof( glm::vec4 ) ) );
-  glEnableVertexAttribArray( 4 );
-  glVertexAttribPointer( 4, 4, GL_FLOAT, GL_FALSE, sizeof( glm::mat4 ), ( void* )( 2 * sizeof( glm::vec4 ) ) );
-  glEnableVertexAttribArray( 5 );
-  glVertexAttribPointer( 5, 4, GL_FLOAT, GL_FALSE, sizeof( glm::mat4 ), ( void* )( 3 * sizeof( glm::vec4 ) ) );
+  for ( GLuint attribIdx = 2; attribIdx < 6; ++attribIdx ) {
+    glEnableVertexAttribArray( attribIdx );
+    glVertexAttribPointer( attribIdx, 4, GL_FLOAT, GL_FALSE, sizeof( glm::mat4 ), reinterpret_cast< void* >( ( attribIdx - 2 ) * sizeof( glm::vec4 ) ) );
+  }
 
   glVertexAttribDivisor( 2, 1 );
   glVertexAttribDivisor( 3, 1 );

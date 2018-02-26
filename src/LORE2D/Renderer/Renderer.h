@@ -42,49 +42,6 @@ namespace Lore {
   struct RenderQueue
   {
 
-    // Lore supports 100 render queues, rendered in order from 0-99.
-    static const uint32_t Background = 0;
-    static const uint32_t General = 50;
-    static const uint32_t Foreground = 99;
-
-    // :::::: //
-
-    // An instance of a type of Renderable attached to a node (e.g., Texture).
-    struct RenderData
-    {
-      Matrix4 model {};
-      bool xFlipped { false };
-      bool yFlipped { false };
-    };
-    using RenderDataList = std::vector<RenderData>;
-
-    struct EntityData
-    {
-      MaterialPtr material { nullptr };
-      VertexBufferPtr vertexBuffer { nullptr };
-      size_t spriteFrame { 0 };
-
-      bool operator < ( const EntityData& r ) const;
-    };
-
-    struct InstancedEntityData : public EntityData
-    {
-      GPUProgramPtr program { nullptr };
-      size_t count { 0 };
-      bool xFlipped { false };
-      bool yFlipped { false };
-    };
-
-    struct Transparent // TODO: This is inconsistent with EntityData, clean these up.
-    {
-      MaterialPtr material { nullptr };
-      VertexBufferPtr vertexBuffer { nullptr };
-      size_t spriteFrame { 0 };
-      Matrix4 model {};
-      bool xFlipped { false };
-      bool yFlipped { false };
-    };
-
     struct BoxData
     {
       BoxPtr box { nullptr };
@@ -103,17 +60,27 @@ namespace Lore {
       Vec2 pos {};
     };
 
-    // Every Material maps to a list of RenderData.
-    using EntityDataMap = std::map<EntityData, RenderDataList>;
-    using InstancedEntityDataMap = std::unordered_map<string, InstancedEntityData>;
-    using TransparentDataMap = std::multimap<real, Transparent>;
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    using NodeList = std::vector<NodePtr>;
+    using EntityNodeMap = std::map<EntityPtr, NodeList>;
+    using InstancedEntitySet = std::unordered_set<EntityPtr>;
+    using EntityNodePair = std::pair<EntityPtr, NodePtr>;
+    using TransparentsMap = std::multimap<real, EntityNodePair>;
     using BoxList = std::vector<BoxData>;
     using TextboxList = std::vector<TextboxData>;
     using LightList = std::vector<LightData>;
 
-    EntityDataMap solids {};
-    InstancedEntityDataMap instanced {};
-    TransparentDataMap transparents {};
+    // Lore supports 100 render queues, rendered in order from 0-99.
+    static const uint32_t Background = 0;
+    static const uint32_t General = 50;
+    static const uint32_t Foreground = 99;
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    EntityNodeMap solids {};
+    InstancedEntitySet instancedSolids {};
+    TransparentsMap transparents {};
     BoxList boxes {};
     TextboxList textboxes {};
     LightList lights {};

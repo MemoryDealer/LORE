@@ -33,10 +33,3 @@
 using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-bool Lore::RenderQueue::EntityData::operator < ( const EntityData & r ) const
-{
-  return ( material->getName() < r.material->getName() );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

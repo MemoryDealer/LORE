@@ -75,9 +75,23 @@ void Entity::enableInstancing( const size_t max )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void Entity::setInstanceControllerNode( const NodePtr node )
+{
+  _instanceControllerNode = node;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void Entity::setSprite( SpritePtr sprite )
 {
   _material->sprite = sprite;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+NodePtr Entity::getInstanceControllerNode() const
+{
+  return _instanceControllerNode;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

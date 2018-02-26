@@ -79,6 +79,11 @@ namespace Lore {
 
     virtual void draw( const Vertices& verts ) = 0;
 
+    //
+    // Accessors.
+
+    Type getType() const;
+
   private:
 
     struct Attribute

@@ -170,6 +170,10 @@ void Node::attachObject( EntityPtr e )
   _entities.insert( e->getName(), e );
   if ( e->isInstanced() ) {
     _instanceID = e->getNextInstanceCount();
+    // First attached node becomes the instance controller node.
+    if ( 0 == _instanceID ) {
+      e->setInstanceControllerNode( this );
+    }
   }
 }
 
@@ -307,6 +311,14 @@ void Node::scale( const real s )
 {
   Vec2 ss( s, s );
   scale( ss );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Node::updateWorldTransform()
+{
+  _transform.derivedScale = _transform.scale;
+  _updateWorldTransform( _getLocalTransform() );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -51,3 +51,10 @@ void VertexBuffer::addAttribute( const AttributeType& type, const uint size )
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+VertexBuffer::Type VertexBuffer::getType() const
+{
+  return _type;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -45,8 +45,25 @@ namespace Lore {
 
     void enableInstancing( const size_t max );
 
+    void setInstanceControllerNode( const NodePtr node );
+
     //
-    // Getters.
+    // Modifiers.
+
+    inline void setMaterial( MaterialPtr material )
+    {
+      _material = material;
+    }
+
+    inline void setMesh( MeshPtr mesh )
+    {
+      _mesh = mesh;
+    }
+
+    void updateInstancedMatrix( const size_t idx, const Matrix4& matrix );
+
+    //
+    // Accessors.
 
     inline MaterialPtr getMaterial() const
     {
@@ -83,20 +100,7 @@ namespace Lore {
       return _instanceCount++;
     }
 
-    //
-    // Setters.
-
-    inline void setMaterial( MaterialPtr material )
-    {
-      _material = material;
-    }
-
-    inline void setMesh( MeshPtr mesh )
-    {
-      _mesh = mesh;
-    }
-
-    void updateInstancedMatrix( const size_t idx, const Matrix4& matrix );
+    NodePtr getInstanceControllerNode() const;
 
     //
     // Helper functions.
@@ -119,6 +123,7 @@ namespace Lore {
     // Only used if Entity is instanced.
     VertexBufferPtr _instancedVertexBuffer { nullptr };
     size_t _instanceCount { 0 };
+    NodePtr _instanceControllerNode { nullptr };
 
     uint _renderQueue { RenderQueue::General };
 

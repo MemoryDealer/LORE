@@ -83,7 +83,7 @@ void SceneGraphVisitor::visit( Renderer* renderer, bool parentDirty )
 
       // Update instancing.
       if ( entity->isInstanced() ) {
-        // balkjdf
+        // Applies node's transform to the buffer for instanced data.
         entity->updateInstancedMatrix( _node->_instanceID, _node->getFullTransform() );
       }
     }

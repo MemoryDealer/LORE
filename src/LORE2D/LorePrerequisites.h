@@ -42,6 +42,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <set>
 #include <sstream>
 #include <stack>
 #include <string>
@@ -50,6 +51,7 @@
 #include <typeinfo>
 #include <queue>
 #include <unordered_map>
+#include <unordered_set>
 
 #if LORE_PLATFORM == LORE_WINDOWS
 #include <variant>

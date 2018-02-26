@@ -96,7 +96,9 @@ namespace Lore {
 
   public:
 
-    ~Node();
+    Node();
+
+    ~Node() override;
 
     NodePtr clone( const string& name, const bool cloneChildNodes = false );
 
@@ -180,9 +182,11 @@ namespace Lore {
     {
       // Depth has a range of [-1000, 1000].
       // TODO: Match these values with z-near and z-far in renderer.
-      assert( depth >= -1000.f && depth <= 1000.f );
+      //assert( depth >= -1000.f && depth <= 1000.f ); // Removed for now due to renderer setting depth for UI elements.
       _depth = depth;
     }
+
+    void updateWorldTransform();
 
     ///
     /// \brief Allocates a SpriteController for this node, which can be used to animate the sprite (if one exists)
@@ -245,8 +249,11 @@ namespace Lore {
     //
     // Deleted functions/operators.
 
-    Node( const Node& rhs ) = delete;
-    Node& operator = ( const Node& rhs ) = delete;
+    Node( const Node& rhs )
+    {
+
+    }
+    //Node& operator = ( const Node& rhs ) = delete;
 
   private:
 
@@ -256,8 +263,6 @@ namespace Lore {
     friend class MemoryPool<Node>;
 
   private:
-
-    Node();
 
     //
     // Scene graph operations.
