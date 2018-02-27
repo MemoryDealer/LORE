@@ -80,13 +80,11 @@ NodePtr Node::clone( const string& name, const bool cloneChildNodes )
   }
   node->_lights = _lights.clone();
 
-  // Detect instancing.
+  // Simulate attaching entities to this node.
   auto it = _entities.getConstIterator();
   while ( it.hasMore() ) {
     auto entity = it.getNext();
-    if ( entity->isInstanced() ) {
-      //_instanceID = entity->getNextInstanceID();
-    }
+    entity->_notifyAttached( node );
   }
 
   _parent->_childNodes.insert( name, node );

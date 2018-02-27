@@ -94,7 +94,7 @@ int main( int argc, char** argv )
 
   //context->createWindow( "Test2", 720, 640 );
 
-  Lore::ScenePtr scene = context->createScene( "Default" );
+  Lore::ScenePtr scene = context->createScene( "Default", Lore::RendererType::Forward2D );
   scene->setBackgroundColor( Lore::StockColor::Black );
 
   // Hack.

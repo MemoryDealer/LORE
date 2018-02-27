@@ -38,10 +38,44 @@ namespace Lore {
 
   public:
 
-    Entity();
+    Entity() = default;
     ~Entity() override;
 
     EntityPtr clone( const string& name );
+
+    //
+    // Special instancing functions.
+
+    VertexBufferPtr getInstancedVertexBuffer() const;
+    size_t getInstanceCount() const;
+
+    ///
+    /// \brief All nodes that use this Entity after a call to this function will be
+    /// rendered with instancing. This greatly improves performance for many Nodes
+    /// using the same Entity.
+    /// Note: This should be called before attaching this Entity to all nodes desired
+    /// to use instancing.
+    void enableInstancing( const size_t max );
+
+    ///
+    /// \brief Restores original rendering mode. The internal instanced data will be
+    /// destroyed.
+    void disableInstancing();
+
+    ///
+    /// \brief This node's properties will be used for rendering in instancing mode
+    /// (e.g., material, sprite controller settings. etc.).
+    void setInstanceControllerNode( const NodePtr node );
+
+    ///
+    /// \brief Updates the matrix entry in the instanced buffer for the specified
+    /// instance ID.
+    void updateInstancedMatrix( const size_t idx, const Matrix4& matrix );
+
+    //
+    // Helper functions.
+
+    void setSprite( SpritePtr sprite );
 
     //
     // Modifiers.
@@ -57,32 +91,6 @@ namespace Lore {
     uint getRenderQueue() const;
     bool isInstanced() const;
     NodePtr getInstanceControllerNode() const;
-
-    //
-    // Helper functions.
-
-    void setSprite( SpritePtr sprite );
-
-    //
-    // Special instancing functions.
-
-    VertexBufferPtr getInstancedVertexBuffer() const;
-    size_t getInstanceCount() const;
-
-    ///
-    /// \brief All nodes that use this Entity after a call to this function will be
-    /// rendered with instancing. 
-    void enableInstancing( const size_t max );
-
-    ///
-    /// \brief This node's properties will be used for rendering in instancing mode
-    /// (e.g., material, sprite controller settings. etc.).
-    void setInstanceControllerNode( const NodePtr node );
-
-    ///
-    /// \brief Updates the matrix entry in the instanced buffer for the specified
-    /// instance ID.
-    void updateInstancedMatrix( const size_t idx, const Matrix4& matrix );
 
   private:
 

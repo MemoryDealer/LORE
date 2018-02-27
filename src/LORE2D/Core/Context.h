@@ -53,7 +53,7 @@ namespace Lore {
     ///
     /// \typedef ErrorListener
     /// \brief Function pointer to an error listener callback.
-    using ErrorListener = void(*)( int, const char* );
+    using ErrorListener = void( *)( int, const char* );
 
   public:
 
@@ -88,7 +88,7 @@ namespace Lore {
     ///
     /// \brief Creates a scene, assigns to it the specified renderer type, and returns a handle to it.
     virtual ScenePtr createScene( const string& name,
-                                  const RendererType& rt = RendererType::Generic );
+                                  const RendererType& rt );
 
     ///
     /// \brief Destroys specified scene and all of its nodes.
@@ -281,6 +281,8 @@ namespace Lore {
     using SceneRegistry = Registry<std::unordered_map, Scene>;
     using WindowRegistry = Registry<std::map, Window>;
 
+    using RendererMap = std::unordered_map <Lore::RendererType, std::unique_ptr<Lore::Renderer>>;
+
   protected:
 
     PoolCluster _poolCluster { "Primary" };
@@ -289,6 +291,8 @@ namespace Lore {
     CameraRegistry _cameraRegistry {};
     WindowRegistry _windowRegistry {};
     SceneRegistry _sceneRegistry {};
+
+    RendererMap _renderers {};
 
     WindowPtr _activeWindow { nullptr };
 

@@ -65,7 +65,7 @@ void Game::loadResources()
 void Game::loadScene()
 {
   // Create a scene with default background color.
-  _scene = _context->createScene( "core" );
+  _scene = _context->createScene( "core", Lore::RendererType::Forward2D );
   _scene->setBackgroundColor( Lore::StockColor::White );
   _scene->setAmbientLightColor( Lore::Color( 0.75f, 0.75f, 0.75f, 1.f ) );
 

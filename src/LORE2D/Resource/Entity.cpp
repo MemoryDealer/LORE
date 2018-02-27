@@ -35,12 +35,6 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Entity::Entity()
-{
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 Entity::~Entity()
 {
 }
@@ -57,62 +51,6 @@ EntityPtr Entity::clone( const string& name )
   entity->_renderQueue = _renderQueue;
 
   return entity;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Entity::setMaterial( MaterialPtr material )
-{
-  _material = material;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Entity::setMesh( MeshPtr mesh )
-{
-  _mesh = mesh;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-NodePtr Entity::getInstanceControllerNode() const
-{
-  return _instanceControllerNode;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Entity::setSprite( SpritePtr sprite )
-{
-  _material->sprite = sprite;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-MaterialPtr Entity::getMaterial() const
-{
-  return _material;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-MeshPtr Entity::getMesh() const
-{
-  return _mesh;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-uint Entity::getRenderQueue() const
-{
-  return _renderQueue;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-bool Entity::isInstanced() const
-{
-  return !!( _instancedVertexBuffer );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -145,9 +83,79 @@ void Entity::enableInstancing( const size_t max )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void Entity::disableInstancing()
+{
+  if ( isInstanced() ) {
+    auto rc = Resource::GetResourceController();
+
+    rc->destroy<VertexBuffer>( _instancedVertexBuffer );
+    _instancedVertexBuffer = nullptr;
+  }
+  _instanceCount = 0;
+  _instanceControllerNode = nullptr;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void Entity::setInstanceControllerNode( const NodePtr node )
 {
   _instanceControllerNode = node;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Entity::setSprite( SpritePtr sprite )
+{
+  _material->sprite = sprite;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Entity::setMaterial( MaterialPtr material )
+{
+  _material = material;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Entity::setMesh( MeshPtr mesh )
+{
+  _mesh = mesh;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+NodePtr Entity::getInstanceControllerNode() const
+{
+  return _instanceControllerNode;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+MaterialPtr Entity::getMaterial() const
+{
+  return _material;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+MeshPtr Entity::getMesh() const
+{
+  return _mesh;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+uint Entity::getRenderQueue() const
+{
+  return _renderQueue;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+bool Entity::isInstanced() const
+{
+  return !!( _instancedVertexBuffer );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

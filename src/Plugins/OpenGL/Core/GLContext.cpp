@@ -28,8 +28,6 @@
 
 #include "DebugCallback.h"
 
-#include <LORE2D/Renderer/RendererFactory.h>
-
 #include <Plugins/OpenGL/Input/GLInput.h>
 #include <Plugins/OpenGL/Renderer/RenderAPI.h>
 #include <Plugins/OpenGL/Resource/GLFont.h>
@@ -188,20 +186,8 @@ void Context::destroyWindow( Lore::WindowPtr window )
 Lore::ScenePtr Context::createScene( const string& name, const Lore::RendererType& rt )
 {
   Lore::ScenePtr scene = Lore::Context::createScene( name, rt );
-  RendererPtr rp = nullptr;
-
-  auto lookup = _renderers.find( rt );
-  if ( _renderers.end() == lookup ) {
-    // This renderer type hasn't been created yet, allocate one and assign it.
-    auto result = _renderers.insert( { rt, RendererFactory::Create( rt ) } );
-    rp = result.first->second.get();
-  }
-  else {
-    rp = lookup->second.get();
-  }
-
-  rp->setRenderAPI( _renderAPI.get() );
-  scene->setRenderer( rp );
+  scene->getRenderer()->setRenderAPI( _renderAPI.get() );
+  
   return scene;
 }
 

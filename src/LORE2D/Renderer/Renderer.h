@@ -42,6 +42,18 @@ namespace Lore {
   struct RenderQueue
   {
 
+    void clear()
+    {
+      solids.clear();
+      instancedSolids.clear();
+      transparents.clear();
+      boxes.clear();
+      textboxes.clear();
+      lights.clear();
+    }
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
     struct BoxData
     {
       BoxPtr box { nullptr };
@@ -94,12 +106,13 @@ namespace Lore {
   /// \brief Interface for Renderers - the object that knows how to interpret
   ///     a RenderView and a Scene's scene graph and present an image to the 
   ///     window. Render plugins shall define these implementations.
-  class Renderer
+  class LORE_EXPORT Renderer
   {
 
   public:
 
-    virtual ~Renderer() { }
+    Renderer() = default;
+    virtual ~Renderer() = default;
 
     ///
     /// \brief Registers a Renderable object for rendering. This should be
@@ -122,10 +135,7 @@ namespace Lore {
     virtual void present( const RenderView& rv,
                           const WindowPtr window ) = 0;
 
-    void setRenderAPI( IRenderAPI* api )
-    {
-      _api = api;
-    }
+    void setRenderAPI( IRenderAPI* api );
 
   protected:
 
@@ -142,7 +152,7 @@ namespace Lore {
   // All built-in LORE renderer types.
   enum class RendererType
   {
-    Generic
+    Forward2D
   };
 
 }

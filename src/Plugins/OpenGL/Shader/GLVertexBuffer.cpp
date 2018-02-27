@@ -42,6 +42,10 @@ GLVertexBuffer::GLVertexBuffer()
 
 GLVertexBuffer::~GLVertexBuffer()
 {
+  glDeleteBuffers( 1, &_vbo );
+  glDeleteBuffers( 1, &_vao );
+  glDeleteBuffers( 1, &_ebo );
+  glDeleteBuffers( 1, &_instancedVBO );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

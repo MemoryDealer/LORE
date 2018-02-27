@@ -40,7 +40,7 @@ namespace Lore {
   ///
   /// \class GenericRenderer
   /// \brief Renders a scene normally, without any special behavior.
-  class GenericRenderer : public Lore::Renderer
+  class Forward2DRenderer : public Lore::Renderer
   {
 
   public:
@@ -49,9 +49,9 @@ namespace Lore {
 
   public:
 
-    GenericRenderer();
+    Forward2DRenderer();
 
-    virtual ~GenericRenderer() override;
+    virtual ~Forward2DRenderer() override;
 
     virtual void addRenderData( EntityPtr e,
                                 NodePtr node ) override;

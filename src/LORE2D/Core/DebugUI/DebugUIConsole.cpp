@@ -233,7 +233,7 @@ void DebugUIConsole::appendChar( const char c )
 
   // Move blinking cursor.
   const auto width = _consoleTextbox->getFont()->getWidth( c );
-  // TODO: Dividing by aspect ratio is major hack to account for adjustment in GenericRenderer.
+  // TODO: Dividing by aspect ratio is major hack to account for adjustment in Forward2DRenderer.
   //   This indicates a wider problem with UI rendering.
   _cursorElement->translate( width / Context::GetActiveWindow()->getAspectRatio(), 0.f );
   ++_cursorIdx;

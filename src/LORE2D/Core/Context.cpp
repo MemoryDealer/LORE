@@ -33,6 +33,7 @@
 #include <LORE2D/Core/CLI/CLI.h>
 #include <LORE2D/Core/DebugUI/DebugUI.h>
 #include <LORE2D/Input/Input.h>
+#include <LORE2D/Renderer/RendererFactory.h>
 #include <LORE2D/Renderer/SceneGraphVisitor.h>
 #include <LORE2D/Resource/Box.h>
 #include <LORE2D/Resource/Entity.h>
@@ -129,6 +130,20 @@ ScenePtr Context::createScene( const string& name, const RendererType& rt )
   auto scene = _poolCluster.create<Scene>();
   scene->setName( name );
   _sceneRegistry.insert( name, scene );
+
+  // Assign the specified renderer to this scene.
+  RendererPtr rp = nullptr;
+  auto lookup = _renderers.find( rt );
+  if ( _renderers.end() == lookup ) {
+    // This renderer type hasn't been created yet, allocate one and assign it.
+    auto result = _renderers.insert( { rt, RendererFactory::Create( rt ) } );
+    rp = result.first->second.get();
+  }
+  else {
+    rp = lookup->second.get();
+  }
+
+  scene->setRenderer( rp );
 
   lore_log( "Scene " + name + " created successfully" );
 

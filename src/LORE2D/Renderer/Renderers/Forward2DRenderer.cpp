@@ -24,7 +24,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "GenericRenderer.h"
+#include "Forward2DRenderer.h"
 
 #include <LORE2D/Core/DebugUI/DebugUI.h>
 #include <LORE2D/Config/Config.h>
@@ -54,7 +54,7 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-GenericRenderer::GenericRenderer()
+Forward2DRenderer::Forward2DRenderer()
 {
   // Initialize all available queues.
   _queues.resize( DefaultRenderQueueCount );
@@ -62,15 +62,17 @@ GenericRenderer::GenericRenderer()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-GenericRenderer::~GenericRenderer()
+Forward2DRenderer::~Forward2DRenderer()
 {
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GenericRenderer::addRenderData( EntityPtr entity,
+void Forward2DRenderer::addRenderData( EntityPtr entity,
                                      NodePtr node )
 {
+  // TODO: Consider a way of optimizing this by skipping processing data here
+  // and directly storing references to nodes in lists in the renderer.
   const uint queueId = entity->getRenderQueue();
   const bool blended = entity->getMaterial()->blendingMode.enabled;
 
@@ -104,7 +106,7 @@ void GenericRenderer::addRenderData( EntityPtr entity,
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GenericRenderer::addBox( BoxPtr box,
+void Forward2DRenderer::addBox( BoxPtr box,
                               const Matrix4& transform )
 {
   const uint queueId = RenderQueue::General;
@@ -121,7 +123,7 @@ void GenericRenderer::addBox( BoxPtr box,
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GenericRenderer::addTextbox( TextboxPtr textbox,
+void Forward2DRenderer::addTextbox( TextboxPtr textbox,
                                   const Matrix4& transform )
 {
   const uint queueId = textbox->getRenderQueue();
@@ -138,7 +140,7 @@ void GenericRenderer::addTextbox( TextboxPtr textbox,
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GenericRenderer::addLight( LightPtr light, const NodePtr node )
+void Forward2DRenderer::addLight( LightPtr light, const NodePtr node )
 {
   const uint queueId = RenderQueue::General;
 
@@ -154,7 +156,7 @@ void GenericRenderer::addLight( LightPtr light, const NodePtr node )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GenericRenderer::present( const RenderView& rv, const WindowPtr window )
+void Forward2DRenderer::present( const RenderView& rv, const WindowPtr window )
 {
   // Build render queues for this RenderView.
   rv.scene->updateSceneGraph();
@@ -265,15 +267,11 @@ void GenericRenderer::present( const RenderView& rv, const WindowPtr window )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GenericRenderer::_clearRenderQueues()
+void Forward2DRenderer::_clearRenderQueues()
 {
   // Remove all data from each queue.
   for ( auto& queue : _queues ) {
-    queue.solids.clear();
-    queue.transparents.clear();
-    queue.boxes.clear();
-    queue.textboxes.clear();
-    queue.lights.clear();
+    queue.clear();
   }
 
   // Erase all queues from the active queue list.
@@ -283,7 +281,7 @@ void GenericRenderer::_clearRenderQueues()
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GenericRenderer::activateQueue( const uint id, RenderQueue& rq )
+void Forward2DRenderer::activateQueue( const uint id, RenderQueue& rq )
 {
   const auto lookup = _activeQueues.find( id );
   if ( _activeQueues.end() == lookup ) {
@@ -293,7 +291,7 @@ void GenericRenderer::activateQueue( const uint id, RenderQueue& rq )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GenericRenderer::renderBackground( const RenderView& rv,
+void Forward2DRenderer::renderBackground( const RenderView& rv,
                                         const real aspectRatio,
                                         const Matrix4& proj )
 {
@@ -361,7 +359,7 @@ void GenericRenderer::renderBackground( const RenderView& rv,
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GenericRenderer::renderSolids( const ScenePtr scene,
+void Forward2DRenderer::renderSolids( const ScenePtr scene,
                                     const RenderQueue& queue,
                                     const Matrix4& viewProjection ) const
 {
@@ -454,7 +452,7 @@ void GenericRenderer::renderSolids( const ScenePtr scene,
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GenericRenderer::renderTransparents( const ScenePtr scene,
+void Forward2DRenderer::renderTransparents( const ScenePtr scene,
                                           const RenderQueue& queue,
                                           const Matrix4& viewProjection ) const
 {
@@ -503,7 +501,7 @@ void GenericRenderer::renderTransparents( const ScenePtr scene,
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GenericRenderer::renderBoxes( const RenderQueue& queue,
+void Forward2DRenderer::renderBoxes( const RenderQueue& queue,
                                    const Matrix4& viewProjection ) const
 {
   _api->setBlendingEnabled( true );
@@ -536,7 +534,7 @@ void GenericRenderer::renderBoxes( const RenderQueue& queue,
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GenericRenderer::renderTextboxes( const RenderQueue& queue,
+void Forward2DRenderer::renderTextboxes( const RenderQueue& queue,
                                        const Matrix4& viewProjection ) const
 {
   _api->setBlendingEnabled( true );
@@ -583,7 +581,7 @@ void GenericRenderer::renderTextboxes( const RenderQueue& queue,
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GenericRenderer::renderUI( const UIPtr ui,
+void Forward2DRenderer::renderUI( const UIPtr ui,
                                 const ScenePtr scene,
                                 const real aspectRatio,
                                 const Matrix4& proj ) const
@@ -677,7 +675,7 @@ void GenericRenderer::renderUI( const UIPtr ui,
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GenericRenderer::_updateLighting( const MaterialPtr material,
+void Forward2DRenderer::_updateLighting( const MaterialPtr material,
                                        const GPUProgramPtr program,
                                        const ScenePtr scene,
                                        const RenderQueue::LightList& lights ) const
@@ -694,7 +692,7 @@ void GenericRenderer::_updateLighting( const MaterialPtr material,
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GenericRenderer::_updateTextureData( const MaterialPtr material,
+void Forward2DRenderer::_updateTextureData( const MaterialPtr material,
                                           const GPUProgramPtr program,
                                           const NodePtr node ) const
 {
@@ -717,7 +715,7 @@ void GenericRenderer::_updateTextureData( const MaterialPtr material,
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Matrix4 GenericRenderer::_calculateFlipMatrix( const NodePtr node ) const
+Matrix4 Forward2DRenderer::_calculateFlipMatrix( const NodePtr node ) const
 {
   auto spc = node->getSpriteController();
   if ( !spc ) {
