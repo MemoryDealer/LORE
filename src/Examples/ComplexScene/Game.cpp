@@ -183,6 +183,7 @@ void Game::loadScene()
   // Add blended stained glass.
 
   Lore::EntityPtr glassEntity = Lore::Resource::CreateEntity( "glass1", Lore::VertexBuffer::Type::TexturedQuad );
+  glassEntity->enableInstancing( 10 );
   glassEntity->setMaterial( Lore::Resource::GetMaterial( "glass1" ) );
   for ( int i = 0; i < 5; ++i ) {
     auto glassNode = _scene->createNode( "glass1" + std::to_string( i ) );

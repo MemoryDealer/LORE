@@ -97,10 +97,6 @@ namespace Lore {
       _background = background;
     }
 
-    ///
-    /// \brief Sets background texture.
-    void setBackground( const string& texture );
-
     //
     // Getters.
 

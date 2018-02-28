@@ -66,13 +66,13 @@ Lore::GPUProgramPtr StockResourceController::createUberProgram( const string& na
   //
   // Layout.
 
-  uint32_t location = 0;
-  src += "layout (location = " + std::to_string( location++ ) + ") in vec2 vertex;";
+  uint32_t layoutLocation = 0;
+  src += "layout (location = " + std::to_string( layoutLocation++ ) + ") in vec2 vertex;";
   if ( textured ) {
-    src += "layout (location = " + std::to_string( location++ ) + ") in vec2 texCoord;";
+    src += "layout (location = " + std::to_string( layoutLocation++ ) + ") in vec2 texCoord;";
   }
   if ( instanced ) {
-    src += "layout (location = " + std::to_string( location++ ) + ") in mat4 instanceMatrix;";
+    src += "layout (location = " + std::to_string( layoutLocation++ ) + ") in mat4 instanceMatrix;";
   }
 
   //
@@ -88,7 +88,7 @@ Lore::GPUProgramPtr StockResourceController::createUberProgram( const string& na
   //
   // Uniforms and outs.
 
-   src += "uniform mat4 transform;";
+  src += "uniform mat4 transform;";
   src += "uniform Rect texSampleRegion;";
 
   if ( textured ) {

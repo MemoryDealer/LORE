@@ -462,11 +462,28 @@ void Forward2DRenderer::renderTransparents( const ScenePtr scene,
   // (Depth values increase going farther back).
   for (const auto& pair : queue.transparents) {
     const EntityPtr entity = pair.second.first;
-    const NodePtr node = pair.second.second;
+    NodePtr node = pair.second.second;
 
     const MaterialPtr material = entity->getMaterial();
-    const GPUProgramPtr program = material->program;
-    const VertexBufferPtr vertexBuffer = entity->getMesh()->getVertexBuffer();
+    GPUProgramPtr program = material->program;
+    VertexBufferPtr vertexBuffer = entity->getMesh()->getVertexBuffer();
+
+    if ( entity->isInstanced() ) {
+      node = entity->getInstanceControllerNode();
+      vertexBuffer = entity->getInstancedVertexBuffer();
+      switch ( vertexBuffer->getType() ) {
+      default:
+        throw Lore::Exception( "Instanced entity must have an instanced vertex buffer" );
+
+      case VertexBuffer::Type::QuadInstanced:
+        program = StockResource::GetGPUProgram( "StandardInstanced" );
+        break;
+
+      case VertexBuffer::Type::TexturedQuadInstanced:
+        program = StockResource::GetGPUProgram( "StandardTexturedInstanced" );
+        break;
+      }
+    }
 
     // Set blending mode using material settings.
     _api->setBlendingFunc( material->blendingMode.srcFactor, material->blendingMode.dstFactor );
@@ -478,21 +495,30 @@ void Forward2DRenderer::renderTransparents( const ScenePtr scene,
       _updateTextureData( material, program, node );
     }
 
+    Matrix4 model = node->getFullTransform();
+    if ( entity->isInstanced() ) {
+      model = viewProjection;
+    }
+
     if ( material->lighting ) {
       _updateLighting( material, program, scene, queue.lights );
-      program->setUniformVar( "model", node->getFullTransform() );
+      program->setUniformVar( "model", model );
     }
 
     // Get the model matrix from the node.
-    Matrix4 model = node->getFullTransform();
     model[3][2] = node->getDepth();
 
     // Calculate model-view-projection matrix for this object.
-    Matrix4 mvp = viewProjection * model * _calculateFlipMatrix( node );
-    program->setTransformVar( mvp );
+    if ( entity->isInstanced() ) {
+      program->setTransformVar( model * _calculateFlipMatrix( node ) );
+    }
+    else {
+      Matrix4 mvp = viewProjection * model * _calculateFlipMatrix( node );
+      program->setTransformVar( mvp );
+    }
 
     // Draw the entity.
-    vertexBuffer->draw();
+    vertexBuffer->draw( entity->getInstanceCount() );
     vertexBuffer->unbind();
   }
 

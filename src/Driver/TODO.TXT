@@ -5,6 +5,7 @@
 -Debug tools - view memory pools for each type, hover over to view details
 -Add frame count mode to animations rather than delta time
 -Re-organize to include/src directories
+-In move to 3D support, associate stock resources directly with a renderer, instead of existing on their own
 -RTT (add priority to renderview, RTTs are automatically rendered before window framebuffers)
 -Multi-texturing
 -Make UI code more convenient, for example in DebugUIConsole, it requires so much code to do basic setup.
