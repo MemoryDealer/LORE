@@ -94,7 +94,7 @@ int main( int argc, char** argv )
 
   //context->createWindow( "Test2", 720, 640 );
 
-  Lore::ScenePtr scene = context->createScene( "Default" );
+  Lore::ScenePtr scene = context->createScene( "Default", Lore::RendererType::Forward2D );
   scene->setBackgroundColor( Lore::StockColor::Black );
 
   // Hack.
@@ -114,7 +114,7 @@ int main( int argc, char** argv )
 
   auto sonicNode = scene->createNode( "sonic" );
   sonicNode->setDepth( -50.f );
-  auto sonicEntity = Lore::Resource::CreateEntity( "sonic", Lore::MeshType::TexturedQuad );
+  auto sonicEntity = Lore::Resource::CreateEntity( "sonic", Lore::VertexBuffer::Type::TexturedQuad );
   auto sonicSprite = Lore::Resource::GetSprite( "sonic-mobile" );
   sonicEntity->setSprite( sonicSprite );
   //sonicEntity->getMaterial()->blendingMode.enabled = true;
@@ -128,7 +128,7 @@ int main( int argc, char** argv )
   //
   // Create some doges.
 
-  auto dogeEntity = Lore::Resource::CreateEntity( "doge", Lore::MeshType::TexturedQuad );
+  auto dogeEntity = Lore::Resource::CreateEntity( "doge", Lore::VertexBuffer::Type::TexturedQuad );
   auto dogeSprite = Lore::Resource::GetSprite( "doge" );
   std::vector<Lore::NodePtr> doges;
   dogeEntity->setSprite( dogeSprite );
@@ -147,7 +147,7 @@ int main( int argc, char** argv )
 
   // Create some blended boxes.
 
-  auto boxEntity = Lore::Resource::CreateEntity( "box", Lore::MeshType::Quad );
+  auto boxEntity = Lore::Resource::CreateEntity( "box", Lore::VertexBuffer::Type::Quad );
   boxEntity->getMaterial()->blendingMode.enabled = true;
   boxEntity->getMaterial()->diffuse = Lore::Color( 0.1f, 0.4f, 0.8f, 0.95f );
   for ( int i = 0; i < 5; ++i ) {
@@ -236,7 +236,7 @@ int main( int argc, char** argv )
 
   postScene->setAmbientLightColor( Lore::Color( 0.12f, 0.12f, 0.12f, 1.f ) );
 
-  auto ppe = Lore::Resource::CreateEntity( "ppe", Lore::MeshType::TexturedQuad );
+  auto ppe = Lore::Resource::CreateEntity( "ppe", Lore::VertexBuffer::Type::TexturedQuad );
   ppe->getMaterial()->lighting = false;
   ppe->getMaterial()->program = Lore::StockResource::GetGPUProgram( "UnlitTexturedRTT" );
   ppe->setTexture( rv.renderTarget->getTexture() );

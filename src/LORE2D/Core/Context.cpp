@@ -33,6 +33,7 @@
 #include <LORE2D/Core/CLI/CLI.h>
 #include <LORE2D/Core/DebugUI/DebugUI.h>
 #include <LORE2D/Input/Input.h>
+#include <LORE2D/Renderer/RendererFactory.h>
 #include <LORE2D/Renderer/SceneGraphVisitor.h>
 #include <LORE2D/Resource/Box.h>
 #include <LORE2D/Resource/Entity.h>
@@ -70,17 +71,10 @@ Context::~Context()
 {
   NotificationUnsubscribe( WindowEventNotification, &Context::onWindowEvent );
 
-  // HACK.
-  // Manually destroy lights before destruction to avoid a strange bad_alloc crash.
-  // (This is the same code in Scene's destructor).
-  auto sceneIt = _sceneRegistry.getIterator();
-  while ( sceneIt.hasMore() ) {
-    auto scene = sceneIt.getNext();
-    auto lightIt = scene->_lights.getIterator();
-    while ( lightIt.hasMore() ) {
-      scene->destroyLight( lightIt.getNext() );
-    }
-  }
+  // Explicitly destroy Scene objects before resources, otherwise the order of destruction
+  // in the pool cluster can lead to crashes, since resources (such as Box or Light) can be destroyed
+  // before the owning object tries to delete them (AABBs for Boxes).
+  _poolCluster.unregisterPool<Scene>();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -89,13 +83,13 @@ void Context::initConfiguration()
 {
   // Setup default memory pool settings. (TODO: Move out of Context.cpp).
   _poolCluster.registerPool<Background>( 16 );
-  _poolCluster.registerPool<Box>( 1024 );
+  _poolCluster.registerPool<Box>( 100024 );
   _poolCluster.registerPool<Camera>( 16 );
   _poolCluster.registerPool<Entity>( 16 );
   _poolCluster.registerPool<Light>( 32 );
   _poolCluster.registerPool<Material>( 32 );
   _poolCluster.registerPool<Mesh>( 8 );
-  _poolCluster.registerPool<Node>( 1024 );
+  _poolCluster.registerPool<Node>( 10024 );
   _poolCluster.registerPool<Scene>( 4 );
   _poolCluster.registerPool<Sprite>( 32 );
   _poolCluster.registerPool<SpriteAnimationSet>( 8 );
@@ -136,6 +130,20 @@ ScenePtr Context::createScene( const string& name, const RendererType& rt )
   auto scene = _poolCluster.create<Scene>();
   scene->setName( name );
   _sceneRegistry.insert( name, scene );
+
+  // Assign the specified renderer to this scene.
+  RendererPtr rp = nullptr;
+  auto lookup = _renderers.find( rt );
+  if ( _renderers.end() == lookup ) {
+    // This renderer type hasn't been created yet, allocate one and assign it.
+    auto result = _renderers.insert( { rt, RendererFactory::Create( rt ) } );
+    rp = result.first->second.get();
+  }
+  else {
+    rp = lookup->second.get();
+  }
+
+  scene->setRenderer( rp );
 
   lore_log( "Scene " + name + " created successfully" );
 

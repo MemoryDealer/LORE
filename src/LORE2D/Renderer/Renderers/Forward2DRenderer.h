@@ -40,7 +40,7 @@ namespace Lore {
   ///
   /// \class GenericRenderer
   /// \brief Renders a scene normally, without any special behavior.
-  class GenericRenderer : public Lore::Renderer
+  class Forward2DRenderer : public Lore::Renderer
   {
 
   public:
@@ -49,23 +49,23 @@ namespace Lore {
 
   public:
 
-    GenericRenderer();
+    Forward2DRenderer();
 
-    virtual ~GenericRenderer() override;
+    virtual ~Forward2DRenderer() override;
 
-    virtual void addRenderData( Lore::EntityPtr e,
-                                Lore::NodePtr node ) override;
+    virtual void addRenderData( EntityPtr e,
+                                NodePtr node ) override;
 
-    virtual void addBox( Lore::BoxPtr box,
+    virtual void addBox( BoxPtr box,
                          const Lore::Matrix4& transform ) override;
 
-    virtual void addTextbox( Lore::TextboxPtr textbox,
-                             const Lore::Matrix4& transform ) override;
+    virtual void addTextbox( TextboxPtr textbox,
+                             const Matrix4& transform ) override;
 
-    virtual void addLight( Lore::LightPtr light,
-                           const Lore::NodePtr node ) override;
+    virtual void addLight( LightPtr light,
+                           const NodePtr node ) override;
 
-    virtual void present( const Lore::RenderView& rv,
+    virtual void present( const RenderView& rv,
                           const WindowPtr window ) override;
 
   private:
@@ -73,15 +73,15 @@ namespace Lore {
     virtual void _clearRenderQueues() override;
 
     void activateQueue( const uint id,
-                        Lore::RenderQueue& rq );
+                        RenderQueue& rq );
 
-    void renderBackground( const Lore::RenderView& rv,
+    void renderBackground( const RenderView& rv,
                             const real aspectRatio,
                             const Matrix4& proj );
 
-    void renderMaterialMap( const Lore::ScenePtr scene,
-                            const RenderQueue& queue,
-                            const Matrix4& viewProjection ) const;
+    void renderSolids( const ScenePtr scene,
+                       const RenderQueue& queue,
+                       const Matrix4& viewProjection ) const;
 
     void renderTransparents( const Lore::ScenePtr scene,
                              const RenderQueue& queue,
@@ -93,17 +93,31 @@ namespace Lore {
     void renderTextboxes( const RenderQueue& queue,
                           const Matrix4& viewProjection ) const;
 
-    void renderUI( const Lore::UIPtr ui,
-                   const Lore::ScenePtr scene,
+    void renderUI( const UIPtr ui,
+                   const ScenePtr scene,
                    const real aspectRatio,
                    const Matrix4& proj ) const;
 
-  private:
+    // Uploads texture data to GPU.
+    void _updateTextureData( const MaterialPtr material,
+                             const GPUProgramPtr program,
+                             const NodePtr node ) const;
+
+    // Uploads lighting data to GPU.
+    void _updateLighting( const MaterialPtr material,
+                          const GPUProgramPtr program,
+                          const ScenePtr scene,
+                          const RenderQueue::LightList& lightData ) const;
+
+    // Returns modifier matrix for node to account for x/y flipping.
+    Matrix4 _calculateFlipMatrix( const NodePtr node ) const;
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     using RenderQueueList = std::vector<RenderQueue>;
     using ActiveRenderQueueList = std::map<uint, RenderQueue&>;
 
-  private:
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     RenderQueueList _queues { };
     ActiveRenderQueueList _activeQueues { };

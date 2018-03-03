@@ -89,8 +89,6 @@ void StockResourceController::createStockResources()
   {
     UberProgramParameters params;
 
-    // When rendering to texture, don't flip Y texture coordinates.
-    //params.texYCoordinateFlipped = false;
     params.maxLights = 0;
     createUberProgram( "UnlitTexturedRTT", params );
   }
@@ -142,13 +140,13 @@ void StockResourceController::createStockResources()
   {
     auto mesh = _controller->create<Mesh>( "TexturedQuad" );
     mesh->setVertexBuffer( _controller->get<VertexBuffer>( "TexturedQuad" ) );
-    _meshTable.insert( { MeshType::TexturedQuad, mesh } );
+    _meshTable.insert( { VertexBuffer::Type::TexturedQuad, mesh } );
   }
 
   {
     auto mesh = _controller->create<Mesh>( "Quad" );
     mesh->setVertexBuffer( _controller->get<VertexBuffer>( "Quad" ) );
-    _meshTable.insert( { MeshType::Quad, mesh } );
+    _meshTable.insert( { VertexBuffer::Type::Quad, mesh } );
   }
 
   // ::::::::::::::::::::::::: //
@@ -171,8 +169,7 @@ void StockResourceController::createStockResources()
 
   {
     auto vb = _controller->create<VertexBuffer>( "Background" );
-    vb->init( MeshType::Background );
-    vb->build();
+    vb->init( VertexBuffer::Type::Background );
   }
 
   // ::::::::::::::::::::::::: //
@@ -200,14 +197,28 @@ void StockResourceController::createStockResources()
     // Generate shaders and vertex buffer for text rendering.
     createTextProgram( "StandardText" );
     auto vb = _controller->create<VertexBuffer>( "StandardText" );
-    vb->init( MeshType::Text );
-    vb->build();
+    vb->init( VertexBuffer::Type::Text );
+  }
+
+  // ::::::::::::::::::::::::: //
+
+  //
+  // Instancing.
+
+  {
+    UberProgramParameters params;
+    params.instanced = true;
+
+    createUberProgram( "StandardTexturedInstanced", params );
+
+    params.numTextures = 0;
+    createUberProgram( "StandardInstanced", params );
   }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-MeshPtr StockResourceController::getMesh( const MeshType& type )
+MeshPtr StockResourceController::getMesh( const VertexBuffer::Type& type )
 {
   return _meshTable.at( type );
 }
@@ -230,7 +241,7 @@ MaterialPtr StockResource::GetMaterial( const string& name )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-MeshPtr StockResource::GetMesh( const MeshType& type )
+MeshPtr StockResource::GetMesh( const VertexBuffer::Type& type )
 {
   return ActiveContext->getStockResourceController()->getMesh( type );
 }

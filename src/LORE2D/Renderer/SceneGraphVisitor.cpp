@@ -80,6 +80,12 @@ void SceneGraphVisitor::visit( Renderer* renderer, bool parentDirty )
     // Ensure this entity hasn't been reclaimed by the pool.
     if ( entity->isInUse() ) {
       renderer->addRenderData( entity, _node );
+
+      // Update instancing.
+      if ( entity->isInstanced() ) {
+        // Applies node's transform to the buffer for instanced data.
+        entity->updateInstancedMatrix( _node->_instanceID, _node->getFullTransform() );
+      }
     }
   }
 

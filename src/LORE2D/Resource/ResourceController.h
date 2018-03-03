@@ -77,25 +77,13 @@ namespace Lore {
     ~ResourceGroup() = default;
 
     template<typename T>
-    void insertResource( T* resource )
-    {
-      ResourceRegistry& registry = _resources[std::type_index( typeid( T ) )];
-      registry.insert( resource->getName(), resource );
-    }
+    void insertResource( T* resource );
 
     template<typename T>
-    T* getResource( const string& id )
-    {
-      ResourceRegistry& registry = _resources[std::type_index( typeid( T ) )];
-      return static_cast< T* >( registry.get( id ) );
-    }
+    T* getResource( const string& id );
 
     template<typename T>
-    void removeResource( const string& id )
-    {
-      ResourceRegistry& registry = _resources[std::type_index( typeid( T ) )];
-      registry.remove( id );
-    }
+    void removeResource( const string& id );
 
     //
     // Modifiers.
@@ -173,127 +161,49 @@ namespace Lore {
     // Creates resources that are implemented directly in LORE2D library.
     template<typename ResourceType>
     typename std::enable_if<std::is_base_of<Alloc<ResourceType>, ResourceType>::value, ResourceType*>::type
-      create( const string& name, const string& groupName = DefaultGroupName )
-    {
-      static_assert( std::is_base_of<IResource, ResourceType>::value, "ResourceType must derived from IResource" );
-      ResourceType* resource = nullptr;
-
-      // Allocate object directly in LORE2D library.
-      resource = MemoryAccess::GetPrimaryPoolCluster()->create<ResourceType>();
-      resource->setName( name );
-      resource->setResourceGroupName( groupName );
-      _getGroup( groupName )->insertResource<ResourceType>( resource );
-      return resource;
-    }
+      create( const string& name, const string& groupName = DefaultGroupName );
 
     // Creates resources that are implemented by a render plugin, using functors the plugin provides.
     template<typename ResourceType>
     typename std::enable_if<!std::is_base_of<Alloc<ResourceType>, ResourceType>::value, ResourceType*>::type
-      create( const string& name, const string& groupName = DefaultGroupName )
-    {
-      static_assert( std::is_base_of<IResource, ResourceType>::value, "ResourceType must derived from IResource" );
-      ResourceType* resource = nullptr;
-
-      // This is a derived resource that is defined in the render plugin. Call the functor bound
-      // for this type to get the allocated result.
-      auto functor = getCreationFunctor<ResourceType>();
-      if ( functor ) {
-        resource = static_cast< ResourceType* >( functor() );
-        resource->setName( name );
-        resource->setResourceGroupName( groupName );
-        _getGroup( groupName )->insertResource<ResourceType>( resource );
-      }
-      return resource;
-    }
+      create( const string& name, const string& groupName = DefaultGroupName );
 
     // Returns true if specified resource exists.
     template<typename ResourceType>
-    bool resourceExists( const string& name, const string& groupName = DefaultGroupName )
-    {
-      return ( _getGroup( groupName )->getResource( name ) != nullptr );
-    }
+    bool resourceExists( const string& name, const string& groupName = DefaultGroupName );
 
     // Returns pointer to specified resource. Throws ItemIdentityException if not found.
     template<typename ResourceType>
-    ResourceType* get( const string& name, const string& groupName = DefaultGroupName )
-    {
-      return _getGroup( groupName )->getResource<ResourceType>( name );
-    }
+    ResourceType* get( const string& name, const string& groupName = DefaultGroupName );
 
     // Destroys resources that are implemented directly in LORE2D library.
     template<typename ResourceType>
     typename std::enable_if<std::is_base_of<Alloc<ResourceType>, ResourceType>::value, void>::type
-      destroy( ResourceType* resource )
-    {
-      auto groupName = resource->getResourceGroupName();
-      _getGroup( groupName )->removeResource<ResourceType>( resource->getName() );
-      MemoryAccess::GetPrimaryPoolCluster()->destroy<ResourceType>( resource );
-    }
+      destroy( ResourceType* resource );
 
     // Destroys resources that are implemented by a render plugin, using functors the plugin provides.
     template<typename ResourceType>
     typename std::enable_if<!std::is_base_of<Alloc<ResourceType>, ResourceType>::value, void>::type
-      destroy( ResourceType* resource )
-    {
-      auto groupName = resource->getResourceGroupName();
-      _getGroup( groupName )->removeResource<ResourceType>( resource->getName() );
-      auto functor = getDestructionFunctor<ResourceType>();
-      if ( functor ) {
-        functor( resource );
-      }
-    }
+      destroy( ResourceType* resource );
 
     // Destroys all resources of specified type in specified group.
     template<typename ResourceType>
-    void destroyAllInGroup( const string& groupName )
-    {
-      const auto t = std::type_index( typeid( ResourceType ) );
-      auto group = _getGroup( groupName );
-      auto registry = group->_resources[t];
-      auto it = registry.getConstIterator();
-      while ( it.hasMore() ) {
-        destroy<ResourceType>( static_cast<ResourceType*>( it.getNext() ) );
-      }
-    }
+    void destroyAllInGroup( const string& groupName );
 
     //
     // Plugin functors.
 
     template<typename T>
-    void addCreationFunctor( PluginCreationFunctor functor )
-    {
-      const auto t = std::type_index( typeid( T ) );
-      _creationFunctors[t] = functor;
-    }
+    void addCreationFunctor( PluginCreationFunctor functor );
 
     template<typename T>
-    void addDestructionFunctor( PluginDestructionFunctor functor )
-    {
-      const auto t = std::type_index( typeid( T ) );
-      _destructionFunctors[t] = functor;
-    }
+    void addDestructionFunctor( PluginDestructionFunctor functor );
 
     template<typename T>
-    PluginCreationFunctor getCreationFunctor()
-    {
-      const auto t = std::type_index( typeid( T ) );
-      auto lookup = _creationFunctors.find( t );
-      if ( _creationFunctors.end() != lookup ) {
-        return lookup->second;
-      }
-      return nullptr;
-    }
+    PluginCreationFunctor getCreationFunctor();
 
     template<typename T>
-    PluginDestructionFunctor getDestructionFunctor()
-    {
-      const auto t = std::type_index( typeid( T ) );
-      auto lookup = _destructionFunctors.find( t );
-      if ( _destructionFunctors.end() != lookup ) {
-        return lookup->second;
-      }
-      return nullptr;
-    }
+    PluginDestructionFunctor getDestructionFunctor();
 
   private:
 
@@ -349,14 +259,14 @@ namespace Lore {
     static BoxPtr CreateBox( const string& name,
                              const string& groupname = ResourceController::DefaultGroupName );
     static EntityPtr CreateEntity( const string& name,
-                                   const MeshType& meshType,
+                                   const VertexBuffer::Type& vbType,
                                    const string& groupName = ResourceController::DefaultGroupName );
     static GPUProgramPtr CreateGPUProgram( const string& name,
                                            const string& groupName = ResourceController::DefaultGroupName );
     static MaterialPtr CreateMaterial( const string& name,
                                        const string& groupName = ResourceController::DefaultGroupName );
     static MeshPtr CreateMesh( const string& name,
-                               const MeshType& meshType,
+                               const VertexBuffer::Type& vbType,
                                const string& groupName = ResourceController::DefaultGroupName );
     static RenderTargetPtr CreateRenderTarget( const string& name,
                                                const uint32_t width,
@@ -379,7 +289,7 @@ namespace Lore {
     static UIPtr CreateUI( const string& name,
                            const string& groupName = ResourceController::DefaultGroupName );
     static VertexBufferPtr CreateVertexBuffer( const string& name,
-                                               const MeshType& type,
+                                               const VertexBuffer::Type& type,
                                                const string& groupName = ResourceController::DefaultGroupName );
 
     //
@@ -449,6 +359,11 @@ namespace Lore {
     static void AssignContext( ContextPtr context );
 
   };
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  // Implement template functions.
+  #include "ResourceController.inl"
 
 }
 

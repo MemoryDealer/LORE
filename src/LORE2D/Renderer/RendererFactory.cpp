@@ -26,7 +26,7 @@
 
 #include "RendererFactory.h"
 
-#include <LORE2D/Renderer/Renderers/GenericRenderer.h>
+#include <LORE2D/Renderer/Renderers/Forward2DRenderer.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -42,8 +42,8 @@ std::unique_ptr<Lore::Renderer> RendererFactory::Create( const Lore::RendererTyp
     throw Lore::Exception( "Unknown renderer type in RendererFactory::createRenderer" );
     break;
 
-  case Lore::RendererType::Generic:
-    return std::make_unique<GenericRenderer>();
+  case Lore::RendererType::Forward2D:
+    return std::make_unique<Forward2DRenderer>();
     break;
 
   }

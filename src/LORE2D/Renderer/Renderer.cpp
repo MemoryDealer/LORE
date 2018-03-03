@@ -34,9 +34,9 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-bool Lore::RenderQueue::EntityData::operator < ( const EntityData & r ) const
+void Renderer::setRenderAPI( IRenderAPI* api )
 {
-  return ( material->getName() < r.material->getName() );
+  _api = api;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -26,22 +26,12 @@
 
 #include "Entity.h"
 
-#include <LORE2D/Renderer/Renderer.h>
 #include <LORE2D/Resource/Material.h>
 #include <LORE2D/Resource/ResourceController.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 using namespace Lore;
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-Entity::Entity()
-  : _material( nullptr )
-  , _mesh( nullptr )
-  , _renderQueue( RenderQueue::General )
-{
-}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -65,17 +55,128 @@ EntityPtr Entity::clone( const string& name )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+VertexBufferPtr Entity::getInstancedVertexBuffer() const
+{
+  return _instancedVertexBuffer;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+size_t Entity::getInstanceCount() const
+{
+  return _instanceCount;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Entity::enableInstancing( const size_t max )
+{
+  if ( isInstanced() ) {
+    throw Lore::Exception( "Instancing is already enabled" );
+  }
+
+  // Create an instanced vertex buffer.
+  auto rc = Resource::GetResourceController();
+  _instancedVertexBuffer = rc->create<VertexBuffer>( _name + "_instanced", getResourceGroupName() );
+  _instancedVertexBuffer->initInstanced( VertexBuffer::Type::TexturedQuadInstanced, max );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Entity::disableInstancing()
+{
+  if ( isInstanced() ) {
+    auto rc = Resource::GetResourceController();
+
+    rc->destroy<VertexBuffer>( _instancedVertexBuffer );
+    _instancedVertexBuffer = nullptr;
+  }
+  _instanceCount = 0;
+  _instanceControllerNode = nullptr;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Entity::setInstanceControllerNode( const NodePtr node )
+{
+  _instanceControllerNode = node;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void Entity::setSprite( SpritePtr sprite )
 {
   _material->sprite = sprite;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Entity::setMaterial( MaterialPtr material )
+{
+  _material = material;
+}
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Entity::_notifyAttached()
+void Entity::setMesh( MeshPtr mesh )
 {
+  _mesh = mesh;
+}
 
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+NodePtr Entity::getInstanceControllerNode() const
+{
+  return _instanceControllerNode;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+MaterialPtr Entity::getMaterial() const
+{
+  return _material;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+MeshPtr Entity::getMesh() const
+{
+  return _mesh;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+uint Entity::getRenderQueue() const
+{
+  return _renderQueue;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+bool Entity::isInstanced() const
+{
+  return !!( _instancedVertexBuffer );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Entity::updateInstancedMatrix( const size_t idx, const Matrix4& matrix )
+{
+  _instancedVertexBuffer->updateInstanced( idx, matrix );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Entity::_notifyAttached( const NodePtr node )
+{
+  if ( isInstanced() ) {
+    node->_instanceID = _instanceCount++;
+    if ( 0 == node->_instanceID ) {
+      // First attached node becomes the instance controller node.
+      _instanceControllerNode = node;
+    }
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

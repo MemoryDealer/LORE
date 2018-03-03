@@ -41,10 +41,10 @@ TEST_CASE( "Load and unload resources in code", "[resource]" )
 
   for ( size_t i = 0; i < size; ++i ) {
     REQUIRE( Lore::Resource::CreateBox( names[i] ) );
-    REQUIRE( Lore::Resource::CreateEntity( names[i], Lore::MeshType::TexturedQuad ) );
+    REQUIRE( Lore::Resource::CreateEntity( names[i], Lore::VertexBuffer::Type::TexturedQuad ) );
     REQUIRE( Lore::Resource::CreateGPUProgram( names[i] ) );
     REQUIRE( Lore::Resource::CreateMaterial( names[i] ) );
-    REQUIRE( Lore::Resource::CreateMesh( names[i], Lore::MeshType::Quad ) );
+    REQUIRE( Lore::Resource::CreateMesh( names[i], Lore::VertexBuffer::Type::Quad ) );
     REQUIRE( Lore::Resource::CreateRenderTarget( names[i], 640, 480 ) );
     REQUIRE( Lore::Resource::CreateShader( names[i] + "_FS", Lore::Shader::Type::Fragment ) );
     REQUIRE( Lore::Resource::CreateShader( names[i] + "_VS", Lore::Shader::Type::Vertex ) );
@@ -53,7 +53,7 @@ TEST_CASE( "Load and unload resources in code", "[resource]" )
     REQUIRE( Lore::Resource::CreateTextbox( names[i] ) );
     REQUIRE( Lore::Resource::CreateTexture( names[i], 32, 32, Lore::StockColor::White ) );
     REQUIRE( Lore::Resource::CreateUI( names[i] ) );
-    REQUIRE( Lore::Resource::CreateVertexBuffer( names[i], Lore::MeshType::Quad ) );
+    REQUIRE( Lore::Resource::CreateVertexBuffer( names[i], Lore::VertexBuffer::Type::Quad ) );
   }
 
   for ( size_t i = 0; i < size; ++i ) {
@@ -111,10 +111,10 @@ TEST_CASE( "Load and unload resources in code, different group", "[resource]" )
 
   for ( size_t i = 0; i < size; ++i ) {
     REQUIRE( Lore::Resource::CreateBox( names[i], groupName ) );
-    REQUIRE( Lore::Resource::CreateEntity( names[i], Lore::MeshType::TexturedQuad, groupName ) );
+    REQUIRE( Lore::Resource::CreateEntity( names[i], Lore::VertexBuffer::Type::TexturedQuad, groupName ) );
     REQUIRE( Lore::Resource::CreateGPUProgram( names[i], groupName ) );
     REQUIRE( Lore::Resource::CreateMaterial( names[i], groupName ) );
-    REQUIRE( Lore::Resource::CreateMesh( names[i], Lore::MeshType::Quad, groupName ) );
+    REQUIRE( Lore::Resource::CreateMesh( names[i], Lore::VertexBuffer::Type::Quad, groupName ) );
     REQUIRE( Lore::Resource::CreateRenderTarget( names[i], 640, 480, groupName ) );
     REQUIRE( Lore::Resource::CreateShader( names[i] + "_FS", Lore::Shader::Type::Fragment, groupName ) );
     REQUIRE( Lore::Resource::CreateShader( names[i] + "_VS", Lore::Shader::Type::Vertex, groupName ) );
@@ -123,7 +123,7 @@ TEST_CASE( "Load and unload resources in code, different group", "[resource]" )
     REQUIRE( Lore::Resource::CreateTextbox( names[i], groupName ) );
     REQUIRE( Lore::Resource::CreateTexture( names[i], 32, 32, Lore::StockColor::White, groupName ) );
     REQUIRE( Lore::Resource::CreateUI( names[i], groupName ) );
-    REQUIRE( Lore::Resource::CreateVertexBuffer( names[i], Lore::MeshType::Quad, groupName ) );
+    REQUIRE( Lore::Resource::CreateVertexBuffer( names[i], Lore::VertexBuffer::Type::Quad, groupName ) );
   }
 
   for ( size_t i = 0; i < size; ++i ) {

@@ -97,10 +97,6 @@ namespace Lore {
       _background = background;
     }
 
-    ///
-    /// \brief Sets background texture.
-    void setBackground( const string& texture );
-
     //
     // Getters.
 
@@ -138,7 +134,6 @@ namespace Lore {
 
     void _addActiveLight( LightPtr light );
 
-    friend class Context; // Hack for destroying lights in ~Context.
     friend class Node;
 
   private:

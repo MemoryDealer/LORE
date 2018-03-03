@@ -41,29 +41,31 @@ namespace Lore { namespace OpenGL {
 
         virtual ~GLVertexBuffer() override;
 
-        void init( const Lore::MeshType& type ) override;
+        void init( const Lore::VertexBuffer::Type& type ) override;
+        void initInstanced( const Type& type, const size_t maxCount ) override;
 
-        virtual void build() override;
+        void updateInstanced( const size_t idx, const Matrix4& matrix ) override;
 
-        virtual void bind() override;
+        void bind() override;
+        void unbind() override;
 
-        virtual void unbind() override;
-
-        virtual void draw() override;
-
-        virtual void draw( const Vertices& verts ) override;
+        void draw( const size_t instanceCount ) override;
+        void draw( const Vertices& verts ) override;
 
     private:
 
-        GLuint _vbo; // Vertex buffer object.
-        GLuint _vao; // Vertex array object.
-        GLuint _ebo; // Element buffer object.
+        GLuint _vbo { 0 }; // Vertex buffer object.
+        GLuint _vao { 0 }; // Vertex array object.
+        GLuint _ebo { 0 }; // Element buffer object.
 
-        std::vector<GLfloat> _vertices;
-        std::vector<GLuint> _indices;
+        GLuint _instancedVBO { 0 };
+        std::vector<glm::mat4> _instancedMatrices {};
 
-        GLenum _mode;
-        GLenum _glType;
+        std::vector<GLfloat> _vertices {};
+        std::vector<GLuint> _indices {};
+
+        GLenum _mode { GL_TRIANGLE_STRIP };
+        GLenum _glType { GL_UNSIGNED_INT };
 
     };
 

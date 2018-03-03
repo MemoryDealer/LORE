@@ -80,6 +80,13 @@ NodePtr Node::clone( const string& name, const bool cloneChildNodes )
   }
   node->_lights = _lights.clone();
 
+  // Simulate attaching entities to this node.
+  auto it = _entities.getConstIterator();
+  while ( it.hasMore() ) {
+    auto entity = it.getNext();
+    entity->_notifyAttached( node );
+  }
+
   _parent->_childNodes.insert( name, node );
   _scene->_nodes.insert( name, node );
   
@@ -156,9 +163,10 @@ void Node::detachFromParent()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Node::attachObject( EntityPtr e )
+void Node::attachObject( EntityPtr entity )
 {
-  _entities.insert( e->getName(), e );
+  _entities.insert( entity->getName(), entity );
+  entity->_notifyAttached( this );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -295,6 +303,14 @@ void Node::scale( const real s )
 {
   Vec2 ss( s, s );
   scale( ss );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Node::updateWorldTransform()
+{
+  _transform.derivedScale = _transform.scale;
+  _updateWorldTransform( _getLocalTransform() );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

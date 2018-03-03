@@ -27,6 +27,8 @@
 
 #include <LORE2D/Resource/IResource.h>
 
+#include <LORE2D/Renderer/Renderer.h>
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
@@ -36,61 +38,79 @@ namespace Lore {
 
   public:
 
-    Entity();
+    Entity() = default;
     ~Entity() override;
 
     EntityPtr clone( const string& name );
 
     //
-    // Getters.
+    // Special instancing functions.
 
-    inline MaterialPtr getMaterial() const
-    {
-      return _material;
-    }
+    VertexBufferPtr getInstancedVertexBuffer() const;
+    size_t getInstanceCount() const;
 
-    inline MeshPtr getMesh() const
-    {
-      return _mesh;
-    }
+    ///
+    /// \brief All nodes that use this Entity after a call to this function will be
+    /// rendered with instancing. This greatly improves performance for many Nodes
+    /// using the same Entity.
+    /// Note: This should be called before attaching this Entity to all nodes desired
+    /// to use instancing.
+    void enableInstancing( const size_t max );
 
-    inline uint getRenderQueue() const
-    {
-      return _renderQueue;
-    }
+    ///
+    /// \brief Restores original rendering mode. The internal instanced data will be
+    /// destroyed.
+    void disableInstancing();
 
-    //
-    // Setters.
+    ///
+    /// \brief This node's properties will be used for rendering in instancing mode
+    /// (e.g., material, sprite controller settings. etc.).
+    void setInstanceControllerNode( const NodePtr node );
 
-    inline void setMaterial( MaterialPtr material )
-    {
-      _material = material;
-    }
-
-    inline void setMesh( MeshPtr mesh )
-    {
-      _mesh = mesh;
-    }
+    ///
+    /// \brief Updates the matrix entry in the instanced buffer for the specified
+    /// instance ID.
+    void updateInstancedMatrix( const size_t idx, const Matrix4& matrix );
 
     //
     // Helper functions.
 
     void setSprite( SpritePtr sprite );
 
+    //
+    // Modifiers.
+
+    void setMaterial( MaterialPtr material ); 
+    void setMesh( MeshPtr mesh );
+
+    //
+    // Accessors.
+
+    MaterialPtr getMaterial() const;
+    MeshPtr getMesh() const;
+    uint getRenderQueue() const;
+    bool isInstanced() const;
+    NodePtr getInstanceControllerNode() const;
+
   private:
 
     friend class Node;
 
-  private:
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    void _notifyAttached();
+    void _notifyAttached( const NodePtr node );
 
-  private:
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    MaterialPtr _material;
-    MeshPtr _mesh;
+    MaterialPtr _material { nullptr };
+    MeshPtr _mesh { nullptr };
 
-    uint _renderQueue;
+    // Only used if Entity is instanced.
+    VertexBufferPtr _instancedVertexBuffer { nullptr };
+    size_t _instanceCount { 0 };
+    NodePtr _instanceControllerNode { nullptr };
+
+    uint _renderQueue { RenderQueue::General };
 
   };
 

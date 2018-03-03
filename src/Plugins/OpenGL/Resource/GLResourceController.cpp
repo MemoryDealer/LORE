@@ -61,12 +61,10 @@ GLResourceController::GLResourceController()
 
   // Create default vertex buffers.
   auto texturedQuadVB = create<VertexBuffer>( "TexturedQuad" );
-  texturedQuadVB->init( MeshType::TexturedQuad );
-  texturedQuadVB->build();
+  texturedQuadVB->init( VertexBuffer::Type::TexturedQuad );
 
   auto quadVB = create<VertexBuffer>( "Quad" );
-  quadVB->init( MeshType::Quad );
-  quadVB->build();
+  quadVB->init( VertexBuffer::Type::Quad );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
