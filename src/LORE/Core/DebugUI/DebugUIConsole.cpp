@@ -165,7 +165,7 @@ DebugUIConsole::DebugUIConsole()
   // Create blinking cursor.
   _cursorElement = _panel->createElement( "DebugUI_Cursor" );
   _cursorEntity = Resource::CreateEntity( "DebugUI_Cursor", VertexBuffer::Type::Quad );
-  _cursorEntity->setMaterial( StockResource::GetMaterial( "UnlitStandard" ) ); // TODO: Add parameter or overload to CreateEntity to avoid cloning default material.
+  _cursorEntity->setMaterial( StockResource::GetMaterial( "UnlitStandard2D" ) ); // TODO: Add parameter or overload to CreateEntity to avoid cloning default material.
   _cursorElement->attachEntity( _cursorEntity );
   _cursorElement->setDimensions( .16f, .4f );
   _cursorElement->setPosition( CursorDefaultX, -.91f );

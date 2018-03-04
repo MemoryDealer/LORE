@@ -55,7 +55,8 @@ GLWindow::~GLWindow()
 
 void GLWindow::init( const string& title,
                      const int width,
-                     const int height )
+                     const int height,
+                     const Lore::RendererType rendererTypeMask )
 {
   _title = title;
   _width = width;
@@ -85,8 +86,16 @@ void GLWindow::init( const string& title,
   GLFWwindow* currentContext = glfwGetCurrentContext();
   glfwMakeContextCurrent( _window );
 
-  _stockController = std::make_unique<StockResourceController>();
+  _stockController = std::make_unique<GLStockResourceController>();
   _stockController->createStockResources();
+
+  // Create stock resources needed for this window given the expected renderer type(s).
+  if ( rendererTypeMask & RendererType::Forward2D ) {
+    _stockController->createRendererStockResources( RendererType::Forward2D );
+  }
+  if ( rendererTypeMask & RendererType::Forward3D ) {
+    _stockController->createRendererStockResources( RendererType::Forward3D );
+  }
 
   glfwMakeContextCurrent( currentContext );
 }

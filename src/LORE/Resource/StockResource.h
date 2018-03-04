@@ -47,6 +47,35 @@ namespace Lore {
     bool scrolling { true };
   };
 
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+  
+  ///
+  /// \class StockResourceFactory
+  /// \brief 
+  class LORE_EXPORT StockResourceFactory
+  {
+
+  public:
+
+    StockResourceFactory() = delete;
+    StockResourceFactory( ResourceControllerPtr controller );
+    virtual ~StockResourceFactory() = default;
+
+    //
+    // Factory functions that must be implemented by the render plugin.
+
+    virtual GPUProgramPtr createUberProgram( const string& name, const UberProgramParameters& params ) = 0;
+    virtual GPUProgramPtr createBackgroundProgram( const string& name, const BackgroundProgramParameters& params ) = 0;
+    virtual GPUProgramPtr createBoxProgram( const string& name ) = 0;
+
+  protected:
+
+    ResourceControllerPtr _controller { nullptr };
+
+  };
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
   ///
   /// \class StockResourceController
   /// \brief Holds a collection of stock resources available for common use. It wraps a ResourceController
@@ -74,6 +103,13 @@ namespace Lore {
 
     void createStockResources();
 
+    void createRendererStockResources( const RendererType type );
+
+    //
+    // Factory functions.
+
+    virtual GPUProgramPtr createTextProgram( const string& name ) = 0;
+
     //
     // Accessor functions.
 
@@ -85,23 +121,18 @@ namespace Lore {
 
     MeshPtr getMesh( const VertexBuffer::Type& type );
 
-    //
-    // Factory functions that must be implemented by the render plugin.
-
-    virtual GPUProgramPtr createUberProgram( const string& name, const UberProgramParameters& params ) = 0;
-    virtual GPUProgramPtr createBackgroundProgram( const string& name, const BackgroundProgramParameters& params ) = 0;
-    virtual GPUProgramPtr createBoxProgram( const string& name ) = 0;
-    virtual GPUProgramPtr createTextProgram( const string& name ) = 0;
-
   protected:
 
     using MeshTable = Util::HashTable<VertexBuffer::Type, MeshPtr>;
+    using StockResourceFactoryMap = std::map<RendererType, std::unique_ptr<StockResourceFactory>>;
 
   protected:
 
     std::unique_ptr<ResourceController> _controller { nullptr };
 
-    MeshTable _meshTable;
+    MeshTable _meshTable {};
+
+    StockResourceFactoryMap _factories {};
 
   };
 

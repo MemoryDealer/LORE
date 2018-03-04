@@ -47,7 +47,8 @@ namespace Lore { namespace OpenGL {
 
         void init( const string& title,
                    const int width,
-                   const int height );
+                   const int height,
+                   const RendererType rendererTypeMask );
 
         //
         // Rendering.

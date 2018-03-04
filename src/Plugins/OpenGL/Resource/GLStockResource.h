@@ -31,23 +31,33 @@
 
 namespace Lore { namespace OpenGL {
 
-    class StockResourceController : public Lore::StockResourceController
-    {
+  class GLStockResource2DFactory final : public Lore::StockResourceFactory
+  {
 
-    public:
+  public:
 
-        StockResourceController();
-        virtual ~StockResourceController() override;
+    GLStockResource2DFactory( ResourceControllerPtr controller );
+    ~GLStockResource2DFactory() override = default;
 
-        //
-        // Factory functions.
+    virtual GPUProgramPtr createUberProgram( const string& name, const Lore::UberProgramParameters& params ) override;
+    virtual GPUProgramPtr createBackgroundProgram( const string& name, const BackgroundProgramParameters& params ) override;
+    virtual GPUProgramPtr createBoxProgram( const string& name ) override;
 
-        virtual GPUProgramPtr createUberProgram( const string& name, const Lore::UberProgramParameters& params ) override;
-        virtual GPUProgramPtr createBackgroundProgram( const string& name, const BackgroundProgramParameters& params ) override;
-        virtual GPUProgramPtr createBoxProgram( const string& name ) override;
-        virtual GPUProgramPtr createTextProgram( const string& name ) override;
+  };
 
-    };
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  class GLStockResourceController final : public Lore::StockResourceController
+  {
+
+  public:
+
+    GLStockResourceController();
+    ~GLStockResourceController() override = default;
+
+    virtual GPUProgramPtr createTextProgram( const string& name ) override;
+
+  };
 
 }}
 

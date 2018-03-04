@@ -45,9 +45,9 @@ Background::Background()
 Background::Layer& Background::addLayer( const string& name )
 {
   Layer layer( name );
-  auto material = StockResource::GetMaterial( "Background" );
+  auto material = StockResource::GetMaterial( "Background2D" );
   layer.setMaterial( ResourceCast<Material>( material->clone( "bg_layer_" + name ) ) );
-  layer.getMaterial()->program = Lore::StockResource::GetGPUProgram( "Background" );
+  layer.getMaterial()->program = Lore::StockResource::GetGPUProgram( "Background2D" );
 
   log_information( "Added layer " + name + " to background " + _name );
 

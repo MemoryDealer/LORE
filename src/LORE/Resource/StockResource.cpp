@@ -47,6 +47,15 @@ using namespace LocalNS;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+StockResourceFactory::StockResourceFactory( ResourceControllerPtr controller )
+: _controller( controller )
+{
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 StockResourceController::StockResourceController()
 {
 }
@@ -61,36 +70,16 @@ StockResourceController::~StockResourceController()
 
 void StockResourceController::createStockResources()
 {
+
   //
-  // Load stock programs.
-
-  // Lit programs.
+  // Create stock shaders.
   {
-    UberProgramParameters params;
 
-    createUberProgram( "StandardTextured", params );
-
-    params.numTextures = 0;
-    createUberProgram( "Standard", params );
-  }
-
-  // Unlit programs.
-  {
-    UberProgramParameters params;
-    params.maxLights = 0;
-
-    createUberProgram( "UnlitTextured", params );
-
-    params.numTextures = 0;
-    createUberProgram( "UnlitStandard", params );
-  }
-
-  // RTT programs.
-  {
     UberProgramParameters params;
 
     params.maxLights = 0;
-    createUberProgram( "UnlitTexturedRTT", params );
+    auto& srf = _factories.at( RendererType::Forward2D );
+    srf->createUberProgram( "UnlitTexturedRTT", params );
   }
 
   //
@@ -104,38 +93,7 @@ void StockResourceController::createStockResources()
   }
 
   //
-  // Load stock materials.
-
-  // Lit materials.
-  {
-    auto material = _controller->create<Material>( "StandardTextured" );
-    material->lighting = true;
-    material->sprite = _controller->get<Sprite>( "White" );
-    material->program = _controller->get<GPUProgram>( "StandardTextured" );
-  }
-
-  {
-    auto material = _controller->create<Material>( "Standard" );
-    material->lighting = true;
-    material->program = _controller->get<GPUProgram>( "Standard" );
-  }
-
-  // Unlit materials.
-  {
-    auto material = _controller->create<Material>( "UnlitTextured" );
-    material->lighting = false;
-    material->sprite = _controller->get<Sprite>( "White" );
-    material->program = _controller->get<GPUProgram>( "UnlitTextured" );
-  }
-
-  {
-    auto material = _controller->create<Material>( "UnlitStandard" );
-    material->lighting = false;
-    material->program = _controller->get<GPUProgram>( "UnlitStandard" );
-  }
-
-  //
-  // Create stock meshes (uses previously created vertex buffers).
+  // Create stock meshes (uses previously created vertex buffers from ResourceController's constructor).
 
   {
     auto mesh = _controller->create<Mesh>( "TexturedQuad" );
@@ -148,40 +106,6 @@ void StockResourceController::createStockResources()
     mesh->setVertexBuffer( _controller->get<VertexBuffer>( "Quad" ) );
     _meshTable.insert( { VertexBuffer::Type::Quad, mesh } );
   }
-
-  // ::::::::::::::::::::::::: //
-
-  //
-  // Background stock resources.
-
-  {
-    BackgroundProgramParameters params;
-
-    createBackgroundProgram( "Background", params );
-  }
-
-  {
-    auto material = _controller->create<Material>( "Background" );
-    material->lighting = false;
-    material->sprite = _controller->get<Sprite>( "White" );
-    material->program = _controller->get<GPUProgram>( "Background" );
-  }
-
-  {
-    auto vb = _controller->create<VertexBuffer>( "Background" );
-    vb->init( VertexBuffer::Type::Background );
-  }
-
-  // ::::::::::::::::::::::::: //
-
-  //
-  // Box stock resources.
-
-  {
-    createBoxProgram( "StandardBox" );
-  }
-
-  // ::::::::::::::::::::::::: //
 
   //
   // Font stock resources.
@@ -199,21 +123,121 @@ void StockResourceController::createStockResources()
     auto vb = _controller->create<VertexBuffer>( "StandardText" );
     vb->init( VertexBuffer::Type::Text );
   }
+}
 
-  // ::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void StockResourceController::createRendererStockResources( const RendererType type )
+{
+  StockResourceFactoryPtr srf = nullptr;
+  auto lookup = _factories.find( type );
+  if ( _factories.end() == lookup ) {
+    throw Lore::Exception( "Unable to get stock resource factory" );
+  }
+  srf = lookup->second.get();
+
+  string suffix;
+  switch ( type ) {
+  default:
+  case RendererType::Forward2D:
+    suffix = "2D";
+    break;
+    
+  case RendererType::Forward3D:
+    suffix = "3D";
+    break;
+  }
 
   //
-  // Instancing.
+  // Create stock programs.
 
+  // Lit programs.
+  {
+    UberProgramParameters params;
+
+    srf->createUberProgram( "StandardTextured" + suffix, params );
+
+    params.numTextures = 0;
+    srf->createUberProgram( "Standard" + suffix, params );
+  }
+
+  // Unlit programs.
+  {
+    UberProgramParameters params;
+    params.maxLights = 0;
+
+    srf->createUberProgram( "UnlitTextured" + suffix, params );
+
+    params.numTextures = 0;
+    srf->createUberProgram( "UnlitStandard" + suffix, params );
+  }
+
+  // Instanced programs.
   {
     UberProgramParameters params;
     params.instanced = true;
 
-    createUberProgram( "StandardTexturedInstanced", params );
+    srf->createUberProgram( "StandardTexturedInstanced" + suffix, params );
 
     params.numTextures = 0;
-    createUberProgram( "StandardInstanced", params );
+    srf->createUberProgram( "StandardInstanced" + suffix, params );
   }
+
+  //
+  // Create stock materials.
+
+  // Lit materials.
+  {
+    auto material = _controller->create<Material>( "StandardTextured" + suffix );
+    material->lighting = true;
+    material->sprite = _controller->get<Sprite>( "White" );
+    material->program = _controller->get<GPUProgram>( "StandardTextured" + suffix );
+  }
+
+  {
+    auto material = _controller->create<Material>( "Standard" + suffix );
+    material->lighting = true;
+    material->program = _controller->get<GPUProgram>( "Standard" + suffix );
+  }
+
+  // Unlit materials.
+  {
+    auto material = _controller->create<Material>( "UnlitTextured" + suffix );
+    material->lighting = false;
+    material->sprite = _controller->get<Sprite>( "White" );
+    material->program = _controller->get<GPUProgram>( "UnlitTextured" + suffix );
+  }
+
+  {
+    auto material = _controller->create<Material>( "UnlitStandard" + suffix );
+    material->lighting = false;
+    material->program = _controller->get<GPUProgram>( "UnlitStandard" + suffix );
+  }
+
+  //
+  // Background stock resources.
+
+  {
+    BackgroundProgramParameters params;
+    srf->createBackgroundProgram( "Background" + suffix, params );
+  }
+
+  {
+    auto material = _controller->create<Material>( "Background" + suffix );
+    material->lighting = false;
+    material->sprite = _controller->get<Sprite>( "White" );
+    material->program = _controller->get<GPUProgram>( "Background" + suffix );
+  }
+
+  {
+    auto vb = _controller->create<VertexBuffer>( "Background" + suffix );
+    vb->init( VertexBuffer::Type::Background );
+  }
+
+  //
+  // Box stock resources.
+
+  srf->createBoxProgram( "StandardBox" + suffix );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -57,6 +57,7 @@ namespace Lore { namespace OpenGL {
     virtual WindowPtr createWindow( const string& title,
                                     const uint width,
                                     const uint height,
+                                    const RendererType rendererTypeMask,
                                     const Window::Mode& mode = Window::Mode::Windowed ) override;
 
     ///

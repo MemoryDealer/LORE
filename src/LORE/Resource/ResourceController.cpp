@@ -343,14 +343,14 @@ EntityPtr Resource::CreateEntity( const string& name, const VertexBuffer::Type& 
 
   case VertexBuffer::Type::Quad:
   {
-    auto material = StockResource::GetMaterial( "Standard" );
+    auto material = StockResource::GetMaterial( "Standard2D" );
     entity->setMaterial( material->clone( "Standard_" + name ) );
   }
     break;
 
   case VertexBuffer::Type::TexturedQuad:
   {
-    auto material = StockResource::GetMaterial( "StandardTextured" );
+    auto material = StockResource::GetMaterial( "StandardTextured2D" );
     entity->setMaterial( material->clone( "StandardTextured_" + name ) );
   }
     break;

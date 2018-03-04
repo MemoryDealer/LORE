@@ -150,10 +150,12 @@ namespace Lore {
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
   // All built-in LORE renderer types.
-  enum class RendererType
+  // TODO: Convert to strongly typed enum and use type-safe bitmasks.
+  enum RendererType
   {
-    Forward2D,
-    Forward3D
+    Forward2D = 0x1,
+    Forward3D = 0x2,
+    All = Forward2D | Forward3D
   };
 
 }

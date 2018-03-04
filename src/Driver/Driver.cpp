@@ -70,7 +70,7 @@ int main( int argc, char** argv )
 {
   auto context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
 
-  Lore::WindowPtr window = context->createWindow( "Test", 640, 480 );
+  Lore::WindowPtr window = context->createWindow( "Test", 640, 480, Lore::RendererType::Forward2D );
   window->setActive();
 
   Lore::Resource::LoadResourceConfiguration( "res/resources.json" );

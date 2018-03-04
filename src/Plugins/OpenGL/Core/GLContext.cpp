@@ -141,10 +141,11 @@ void Context::renderFrame( const float lagMultiplier )
 Lore::WindowPtr Context::createWindow( const string& title,
                                        const uint width,
                                        const uint height,
+                                       const Lore::RendererType rendererTypeMask,
                                        const Lore::Window::Mode& mode )
 {
   auto window = _poolCluster.create<Window, GLWindow>();
-  window->init( title, width, height );
+  window->init( title, width, height, rendererTypeMask );
   window->setMode( mode );
   _windowRegistry.insert( title, window );
 

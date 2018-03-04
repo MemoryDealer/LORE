@@ -72,9 +72,9 @@ void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
   case VertexBuffer::Type::Quad:
     _mode = GL_TRIANGLE_STRIP;
     _vertices = { -0.1f, -0.1f,
-      -0.1f, 0.1f,
-      0.1f, -0.1f,
-      0.1f, 0.1f };
+                  -0.1f, 0.1f,
+                  0.1f, -0.1f,
+                  0.1f, 0.1f };
     _indices = { 0, 1, 2, 3 };
 
     addAttribute( AttributeType::Float, 2 );
@@ -83,9 +83,9 @@ void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
   case VertexBuffer::Type::TexturedQuad:
     _mode = GL_TRIANGLE_STRIP;
     _vertices = { -0.1f, -0.1f,     0.f, 0.f,
-      -0.1f, 0.1f,      0.f, 1.f,
-      0.1f, -0.1f,      1.f, 0.f,
-      0.1f, 0.1f,       1.f, 1.f };
+                  -0.1f, 0.1f,      0.f, 1.f,
+                  0.1f, -0.1f,      1.f, 0.f,
+                  0.1f, 0.1f,       1.f, 1.f };
     _indices = { 0, 1, 2, 3 };
 
     addAttribute( AttributeType::Float, 2 );
@@ -95,9 +95,9 @@ void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
   case VertexBuffer::Type::Background:
     _mode = GL_TRIANGLE_STRIP;
     _vertices = { -1.f, -1.f,     0.f, 0.f,
-      -1.f, 1.f,      0.f, 1.f,
-      1.f, -1.f,      1.f, 0.f,
-      1.f, 1.f,       1.f, 1.f };
+                  -1.f, 1.f,      0.f, 1.f,
+                  1.f, -1.f,      1.f, 0.f,
+                  1.f, 1.f,       1.f, 1.f };
     _indices = { 0, 1, 2, 3 };
 
     addAttribute( AttributeType::Float, 2 );
@@ -207,12 +207,8 @@ void GLVertexBuffer::initInstanced( const Type& type, const size_t maxCount )
   for ( GLuint attribIdx = 2; attribIdx < 6; ++attribIdx ) {
     glEnableVertexAttribArray( attribIdx );
     glVertexAttribPointer( attribIdx, 4, GL_FLOAT, GL_FALSE, sizeof( glm::mat4 ), reinterpret_cast< void* >( ( attribIdx - 2 ) * sizeof( glm::vec4 ) ) );
+    glVertexAttribDivisor( attribIdx, 1 );
   }
-
-  glVertexAttribDivisor( 2, 1 );
-  glVertexAttribDivisor( 3, 1 );
-  glVertexAttribDivisor( 4, 1 );
-  glVertexAttribDivisor( 5, 1 );
 
   glBindVertexArray( 0 );
 

@@ -36,20 +36,14 @@ using namespace Lore::OpenGL;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-StockResourceController::StockResourceController()
-{
-  _controller = std::make_unique<GLResourceController>();
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-StockResourceController::~StockResourceController()
+GLStockResource2DFactory::GLStockResource2DFactory( Lore::ResourceControllerPtr controller )
+: StockResourceFactory( controller )
 {
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::GPUProgramPtr StockResourceController::createUberProgram( const string& name, const Lore::UberProgramParameters& params )
+Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& name, const Lore::UberProgramParameters& params )
 {
   const bool textured = ( params.numTextures > 0 );
   const bool lit = ( params.maxLights > 0 );
@@ -274,7 +268,7 @@ Lore::GPUProgramPtr StockResourceController::createUberProgram( const string& na
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::GPUProgramPtr StockResourceController::createBackgroundProgram( const string& name, const Lore::BackgroundProgramParameters& params )
+Lore::GPUProgramPtr GLStockResource2DFactory::createBackgroundProgram( const string& name, const Lore::BackgroundProgramParameters& params )
 {
   const string header = "#version " +
     std::to_string( APIVersion::GetMajor() ) + std::to_string( APIVersion::GetMinor() ) + "0" +
@@ -400,7 +394,7 @@ Lore::GPUProgramPtr StockResourceController::createBackgroundProgram( const stri
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::GPUProgramPtr StockResourceController::createBoxProgram( const string& name )
+Lore::GPUProgramPtr GLStockResource2DFactory::createBoxProgram( const string& name )
 {
   const string header = "#version " +
     std::to_string( APIVersion::GetMajor() ) + std::to_string( APIVersion::GetMinor() ) + "0" +
@@ -508,8 +502,19 @@ Lore::GPUProgramPtr StockResourceController::createBoxProgram( const string& nam
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::GPUProgramPtr StockResourceController::createTextProgram( const string& name )
+GLStockResourceController::GLStockResourceController()
+{
+  _controller = std::make_unique<GLResourceController>();
+
+  _factories[RendererType::Forward2D] = std::make_unique<GLStockResource2DFactory>( _controller.get() );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Lore::GPUProgramPtr GLStockResourceController::createTextProgram( const string& name )
 {
   const string header = "#version " +
     std::to_string( APIVersion::GetMajor() ) + std::to_string( APIVersion::GetMinor() ) + "0" +

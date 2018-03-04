@@ -61,6 +61,7 @@ namespace Lore {
   class SpriteAnimationSet;
   class SpriteController;
   class StockResourceController;
+  class StockResourceFactory;
   class Textbox;
   class Texture;
   class UI;
@@ -97,6 +98,7 @@ namespace Lore {
   using SpriteAnimationSetPtr = SpriteAnimationSet*;
   using SpriteControllerPtr = SpriteController*;
   using StockResourceControllerPtr = StockResourceController*;
+  using StockResourceFactoryPtr = StockResourceFactory*;
   using TextboxPtr = Textbox*;
   using TexturePtr = Texture*;
   using UIPtr = UI*;

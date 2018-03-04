@@ -298,7 +298,7 @@ void Forward2DRenderer::renderBackground( const RenderView& rv,
   BackgroundPtr background = rv.scene->getBackground();
   Background::LayerMap layers = background->getLayerMap();
 
-  VertexBufferPtr vb = StockResource::GetVertexBuffer( "Background" );
+  VertexBufferPtr vb = StockResource::GetVertexBuffer( "Background2D" );
   vb->bind();
 
   const Vec2 camPos = rv.camera->getPosition();
@@ -377,11 +377,11 @@ void Forward2DRenderer::renderSolids( const ScenePtr scene,
       throw Lore::Exception( "Instanced entity must have an instanced vertex buffer" );
 
     case VertexBuffer::Type::QuadInstanced:
-      program = StockResource::GetGPUProgram( "StandardInstanced" );
+      program = StockResource::GetGPUProgram( "StandardInstanced2D" );
       break;
 
     case VertexBuffer::Type::TexturedQuadInstanced:
-      program = StockResource::GetGPUProgram( "StandardTexturedInstanced" );
+      program = StockResource::GetGPUProgram( "StandardTexturedInstanced2D" );
       break;
     }
 
@@ -476,11 +476,11 @@ void Forward2DRenderer::renderTransparents( const ScenePtr scene,
         throw Lore::Exception( "Instanced entity must have an instanced vertex buffer" );
 
       case VertexBuffer::Type::QuadInstanced:
-        program = StockResource::GetGPUProgram( "StandardInstanced" );
+        program = StockResource::GetGPUProgram( "StandardInstanced2D" );
         break;
 
       case VertexBuffer::Type::TexturedQuadInstanced:
-        program = StockResource::GetGPUProgram( "StandardTexturedInstanced" );
+        program = StockResource::GetGPUProgram( "StandardTexturedInstanced2D" );
         break;
       }
     }
@@ -533,7 +533,7 @@ void Forward2DRenderer::renderBoxes( const RenderQueue& queue,
   _api->setBlendingEnabled( true );
   _api->setBlendingFunc( Material::BlendFactor::SrcAlpha, Material::BlendFactor::OneMinusSrcAlpha );
 
-  GPUProgramPtr program = StockResource::GetGPUProgram( "StandardBox" );
+  GPUProgramPtr program = StockResource::GetGPUProgram( "StandardBox2D" );
   VertexBufferPtr vb = StockResource::GetVertexBuffer( "TexturedQuad" );
 
   program->use();
