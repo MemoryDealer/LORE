@@ -1,6 +1,6 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
-// This source file is part of LORE2D
+// This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
 // Copyright (c) 2016-2017 Jordan Sparks
@@ -27,13 +27,13 @@
 #include <memory>
 #include <sstream>
 
-#include <LORE2D/Lore.h>
+#include <LORE/Lore.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // Note: Error 1282 on binding calls with no prior errors indicates a wrong context.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Memory/PoolCluster.h>
+#include <LORE/Memory/PoolCluster.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 

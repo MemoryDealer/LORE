@@ -1,6 +1,6 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
-// This source file is part of LORE2D
+// This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
 // Copyright (c) 2016-2017 Jordan Sparks
@@ -24,7 +24,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/LorePlatform.h>
+#include <LORE/LorePlatform.h>
 
 #define CATCH_CONFIG_RUNNER
 #include "catch.hpp"

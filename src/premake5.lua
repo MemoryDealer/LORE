@@ -1,5 +1,5 @@
 ----------------------------
--- LORE2D Premake5 script --
+-- LORE Premake5 script --
 ----------------------------
 
 targetdir "../bin/%{cfg.buildcfg}/Run"
@@ -15,7 +15,7 @@ characterset ( "MBCS" )
 
 -- Solution
 
-solution "LORE2D"
+solution "LORE"
     configurations { "Debug", "Release" }
     startproject "Example_ComplexScene"
 
@@ -41,16 +41,16 @@ filter "system:MacOSX"
 -- Project(s)
 --
 
-project "LORE2D"
-    location "LORE2D"
+project "LORE"
+    location "LORE"
     kind "SharedLib"
     language "C++"
     defines { "__Lore_Exports__", "_HAS_CXX17" }
     pchheader "_pch.h"
-    pchsource "LORE2D/_pch.cpp"
+    pchsource "LORE/_pch.cpp"
     forceincludes { "_pch.h" }
     files {
-        "LORE2D/**.h", "LORE2D/**.cpp"
+        "LORE/**.h", "LORE/**.cpp"
     }
     postbuildcommands { "{COPY} ../../res/ ../../bin/%{cfg.buildcfg}/Run/res/" }
 
@@ -58,7 +58,7 @@ project "Plugin_OpenGL"
     location "Plugins/OpenGL"
     kind "SharedLib"
     language "C++"
-    libdirs { "../bin/%{cfg.buildcfg}/Run" } -- Location of LORE2D.lib after build.
+    libdirs { "../bin/%{cfg.buildcfg}/Run" } -- Location of LORE.lib after build.
     defines { "__LoreOpenGL_Exports__", "_HAS_CXX17" }
     pchheader "_pch.h"
     pchsource "Plugins/OpenGL/_pch.cpp"
@@ -66,7 +66,7 @@ project "Plugin_OpenGL"
     files {
         "Plugins/OpenGL/**.h", "Plugins/OpenGL/**.cpp"
     }
-    links { "LORE2D", "glad", "freetype" }
+    links { "LORE", "glad", "freetype" }
 
     -- OS-specific options
     filter { "system:Windows" }
@@ -100,7 +100,7 @@ project "Example_ComplexScene"
         "Examples/ComplexScene/**.h",
         "Examples/ComplexScene/**.cpp"
     }
-    links { "LORE2D" }
+    links { "LORE" }
     postbuildcommands { "{COPY} ../../../res/ ../../../bin/%{cfg.buildcfg}/Run/res/" }
 
 project "Driver"
@@ -112,7 +112,7 @@ project "Driver"
         "Driver/**.cpp",
         "Driver/TODO.TXT"
     }
-    links { "LORE2D" }
+    links { "LORE" }
     postbuildcommands { "{COPY} ../../res/ ../../bin/%{cfg.buildcfg}/Run/res/" }
 
 project "Tests"
@@ -124,5 +124,5 @@ project "Tests"
     files {
         "Tests/**.h", "Tests/**.hpp", "Tests/**.cpp", "Tests/**.json"
     }
-    links { "LORE2D" }
+    links { "LORE" }
     postbuildcommands { "{COPY} data/ ../../bin/%{cfg.buildcfg}/Run/TestData/" }

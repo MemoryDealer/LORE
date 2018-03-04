@@ -1,6 +1,6 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
-// This source file is part of LORE2D
+// This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
 // Copyright (c) 2016-2017 Jordan Sparks
@@ -26,7 +26,7 @@
 
 #include "GLStockResource.h"
 
-#include <LORE2D/Core/APIVersion.h>
+#include <LORE/Core/APIVersion.h>
 
 #include <Plugins/OpenGL/Resource/GLResourceController.h>
 

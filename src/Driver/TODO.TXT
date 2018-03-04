@@ -1,5 +1,4 @@
 --- Features ---
--Fix gl 1282 regression
 -Cleanup Node class, rename functions for local/world/full transform
 -Also a regression in math tests for vector division, introduced somewhere during AABBs (was temporarily address with higher epsilon)
 -Debug tools - view memory pools for each type, hover over to view details

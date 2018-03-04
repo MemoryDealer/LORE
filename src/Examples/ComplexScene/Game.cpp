@@ -1,6 +1,6 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
-// This source file is part of LORE2D
+// This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
 // Copyright (c) 2016-2017 Jordan Sparks
@@ -275,8 +275,10 @@ void Game::update()
 {
   static float blockOffset = 0.f;
   float blockExtraOffset = 0.f;
+  int i = 0;
   for ( auto& block : _floatingBlocks ) {
     block->setPosition( block->getPosition().x, std::sinf( blockOffset ) * 0.5f + blockExtraOffset );
+    block->rotate( ( i++ % 2 == 0 ) ? Lore::Math::POSITIVE_Z_AXIS : Lore::Math::POSITIVE_Y_AXIS, Lore::Degree( 0.31f ) );
   }
   blockOffset += 0.01f;
 }

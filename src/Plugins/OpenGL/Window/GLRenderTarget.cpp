@@ -1,6 +1,6 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
-// This source file is part of LORE2D
+// This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
 // Copyright (c) 2016-2017 Jordan Sparks
@@ -26,7 +26,7 @@
 
 #include "GLRenderTarget.h"
 
-#include <LORE2D/Core/Context.h>
+#include <LORE/Core/Context.h>
 #include <Plugins/OpenGL/Resource/GLTexture.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

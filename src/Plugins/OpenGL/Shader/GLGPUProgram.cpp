@@ -1,6 +1,6 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
-// This source file is part of LORE2D
+// This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
 // Copyright (c) 2016-2017 Jordan Sparks
@@ -26,8 +26,8 @@
 
 #include "GLGPUProgram.h"
 
-#include <LORE2D/Scene/Light.h>
-#include <LORE2D/Shader/Shader.h>
+#include <LORE/Scene/Light.h>
+#include <LORE/Shader/Shader.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
