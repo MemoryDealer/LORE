@@ -37,7 +37,7 @@ namespace Lore {
   // Forward declarations.
 
   class AABB;
-  class Background;
+  class Skybox;
   class Box;
   class Camera;
   class Context;
@@ -74,7 +74,7 @@ namespace Lore {
   // Pointer types.
 
   using AABBPtr = AABB*;
-  using BackgroundPtr = Background*;
+  using SkyboxPtr = Skybox*;
   using BoxPtr = Box*;
   using CameraPtr = Camera*;
   using ContextPtr = Context*;

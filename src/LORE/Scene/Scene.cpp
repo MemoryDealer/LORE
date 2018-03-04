@@ -45,8 +45,8 @@ Scene::Scene()
   _root.setName( "root" );
   _root._scene = this;
 
-  // TODO: Get stock background
-  _background = MemoryAccess::GetPrimaryPoolCluster()->create<Background>();
+  // TODO: Get stock skybox
+  _skybox = MemoryAccess::GetPrimaryPoolCluster()->create<Skybox>();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

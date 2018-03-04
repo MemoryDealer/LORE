@@ -268,7 +268,7 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::GPUProgramPtr GLStockResource2DFactory::createBackgroundProgram( const string& name, const Lore::BackgroundProgramParameters& params )
+Lore::GPUProgramPtr GLStockResource2DFactory::createSkyboxProgram( const string& name, const Lore::SkyboxProgramParameters& params )
 {
   const string header = "#version " +
     std::to_string( APIVersion::GetMajor() ) + std::to_string( APIVersion::GetMinor() ) + "0" +
@@ -316,7 +316,7 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createBackgroundProgram( const str
   auto vsptr = _controller->create<Shader>( name + "_VS" );
   vsptr->init( Shader::Type::Vertex );
   if ( !vsptr->loadFromSource( src ) ) {
-    throw Lore::Exception( "Failed to compile background vertex shader for " + name );
+    throw Lore::Exception( "Failed to compile skybox vertex shader for " + name );
   }
 
   // ::::::::::::::::::::::::::::::::: //
@@ -359,7 +359,7 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createBackgroundProgram( const str
   auto fsptr = _controller->create<Shader>( name + "_FS" );
   fsptr->init( Shader::Type::Fragment );
   if ( !fsptr->loadFromSource( src ) ) {
-    throw Lore::Exception( "Failed to compile background fragment shader for " + name );
+    throw Lore::Exception( "Failed to compile skybox fragment shader for " + name );
   }
 
   // ::::::::::::::::::::::::::::::::: //

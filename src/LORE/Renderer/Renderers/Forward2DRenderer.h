@@ -75,7 +75,7 @@ namespace Lore {
     void activateQueue( const uint id,
                         RenderQueue& rq );
 
-    void renderBackground( const RenderView& rv,
+    void renderSkybox( const RenderView& rv,
                             const real aspectRatio,
                             const Matrix4& proj );
 

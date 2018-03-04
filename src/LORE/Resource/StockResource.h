@@ -42,7 +42,7 @@ namespace Lore {
     bool instanced { false };
   };
 
-  struct BackgroundProgramParameters
+  struct SkyboxProgramParameters
   {
     bool scrolling { true };
   };
@@ -65,7 +65,7 @@ namespace Lore {
     // Factory functions that must be implemented by the render plugin.
 
     virtual GPUProgramPtr createUberProgram( const string& name, const UberProgramParameters& params ) = 0;
-    virtual GPUProgramPtr createBackgroundProgram( const string& name, const BackgroundProgramParameters& params ) = 0;
+    virtual GPUProgramPtr createSkyboxProgram( const string& name, const SkyboxProgramParameters& params ) = 0;
     virtual GPUProgramPtr createBoxProgram( const string& name ) = 0;
 
   protected:

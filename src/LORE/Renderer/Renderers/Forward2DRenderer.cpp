@@ -181,7 +181,7 @@ void Forward2DRenderer::present( const RenderView& rv, const WindowPtr window )
 
   _api->setDepthTestEnabled( true );
 
-  Color bg = rv.scene->getBackgroundColor();
+  Color bg = rv.scene->getSkyboxColor();
   _api->clear();
   _api->clearColor( bg.r, bg.g, bg.b, 0.f );
   _api->setPolygonMode( IRenderAPI::PolygonMode::Fill );
@@ -194,8 +194,8 @@ void Forward2DRenderer::present( const RenderView& rv, const WindowPtr window )
 
   const Matrix4 viewProjection = rv.camera->getViewMatrix() * projection;
 
-  // Render background before scene node entities.
-  renderBackground( rv, aspectRatio, projection );
+  // Render skybox before scene node entities.
+  renderSkybox( rv, aspectRatio, projection );
 
   // Iterate through all active render queues and render each object.
   for ( const auto& activeQueue : _activeQueues ) {
@@ -291,20 +291,20 @@ void Forward2DRenderer::activateQueue( const uint id, RenderQueue& rq )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Forward2DRenderer::renderBackground( const RenderView& rv,
+void Forward2DRenderer::renderSkybox( const RenderView& rv,
                                         const real aspectRatio,
                                         const Matrix4& proj )
 {
-  BackgroundPtr background = rv.scene->getBackground();
-  Background::LayerMap layers = background->getLayerMap();
+  SkyboxPtr skybox = rv.scene->getSkybox();
+  Skybox::LayerMap layers = skybox->getLayerMap();
 
-  VertexBufferPtr vb = StockResource::GetVertexBuffer( "Background2D" );
+  VertexBufferPtr vb = StockResource::GetVertexBuffer( "Skybox2D" );
   vb->bind();
 
   const Vec2 camPos = rv.camera->getPosition();
 
   for ( const auto& pair : layers ) {
-    const Background::Layer& layer = pair.second;
+    const Skybox::Layer& layer = pair.second;
     MaterialPtr mat = layer.getMaterial();
 
     if ( mat->sprite && mat->sprite->getTextureCount() ) {
@@ -342,7 +342,7 @@ void Forward2DRenderer::renderBackground( const RenderView& rv,
 
       Matrix4 transform = Math::CreateTransformationMatrix( Vec2( 0.f, 0.f ) );
       transform[0][0] = aspectRatio;
-      transform[1][1] = Math::Clamp( aspectRatio, 1.f, 90.f ); // HACK to prevent clipping background on aspect ratios < 1.0.
+      transform[1][1] = Math::Clamp( aspectRatio, 1.f, 90.f ); // HACK to prevent clipping skybox on aspect ratios < 1.0.
       transform[3][2] = layer.getDepth();
       program->setTransformVar( proj * transform );
 

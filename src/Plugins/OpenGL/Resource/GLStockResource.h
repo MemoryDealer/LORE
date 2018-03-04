@@ -40,7 +40,7 @@ namespace Lore { namespace OpenGL {
     ~GLStockResource2DFactory() override = default;
 
     virtual GPUProgramPtr createUberProgram( const string& name, const Lore::UberProgramParameters& params ) override;
-    virtual GPUProgramPtr createBackgroundProgram( const string& name, const BackgroundProgramParameters& params ) override;
+    virtual GPUProgramPtr createSkyboxProgram( const string& name, const SkyboxProgramParameters& params ) override;
     virtual GPUProgramPtr createBoxProgram( const string& name ) override;
 
   };

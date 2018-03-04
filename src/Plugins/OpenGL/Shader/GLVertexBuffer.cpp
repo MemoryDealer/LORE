@@ -92,7 +92,7 @@ void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
     addAttribute( AttributeType::Float, 2 );
     break;
 
-  case VertexBuffer::Type::Background:
+  case VertexBuffer::Type::Skybox:
     _mode = GL_TRIANGLE_STRIP;
     _vertices = { -1.f, -1.f,     0.f, 0.f,
                   -1.f, 1.f,      0.f, 1.f,

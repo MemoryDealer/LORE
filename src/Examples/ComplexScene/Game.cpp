@@ -64,9 +64,9 @@ void Game::loadResources()
 
 void Game::loadScene()
 {
-  // Create a scene with default background color.
+  // Create a scene with default skybox color.
   _scene = _context->createScene( "core", Lore::RendererType::Forward2D );
-  _scene->setBackgroundColor( Lore::StockColor::White );
+  _scene->setSkyboxColor( Lore::StockColor::White );
   _scene->setAmbientLightColor( Lore::Color( 0.75f, 0.75f, 0.75f, 1.f ) );
 
   // Create a camera to view the scene.
@@ -193,30 +193,30 @@ void Game::loadScene()
   }
 
   //
-  // Add a background to the scene.
+  // Add a skybox to the scene.
 
-  Lore::BackgroundPtr background = _scene->getBackground();
+  Lore::SkyboxPtr skybox = _scene->getSkybox();
 
   // The first layer will be some scrolling clouds.
-  auto& layerClouds = background->addLayer( "clouds" );
+  auto& layerClouds = skybox->addLayer( "clouds" );
   layerClouds.setSprite( Lore::Resource::GetSprite( "clouds" ) );
   layerClouds.setScrollSpeed( Lore::Vec2( 0.001f, 0.00005f ) );
   layerClouds.setDepth( 1000.f ); // This is the default but we are setting it here for reference.
 
   // Add far layer with heavy parallax.
-  auto& layerFar = background->addLayer( "far" );
+  auto& layerFar = skybox->addLayer( "far" );
   layerFar.setSprite( Lore::Resource::GetSprite( "bg-far" ) );
   layerFar.setDepth( 990.f );
   layerFar.setParallax( Lore::Vec2( 0.3f, 0.08f ) );
 
   // Add middle layer with lighter parallax.
-  auto& layerMiddle = background->addLayer( "middle" );
+  auto& layerMiddle = skybox->addLayer( "middle" );
   layerMiddle.setSprite( Lore::Resource::GetSprite( "bg-middle" ) );
   layerMiddle.setDepth( 980.f );
   layerMiddle.setParallax( Lore::Vec2( .5f, .10f ) );
 
   // Add closest layer with the least amount of parallax.
-  auto& layerForeground = background->addLayer( "foreground" );
+  auto& layerForeground = skybox->addLayer( "foreground" );
   layerForeground.setSprite( Lore::Resource::GetSprite( "bg-foreground" ) );
   layerForeground.setDepth( 970.f );
   layerForeground.setParallax( Lore::Vec2( .7f, 0.12f ) );

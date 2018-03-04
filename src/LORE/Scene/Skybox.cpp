@@ -24,7 +24,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Background.h"
+#include "Skybox.h"
 
 #include <LORE/Core/Exception.h>
 #include <LORE/Resource/StockResource.h>
@@ -36,20 +36,20 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Background::Background()
+Skybox::Skybox()
 {
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Background::Layer& Background::addLayer( const string& name )
+Skybox::Layer& Skybox::addLayer( const string& name )
 {
   Layer layer( name );
-  auto material = StockResource::GetMaterial( "Background2D" );
+  auto material = StockResource::GetMaterial( "Skybox2D" );
   layer.setMaterial( ResourceCast<Material>( material->clone( "bg_layer_" + name ) ) );
-  layer.getMaterial()->program = Lore::StockResource::GetGPUProgram( "Background2D" );
+  layer.getMaterial()->program = Lore::StockResource::GetGPUProgram( "Skybox2D" );
 
-  log_information( "Added layer " + name + " to background " + _name );
+  log_information( "Added layer " + name + " to skybox " + _name );
 
   auto pair = _layers.insert( { name, layer } );
   return pair.first->second;
@@ -57,11 +57,11 @@ Background::Layer& Background::addLayer( const string& name )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Background::Layer& Background::getLayer( const string& name )
+Skybox::Layer& Skybox::getLayer( const string& name )
 {
   auto lookup = _layers.find( name );
   if ( _layers.end() == lookup ) {
-    throw Lore::ItemIdentityException( "Could not find background layer named " + name + " in background " + _name );
+    throw Lore::ItemIdentityException( "Could not find skybox layer named " + name + " in skybox " + _name );
   }
 
   return lookup->second;
@@ -69,21 +69,21 @@ Background::Layer& Background::getLayer( const string& name )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Background::removeLayer( const string& name )
+void Skybox::removeLayer( const string& name )
 {
   auto lookup = _layers.find( name );
   if ( _layers.end() == lookup ) {
-    throw Lore::ItemIdentityException( "Could not find background layer named " + name + " in background " + _name );
+    throw Lore::ItemIdentityException( "Could not find skybox layer named " + name + " in skybox " + _name );
   }
 
   _layers.erase( lookup );
 
-  log_information( "Remove layer " + name + " from background " + _name );
+  log_information( "Remove layer " + name + " from skybox " + _name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Background::Layer::setSprite( SpritePtr sprite )
+void Skybox::Layer::setSprite( SpritePtr sprite )
 {
   if ( _material ) {
     _material->sprite = sprite;
@@ -92,7 +92,7 @@ void Background::Layer::setSprite( SpritePtr sprite )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Background::Layer::setScrollSpeed( const Vec2& speed )
+void Skybox::Layer::setScrollSpeed( const Vec2& speed )
 {
   if ( _material ) {
     _material->setTextureScrollSpeed( speed );
@@ -101,7 +101,7 @@ void Background::Layer::setScrollSpeed( const Vec2& speed )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-SpriteControllerPtr Background::Layer::createSpriteController()
+SpriteControllerPtr Skybox::Layer::createSpriteController()
 {
   _spriteController.reset();
   _spriteController = std::make_shared<SpriteController>();
@@ -110,7 +110,7 @@ SpriteControllerPtr Background::Layer::createSpriteController()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-SpriteControllerPtr Background::Layer::getSpriteController() const
+SpriteControllerPtr Skybox::Layer::getSpriteController() const
 {
   return _spriteController.get();
 }

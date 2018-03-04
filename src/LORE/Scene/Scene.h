@@ -28,7 +28,7 @@
 #include <LORE/Memory/Alloc.h>
 #include <LORE/Resource/Color.h>
 #include <LORE/Resource/Registry.h>
-#include <LORE/Scene/Background.h>
+#include <LORE/Scene/Skybox.h>
 #include <LORE/Scene/Light.h>
 #include <LORE/Scene/Node.h>
 
@@ -82,7 +82,7 @@ namespace Lore {
       _renderer = renderer;
     }
 
-    inline void setBackgroundColor( const Color& color )
+    inline void setSkyboxColor( const Color& color )
     {
       _bgColor = color;
     }
@@ -92,9 +92,9 @@ namespace Lore {
       _ambientLightColor = color;
     }
 
-    inline void setBackground( BackgroundPtr background )
+    inline void setSkybox( SkyboxPtr skybox )
     {
-      _background = background;
+      _skybox = skybox;
     }
 
     //
@@ -110,7 +110,7 @@ namespace Lore {
       return _renderer;
     }
 
-    inline Color getBackgroundColor() const
+    inline Color getSkyboxColor() const
     {
       return _bgColor;
     }
@@ -125,9 +125,9 @@ namespace Lore {
       return _lights.get( name );
     }
 
-    inline BackgroundPtr getBackground() const
+    inline SkyboxPtr getSkybox() const
     {
-      return _background;
+      return _skybox;
     }
 
   private:
@@ -156,7 +156,7 @@ namespace Lore {
 
     LightMap _lights {};
 
-    BackgroundPtr _background { nullptr };
+    SkyboxPtr _skybox { nullptr };
 
   };
 

@@ -87,7 +87,7 @@ int main( int argc, char** argv )
 
   If you are using GLEW, build GLEW with the GLEW_MX define and call init() in the second thread as well. Read up on GLEW_MX about multithreaded usage. I strongly recommend boost thread specific pointers for this.
 
-  Remember to destroy the second window just like the main one. That's it. I've been using this method for background resource loading for years and haven't ran into any issues.
+  Remember to destroy the second window just like the main one. That's it. I've been using this method for skybox resource loading for years and haven't ran into any issues.
 
   Hope it helps."
   */
@@ -95,7 +95,7 @@ int main( int argc, char** argv )
   //context->createWindow( "Test2", 720, 640 );
 
   Lore::ScenePtr scene = context->createScene( "Default", Lore::RendererType::Forward2D );
-  scene->setBackgroundColor( Lore::StockColor::Black );
+  scene->setSkyboxColor( Lore::StockColor::Black );
 
   // Hack.
   Lore::CLI::SetActiveScene( scene );
@@ -166,9 +166,9 @@ int main( int argc, char** argv )
   textNode->attachObject( textbox );
 
   //
-  // Create background.
+  // Create skybox.
 
-  auto bg = scene->getBackground();
+  auto bg = scene->getSkybox();
   auto& layer = bg->addLayer( "1" );
   layer.setSprite( Lore::Resource::GetSprite( "clouds" ) );
   layer.setScrollSpeed( Lore::Vec2( 0.0008f, 0.0004f ) );
@@ -182,8 +182,8 @@ int main( int argc, char** argv )
   //layer.getMaterial()->getPass().setTextureSampleRegion( 0.15f, 0.05f, 0.08f, 0.58f );
 
   //Lore::Resource::LoadTexture( "bg_default", "res/images/clouds.jpg" );
-  //Lore::BackgroundPtr bg = scene->getBackground();
-  //Lore::Background::Layer& layer = bg->addLayer( "default" );
+  //Lore::SkyboxPtr bg = scene->getSkybox();
+  //Lore::Skybox::Layer& layer = bg->addLayer( "default" );
   //layer.setTexture( Lore::Resource::GetTexture( "bg_default" ) );
   //layer.setScrollSpeed( Lore::Vec2( 0.001f, 0.002f ) );
   //layer.setDepth( 950.f );

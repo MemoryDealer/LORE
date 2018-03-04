@@ -33,10 +33,10 @@
 namespace Lore {
 
   ///
-  /// \class Background
-  /// \brief Constitutes the entire background of a scene, can contain many layers
+  /// \class Skybox
+  /// \brief Constitutes the entire skybox of a scene, can contain many layers
   ///   with different parallax settings and textures.
-  class LORE_EXPORT Background final : public Alloc<Background>
+  class LORE_EXPORT Skybox final : public Alloc<Skybox>
   {
 
     LORE_OBJECT_BODY()
@@ -105,9 +105,9 @@ namespace Lore {
 
   public:
 
-    Background();
+    Skybox();
 
-    ~Background() = default;
+    ~Skybox() = default;
 
     //
     // Layers.

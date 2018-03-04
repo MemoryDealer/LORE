@@ -215,23 +215,23 @@ void StockResourceController::createRendererStockResources( const RendererType t
   }
 
   //
-  // Background stock resources.
+  // Skybox stock resources.
 
   {
-    BackgroundProgramParameters params;
-    srf->createBackgroundProgram( "Background" + suffix, params );
+    SkyboxProgramParameters params;
+    srf->createSkyboxProgram( "Skybox" + suffix, params );
   }
 
   {
-    auto material = _controller->create<Material>( "Background" + suffix );
+    auto material = _controller->create<Material>( "Skybox" + suffix );
     material->lighting = false;
     material->sprite = _controller->get<Sprite>( "White" );
-    material->program = _controller->get<GPUProgram>( "Background" + suffix );
+    material->program = _controller->get<GPUProgram>( "Skybox" + suffix );
   }
 
   {
-    auto vb = _controller->create<VertexBuffer>( "Background" + suffix );
-    vb->init( VertexBuffer::Type::Background );
+    auto vb = _controller->create<VertexBuffer>( "Skybox" + suffix );
+    vb->init( VertexBuffer::Type::Skybox );
   }
 
   //

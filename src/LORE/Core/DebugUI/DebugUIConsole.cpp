@@ -157,9 +157,9 @@ DebugUIConsole::DebugUIConsole()
   _consoleBox = Resource::CreateBox( "DebugUI_Console" );
   _consoleBoxElement->attachBox( _consoleBox );
 
-  // Create background for console.
-  _backgroundElement = _panel->createElement( "background" );
-  _backgroundEntity = Resource::CreateEntity( "DebugUI_ConsoleBackground", VertexBuffer::Type::Quad );
+  // Create skybox for console.
+  _backgroundElement = _panel->createElement( "skybox" );
+  _backgroundEntity = Resource::CreateEntity( "DebugUI_ConsoleSkybox", VertexBuffer::Type::Quad );
   _backgroundElement->attachEntity( _backgroundEntity );
 
   // Create blinking cursor.
@@ -181,10 +181,10 @@ DebugUIConsole::DebugUIConsole()
   _backgroundElement->setDepth( 1.f ); // Behind console text.
 
   // Setup colors.
-  auto backgroundMat = _backgroundEntity->getMaterial();
-  backgroundMat->blendingMode.enabled = true;
-  backgroundMat->diffuse.a = 0.5f;
-  backgroundMat->ambient = Color( 0.f, 0.f, 0.f, 0.0f );
+  auto skyboxMat = _backgroundEntity->getMaterial();
+  skyboxMat->blendingMode.enabled = true;
+  skyboxMat->diffuse.a = 0.5f;
+  skyboxMat->ambient = Color( 0.f, 0.f, 0.f, 0.0f );
   _consoleBox->setFillColor( Color( 0.f, 0.f, 0.f, 0.6f ) );
   _consoleBox->setBorderColor( Color( .5f, .5f, .5f, .9f ) );
 
