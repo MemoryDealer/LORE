@@ -70,7 +70,6 @@ StockResourceController::~StockResourceController()
 
 void StockResourceController::createStockResources()
 {
-
   //
   // Create stock shaders.
   {

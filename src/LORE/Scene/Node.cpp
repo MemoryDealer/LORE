@@ -57,8 +57,8 @@ NodePtr Node::clone( const string& name, const bool cloneChildNodes )
   }
 
   auto node = MemoryAccess::GetPrimaryPoolCluster()->create<Node>();
-  node->setName( name );
-  node->setResourceGroupName( getResourceGroupName() );
+  node->_name = name;
+  node->_scene = _scene;
   node->_aabb = std::make_unique<AABB>( node );
   // TODO: Clone sprite controller...
   node->_transform = _transform;
@@ -66,7 +66,6 @@ NodePtr Node::clone( const string& name, const bool cloneChildNodes )
   node->_entities = _entities.clone();
   node->_boxes = _boxes.clone();
   node->_textboxes = _textboxes.clone();
-  node->_scene = _scene;
   node->_parent = _parent;
   if ( cloneChildNodes ) {
     // Clone all child nodes.
@@ -98,8 +97,7 @@ NodePtr Node::clone( const string& name, const bool cloneChildNodes )
 NodePtr Node::createChildNode( const string& name )
 {
   auto node = MemoryAccess::GetPrimaryPoolCluster()->create<Node>();
-  node->setName( name );
-  node->setResourceGroupName( ResourceController::DefaultGroupName );
+  node->_name = name;
   node->_scene = _scene;
   node->_parent = this;
   node->_aabb = std::make_unique<AABB>( node );
@@ -199,9 +197,16 @@ bool Node::intersects( NodePtr rhs ) const
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void Node::setName( const string& name )
+{
+  _name = name;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void Node::setPosition( const Vec2& position )
 {
-  _transform.position = position;
+  _transform.position = Vec3( position );
   _dirty();
 }
 
@@ -214,9 +219,25 @@ void Node::setPosition( const real x, const real y )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+
+void Node::setPosition( const Vec3& position )
+{
+  _transform.position = position;
+  _dirty();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Node::setPosition( const real x, const real y, const real z1 )
+{
+  setPosition( Vec2( x, y ) );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void Node::translate( const Vec2& offset )
 {
-  _transform.position += offset;
+  _transform.position += Vec3( offset );
   _dirty();
 }
 
@@ -285,7 +306,7 @@ void Node::rotate( const Quaternion& q, const TransformSpace& ts )
 
 void Node::setScale( const Vec2& scale )
 {
-  _transform.scale = scale;
+  _transform.scale = Vec3( scale );
   _dirty();
 }
 
@@ -293,7 +314,7 @@ void Node::setScale( const Vec2& scale )
 
 void Node::scale( const Vec2& s )
 {
-  _transform.scale *= s;
+  _transform.scale *= Vec3( s );
   _dirty();
 }
 
@@ -320,6 +341,13 @@ SpriteControllerPtr Node::createSpriteController()
   _spriteController.reset(); // TODO: Necessary?
   _spriteController = std::make_unique<SpriteController>();
   return _spriteController.get();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+string Node::getName() const
+{
+  return _name;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

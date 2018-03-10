@@ -69,7 +69,7 @@ namespace Lore {
     struct LightData
     {
       LightPtr light { nullptr };
-      Vec2 pos {};
+      Vec3 pos {};
     };
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

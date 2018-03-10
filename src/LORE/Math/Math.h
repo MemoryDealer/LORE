@@ -112,7 +112,7 @@ namespace Lore {
 
     ///
     /// \brief Creates 4x4 matrix from a position and orientation.
-    static inline Matrix4 CreateTransformationMatrix( const Vec2& position,
+    static inline Matrix4 CreateTransformationMatrix( const Vec3& position,
                                                       const Quaternion& orientation = Quaternion() )
     {
       Matrix4 m;
@@ -132,44 +132,7 @@ namespace Lore {
       m[0][2] = rot3x3[2][0];
       m[1][2] = rot3x3[2][1];
       m[2][2] = rot3x3[2][2];
-      m[3][2] = 0.f;
-
-      m[0][3] = m[1][3] = m[2][3] = 0.f;
-      m[3][3] = 1.f;
-
-      return m;
-    }
-
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-    ///
-    /// \brief Creates 4x4 matrix from a 2D position, orientation, and scale.
-    ///     Note the scale must be uniform.
-    static inline Matrix4 CreateTransformationMatrix( const Vec2& position,
-                                                      const Quaternion& orientation,
-                                                      const Vec2& scale )
-    {
-      // This function only supports uniform scaling.
-      //assert( scale.x == scale.y );
-
-      Matrix4 m;
-      Matrix3 rot3x3 = orientation.createRotationMatrix();
-
-      // Setup scale, rotation, and translation.
-      m[0][0] = scale.x * rot3x3[0][0];
-      m[1][0] = scale.y * rot3x3[0][1];
-      m[2][0] = rot3x3[0][2];
-      m[3][0] = position.x;
-
-      m[0][1] = scale.x * rot3x3[1][0];
-      m[1][1] = scale.y * rot3x3[1][1];
-      m[2][1] = rot3x3[1][2];
-      m[3][1] = position.y;
-
-      m[0][2] = scale.x * rot3x3[2][0];
-      m[1][2] = scale.y * rot3x3[2][1];
-      m[2][2] = rot3x3[2][2];
-      m[3][2] = 0.f;
+      m[3][2] = position.z;
 
       m[0][3] = m[1][3] = m[2][3] = 0.f;
       m[3][3] = 1.f;

@@ -145,6 +145,11 @@ struct Vector<T, 3>
     struct { T r, g, b; };
   };
 
+  explicit constexpr Vector( const Vec2& v2 )
+    : x( v2.x ), y( v2.y ), z( 0 )
+  {
+  }
+
   constexpr Vector( const T x_, const T y_, const T z_ )
     : x( x_ ), y( y_ ), z( z_ )
   {

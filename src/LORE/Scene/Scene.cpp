@@ -42,7 +42,7 @@ using namespace Lore;
 
 Scene::Scene()
 {
-  _root.setName( "root" );
+  _root._name = "root";
   _root._scene = this;
 
   // TODO: Get stock skybox
@@ -76,8 +76,7 @@ NodePtr Scene::createNode( const string& name )
 {
   // Note: Not using make_unique here because Node's new operator is private.
   auto node = MemoryAccess::GetPrimaryPoolCluster()->create<Node>();
-  node->setName( name );
-  node->setResourceGroupName( ResourceController::DefaultGroupName );
+  node->_name = name;
   node->_scene = this;
   node->_aabb = std::make_unique<AABB>(  node  );
 

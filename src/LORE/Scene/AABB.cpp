@@ -39,7 +39,7 @@ using namespace Lore;
 AABB::AABB( NodePtr node )
 : _node( node )
 {
-  _box = Lore::Resource::CreateBox( node->getName() + "_AABB", node->getResourceGroupName() );
+  _box = Lore::Resource::CreateBox( node->_scene->getName() + "." + node->getName() + "_AABB", ResourceController::DefaultGroupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -52,12 +52,12 @@ namespace Lore {
       return _box;
     }
 
-    Vec2 getMin() const
+    Vec3 getMin() const
     {
       return _min;
     }
 
-    Vec2 getMax() const
+    Vec3 getMax() const
     {
       return _max;
     }
@@ -72,7 +72,7 @@ namespace Lore {
       return _dimensions.y;
     }
 
-    Vec2 getDimensions() const
+    Vec3 getDimensions() const
     {
       return _dimensions;
     }
@@ -81,9 +81,9 @@ namespace Lore {
 
     NodePtr _node { nullptr };
     BoxPtr _box { nullptr };
-    Vec2 _min {};
-    Vec2 _max {};
-    Vec2 _dimensions {};
+    Vec3 _min {};
+    Vec3 _max {};
+    Vec3 _dimensions {};
 
   };
 

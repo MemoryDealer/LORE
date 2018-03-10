@@ -154,7 +154,7 @@ void Camera::updateTracking( const real aspectRatio )
     return;
   }
 
-  const Vec2 nodePos = _trackingNode->getPosition();
+  const Vec3 nodePos = _trackingNode->getPosition();
 
   switch ( _trackingStyle ) {
   default:
@@ -179,14 +179,16 @@ void Camera::_dirty()
 
 void Camera::_updateViewMatrix()
 {
-  Vec2 scale( _zoom, _zoom );
-  _view = Math::CreateTransformationMatrix( _position,
+  Vec3 scale( _zoom, _zoom, _zoom );
+  _view = Math::CreateTransformationMatrix( Vec3( _position ),
                                             Quaternion(),
                                             scale );
 
   // Wtf? Have to invert x/y values...not sure why at the moment.
   _view[3][0] *= -_zoom;
   _view[3][1] *= -_zoom;
+  // TODO: What to do with z view value?
+  //_view[3][2] *= _zoom;
 
   _viewMatrixDirty = false;
 }

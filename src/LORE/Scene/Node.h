@@ -44,8 +44,6 @@ namespace Lore {
   class LORE_EXPORT Node : public Alloc<Node>
   {
 
-    LORE_OBJECT_BODY()
-
   public:
 
     // TODO: Use a RenderableList for textboxes, textures, boxes, etc?
@@ -65,10 +63,10 @@ namespace Lore {
     struct Transform
     {
 
-      Vec2 position;
+      Vec3 position;
       Quaternion orientation;
-      Vec2 scale;
-      Vec2 derivedScale;
+      Vec3 scale;
+      Vec3 derivedScale;
 
       Matrix4 local; // Local transformation matrix.
       bool dirty; // True if matrix needs update.
@@ -78,8 +76,8 @@ namespace Lore {
       Transform()
         : position()
         , orientation()
-        , scale( 1.f, 1.f )
-        , derivedScale( 1.f, 1.f )
+        , scale( 1.f, 1.f, 1.f )
+        , derivedScale( 1.f, 1.f, 1.f )
         , local()
         , dirty( true )
         , world()
@@ -154,9 +152,15 @@ namespace Lore {
     //
     // Modifiers.
 
+    void setName( const string& name );
+
     void setPosition( const Vec2& position );
 
     void setPosition( const real x, const real y );
+
+    void setPosition( const Vec3& position );
+
+    void setPosition( const real x, const real y, const real z );
 
     void translate( const Vec2& offset );
 
@@ -196,19 +200,21 @@ namespace Lore {
     //
     // Getters.
 
+    string getName() const;
+
     inline NodePtr getParent() const
     {
       return _parent;
     }
 
-    inline Vec2 getPosition() const
+    inline Vec3 getPosition() const
     {
       return _transform.position;
     }
 
-    inline Vec2 getDerivedPosition() const
+    inline Vec3 getDerivedPosition() const
     {
-      return Vec2( _transform.world[3][0], _transform.world[3][1] );
+      return Vec3( _transform.world[3][0], _transform.world[3][1], _transform.world[3][2] );
     }
 
     inline Quaternion getOrientation() const
@@ -221,12 +227,12 @@ namespace Lore {
       return _transform.world;
     }
 
-    inline Vec2 getScale() const
+    inline Vec3 getScale() const
     {
       return _transform.scale;
     }
 
-    inline Vec2 getDerivedScale() const
+    inline Vec3 getDerivedScale() const
     {
       return _transform.derivedScale;
     }
@@ -258,6 +264,7 @@ namespace Lore {
 
   private:
 
+    friend class AABB;
     friend class Entity;
     friend class Scene; // Only scenes can construct nodes.
     friend class SceneGraphVisitor;
@@ -286,6 +293,8 @@ namespace Lore {
   private:
 
     // TODO: Node is getting large, consider holding node -> entity mappings somewhere else.
+
+    string _name {};
 
     std::unique_ptr<AABB> _aabb { nullptr };
     std::unique_ptr<SpriteController> _spriteController { nullptr };

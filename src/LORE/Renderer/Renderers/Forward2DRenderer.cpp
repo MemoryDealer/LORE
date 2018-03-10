@@ -225,7 +225,7 @@ void Forward2DRenderer::present( const RenderView& rv, const WindowPtr window )
         RenderQueue::BoxData data;
         data.box = aabb->getBox();
         data.model = Math::CreateTransformationMatrix( node->getDerivedPosition(), Quaternion(), aabb->getDimensions() * 5.f );
-        data.model[3][2] = Node::Depth::Min;
+        data.model[3][2] = Node::Depth::Min * 0.25f; // Prevent clipping from camera zoom (TODO: Fix zoom clipping).
 
         tmpQueue.boxes.push_back( data );
       }
@@ -340,7 +340,7 @@ void Forward2DRenderer::renderSkybox( const RenderView& rv,
       offset.y += camPos.y * layer.getParallax().y;
       program->setUniformVar( "texSampleOffset", offset );
 
-      Matrix4 transform = Math::CreateTransformationMatrix( Vec2( 0.f, 0.f ) );
+      Matrix4 transform = Math::CreateTransformationMatrix( Vec3() );
       transform[0][0] = aspectRatio;
       transform[1][1] = Math::Clamp( aspectRatio, 1.f, 90.f ); // HACK to prevent clipping skybox on aspect ratios < 1.0.
       transform[3][2] = layer.getDepth();
@@ -674,7 +674,7 @@ void Forward2DRenderer::renderUI( const UIPtr ui,
       if ( box ) {
         RenderQueue::BoxData bd;
         bd.box = box;
-        bd.model = Math::CreateTransformationMatrix( elementPos, Quaternion(), elementDimensions );
+        bd.model = Math::CreateTransformationMatrix( Vec3( elementPos ), Quaternion(), Vec3( elementDimensions ) );
         bd.model[3][2] = element->getDepth() + DepthOffset;
         queue.boxes.push_back( bd );
       }
@@ -683,8 +683,8 @@ void Forward2DRenderer::renderUI( const UIPtr ui,
       if ( textbox ) {
         RenderQueue::TextboxData td;
         td.textbox = textbox;
-        td.model = Math::CreateTransformationMatrix( elementPos );
-        td.model[3][2] = element->getDepth() + DepthOffset;
+        td.model = Math::CreateTransformationMatrix( Vec3( elementPos ) );
+        td.model[3][2] = element->getDepth() + DepthOffset - 0.01f; // Give text a little room over boxes.
         queue.textboxes.push_back( td );
       }
     }
