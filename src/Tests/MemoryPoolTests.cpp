@@ -97,28 +97,28 @@ TEST_CASE( "Pool Cluster", "[memory]" )
   constexpr const size_t size = 128;
   Lore::PoolCluster cluster( "test" );
   cluster.registerPool<Lore::Node>( size );
-  cluster.registerPool<Lore::Camera>( size );
+  cluster.registerPool<Lore::Material>( size );
 
   SECTION( "Creation/destruction" )
   {
-    std::vector<Lore::Node*> nodes;
-    std::vector<Lore::Camera*> shaders;
+    std::vector<Lore::NodePtr> nodes;
+    std::vector<Lore::MaterialPtr> materials;
     for ( int i = 0; i < size; ++i ) {
       nodes.push_back( cluster.create<Lore::Node>() );
-      shaders.push_back( cluster.create<Lore::Camera>() );
+      materials.push_back( cluster.create<Lore::Material>() );
 
       REQUIRE( true == nodes[i]->isInUse() );
-      REQUIRE( true == shaders[i]->isInUse() );
+      REQUIRE( true == materials[i]->isInUse() );
     }
 
     cluster.destroy<Lore::Node>( nodes[100] );
-    cluster.destroy<Lore::Camera>( shaders[100] );
+    cluster.destroy<Lore::Material>( materials[100] );
     REQUIRE( false == nodes[100]->isInUse() );
-    REQUIRE( false == shaders[100]->isInUse() );
+    REQUIRE( false == materials[100]->isInUse() );
   }
 
   cluster.unregisterPool<Lore::Node>();
-  cluster.unregisterPool<Lore::Camera>();
+  cluster.unregisterPool<Lore::Material>();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

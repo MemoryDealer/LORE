@@ -101,7 +101,7 @@ namespace Lore {
 
     ///
     /// \brief Creates a new camera for use with a RenderView.
-    CameraPtr createCamera( const string& name );
+    CameraPtr createCamera( const string& name, const Camera::Type type );
 
     ///
     /// \brief Destroys specified camera.
@@ -170,7 +170,11 @@ namespace Lore {
     /// \brief Returns specified CameraPtr if it exists.
     CameraPtr getCamera( const string& name )
     {
-      return _cameraRegistry.get( name );
+      auto it = _cameras.find( name );
+      if ( _cameras.end() == it ) {
+        throw ItemIdentityException( "Camera " + name + " does not exist" );
+      }
+      return it->second.get();
     }
 
     ///
@@ -278,10 +282,10 @@ namespace Lore {
 
   protected:
 
-    using CameraRegistry = Registry<std::unordered_map, Camera>;
     using SceneRegistry = Registry<std::unordered_map, Scene>;
     using WindowRegistry = Registry<std::map, Window>;
 
+    using CameraMap = std::unordered_map<string, std::unique_ptr<Camera>>;
     using RendererMap = std::unordered_map <Lore::RendererType, std::unique_ptr<Lore::Renderer>>;
 
   protected:
@@ -289,10 +293,10 @@ namespace Lore {
     PoolCluster _poolCluster { "Primary" };
     std::unique_ptr<FrameListenerController> _frameListenerController { std::make_unique<FrameListenerController>() };
 
-    CameraRegistry _cameraRegistry {};
     WindowRegistry _windowRegistry {};
     SceneRegistry _sceneRegistry {};
 
+    CameraMap _cameras { };
     RendererMap _renderers {};
 
     WindowPtr _activeWindow { nullptr };

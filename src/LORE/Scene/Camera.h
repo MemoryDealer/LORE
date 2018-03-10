@@ -33,13 +33,21 @@
 
 namespace Lore {
 
-  class LORE_EXPORT Camera final : public Alloc<Camera>
+  class LORE_EXPORT Camera
   {
 
   public:
 
-    Camera();
-    ~Camera() override;
+    enum class Type
+    {
+      Type2D,
+      Type3D
+    };
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    Camera() = default;
+    virtual ~Camera() = default;
 
     //
     // Modifiers.
@@ -48,22 +56,30 @@ namespace Lore {
 
     void setPosition( const real x, const real y );
 
+    void setPosition( const real x, const real y, const real z );
+
     void translate( const Vec2& offset );
 
     void translate( const real xOffset, const real yOffset );
+
+    void translate( const real xOffset, const real yOffset, const real zOffset );
 
     void zoom( const real amount );
 
     void setZoom( const real amount );
 
-    // TODO: Set projection mode (Ortho/Persp).
+    virtual void setPosition( const Vec3& pos ) = 0;
+
+    virtual void translate( const Vec3& offset ) = 0;
+
+    virtual void lookAt( const Vec3& pos, const Vec3& target, const Vec3& up ) = 0;
 
     //
     // Getters.
 
     string getName() const;
 
-    Vec2 getPosition() const;
+    Vec3 getPosition() const;
 
     Matrix4 getViewMatrix();
 
@@ -76,29 +92,85 @@ namespace Lore {
 
     void trackNode( NodePtr node, const TrackingStyle& mode = TrackingStyle::Simple );
 
-    void updateTracking(const real aspectRatio);
+    void updateTracking( const real aspectRatio );
 
-  private:
+  protected:
 
     friend class Context;
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     void _dirty();
-    void _updateViewMatrix();
+    virtual void _updateViewMatrix() = 0;
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    string _name {};
+    string _name { };
 
-    Vec2 _position {};
-    Matrix4 _view {};
+    Vec3 _position { };
+    Matrix4 _view { };
     real _zoom { 1.f };
 
     bool _viewMatrixDirty { true };
 
     NodePtr _trackingNode { nullptr };
     TrackingStyle _trackingStyle { TrackingStyle::Simple };
+
+  };
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  class LORE_EXPORT Camera2D final : public Camera
+  {
+
+  public:
+
+    Camera2D() = default;
+    ~Camera2D() override = default;
+
+    //
+    // Modifiers.
+
+    void setPosition( const Vec3& pos ) override;
+
+    void translate( const Vec3& offset ) override;
+
+    void lookAt( const Vec3& pos, const Vec3& target, const Vec3& up ) override { }
+
+  protected:
+
+    void _updateViewMatrix() override;
+
+  };
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  class LORE_EXPORT Camera3D final : public Camera
+  {
+
+  public:
+
+    Camera3D() = default;
+    ~Camera3D() override = default;
+
+    //
+    // Modifiers.
+
+    void setPosition( const Vec3& pos ) override;
+
+    void translate( const Vec3& offset ) override;
+
+    void lookAt( const Vec3& pos, const Vec3& target, const Vec3& up ) override;
+
+  protected:
+
+    void _updateViewMatrix() override;
+
+  private:
+
+    Vec3 _right {};
+    Vec3 _up {};
+    Vec3 _look {};
 
   };
 

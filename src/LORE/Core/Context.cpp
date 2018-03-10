@@ -82,9 +82,9 @@ Context::~Context()
 void Context::initConfiguration()
 {
   // Setup default memory pool settings. (TODO: Move out of Context.cpp).
-  _poolCluster.registerPool<Skybox>( 16 );
+  _poolCluster.registerPool<Skybox>( 4 );
+
   _poolCluster.registerPool<Box>( 100024 );
-  _poolCluster.registerPool<Camera>( 16 );
   _poolCluster.registerPool<Entity>( 16 );
   _poolCluster.registerPool<Light>( 32 );
   _poolCluster.registerPool<Material>( 32 );
@@ -170,13 +170,31 @@ void Context::destroyScene( ScenePtr scene )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-CameraPtr Context::createCamera( const string& name )
+CameraPtr Context::createCamera( const string& name, const Camera::Type type )
 {
-  auto camera = _poolCluster.create<Camera>();
-  camera->_name = name;
-  _cameraRegistry.insert( name, camera );
+  std::unique_ptr<Camera> camera = nullptr;
+  switch ( type ) {
+  default:
+    break;
 
-  return camera;
+  case Camera::Type::Type2D:
+    camera = std::make_unique<Camera2D>();
+    break;
+
+  case Camera::Type::Type3D:
+    camera = std::make_unique<Camera3D>();
+    break;
+  }
+
+  camera->_name = name;
+  auto it = _cameras.emplace( name, std::move( camera ) );
+  if ( !it.second ) {
+    throw Exception( "Failed to emplace camera in map" );
+  }
+
+  log_information( "Camera " + name + " successfully created" );
+
+  return it.first->second.get();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -184,9 +202,8 @@ CameraPtr Context::createCamera( const string& name )
 void Context::destroyCamera( CameraPtr camera )
 {
   auto name = camera->getName();
-  _cameraRegistry.remove( name );
-
-  _poolCluster.destroy<Camera>( camera );
+  log_information( "Destroying camera " + name );
+  _cameras.erase( name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -45,48 +45,44 @@ using namespace LocalNS;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Camera::Camera()
-{
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-Camera::~Camera()
-{
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 void Camera::setPosition( const Vec2& pos )
 {
-  _position = pos;
-  _dirty();
+  setPosition( Vec3( pos ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Camera::setPosition( const real x, const real y )
 {
-  _position.x = x / _zoom;
-  _position.y = y / _zoom;
-  _dirty();
+  setPosition( x, y, 0.f ); // Call Vec3 function with z-value of zero.
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Camera::setPosition( const real x, const real y, const real z )
+{
+  setPosition( Vec3( x, y, 0.f ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Camera::translate( const Vec2& offset )
 {
-  _position += offset / _zoom;
-  _dirty();
+  translate( Vec3( offset ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Camera::translate( const real xOffset, const real yOffset )
 {
-  _position.x += xOffset / _zoom;
-  _position.y += yOffset / _zoom;
-  _dirty();
+  translate( xOffset, yOffset, 0.f ); // Call Vec3 function with z-value of zero.
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Camera::translate( const real xOffset, const real yOffset, const real zOffset )
+{
+  translate( Vec3( xOffset, yOffset, zOffset ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -122,7 +118,7 @@ string Camera::getName() const
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Vec2 Camera::getPosition() const
+Vec3 Camera::getPosition() const
 {
   return _position;
 }
@@ -133,6 +129,7 @@ Matrix4 Camera::getViewMatrix()
 {
   if ( _viewMatrixDirty ) {
     _updateViewMatrix();
+    _viewMatrixDirty = false;
   }
 
   return _view;
@@ -176,11 +173,30 @@ void Camera::_dirty()
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Camera::_updateViewMatrix()
+void Camera2D::setPosition( const Vec3& pos )
+{
+  _position = pos / _zoom;
+  _dirty();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Camera2D::translate( const Vec3& offset )
+{
+  _position += offset / _zoom;
+  _dirty();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Camera2D::_updateViewMatrix()
 {
   Vec3 scale( _zoom, _zoom, 1.f );
-  _view = Math::CreateTransformationMatrix( Vec3( _position ),
+  _position.z = 0.f;
+  _view = Math::CreateTransformationMatrix( _position,
                                             Quaternion(),
                                             scale );
 
@@ -189,8 +205,76 @@ void Camera::_updateViewMatrix()
   _view[3][1] *= -_zoom;
   // TODO: What to do with z view value?
   //_view[3][2] *= _zoom;
+}
 
-  _viewMatrixDirty = false;
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Camera3D::setPosition( const Vec3& pos )
+{
+  _position = pos;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Camera3D::translate( const Vec3& offset )
+{
+  _position += offset;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Camera3D::lookAt( const Vec3& pos, const Vec3& target, const Vec3& up )
+{
+  _look = ( target - pos ).normalizedCopy();
+  _right = ( up.cross( _look ) ).normalizedCopy();
+  _up = _look.cross( _right );
+  _position = pos;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Camera3D::_updateViewMatrix()
+{
+  // Keep camera's axes orthogonal to each other and of unit length.
+  const Vec3 L = _look.normalizedCopy();
+  const Vec3 U = ( L.cross( _right ) ).normalizedCopy();
+
+  // U, L already ortho-normal, so no need to normalize cross product.
+  const Vec3 R = U.cross( L );
+
+  // Fill in the view matrix entries.
+  const real x = -( _position.dot( R ) );
+  const real y = -( _position.dot( U ) );
+  const real z = -( _position.dot( L ) );
+
+  // V =
+  // | u_x    v_x    w_x    0 |
+  // | u_y    v_y    w_y    0 |
+  // | u_z    v_z    w_z    0 |
+  // | -Q*u   -Q*v   -Q*w   1 |
+
+  _view[0][0] = _right.x;
+  _view[1][0] = _right.y;
+  _view[2][0] = _right.z;
+  _view[3][0] = x;
+
+  _view[0][1] = _up.x;
+  _view[1][1] = _up.y;
+  _view[2][1] = _up.z;
+  _view[3][1] = y;
+
+  _view[0][2] = _look.x;
+  _view[1][2] = _look.y;
+  _view[2][2] = _look.z;
+  _view[3][2] = z;
+
+  _view[0][3] = 0.f;
+  _view[1][3] = 0.f;
+  _view[2][3] = 0.f;
+  _view[3][3] = 1.f;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

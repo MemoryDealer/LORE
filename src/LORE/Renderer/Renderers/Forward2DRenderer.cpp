@@ -301,7 +301,7 @@ void Forward2DRenderer::renderSkybox( const RenderView& rv,
   VertexBufferPtr vb = StockResource::GetVertexBuffer( "Skybox2D" );
   vb->bind();
 
-  const Vec2 camPos = rv.camera->getPosition();
+  const Vec3 camPos = rv.camera->getPosition();
 
   for ( const auto& pair : layers ) {
     const Skybox::Layer& layer = pair.second;

@@ -159,7 +159,7 @@ struct Vector<T, 3>
 
   ///
   /// \brief Returns cross product of this vector with rhs.
-  Vector<T, 3> cross( const Vector<T, 3>& rhs )
+  Vector<T, 3> cross( const Vector<T, 3>& rhs ) const
   {
     Vector<T, 3> re;
     re.x = y * rhs.z - z * rhs.y;

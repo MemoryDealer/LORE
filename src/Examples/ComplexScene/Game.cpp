@@ -70,7 +70,7 @@ void Game::loadScene()
   _scene->setAmbientLightColor( Lore::Color( 0.75f, 0.75f, 0.75f, 1.f ) );
 
   // Create a camera to view the scene.
-  _camera = _context->createCamera( "core" ); // TODO: Should this come from context?
+  _camera = _context->createCamera( "core", Lore::Camera::Type::Type2D );
 
   // TODO: This is a hack that should be taken care of internally.
   Lore::CLI::SetActiveScene( _scene );
