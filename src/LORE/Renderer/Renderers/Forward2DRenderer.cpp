@@ -225,7 +225,7 @@ void Forward2DRenderer::present( const RenderView& rv, const WindowPtr window )
         RenderQueue::BoxData data;
         data.box = aabb->getBox();
         data.model = Math::CreateTransformationMatrix( node->getDerivedPosition(), Quaternion(), aabb->getDimensions() * 5.f );
-        data.model[3][2] = Node::Depth::Min * 0.25f; // Prevent clipping from camera zoom (TODO: Fix zoom clipping).
+        data.model[3][2] = Node::Depth::Min;
 
         tmpQueue.boxes.push_back( data );
       }

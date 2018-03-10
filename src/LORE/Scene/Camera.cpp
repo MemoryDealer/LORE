@@ -179,7 +179,7 @@ void Camera::_dirty()
 
 void Camera::_updateViewMatrix()
 {
-  Vec3 scale( _zoom, _zoom, _zoom );
+  Vec3 scale( _zoom, _zoom, 1.f );
   _view = Math::CreateTransformationMatrix( Vec3( _position ),
                                             Quaternion(),
                                             scale );
