@@ -184,6 +184,55 @@ namespace Lore {
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+    static inline Matrix4 PerspectiveRH( const real fovy,
+                                         const real aspect,
+                                         const real zNear,
+                                         const real zFar )
+    {
+      Matrix4 perspective;
+
+      const real tanHalfFovy = std::tan( fovy / 2.f );
+      perspective[0][0] = 1.f / ( aspect * tanHalfFovy );
+      perspective[1][1] = 1.f / tanHalfFovy;
+      perspective[2][3] = 1.f;
+
+      perspective[2][2] = ( zFar + zNear ) / ( zFar - zNear );
+      perspective[3][2] = ( 2.f * zFar * zNear ) / ( zFar - zNear );
+
+      return perspective;
+    }
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    static inline Matrix4 LookAtRH( const Vec3& eye,
+                                    const Vec3& target,
+                                    const Vec3& up )
+    {
+      Matrix4 result;
+
+      const Vec3 f = ( target - eye ).normalizedCopy();
+      const Vec3 s = ( f.cross( up ) ).normalizedCopy();
+      const Vec3 u = s.cross( f );
+
+      result[0][0] = s.x;
+      result[0][0] = s.x;
+      result[1][0] = s.y;
+      result[2][0] = s.z;
+      result[0][1] = u.x;
+      result[1][1] = u.y;
+      result[2][1] = u.z;
+      result[0][2] = -f.x;
+      result[1][2] = -f.y;
+      result[2][2] = -f.z;
+      result[3][0] = -s.dot( eye );
+      result[3][1] = -u.dot( eye );
+      result[3][2] = f.dot( eye );
+
+      return result;
+    }
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
     ///
     /// \brief Converts value from degrees to radians.
     static inline real DegreesToRadians( const real degrees )

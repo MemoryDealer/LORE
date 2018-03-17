@@ -12,14 +12,14 @@ libdirs { "../lib/x64/%{cfg.buildcfg}" }
 architecture "x86_64"
 characterset ( "MBCS" )
 
-
+--
 -- Solution
 
 solution "LORE"
     configurations { "Debug", "Release" }
     startproject "Example_ComplexScene"
 
-
+--
 -- Configurations
 
 filter "configurations:Debug"
@@ -30,7 +30,9 @@ filter "configurations:Release"
     defines { "NDEBUG" }
     optimize "On"
 
+--
 -- Systems
+
 filter "system:MacOSX"
     cppdialect "C++14"
 
@@ -38,8 +40,7 @@ filter "system:MacOSX"
 --buildoptions { "/std:c++latest" }
 
 --
--- Project(s)
---
+-- Projects
 
 project "LORE"
     location "LORE"
@@ -89,16 +90,27 @@ project "glad"
 
 --
 -- Examples
---
 
-project "Example_ComplexScene"
-    location "Examples/ComplexScene"
+project "Example_ComplexScene2D"
+    location "Examples/ComplexScene2D"
     kind "ConsoleApp"
     language "C++"
     defines { "_HAS_CXX17" }
     files { 
-        "Examples/ComplexScene/**.h",
-        "Examples/ComplexScene/**.cpp"
+        "Examples/ComplexScene2D/**.h",
+        "Examples/ComplexScene2D/**.cpp"
+    }
+    links { "LORE" }
+    postbuildcommands { "{COPY} ../../../res/ ../../../bin/%{cfg.buildcfg}/Run/res/" }
+
+project "Example_ComplexScene3D"
+    location "Examples/ComplexScene3D"
+    kind "ConsoleApp"
+    language "C++"
+    defines { "_HAS_CXX17" }
+    files { 
+        "Examples/ComplexScene3D/**.h",
+        "Examples/ComplexScene3D/**.cpp"
     }
     links { "LORE" }
     postbuildcommands { "{COPY} ../../../res/ ../../../bin/%{cfg.buildcfg}/Run/res/" }
@@ -114,6 +126,9 @@ project "Driver"
     }
     links { "LORE" }
     postbuildcommands { "{COPY} ../../res/ ../../bin/%{cfg.buildcfg}/Run/res/" }
+
+--
+-- Tests
 
 project "Tests"
     location "Tests"

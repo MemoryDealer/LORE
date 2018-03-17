@@ -106,6 +106,12 @@ void StockResourceController::createStockResources()
     _meshTable.insert( { VertexBuffer::Type::Quad, mesh } );
   }
 
+  {
+    auto mesh = _controller->create<Mesh>( "Cube" );
+    mesh->setVertexBuffer( _controller->get<VertexBuffer>( "Cube" ) );
+    _meshTable.insert( { VertexBuffer::Type::Cube, mesh } );
+  }
+
   //
   // Font stock resources.
 
@@ -140,6 +146,10 @@ void StockResourceController::createRendererStockResources( const RendererType t
   default:
   case RendererType::Forward2D:
     suffix = "2D";
+    {
+      auto vb = _controller->create<VertexBuffer>( "Skybox" + suffix );
+      vb->init( VertexBuffer::Type::Skybox2D );
+    }
     break;
     
   case RendererType::Forward3D:
@@ -226,11 +236,6 @@ void StockResourceController::createRendererStockResources( const RendererType t
     material->lighting = false;
     material->sprite = _controller->get<Sprite>( "White" );
     material->program = _controller->get<GPUProgram>( "Skybox" + suffix );
-  }
-
-  {
-    auto vb = _controller->create<VertexBuffer>( "Skybox" + suffix );
-    vb->init( VertexBuffer::Type::Skybox );
   }
 
   //

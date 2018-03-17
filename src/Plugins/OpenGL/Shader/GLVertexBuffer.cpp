@@ -69,6 +69,9 @@ void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
     // Attributes should be added by the caller.
     break;
 
+  //
+  // 2D.
+
   case VertexBuffer::Type::Quad:
     _mode = GL_TRIANGLE_STRIP;
     _vertices = { -0.1f, -0.1f,
@@ -92,7 +95,7 @@ void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
     addAttribute( AttributeType::Float, 2 );
     break;
 
-  case VertexBuffer::Type::Skybox:
+  case VertexBuffer::Type::Skybox2D:
     _mode = GL_TRIANGLE_STRIP;
     _vertices = { -1.f, -1.f,     0.f, 0.f,
                   -1.f, 1.f,      0.f, 1.f,
@@ -118,6 +121,21 @@ void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
     glBindVertexArray( 0 );
     _attributes.clear();
     return; // Early return for special case.
+
+  //
+  // 3D.
+
+  case VertexBuffer::Type::Cube:
+    // TODO: Add rest of vertices.
+    _mode = GL_TRIANGLE_STRIP;
+    _vertices = { -0.1f, -0.1f,
+      -0.1f, 0.1f,
+      0.1f, -0.1f,
+      0.1f, 0.1f };
+    _indices = { 0, 1, 2, 3 };
+
+    addAttribute( AttributeType::Float, 2 );
+    break;
   }
 
   glGenVertexArrays( 1, &_vao );

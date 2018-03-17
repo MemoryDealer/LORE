@@ -36,18 +36,12 @@ using namespace Lore::OpenGL;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-GLStockResource2DFactory::GLStockResource2DFactory( Lore::ResourceControllerPtr controller )
-: StockResourceFactory( controller )
-{
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 GLStockResourceController::GLStockResourceController()
 {
   _controller = std::make_unique<GLResourceController>();
 
   _factories[RendererType::Forward2D] = std::make_unique<GLStockResource2DFactory>( _controller.get() );
+  _factories[RendererType::Forward3D] = std::make_unique<GLStockResource3DFactory>( _controller.get() );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

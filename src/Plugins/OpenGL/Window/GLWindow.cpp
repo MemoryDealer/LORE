@@ -90,12 +90,8 @@ void GLWindow::init( const string& title,
   _stockController->createStockResources();
 
   // Create stock resources needed for this window given the expected renderer type(s).
-  if ( rendererTypeMask & RendererType::Forward2D ) {
-    _stockController->createRendererStockResources( RendererType::Forward2D );
-  }
-  if ( rendererTypeMask & RendererType::Forward3D ) {
-    _stockController->createRendererStockResources( RendererType::Forward3D );
-  }
+  _stockController->createRendererStockResources( RendererType::Forward2D );
+  _stockController->createRendererStockResources( RendererType::Forward3D );
 
   glfwMakeContextCurrent( currentContext );
 }

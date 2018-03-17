@@ -34,9 +34,9 @@
 namespace Lore {
 
   ///
-  /// \class Forward2DRenderer
-  /// \brief A basic 2D forward renderer.
-  class Forward2DRenderer : public Lore::Renderer
+  /// \class Forward3DRenderer
+  /// \brief A basic 3D forward renderer.
+  class Forward3DRenderer : public Lore::Renderer
   {
 
   public:
@@ -45,9 +45,8 @@ namespace Lore {
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    Forward2DRenderer();
-
-    ~Forward2DRenderer() override = default;
+    Forward3DRenderer();
+    ~Forward3DRenderer() override = default;
 
     void addRenderData( EntityPtr e,
                         NodePtr node ) override;
@@ -68,45 +67,18 @@ namespace Lore {
 
     void _clearRenderQueues() override;
 
-    void activateQueue( const uint id,
+    void _activateQueue( const uint id,
                         RenderQueue& rq );
 
-    void renderSkybox( const RenderView& rv,
-                            const real aspectRatio,
-                            const Matrix4& proj );
-
-    void renderSolids( const ScenePtr scene,
+    void _renderSolids( const ScenePtr scene,
                        const RenderQueue& queue,
                        const Matrix4& viewProjection ) const;
-
-    void renderTransparents( const Lore::ScenePtr scene,
-                             const RenderQueue& queue,
-                              const Matrix4& viewProjection ) const;
-
-    void renderBoxes( const RenderQueue& queue,
-                      const Matrix4& viewProjection ) const;
-
-    void renderTextboxes( const RenderQueue& queue,
-                          const Matrix4& viewProjection ) const;
-
-    void renderUI( const UIPtr ui,
-                   const ScenePtr scene,
-                   const real aspectRatio,
-                   const Matrix4& proj ) const;
-
-    // Uploads texture data to GPU.
-    void _updateTextureData( const MaterialPtr material,
-                             const GPUProgramPtr program,
-                             const NodePtr node ) const;
 
     // Uploads lighting data to GPU.
     void _updateLighting( const MaterialPtr material,
                           const GPUProgramPtr program,
                           const ScenePtr scene,
                           const RenderQueue::LightList& lightData ) const;
-
-    // Returns modifier matrix for node to account for x/y flipping.
-    Matrix4 _calculateFlipMatrix( const NodePtr node ) const;
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 

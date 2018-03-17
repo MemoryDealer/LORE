@@ -36,14 +36,14 @@ using namespace Lore::OpenGL;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-GLStockResource2DFactory::GLStockResource2DFactory( Lore::ResourceControllerPtr controller )
+GLStockResource3DFactory::GLStockResource3DFactory( Lore::ResourceControllerPtr controller )
   : StockResourceFactory( controller )
 {
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& name, const Lore::UberProgramParameters& params )
+Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& name, const Lore::UberProgramParameters& params )
 {
   const bool textured = ( params.numTextures > 0 );
   const bool lit = ( params.maxLights > 0 );
@@ -61,7 +61,7 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
   // Layout.
 
   uint32_t layoutLocation = 0;
-  src += "layout (location = " + std::to_string( layoutLocation++ ) + ") in vec2 vertex;";
+  src += "layout (location = " + std::to_string( layoutLocation++ ) + ") in vec3 vertex;";
   if ( textured ) {
     src += "layout (location = " + std::to_string( layoutLocation++ ) + ") in vec2 texCoord;";
   }
@@ -100,10 +100,10 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
   src += "void main(){";
 
   if ( instanced ) {
-    src += "gl_Position = transform * instanceMatrix * vec4(vertex, 1.0, 1.0);";
+    src += "gl_Position = transform * instanceMatrix * vec4(vertex, 1.0);";
   }
   else {
-    src += "gl_Position = transform * vec4(vertex, 1.0, 1.0);";
+    src += "gl_Position = transform * vec4(vertex, 1.0);";
   }
   if ( textured ) {
     src += "TexCoord = vec2(texCoord.x * texSampleRegion.w + texSampleRegion.x, texCoord.y * texSampleRegion.h + texSampleRegion.y);";
@@ -111,10 +111,10 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
 
   if ( lit ) {
     if ( instanced ) {
-      src += "FragPos = (instanceMatrix * vec4(vertex, 0.0, 1.0)).xy;";
+      src += "FragPos = (instanceMatrix * vec4(vertex, 1.0)).xy;";
     }
     else {
-      src += "FragPos = (model * vec4(vertex, 0.0, 1.0)).xy;";
+      src += "FragPos = (model * vec4(vertex, 1.0)).xy;";
     }
   }
 
@@ -160,7 +160,7 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
   // Lighting.
   if ( lit ) {
     src += "struct Light {";
-    src += "vec2 pos;";
+    src += "vec3 pos;";
     src += "vec3 color;";
     src += "float constant;";
     src += "float linear;";
@@ -179,15 +179,15 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
     // Light functions.
 
     // Point light.
-    src += "vec3 CalcPointLight(Light l) {";
-
-    src += "const float d = length(l.pos - FragPos);";
-    src += "const float att = l.intensity / (l.constant + l.linear * d + l.quadratic * pow(d, 2.0));";
-
-    src += "const vec3 lDiffuse = l.color * material.diffuse.rgb * att;";
-    src += "return lDiffuse;";
-
-    src += "}";
+//     src += "vec3 CalcPointLight(Light l) {";
+//     
+//     src += "const float d = length(l.pos - FragPos);";
+//     src += "const float att = l.intensity / (l.constant + l.linear * d + l.quadratic * pow(d, 2.0));";
+// 
+//     src += "const vec3 lDiffuse = l.color * material.diffuse.rgb * att;";
+//     src += "return lDiffuse;";
+// 
+//     src += "}";
   }
 
   //
@@ -198,25 +198,25 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
   // Setup default values for calculating pixel.
   src += "vec4 texSample = vec4(1.0, 1.0, 1.0, 1.0);";
 
-  if ( textured ) {
-    src += "texSample = texture(tex, TexCoord + texSampleOffset);";
-    src += "if ( texSample.a < 0.1 ) {";
-    src += "  discard;";
-    src += "}";
-  }
+//   if ( textured ) {
+//     src += "texSample = texture(tex, TexCoord + texSampleOffset);";
+//     src += "if ( texSample.a < 0.1 ) {";
+//     src += "  discard;";
+//     src += "}";
+//   }
 
   // Apply alpha blending from material.
   src += "texSample.a *= material.diffuse.a;";
 
-  if ( lit ) {
-    src += "vec3 lighting = material.ambient.rgb * sceneAmbient.rgb;";
-
-    src += "for(int i=0; i<numLights; ++i){";
-    src += "  lighting += CalcPointLight(lights[i]);";
-    src += "}";
-
-    src += "texSample *= vec4(lighting, 1.0);";
-  }
+//   if ( lit ) {
+//     src += "vec3 lighting = material.ambient.rgb * sceneAmbient.rgb;";
+// 
+//     src += "for(int i=0; i<numLights; ++i){";
+//     src += "  lighting += CalcPointLight(lights[i]);";
+//     src += "}";
+// 
+//     src += "texSample *= vec4(lighting, 1.0);";
+//   }
 
   // Final pixel.
   src += "pixel = texSample;";
@@ -268,7 +268,7 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::GPUProgramPtr GLStockResource2DFactory::createSkyboxProgram( const string& name, const Lore::SkyboxProgramParameters& params )
+Lore::GPUProgramPtr GLStockResource3DFactory::createSkyboxProgram( const string& name, const Lore::SkyboxProgramParameters& params )
 {
   const string header = "#version " +
     std::to_string( APIVersion::GetMajor() ) + std::to_string( APIVersion::GetMinor() ) + "0" +
@@ -394,7 +394,7 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createSkyboxProgram( const string&
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::GPUProgramPtr GLStockResource2DFactory::createBoxProgram( const string& name )
+Lore::GPUProgramPtr GLStockResource3DFactory::createBoxProgram( const string& name )
 {
   const string header = "#version " +
     std::to_string( APIVersion::GetMajor() ) + std::to_string( APIVersion::GetMinor() ) + "0" +

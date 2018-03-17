@@ -65,6 +65,9 @@ GLResourceController::GLResourceController()
 
   auto quadVB = create<VertexBuffer>( "Quad" );
   quadVB->init( VertexBuffer::Type::Quad );
+
+  auto cubeVB = create<VertexBuffer>( "Cube" );
+  cubeVB->init( VertexBuffer::Type::Cube );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

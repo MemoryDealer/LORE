@@ -45,7 +45,8 @@ namespace Lore {
       TexturedQuad,
       QuadInstanced,
       TexturedQuadInstanced,
-      Skybox,
+      Skybox2D,
+      Cube,
       Text
     };
 

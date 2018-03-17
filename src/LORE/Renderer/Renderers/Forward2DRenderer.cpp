@@ -62,12 +62,6 @@ Forward2DRenderer::Forward2DRenderer()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Forward2DRenderer::~Forward2DRenderer()
-{
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 void Forward2DRenderer::addRenderData( EntityPtr entity,
                                      NodePtr node )
 {

@@ -119,9 +119,9 @@ void Context::initConfiguration()
 
   // Setup default memory pool settings.
   _poolCluster.registerPool<Font, GLFont>( 4 );
-  _poolCluster.registerPool<GPUProgram, GLGPUProgram>( 16 );
+  _poolCluster.registerPool<GPUProgram, GLGPUProgram>( 64 );
   _poolCluster.registerPool<RenderTarget, GLRenderTarget>( 4 );
-  _poolCluster.registerPool<Shader, GLShader>( 32 );
+  _poolCluster.registerPool<Shader, GLShader>( 64 );
   _poolCluster.registerPool<Texture, GLTexture>( 64 );
   _poolCluster.registerPool<VertexBuffer, GLVertexBuffer>( 32 );
   _poolCluster.registerPool<Window, GLWindow>( 1 );

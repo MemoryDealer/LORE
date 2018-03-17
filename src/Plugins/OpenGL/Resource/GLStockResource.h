@@ -47,6 +47,22 @@ namespace Lore { namespace OpenGL {
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+  class GLStockResource3DFactory final : public Lore::StockResourceFactory
+  {
+
+  public:
+
+    GLStockResource3DFactory( ResourceControllerPtr controller );
+    ~GLStockResource3DFactory() override = default;
+
+    virtual GPUProgramPtr createUberProgram( const string& name, const Lore::UberProgramParameters& params ) override;
+    virtual GPUProgramPtr createSkyboxProgram( const string& name, const SkyboxProgramParameters& params ) override;
+    virtual GPUProgramPtr createBoxProgram( const string& name ) override;
+
+  };
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
   class GLStockResourceController final : public Lore::StockResourceController
   {
 

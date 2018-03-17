@@ -168,9 +168,8 @@ namespace Lore {
 
   private:
 
-    Vec3 _right {};
+    Vec3 _target { };
     Vec3 _up {};
-    Vec3 _look {};
 
   };
 

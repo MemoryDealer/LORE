@@ -214,6 +214,7 @@ void Camera2D::_updateViewMatrix()
 void Camera3D::setPosition( const Vec3& pos )
 {
   _position = pos;
+  _dirty();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -221,16 +222,17 @@ void Camera3D::setPosition( const Vec3& pos )
 void Camera3D::translate( const Vec3& offset )
 {
   _position += offset;
+  _dirty();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Camera3D::lookAt( const Vec3& pos, const Vec3& target, const Vec3& up )
+void Camera3D::lookAt( const Vec3& eye, const Vec3& target, const Vec3& up )
 {
-  _look = ( target - pos ).normalizedCopy();
-  _right = ( up.cross( _look ) ).normalizedCopy();
-  _up = _look.cross( _right );
-  _position = pos;
+  _position = eye;
+  _target = target;
+  _up = up;
+  _dirty();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -238,43 +240,7 @@ void Camera3D::lookAt( const Vec3& pos, const Vec3& target, const Vec3& up )
 
 void Camera3D::_updateViewMatrix()
 {
-  // Keep camera's axes orthogonal to each other and of unit length.
-  const Vec3 L = _look.normalizedCopy();
-  const Vec3 U = ( L.cross( _right ) ).normalizedCopy();
-
-  // U, L already ortho-normal, so no need to normalize cross product.
-  const Vec3 R = U.cross( L );
-
-  // Fill in the view matrix entries.
-  const real x = -( _position.dot( R ) );
-  const real y = -( _position.dot( U ) );
-  const real z = -( _position.dot( L ) );
-
-  // V =
-  // | u_x    v_x    w_x    0 |
-  // | u_y    v_y    w_y    0 |
-  // | u_z    v_z    w_z    0 |
-  // | -Q*u   -Q*v   -Q*w   1 |
-
-  _view[0][0] = _right.x;
-  _view[1][0] = _right.y;
-  _view[2][0] = _right.z;
-  _view[3][0] = x;
-
-  _view[0][1] = _up.x;
-  _view[1][1] = _up.y;
-  _view[2][1] = _up.z;
-  _view[3][1] = y;
-
-  _view[0][2] = _look.x;
-  _view[1][2] = _look.y;
-  _view[2][2] = _look.z;
-  _view[3][2] = z;
-
-  _view[0][3] = 0.f;
-  _view[1][3] = 0.f;
-  _view[2][3] = 0.f;
-  _view[3][3] = 1.f;
+  _view = Math::LookAtRH( _position, _position + _target, _up );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

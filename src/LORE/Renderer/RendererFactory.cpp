@@ -27,6 +27,7 @@
 #include "RendererFactory.h"
 
 #include <LORE/Renderer/Renderers/Forward2DRenderer.h>
+#include <LORE/Renderer/Renderers/Forward3DRenderer.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -44,7 +45,9 @@ std::unique_ptr<Lore::Renderer> RendererFactory::Create( const Lore::RendererTyp
 
   case Lore::RendererType::Forward2D:
     return std::make_unique<Forward2DRenderer>();
-    break;
+
+  case Lore::RendererType::Forward3D:
+    return std::make_unique<Forward3DRenderer>();
 
   }
 }
