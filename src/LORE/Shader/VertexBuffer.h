@@ -25,7 +25,6 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE/Math/Matrix.h>
 #include <LORE/Memory/Alloc.h>
 #include <LORE/Resource/IResource.h>
 
@@ -57,7 +56,7 @@ namespace Lore {
     };
 
     using Vertices = std::vector<real>;
-    using Matrices = std::vector<Matrix4>;
+    using Matrices = std::vector<glm::mat4>;
 
   public:
 
@@ -68,7 +67,7 @@ namespace Lore {
 
     virtual void initInstanced( const Type& type, const size_t maxCount ) = 0;
 
-    virtual void updateInstanced( const size_t idx, const Matrix4& matrix ) = 0;
+    virtual void updateInstanced( const size_t idx, const glm::mat4& matrix ) = 0;
 
     void addAttribute( const AttributeType& type, const uint size );
 

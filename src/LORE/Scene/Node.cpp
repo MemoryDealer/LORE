@@ -204,9 +204,9 @@ void Node::setName( const string& name )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Node::setPosition( const Vec2& position )
+void Node::setPosition( const glm::vec2& position )
 {
-  _transform.position = Vec3( position );
+  _transform.position = glm::vec3( position.x, position.y, 0.f );
   _dirty();
 }
 
@@ -214,13 +214,13 @@ void Node::setPosition( const Vec2& position )
 
 void Node::setPosition( const real x, const real y )
 {
-  setPosition( Vec2( x, y ) );
+  setPosition( glm::vec2( x, y ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 
-void Node::setPosition( const Vec3& position )
+void Node::setPosition( const glm::vec3& position )
 {
   _transform.position = position;
   _dirty();
@@ -230,14 +230,14 @@ void Node::setPosition( const Vec3& position )
 
 void Node::setPosition( const real x, const real y, const real z1 )
 {
-  setPosition( Vec2( x, y ) );
+  setPosition( glm::vec2( x, y ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Node::translate( const Vec2& offset )
+void Node::translate( const glm::vec2& offset )
 {
-  _transform.position += Vec3( offset );
+  _transform.position += glm::vec3( offset.x, offset.y, 0.f );
   _dirty();
 }
 
@@ -245,45 +245,30 @@ void Node::translate( const Vec2& offset )
 
 void Node::translate( const real xOffset, const real yOffset )
 {
-  translate( Vec2( xOffset, yOffset ) );
+  translate( glm::vec2( xOffset, yOffset ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Node::rotate( const Radian& angle, const TransformSpace& ts )
+void Node::rotate( const real angle, const TransformSpace& ts )
 {
-  rotate( Math::POSITIVE_Z_AXIS, angle, ts );
+  rotate( glm::vec3( 0.f, 0.f, 1.f ), angle, ts );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Node::rotate( const Degree& angle, const TransformSpace& ts )
+void Node::rotate( const glm::vec3& axis, const real angle, const TransformSpace& ts )
 {
-  rotate( Math::POSITIVE_Z_AXIS, angle, ts );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Node::rotate( const Vec3& axis, const Radian& angle, const TransformSpace& ts )
-{
-  Quaternion q = Math::CreateQuaternion( axis, angle );
+  glm::quat q( 1.f, 0.f, 0.f, 0.f );
+  q = glm::rotate( q, angle, axis );
   rotate( q, ts );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Node::rotate( const Vec3& axis, const Degree& angle, const TransformSpace& ts )
+void Node::rotate( const glm::quat& q, const TransformSpace& ts )
 {
-  Quaternion q = Math::CreateQuaternion( axis, angle );
-  rotate( q, ts );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Node::rotate( const Quaternion& q, const TransformSpace& ts )
-{
-  Quaternion qnorm = q;
-  qnorm.normalize();
+  glm::quat qnorm = glm::normalize( q );
 
   switch ( ts ) {
   case TransformSpace::Local:
@@ -304,17 +289,17 @@ void Node::rotate( const Quaternion& q, const TransformSpace& ts )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Node::setScale( const Vec2& scale )
+void Node::setScale( const glm::vec2& scale )
 {
-  _transform.scale = Vec3( scale );
+  _transform.scale = glm::vec3( scale.x, scale.y, 1.f );
   _dirty();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Node::scale( const Vec2& s )
+void Node::scale( const glm::vec2& s )
 {
-  _transform.scale *= Vec3( s );
+  _transform.scale *= glm::vec3( s.x, s.y, 1.f );
   _dirty();
 }
 
@@ -322,7 +307,7 @@ void Node::scale( const Vec2& s )
 
 void Node::scale( const real s )
 {
-  Vec2 ss( s, s );
+  glm::vec2 ss( s, s );
   scale( ss );
 }
 
@@ -381,11 +366,12 @@ bool Node::_transformDirty() const
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Matrix4 Node::_getLocalTransform()
+glm::mat4 Node::_getLocalTransform()
 {
   if ( _transform.dirty ) {
     _transform.local = Math::CreateTransformationMatrix( _transform.position,
-                                                         _transform.orientation );
+                                                         _transform.orientation,
+                                                         glm::vec3( 1.f ) );
     _transform.dirty = false;
   }
 
@@ -394,10 +380,10 @@ Matrix4 Node::_getLocalTransform()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Node::_updateWorldTransform( const Matrix4& m )
+void Node::_updateWorldTransform( const glm::mat4& m )
 {
   // Apply scaling to final world transform.
-  Matrix4 s;
+  glm::mat4 s( 1.f );
   s[0][0] = _transform.derivedScale.x;
   s[1][1] = _transform.derivedScale.y;
 

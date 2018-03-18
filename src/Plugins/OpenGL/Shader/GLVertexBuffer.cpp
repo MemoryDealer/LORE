@@ -26,8 +26,6 @@
 
 #include "GLVertexBuffer.h"
 
-#include <Plugins/OpenGL/Math/MathConverter.h>
-
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 using namespace Lore::OpenGL;
@@ -235,9 +233,9 @@ void GLVertexBuffer::initInstanced( const Type& type, const size_t maxCount )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLVertexBuffer::updateInstanced( const size_t idx, const Lore::Matrix4& matrix )
+void GLVertexBuffer::updateInstanced( const size_t idx, const glm::mat4& matrix )
 {
-  _instancedMatrices[idx] = MathConverter::LoreToGLM( matrix );
+  _instancedMatrices[idx] = matrix;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

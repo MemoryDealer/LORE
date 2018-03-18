@@ -72,7 +72,7 @@ MaterialPtr Material::clone( const string& newName )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Material::setTextureScrollSpeed( const Vec2& scroll )
+void Material::setTextureScrollSpeed( const glm::vec2& scroll )
 {
   // TODO: Put all texture scrolling in a single function (e.g., pass ref to offset).
   if ( !_texCoordCallback ) {

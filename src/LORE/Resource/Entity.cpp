@@ -160,7 +160,7 @@ bool Entity::isInstanced() const
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Entity::updateInstancedMatrix( const size_t idx, const Matrix4& matrix )
+void Entity::updateInstancedMatrix( const size_t idx, const glm::mat4& matrix )
 {
   _instancedVertexBuffer->updateInstanced( idx, matrix );
 }

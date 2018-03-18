@@ -27,8 +27,6 @@
 
 #include <LORE/Shader/GPUProgram.h>
 
-#include <Plugins/OpenGL/Math/MathConverter.h>
-
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore { namespace OpenGL {
@@ -56,25 +54,23 @@ namespace Lore { namespace OpenGL {
 
         virtual void addTransformVar( const string& id ) override;
 
-        virtual void setTransformVar( const Matrix4& m ) override;
+        virtual void setTransformVar( const glm::mat4& m ) override;
 
         virtual void addUniformVar( const string& id ) override;
 
-        virtual void setUniformVar( const string& id, const Matrix4& m ) override;
+        virtual void setUniformVar( const string& id, const glm::mat4& m ) override;
 
-        virtual void setUniformVar( const string& id, const Vec2& v ) override;
+        virtual void setUniformVar( const string& id, const glm::vec2& v ) override;
 
-        virtual void setUniformVar( const string& id, const Vec3& v ) override;
+        virtual void setUniformVar( const string& id, const glm::vec3& v ) override;
 
-        virtual void setUniformVar( const string& id, const Vec4& v ) override;
+        virtual void setUniformVar( const string& id, const glm::vec4& v ) override;
 
         virtual void setUniformVar( const string& id, const real r ) override;
 
         virtual void setUniformVar( const string& id, const int i ) override;
 
         virtual void updateLights( const RenderQueue::LightList& lights ) override;
-
-        void setUniformVar( const string& id, const glm::mat4x4& m );
 
     private:
 
@@ -84,7 +80,7 @@ namespace Lore { namespace OpenGL {
 
         GLuint _getUniform( const string& id );
 
-        void _updateUniform( const GLint id, const Lore::Matrix4& m );
+        void _updateUniform( const GLint id, const glm::mat4& m );
 
     private:
 

@@ -57,19 +57,19 @@ namespace Lore {
     struct BoxData
     {
       BoxPtr box { nullptr };
-      Matrix4 model {};
+      glm::mat4 model { 1.f };
     };
 
     struct TextboxData
     {
       TextboxPtr textbox { nullptr };
-      Matrix4 model {};
+      glm::mat4 model { 1.f };
     };
 
     struct LightData
     {
       LightPtr light { nullptr };
-      Vec3 pos {};
+      glm::vec3 pos { 0.f };
     };
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -121,10 +121,10 @@ namespace Lore {
                                 Lore::NodePtr node ) = 0;
 
     virtual void addBox( Lore::BoxPtr box,
-                         const Lore::Matrix4& transform ) = 0;
+                         const glm::mat4& transform ) = 0;
 
     virtual void addTextbox( Lore::TextboxPtr textbox,
-                             const Lore::Matrix4& transform ) = 0;
+                             const glm::mat4& transform ) = 0;
 
     virtual void addLight( Lore::LightPtr light,
                            const Lore::NodePtr node ) = 0;

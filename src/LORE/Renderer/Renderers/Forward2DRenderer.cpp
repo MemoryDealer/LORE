@@ -101,7 +101,7 @@ void Forward2DRenderer::addRenderData( EntityPtr entity,
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Forward2DRenderer::addBox( BoxPtr box,
-                              const Matrix4& transform )
+                              const glm::mat4& transform )
 {
   const uint queueId = RenderQueue::General;
 
@@ -118,7 +118,7 @@ void Forward2DRenderer::addBox( BoxPtr box,
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Forward2DRenderer::addTextbox( TextboxPtr textbox,
-                                  const Matrix4& transform )
+                                  const glm::mat4& transform )
 {
   const uint queueId = textbox->getRenderQueue();
 
@@ -182,11 +182,11 @@ void Forward2DRenderer::present( const RenderView& rv, const WindowPtr window )
 
   // Setup view-projection matrix.
   // TODO: Take viewport dimensions into account. Cache more things inside window.
-  const Matrix4 projection = Math::OrthoRH( -aspectRatio, aspectRatio,
-                                            -1.f, 1.f,
-                                            1500.f, -1500.f );
+  const glm::mat4 projection = glm::ortho( -aspectRatio, aspectRatio,
+                                           -1.f, 1.f,
+                                           1500.f, -1500.f );
 
-  const Matrix4 viewProjection = rv.camera->getViewMatrix() * projection;
+  const glm::mat4 viewProjection = rv.camera->getViewMatrix() * projection;
 
   // Render skybox before scene node entities.
   renderSkybox( rv, aspectRatio, projection );
@@ -218,7 +218,7 @@ void Forward2DRenderer::present( const RenderView& rv, const WindowPtr window )
       if ( aabb ) {
         RenderQueue::BoxData data;
         data.box = aabb->getBox();
-        data.model = Math::CreateTransformationMatrix( node->getDerivedPosition(), Quaternion(), aabb->getDimensions() * 5.f );
+        data.model = Math::CreateTransformationMatrix( node->getDerivedPosition(), glm::quat(), aabb->getDimensions() * 5.f );
         data.model[3][2] = Node::Depth::Min;
 
         tmpQueue.boxes.push_back( data );
@@ -287,7 +287,7 @@ void Forward2DRenderer::activateQueue( const uint id, RenderQueue& rq )
 
 void Forward2DRenderer::renderSkybox( const RenderView& rv,
                                         const real aspectRatio,
-                                        const Matrix4& proj )
+                                        const glm::mat4& proj )
 {
   SkyboxPtr skybox = rv.scene->getSkybox();
   Skybox::LayerMap layers = skybox->getLayerMap();
@@ -295,7 +295,7 @@ void Forward2DRenderer::renderSkybox( const RenderView& rv,
   VertexBufferPtr vb = StockResource::GetVertexBuffer( "Skybox2D" );
   vb->bind();
 
-  const Vec3 camPos = rv.camera->getPosition();
+  const glm::vec3 camPos = rv.camera->getPosition();
 
   for ( const auto& pair : layers ) {
     const Skybox::Layer& layer = pair.second;
@@ -329,14 +329,14 @@ void Forward2DRenderer::renderSkybox( const RenderView& rv,
       program->setUniformVar( "material.diffuse", mat->diffuse );
 
       // Apply scrolling and parallax offsets.
-      Vec2 offset = mat->getTexCoordOffset();
+      glm::vec2 offset = mat->getTexCoordOffset();
       offset.x += camPos.x * layer.getParallax().x;
       offset.y += camPos.y * layer.getParallax().y;
       program->setUniformVar( "texSampleOffset", offset );
 
-      Matrix4 transform = Math::CreateTransformationMatrix( Vec3() );
+      glm::mat4 transform( 1.f );
       transform[0][0] = aspectRatio;
-      transform[1][1] = Math::Clamp( aspectRatio, 1.f, 90.f ); // HACK to prevent clipping skybox on aspect ratios < 1.0.
+      transform[1][1] = glm::clamp( aspectRatio, 1.f, 90.f ); // HACK to prevent clipping skybox on aspect ratios < 1.0.
       transform[3][2] = layer.getDepth();
       program->setTransformVar( proj * transform );
 
@@ -355,7 +355,7 @@ void Forward2DRenderer::renderSkybox( const RenderView& rv,
 
 void Forward2DRenderer::renderSolids( const ScenePtr scene,
                                     const RenderQueue& queue,
-                                    const Matrix4& viewProjection ) const
+                                    const glm::mat4& viewProjection ) const
 {
   // Render instanced solids.
   for ( const auto& entity : queue.instancedSolids ) {
@@ -393,7 +393,7 @@ void Forward2DRenderer::renderSolids( const ScenePtr scene,
     }
 
     // Apply the view-projection for instanced rendering.
-    Matrix4 flipMatrix = _calculateFlipMatrix( node );
+    glm::mat4 flipMatrix = _calculateFlipMatrix( node );
     flipMatrix[3][2] = node->getDepth();
     program->setTransformVar( viewProjection * flipMatrix );
 
@@ -425,11 +425,11 @@ void Forward2DRenderer::renderSolids( const ScenePtr scene,
       }
 
       // Get the model matrix from the node.
-      Matrix4 model = node->getFullTransform();
+      glm::mat4 model = node->getFullTransform();
       model[3][2] = node->getDepth();
 
       // Calculate model-view-projection matrix for this object.
-      const Matrix4 mvp = viewProjection * model * _calculateFlipMatrix( node );
+      const glm::mat4 mvp = viewProjection * model * _calculateFlipMatrix( node );
       program->setTransformVar( mvp );
 
       if ( material->lighting ) {
@@ -448,7 +448,7 @@ void Forward2DRenderer::renderSolids( const ScenePtr scene,
 
 void Forward2DRenderer::renderTransparents( const ScenePtr scene,
                                           const RenderQueue& queue,
-                                          const Matrix4& viewProjection ) const
+                                          const glm::mat4& viewProjection ) const
 {
   _api->setBlendingEnabled( true );
 
@@ -489,7 +489,7 @@ void Forward2DRenderer::renderTransparents( const ScenePtr scene,
       _updateTextureData( material, program, node );
     }
 
-    Matrix4 model = node->getFullTransform();
+    glm::mat4 model = node->getFullTransform();
     if ( entity->isInstanced() ) {
       model = viewProjection;
     }
@@ -507,7 +507,7 @@ void Forward2DRenderer::renderTransparents( const ScenePtr scene,
       program->setTransformVar( model * _calculateFlipMatrix( node ) );
     }
     else {
-      Matrix4 mvp = viewProjection * model * _calculateFlipMatrix( node );
+      glm::mat4 mvp = viewProjection * model * _calculateFlipMatrix( node );
       program->setTransformVar( mvp );
     }
 
@@ -522,7 +522,7 @@ void Forward2DRenderer::renderTransparents( const ScenePtr scene,
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Forward2DRenderer::renderBoxes( const RenderQueue& queue,
-                                   const Matrix4& viewProjection ) const
+                                     const glm::mat4& viewProjection ) const
 {
   _api->setBlendingEnabled( true );
   _api->setBlendingFunc( Material::BlendFactor::SrcAlpha, Material::BlendFactor::OneMinusSrcAlpha );
@@ -533,17 +533,18 @@ void Forward2DRenderer::renderBoxes( const RenderQueue& queue,
   program->use();
   vb->bind();
 
-  for ( auto& data : queue.boxes ) {
+  for ( const RenderQueue::BoxData& data : queue.boxes ) {
     BoxPtr box = data.box;
     program->setUniformVar( "borderColor", box->getBorderColor() );
     program->setUniformVar( "fillColor", box->getFillColor() );
     program->setUniformVar( "borderWidth", box->getBorderWidth() );
-    program->setUniformVar( "scale", Vec2( data.model[0][0], data.model[1][1] ) * box->getSize() );
+    program->setUniformVar( "scale", glm::vec2( data.model[0][0], data.model[1][1] ) * box->getSize() );
 
     // Apply box scaling to final transform.
-    data.model[0][0] *= box->getWidth();
-    data.model[1][1] *= box->getHeight();
-    program->setTransformVar( viewProjection * data.model );
+    glm::mat4 model = data.model;
+    model[0][0] *= box->getWidth();
+    model[1][1] *= box->getHeight();
+    program->setTransformVar( viewProjection * model );
 
     vb->draw();
   }
@@ -555,7 +556,7 @@ void Forward2DRenderer::renderBoxes( const RenderQueue& queue,
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Forward2DRenderer::renderTextboxes( const RenderQueue& queue,
-                                       const Matrix4& viewProjection ) const
+                                       const glm::mat4& viewProjection ) const
 {
   _api->setBlendingEnabled( true );
   _api->setBlendingFunc( Material::BlendFactor::SrcAlpha, Material::BlendFactor::OneMinusSrcAlpha );
@@ -604,7 +605,7 @@ void Forward2DRenderer::renderTextboxes( const RenderQueue& queue,
 void Forward2DRenderer::renderUI( const UIPtr ui,
                                 const ScenePtr scene,
                                 const real aspectRatio,
-                                const Matrix4& proj ) const
+                                const glm::mat4& proj ) const
 {
   auto panelIt = ui->getPanelIterator();
 
@@ -618,7 +619,7 @@ void Forward2DRenderer::renderUI( const UIPtr ui,
   // For each panel.
   while ( panelIt.hasMore() ) {
     auto panel = panelIt.getNext();
-    const Vec2 panelOrigin = panel->getOrigin();
+    const glm::vec2 panelOrigin = panel->getOrigin();
 
     // For each element in this panel.
     auto elementIt = panel->getElementIterator();
@@ -668,7 +669,8 @@ void Forward2DRenderer::renderUI( const UIPtr ui,
       if ( box ) {
         RenderQueue::BoxData bd;
         bd.box = box;
-        bd.model = Math::CreateTransformationMatrix( Vec3( elementPos ), Quaternion(), Vec3( elementDimensions ) );
+        glm::quat q( 1.f, 0.f, 0.f, 0.f );
+        bd.model = Math::CreateTransformationMatrix( glm::vec3( elementPos.x, elementPos.y, 0.f ), q, glm::vec3( elementDimensions.x, elementDimensions.y, 1.f ) );
         bd.model[3][2] = element->getDepth() + DepthOffset;
         queue.boxes.push_back( bd );
       }
@@ -677,7 +679,8 @@ void Forward2DRenderer::renderUI( const UIPtr ui,
       if ( textbox ) {
         RenderQueue::TextboxData td;
         td.textbox = textbox;
-        td.model = Math::CreateTransformationMatrix( Vec3( elementPos ) );
+        glm::quat q( 1.f, 0.f, 0.f, 0.f );
+        td.model = Math::CreateTransformationMatrix( glm::vec3( elementPos.x, elementPos.y, 0.f ), q, glm::vec3( 1.f ) );
         td.model[3][2] = element->getDepth() + DepthOffset - 0.01f; // Give text a little room over boxes.
         queue.textboxes.push_back( td );
       }
@@ -735,14 +738,14 @@ void Forward2DRenderer::_updateTextureData( const MaterialPtr material,
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Matrix4 Forward2DRenderer::_calculateFlipMatrix( const NodePtr node ) const
+glm::mat4 Forward2DRenderer::_calculateFlipMatrix( const NodePtr node ) const
 {
   auto spc = node->getSpriteController();
   if ( !spc ) {
-    return Matrix4();
+    return glm::mat4( 1.f );
   }
 
-  Vec3 scale( 1.f, 1.f, 1.f );
+  glm::vec3 scale( 1.f, 1.f, 1.f );
   if ( spc->getXFlipped() ) {
     scale.x = -1.f;
   }
@@ -750,7 +753,8 @@ Matrix4 Forward2DRenderer::_calculateFlipMatrix( const NodePtr node ) const
     scale.y = -1.f;
   }
 
-  return Math::CreateTransformationMatrix( Vec3(), Quaternion(), scale );
+  glm::quat q( 1.f, 0.f, 0.f, 0.f );
+  return Math::CreateTransformationMatrix( glm::vec3( 0.f ), q, scale );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

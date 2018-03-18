@@ -58,7 +58,7 @@ void AABB::update()
   const auto w = _node->getDerivedScale().x * 0.2f;
   const auto h = _node->getDerivedScale().y * 0.2f;
 
-  auto angle = _node->getFullTransform().toEulerAngles().z;
+  auto angle = glm::eulerAngles( glm::quat_cast( _node->getFullTransform() ) ).z;
   _dimensions.x = h * std::abs( std::sin( angle ) ) + w * std::abs( std::cos( angle ) );
   _dimensions.y = w * std::abs( std::sin( angle ) ) + h * std::abs( std::cos( angle ) );
 

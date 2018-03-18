@@ -53,7 +53,7 @@ namespace Lore {
 
     // Getters.
 
-    Vec2 getOrigin() const { return _origin; }
+    glm::vec2 getOrigin() const { return _origin; }
 
     UIElementPtr getElement( const string& name );
 
@@ -66,12 +66,12 @@ namespace Lore {
 
     inline void setOrigin( const real x, const real y )
     {
-      _origin = Vec2( x, y );
+      _origin = glm::vec2( x, y );
     }
 
   private:
 
-    Vec2 _origin {};
+    glm::vec2 _origin {};
     ElementRegistry _elements {};
 
   };

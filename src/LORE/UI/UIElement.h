@@ -48,12 +48,12 @@ namespace Lore {
     //
     // Getters.
 
-    inline Vec2 getPosition() const
+    inline glm::vec2 getPosition() const
     {
       return _pos;
     }
 
-    inline Vec2 getDimensions() const
+    inline glm::vec2 getDimensions() const
     {
       return _dimensions;
     }
@@ -88,17 +88,17 @@ namespace Lore {
 
     inline void setPosition( const real x, const real y )
     {
-      _pos = Vec2( x, y );
+      _pos = glm::vec2( x, y );
     }
 
     inline void translate( const real x, const real y )
     {
-      _pos += Vec2( x, y );
+      _pos += glm::vec2( x, y );
     }
 
     inline void setDimensions( const real w, const real h )
     {
-      _dimensions = Vec2( w, h );
+      _dimensions = glm::vec2( w, h );
     }
 
     inline void setDepth( const real depth )
@@ -129,8 +129,8 @@ namespace Lore {
 
   private:
 
-    Vec2 _pos {};
-    Vec2 _dimensions { 0.1f, 0.1f };
+    glm::vec2 _pos {};
+    glm::vec2 _dimensions { 0.1f, 0.1f };
     real _depth { 0.f };
     EntityPtr _entity { nullptr };
     BoxPtr _box { nullptr };

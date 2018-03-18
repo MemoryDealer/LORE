@@ -25,22 +25,18 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE/Math/Vector.h>
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 namespace Lore {
 
     ///
     /// \typedef Colori Represents color as 4D vector (r, g, b, a).
     /// Uses ints with range of [0, 255].
-    using Color4i = Vector<int, 4>;
+    using Color4i = glm::tvec4<uint32_t>;
 
 
     ///
     /// \typedef Color4f Represents color as 4D vector (r, g, b, a).
     /// Uses floats with range of [0.f, 1.f].
-    using Color4f = Vector<float, 4>;
+    using Color4f = glm::vec4;
 
     ///
     /// \typedef Color Represents color as 4D vector (r, g, b, a).

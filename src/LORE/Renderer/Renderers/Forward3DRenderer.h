@@ -52,10 +52,10 @@ namespace Lore {
                         NodePtr node ) override;
 
     void addBox( BoxPtr box,
-                 const Lore::Matrix4& transform ) override;
+                 const glm::mat4& transform ) override;
 
     void addTextbox( TextboxPtr textbox,
-                     const Matrix4& transform ) override;
+                     const glm::mat4& transform ) override;
 
     void addLight( LightPtr light,
                    const NodePtr node ) override;
@@ -72,7 +72,7 @@ namespace Lore {
 
     void _renderSolids( const ScenePtr scene,
                        const RenderQueue& queue,
-                       const Matrix4& viewProjection ) const;
+                       const glm::mat4& viewProjection ) const;
 
     // Uploads lighting data to GPU.
     void _updateLighting( const MaterialPtr material,

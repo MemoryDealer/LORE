@@ -69,17 +69,17 @@ namespace Lore {
 
       virtual void addTransformVar( const string& id ) = 0;
 
-      virtual void setTransformVar( const Matrix4& m ) = 0;
+      virtual void setTransformVar( const glm::mat4& m ) = 0;
 
       virtual void addUniformVar( const string& id ) = 0;
 
-      virtual void setUniformVar( const string& id, const Matrix4& m ) = 0;
+      virtual void setUniformVar( const string& id, const glm::mat4& m ) = 0;
 
-      virtual void setUniformVar( const string& id, const Vec2& v ) = 0;
+      virtual void setUniformVar( const string& id, const glm::vec2& v ) = 0;
 
-      virtual void setUniformVar( const string& id, const Vec3& v ) = 0;
+      virtual void setUniformVar( const string& id, const glm::vec3& v ) = 0;
 
-      virtual void setUniformVar( const string& id, const Vec4& v ) = 0;
+      virtual void setUniformVar( const string& id, const glm::vec4& v ) = 0;
 
       virtual void setUniformVar( const string& id, const real r ) = 0;
 

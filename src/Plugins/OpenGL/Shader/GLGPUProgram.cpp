@@ -114,7 +114,7 @@ void GLGPUProgram::addTransformVar( const string& id )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLGPUProgram::setTransformVar( const Lore::Matrix4& m )
+void GLGPUProgram::setTransformVar( const glm::mat4& m )
 {
   _updateUniform( _transform, m );
 }
@@ -129,7 +129,7 @@ void GLGPUProgram::addUniformVar( const string& id )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLGPUProgram::setUniformVar( const string& id, const Lore::Matrix4& m )
+void GLGPUProgram::setUniformVar( const string& id, const glm::mat4& m )
 {
   auto uniform = _getUniform( id );
   if ( -1 != uniform ) {
@@ -139,34 +139,31 @@ void GLGPUProgram::setUniformVar( const string& id, const Lore::Matrix4& m )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLGPUProgram::setUniformVar( const string& id, const Lore::Vec2& v )
+void GLGPUProgram::setUniformVar( const string& id, const glm::vec2& v )
 {
   auto uniform = _getUniform( id );
   if ( -1 != uniform ) {
-    glm::vec2 glmv = MathConverter::LoreToGLM( v );
-    glUniform2fv( uniform, 1, glm::value_ptr( glmv ) );
+    glUniform2fv( uniform, 1, glm::value_ptr( v ) );
   }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLGPUProgram::setUniformVar( const string& id, const Lore::Vec3& v )
+void GLGPUProgram::setUniformVar( const string& id, const glm::vec3& v )
 {
   auto uniform = _getUniform( id );
   if ( -1 != uniform ) {
-    glm::vec3 glmv = MathConverter::LoreToGLM( v );
-    glUniform3fv( uniform, 1, glm::value_ptr( glmv ) );
+    glUniform3fv( uniform, 1, glm::value_ptr( v ) );
   }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLGPUProgram::setUniformVar( const string& id, const Lore::Vec4& v )
+void GLGPUProgram::setUniformVar( const string& id, const glm::vec4& v )
 {
   auto uniform = _getUniform( id );
   if ( -1 != uniform ) {
-    glm::vec4 glmv = MathConverter::LoreToGLM( v );
-    glUniform4fv( uniform, 1, glm::value_ptr( glmv ) );
+    glUniform4fv( uniform, 1, glm::value_ptr( v ) );
   }
 }
 
@@ -221,16 +218,6 @@ void GLGPUProgram::updateLights( const Lore::RenderQueue::LightList& lights )
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void GLGPUProgram::setUniformVar( const string& id, const glm::mat4x4& m )
-{
-  auto uniform = _getUniform( id );
-  if ( -1 != uniform ) {
-    glUniformMatrix4fv( uniform, 1, GL_FALSE, glm::value_ptr( m ) );
-  }
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 GLuint GLGPUProgram::_getUniform( const string& id )
@@ -247,10 +234,9 @@ GLuint GLGPUProgram::_getUniform( const string& id )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLGPUProgram::_updateUniform( const GLint id, const Lore::Matrix4& m )
+void GLGPUProgram::_updateUniform( const GLint id, const glm::mat4& m )
 {
-  glm::mat4x4 mm = MathConverter::LoreToGLM( m );
-  glUniformMatrix4fv( id, 1, GL_FALSE, glm::value_ptr( mm ) );
+  glUniformMatrix4fv( id, 1, GL_FALSE, glm::value_ptr( m ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

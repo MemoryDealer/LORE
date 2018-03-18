@@ -26,9 +26,6 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 #include <LORE/Memory/Alloc.h>
-#include <LORE/Math/Vector.h>
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
@@ -64,7 +61,7 @@ namespace Lore {
       //
       // Modifiers.
 
-      inline void setParallax( const Vec2& parallax ) { _parallax = parallax; }
+      inline void setParallax( const glm::vec2& parallax ) { _parallax = parallax; }
 
       inline void setDepth( const real depth ) { _depth = depth; }
 
@@ -72,14 +69,14 @@ namespace Lore {
 
       void setSprite( SpritePtr texture );
 
-      void setScrollSpeed( const Vec2& speed );
+      void setScrollSpeed( const glm::vec2& speed );
 
       SpriteControllerPtr createSpriteController();
 
       //
       // Getters.
 
-      inline Vec2 getParallax() const { return _parallax; }
+      inline glm::vec2 getParallax() const { return _parallax; }
 
       inline real getDepth() const { return _depth; }
 
@@ -89,7 +86,7 @@ namespace Lore {
 
     private:
 
-      Vec2 _parallax { 0.f, 0.f };
+      glm::vec2 _parallax { 0.f, 0.f };
       real _depth { 1000.f };
       MaterialPtr _material { nullptr };
       std::shared_ptr<SpriteController> _spriteController { nullptr }; // TODO: Change to unique_ptr - using shared_ptr for now due to compile errors.

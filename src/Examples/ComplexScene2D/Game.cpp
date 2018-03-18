@@ -200,26 +200,26 @@ void Game::loadScene()
   // The first layer will be some scrolling clouds.
   auto& layerClouds = skybox->addLayer( "clouds" );
   layerClouds.setSprite( Lore::Resource::GetSprite( "clouds" ) );
-  layerClouds.setScrollSpeed( Lore::Vec2( 0.001f, 0.00005f ) );
+  layerClouds.setScrollSpeed( glm::vec2( 0.001f, 0.00005f ) );
   layerClouds.setDepth( 1000.f ); // This is the default but we are setting it here for reference.
 
   // Add far layer with heavy parallax.
   auto& layerFar = skybox->addLayer( "far" );
   layerFar.setSprite( Lore::Resource::GetSprite( "bg-far" ) );
   layerFar.setDepth( 990.f );
-  layerFar.setParallax( Lore::Vec2( 0.3f, 0.08f ) );
+  layerFar.setParallax( glm::vec2( 0.3f, 0.08f ) );
 
   // Add middle layer with lighter parallax.
   auto& layerMiddle = skybox->addLayer( "middle" );
   layerMiddle.setSprite( Lore::Resource::GetSprite( "bg-middle" ) );
   layerMiddle.setDepth( 980.f );
-  layerMiddle.setParallax( Lore::Vec2( .5f, .10f ) );
+  layerMiddle.setParallax( glm::vec2( .5f, .10f ) );
 
   // Add closest layer with the least amount of parallax.
   auto& layerForeground = skybox->addLayer( "foreground" );
   layerForeground.setSprite( Lore::Resource::GetSprite( "bg-foreground" ) );
   layerForeground.setDepth( 970.f );
-  layerForeground.setParallax( Lore::Vec2( .7f, 0.12f ) );
+  layerForeground.setParallax( glm::vec2( .7f, 0.12f ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -229,7 +229,7 @@ void Game::processInput()
   // Player movement.
   constexpr const Lore::real PlayerSpeed = 0.01f;
   auto spc = _playerNode->getSpriteController();
-  Lore::Vec2 playerOffset;
+  glm::vec2 playerOffset {};
   if ( Lore::Input::GetKeyState( Lore::Keycode::W ) ) {
     playerOffset.y += PlayerSpeed;
   }
@@ -260,7 +260,7 @@ void Game::processInput()
 
   // Temporary cloning test.
   if ( Lore::Input::GetKeyState( Lore::Keycode::C ) ) {
-    static Lore::Vec2 offset { 0.f, 0.2f };
+    static glm::vec2 offset { 0.f, 0.2f };
     static int ctr = 0;
     auto node = _scene->getNode( "block0" );
     auto clone = node->clone( node->getName() + std::to_string( ctr++ ) );
@@ -277,8 +277,8 @@ void Game::update()
   float blockExtraOffset = 0.f;
   int i = 0;
   for ( auto& block : _floatingBlocks ) {
-    block->setPosition( block->getPosition().x, std::sinf( blockOffset ) * 0.5f + blockExtraOffset );
-    block->rotate( ( i++ % 2 == 0 ) ? Lore::Math::POSITIVE_Z_AXIS : Lore::Math::POSITIVE_Y_AXIS, Lore::Degree( 0.31f ) );
+    //block->setPosition( block->getPosition().x, std::sinf( blockOffset ) * 0.5f + blockExtraOffset );
+    block->rotate( ( i++ % 2 == 0 ) ? glm::vec3( 0.f, 0.f, 1.f ) : glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( 0.00031f ) );
   }
   blockOffset += 0.01f;
 }

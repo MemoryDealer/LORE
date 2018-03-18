@@ -202,7 +202,7 @@ uint32_t CLI::GetNumArgs( const string& str )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Vec2 CLI::ToVec2( const string& str )
+glm::vec2 CLI::ToVec2( const string& str )
 {
   std::istringstream tokenizer( str );
   string x, y;
@@ -216,12 +216,12 @@ Vec2 CLI::ToVec2( const string& str )
     y = "0";
   }
 
-  return Vec2( std::stof( x ), std::stof( y ) );
+  return glm::vec2( std::stof( x ), std::stof( y ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Vec4 CLI::ToVec4( const string& str )
+glm::vec4 CLI::ToVec4( const string& str )
 {
   std::istringstream tokenizer( str );
   string x, y, z, w;
@@ -243,7 +243,7 @@ Vec4 CLI::ToVec4( const string& str )
     w = "0";
   }
 
-  return Vec4( std::stof( x ), std::stof( y ), std::stof( z ), std::stof( w ) );
+  return glm::vec4( std::stof( x ), std::stof( y ), std::stof( z ), std::stof( w ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

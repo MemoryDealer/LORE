@@ -54,7 +54,7 @@ namespace Lore {
 
     private:
 
-        std::stack<Matrix4> _stack;
+        std::stack<glm::mat4> _stack;
         NodePtr _node;
 
     };

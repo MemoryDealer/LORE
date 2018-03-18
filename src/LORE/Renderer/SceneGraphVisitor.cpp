@@ -61,7 +61,7 @@ SceneGraphVisitor::~SceneGraphVisitor()
 void SceneGraphVisitor::visit( Renderer* renderer, bool parentDirty )
 {
   const bool transformDirty = _node->_transformDirty();
-  const Matrix4 transform = _node->_getLocalTransform();
+  const glm::mat4 transform = _node->_getLocalTransform();
 
   if ( parentDirty ) {
     _node->_updateWorldTransform( _stack.top() * transform );

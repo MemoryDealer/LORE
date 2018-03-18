@@ -144,12 +144,12 @@ namespace Lore {
       return GET_VARIANT<Array>( _value );
     }
 
-    Vec4 toVec4() const
+    glm::vec4 toVec4() const
     {
       if ( Type::Array == getType() ) {
         const auto& values = toArray();
         assert( 4 == values.size() );
-        return Vec4( values[0].toReal(), values[1].toReal(), values[2].toReal(), values[3].toReal() );
+        return glm::vec4( values[0].toReal(), values[1].toReal(), values[2].toReal(), values[3].toReal() );
       }
       throw Lore::Exception( "Value not array type" );
     }

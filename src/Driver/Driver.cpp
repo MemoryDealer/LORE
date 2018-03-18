@@ -171,13 +171,13 @@ int main( int argc, char** argv )
   auto bg = scene->getSkybox();
   auto& layer = bg->addLayer( "1" );
   layer.setSprite( Lore::Resource::GetSprite( "clouds" ) );
-  layer.setScrollSpeed( Lore::Vec2( 0.0008f, 0.0004f ) );
-  layer.setParallax( Lore::Vec2( 0.05f, 0.05f ) );
+  layer.setScrollSpeed( glm::vec2( 0.0008f, 0.0004f ) );
+  layer.setParallax( glm::vec2( 0.05f, 0.05f ) );
   layer.setDepth( 1001.f );
 
   auto& layer2 = bg->addLayer( "2" );
   layer2.setSprite( Lore::Resource::GetSprite( "bg" ) );
-  layer2.setParallax( Lore::Vec2(0.1f, 0.1f) );
+  layer2.setParallax( glm::vec2(0.1f, 0.1f) );
   layer2.setMaterial( Lore::Resource::GetMaterial( "bg" ) );
   //layer.getMaterial()->getPass().setTextureSampleRegion( 0.15f, 0.05f, 0.08f, 0.58f );
 
@@ -185,29 +185,29 @@ int main( int argc, char** argv )
   //Lore::SkyboxPtr bg = scene->getSkybox();
   //Lore::Skybox::Layer& layer = bg->addLayer( "default" );
   //layer.setTexture( Lore::Resource::GetTexture( "bg_default" ) );
-  //layer.setScrollSpeed( Lore::Vec2( 0.001f, 0.002f ) );
+  //layer.setScrollSpeed( glm::vec2( 0.001f, 0.002f ) );
   //layer.setDepth( 950.f );
 
   //auto& layer2 = bg->addLayer( "face" );
   //layer2.setTexture( Lore::Resource::LoadTexture( "bg_face", "res/images/awesomeface.png" ) );
-  //layer2.setScrollSpeed( Lore::Vec2( -0.002f, 0.001f ) );
+  //layer2.setScrollSpeed( glm::vec2( -0.002f, 0.001f ) );
   //layer2.setDepth( 500.f );
 
   //auto& layer3 = bg->addLayer( "face2" );
   //layer3.setTexture( Lore::Resource::GetTexture( "bg_face" ) );
-  //layer3.setScrollSpeed( Lore::Vec2( 0.002f, -0.001f ) );
+  //layer3.setScrollSpeed( glm::vec2( 0.002f, -0.001f ) );
   //layer3.setDepth( 499.f );
 
   //auto& layer4 = bg->addLayer( "face3" );
   //layer4.setTexture( Lore::Resource::GetTexture( "bg_face" ) );
-  //layer4.setScrollSpeed( Lore::Vec2( -0.001f, -0.001f ) );
+  //layer4.setScrollSpeed( glm::vec2( -0.001f, -0.001f ) );
   //layer4.setDepth( 498.f );
   ////layer4.getMaterial()->getPass().setTextureSampleRegion( 0.5f, 0.5f, 0.5f, 0.5f );
 
   //{
   //  auto& layer4 = bg->addLayer( "face4" );
   //  layer4.setTexture( Lore::Resource::GetTexture( "bg_face" ) );
-  //  layer4.setScrollSpeed( Lore::Vec2( -0.003f, 0.003f ) );
+  //  layer4.setScrollSpeed( glm::vec2( -0.003f, 0.003f ) );
   //  layer4.setDepth( 497.f );
   //}
 
@@ -243,7 +243,7 @@ int main( int argc, char** argv )
   auto ppeNode = postScene->createNode( "ppe" );
   ppeNode->attachObject( ppe );
   ppeNode->attachObject( pLight );
-  ppeNode->scale( Lore::Vec2( 10.6664f, 8.f ) );*/
+  ppeNode->scale( glm::vec2( 10.6664f, 8.f ) );*/
 
   // ---
 
@@ -341,7 +341,7 @@ int main( int argc, char** argv )
     //sonicNode->scale( 10.05f * std::sinf( f ) );
     //textureElement->setPosition( f, 0.5f );
     // TODO: Repro case where both quads appeared to be scaling with only rotations being done (create test for this).
-    //node->getChild( "AChild" )->rotate( Lore::Degree( -.1f ) );
+    //node->getChild( "AChild" )->rotate( glm::degrees( -.1f ) );
 
     {
       static float sin = 0.f;
@@ -350,13 +350,13 @@ int main( int argc, char** argv )
     }
 
     for ( auto doge : doges ) {
-     doge->rotate( Lore::Degree( .1f ) );
+     doge->rotate( glm::degrees( .1f ) );
     }
 
-    scene->getNode( "dogen" )->rotate( Lore::Degree( -.2f ) );
-    scene->getNode( "dogen2" )->rotate( Lore::Degree( .2f ) );
+    scene->getNode( "dogen" )->rotate( glm::degrees( -.2f ) );
+    scene->getNode( "dogen2" )->rotate( glm::degrees( .2f ) );
 
-    //sonicNode->rotate( Lore::Degree( .1f ) );
+    //sonicNode->rotate( glm::degrees( .1f ) );
 
     float speed = 0.01f;
     if ( Lore::Input::GetKeymodState( Lore::Keymod::Shift ) ) {

@@ -6,8 +6,14 @@ targetdir "../bin/%{cfg.buildcfg}/Run"
 objdir "../bin/%{cfg.buildcfg}/Obj"
 debugdir "../bin/%{cfg.buildcfg}/Run"
 
-includedirs { ".", "%{prj.location}", "%{sln.location}/Plugins/ThirdParty", "%{sln.location}/External",
-               "%{sln.location}/External/freetype2", "%{sln.location}/External/rapidjson/include" }
+includedirs { ".",
+              "%{prj.location}",
+              "%{sln.location}/External",
+              "%{sln.location}/External/freetype2",
+              "%{sln.location}/External/rapidjson/include",
+              "%{sln.location}/External/glm",
+              "%{sln.location}/Plugins/ThirdParty"
+            }
 libdirs { "../lib/x64/%{cfg.buildcfg}" }
 architecture "x86_64"
 characterset ( "MBCS" )

@@ -71,7 +71,7 @@ namespace Lore {
     //
     // Setters.
 
-    void setTextureScrollSpeed( const Vec2& scroll );
+    void setTextureScrollSpeed( const glm::vec2& scroll );
 
     void setTextureSampleRegion( const Rect& region );
 
@@ -83,7 +83,7 @@ namespace Lore {
     //
     // Getters.
 
-    inline Vec2 getTexCoordOffset() const
+    inline glm::vec2 getTexCoordOffset() const
     {
       return _texCoordOffset;
     }
@@ -119,8 +119,8 @@ namespace Lore {
     // TODO: Use linked list of materials for multi-pass rendering. The renderer
     // can pick these up and fill separate rendering queue groups for each pass.
 
-    Vec2 _texCoordScrollSpeed { };
-    Vec2 _texCoordOffset { };
+    glm::vec2 _texCoordScrollSpeed { };
+    glm::vec2 _texCoordOffset { };
     Rect _texSampleRegion { 0.f, 0.f, 1.f, 1.f };
     FrameListenerController::FrameStartedCallback _texCoordCallback { nullptr };
 

@@ -103,7 +103,7 @@ void Forward3DRenderer::addRenderData( EntityPtr entity,
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Forward3DRenderer::addBox( BoxPtr box,
-                                const Matrix4& transform )
+                                const glm::mat4& transform )
 {
   const uint queueId = RenderQueue::General;
 
@@ -120,7 +120,7 @@ void Forward3DRenderer::addBox( BoxPtr box,
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Forward3DRenderer::addTextbox( TextboxPtr textbox,
-                                    const Matrix4& transform )
+                                    const glm::mat4& transform )
 {
   const uint queueId = textbox->getRenderQueue();
 
@@ -185,14 +185,14 @@ void Forward3DRenderer::present( const RenderView& rv,
 
   // Setup view-projection matrix.
   // TODO: Take viewport dimensions into account. Cache more things inside window.
-//   const Matrix4 projection = Math::OrthoRH( -aspectRatio, aspectRatio,
+//   const glm::mat4 projection = Math::OrthoRH( -aspectRatio, aspectRatio,
 //                                             -1.f, 1.f,
 //                                             1500.f, -1500.f );
-  const Matrix4 projection = Math::PerspectiveRH( Math::RadiansToDegrees( 45.f ),
-                                                  aspectRatio,
-                                                  0.1f, 1000.f );
+  const glm::mat4 projection = glm::perspective( glm::radians( 45.f ),
+                                                 aspectRatio,
+                                                 0.1f, 1000.f );
 
-  const Matrix4 viewProjection = rv.camera->getViewMatrix() * projection;
+  const glm::mat4 viewProjection = rv.camera->getViewMatrix() * projection;
 
   for ( const auto& activeQueue : _activeQueues ) {
     RenderQueue& queue = activeQueue.second;
@@ -233,7 +233,7 @@ void Forward3DRenderer::_activateQueue( const uint id,
 
 void Forward3DRenderer::_renderSolids( const ScenePtr scene,
                                        const RenderQueue& queue,
-                                       const Matrix4& viewProjection ) const
+                                       const glm::mat4& viewProjection ) const
 {
   // Render non-instanced solids.
   for ( auto& pair : queue.solids ) {
@@ -259,10 +259,10 @@ void Forward3DRenderer::_renderSolids( const ScenePtr scene,
       }
 
       // Get the model matrix from the node.
-      Matrix4 model = node->getFullTransform();
+      glm::mat4 model = node->getFullTransform();
 
       // Calculate model-view-projection matrix for this object.
-      const Matrix4 mvp = viewProjection * model;
+      const glm::mat4 mvp = viewProjection * model;
       program->setTransformVar( mvp );
 
       if ( material->lighting ) {

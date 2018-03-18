@@ -92,7 +92,7 @@ void Skybox::Layer::setSprite( SpritePtr sprite )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Skybox::Layer::setScrollSpeed( const Vec2& speed )
+void Skybox::Layer::setScrollSpeed( const glm::vec2& speed )
 {
   if ( _material ) {
     _material->setTextureScrollSpeed( speed );

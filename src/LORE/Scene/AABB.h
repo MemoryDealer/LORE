@@ -25,10 +25,6 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE/Math/Vector.h>
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 namespace Lore {
 
   class AABB final
@@ -52,12 +48,12 @@ namespace Lore {
       return _box;
     }
 
-    Vec3 getMin() const
+    glm::vec3 getMin() const
     {
       return _min;
     }
 
-    Vec3 getMax() const
+    glm::vec3 getMax() const
     {
       return _max;
     }
@@ -72,7 +68,7 @@ namespace Lore {
       return _dimensions.y;
     }
 
-    Vec3 getDimensions() const
+    glm::vec3 getDimensions() const
     {
       return _dimensions;
     }
@@ -81,9 +77,9 @@ namespace Lore {
 
     NodePtr _node { nullptr };
     BoxPtr _box { nullptr };
-    Vec3 _min {};
-    Vec3 _max {};
-    Vec3 _dimensions {};
+    glm::vec3 _min {};
+    glm::vec3 _max {};
+    glm::vec3 _dimensions {};
 
   };
 

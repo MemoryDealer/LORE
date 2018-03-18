@@ -62,28 +62,15 @@ namespace Lore {
 
     struct Transform
     {
+      glm::vec3 position { 0.f };
+      glm::quat orientation { 1.f, 0.f, 0.f, 0.f };
+      glm::vec3 scale { 1.f };
+      glm::vec3 derivedScale { 1.f };
 
-      Vec3 position;
-      Quaternion orientation;
-      Vec3 scale;
-      Vec3 derivedScale;
+      glm::mat4 local { 1.f }; // Local transformation matrix.
+      bool dirty { true }; // True if matrix needs update.
 
-      Matrix4 local; // Local transformation matrix.
-      bool dirty; // True if matrix needs update.
-
-      Matrix4 world; // Derived transformation in scene graph.
-
-      Transform()
-        : position()
-        , orientation()
-        , scale( 1.f, 1.f, 1.f )
-        , derivedScale( 1.f, 1.f, 1.f )
-        , local()
-        , dirty( true )
-        , world()
-      {
-      }
-
+      glm::mat4 world { 1.f }; // Derived transformation in scene graph.
     };
 
     struct Depth {
@@ -154,31 +141,27 @@ namespace Lore {
 
     void setName( const string& name );
 
-    void setPosition( const Vec2& position );
+    void setPosition( const glm::vec2& position );
 
     void setPosition( const real x, const real y );
 
-    void setPosition( const Vec3& position );
+    void setPosition( const glm::vec3& position );
 
     void setPosition( const real x, const real y, const real z );
 
-    void translate( const Vec2& offset );
+    void translate( const glm::vec2& offset );
 
     void translate( const real xOffset, const real yOffset );
 
-    void rotate( const Radian& angle, const TransformSpace& ts = TransformSpace::Local );
+    void rotate( const real angle, const TransformSpace& ts = TransformSpace::Local );
 
-    void rotate( const Degree& angle, const TransformSpace& ts = TransformSpace::Local );
+    void rotate( const glm::vec3& axis, const real angle, const TransformSpace& ts = TransformSpace::Local );
 
-    void rotate( const Vec3& axis, const Radian& angle, const TransformSpace& ts = TransformSpace::Local );
+    void rotate( const glm::quat& q, const TransformSpace& ts = TransformSpace::Local );
 
-    void rotate( const Vec3& axis, const Degree& angle, const TransformSpace& ts = TransformSpace::Local );
+    void setScale( const glm::vec2& scale );
 
-    void rotate( const Quaternion& q, const TransformSpace& ts = TransformSpace::Local );
-
-    void setScale( const Vec2& scale );
-
-    void scale( const Vec2& s );
+    void scale( const glm::vec2& s );
 
     void scale( const real s );
 
@@ -207,32 +190,32 @@ namespace Lore {
       return _parent;
     }
 
-    inline Vec3 getPosition() const
+    inline glm::vec3 getPosition() const
     {
       return _transform.position;
     }
 
-    inline Vec3 getDerivedPosition() const
+    inline glm::vec3 getDerivedPosition() const
     {
-      return Vec3( _transform.world[3][0], _transform.world[3][1], _transform.world[3][2] );
+      return glm::vec3( _transform.world[3][0], _transform.world[3][1], _transform.world[3][2] );
     }
 
-    inline Quaternion getOrientation() const
+    inline glm::quat getOrientation() const
     {
       return _transform.orientation;
     }
 
-    inline Matrix4 getFullTransform() const
+    inline glm::mat4 getFullTransform() const
     {
       return _transform.world;
     }
 
-    inline Vec3 getScale() const
+    inline glm::vec3 getScale() const
     {
       return _transform.scale;
     }
 
-    inline Vec3 getDerivedScale() const
+    inline glm::vec3 getDerivedScale() const
     {
       return _transform.derivedScale;
     }
@@ -282,9 +265,9 @@ namespace Lore {
 
     bool _transformDirty() const;
 
-    Matrix4 _getLocalTransform();
+    glm::mat4 _getLocalTransform();
 
-    void _updateWorldTransform( const Matrix4& m );
+    void _updateWorldTransform( const glm::mat4& m );
 
     void _updateChildrenScale();
 

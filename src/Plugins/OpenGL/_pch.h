@@ -40,7 +40,8 @@
 #include <GLFW/glfw3.h>
 
 // GLM.
-#include <Plugins/ThirdParty/glm/glm.hpp>
-#include <Plugins/ThirdParty/glm/gtc/matrix_transform.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

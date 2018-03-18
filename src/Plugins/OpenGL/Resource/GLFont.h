@@ -43,8 +43,8 @@ namespace Lore { namespace OpenGL {
     {
       GLuint textureID;
       GLuint advance;
-      IVec2 size;
-      IVec2 bearing;
+      glm::tvec2<uint32_t> size;
+      glm::tvec2<uint32_t> bearing;
     };
 
   public:

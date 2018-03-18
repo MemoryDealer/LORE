@@ -52,13 +52,13 @@ namespace Lore {
     //
     // Modifiers.
 
-    void setPosition( const Vec2& pos );
+    void setPosition( const glm::vec2& pos );
 
     void setPosition( const real x, const real y );
 
     void setPosition( const real x, const real y, const real z );
 
-    void translate( const Vec2& offset );
+    void translate( const glm::vec2& offset );
 
     void translate( const real xOffset, const real yOffset );
 
@@ -68,20 +68,20 @@ namespace Lore {
 
     void setZoom( const real amount );
 
-    virtual void setPosition( const Vec3& pos ) = 0;
+    virtual void setPosition( const glm::vec3& pos ) = 0;
 
-    virtual void translate( const Vec3& offset ) = 0;
+    virtual void translate( const glm::vec3& offset ) = 0;
 
-    virtual void lookAt( const Vec3& pos, const Vec3& target, const Vec3& up ) = 0;
+    virtual void lookAt( const glm::vec3& pos, const glm::vec3& target, const glm::vec3& up ) = 0;
 
     //
     // Getters.
 
     string getName() const;
 
-    Vec3 getPosition() const;
+    glm::vec3 getPosition() const;
 
-    Matrix4 getViewMatrix();
+    glm::mat4 getViewMatrix();
 
     // Tracking.
 
@@ -107,8 +107,8 @@ namespace Lore {
 
     string _name { };
 
-    Vec3 _position { };
-    Matrix4 _view { };
+    glm::vec3 _position { 0.f };
+    glm::mat4 _view { 0.f };
     real _zoom { 1.f };
 
     bool _viewMatrixDirty { true };
@@ -131,11 +131,11 @@ namespace Lore {
     //
     // Modifiers.
 
-    void setPosition( const Vec3& pos ) override;
+    void setPosition( const glm::vec3& pos ) override;
 
-    void translate( const Vec3& offset ) override;
+    void translate( const glm::vec3& offset ) override;
 
-    void lookAt( const Vec3& pos, const Vec3& target, const Vec3& up ) override { }
+    void lookAt( const glm::vec3& pos, const glm::vec3& target, const glm::vec3& up ) override { }
 
   protected:
 
@@ -156,11 +156,11 @@ namespace Lore {
     //
     // Modifiers.
 
-    void setPosition( const Vec3& pos ) override;
+    void setPosition( const glm::vec3& pos ) override;
 
-    void translate( const Vec3& offset ) override;
+    void translate( const glm::vec3& offset ) override;
 
-    void lookAt( const Vec3& pos, const Vec3& target, const Vec3& up ) override;
+    void lookAt( const glm::vec3& pos, const glm::vec3& target, const glm::vec3& up ) override;
 
   protected:
 
@@ -168,8 +168,8 @@ namespace Lore {
 
   private:
 
-    Vec3 _target { };
-    Vec3 _up {};
+    glm::vec3 _target { };
+    glm::vec3 _up {};
 
   };
 

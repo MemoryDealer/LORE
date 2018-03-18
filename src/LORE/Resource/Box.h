@@ -70,7 +70,7 @@ namespace Lore {
       return _size.y;
     }
 
-    inline Vec2 getSize() const
+    inline glm::vec2 getSize() const
     {
       return _size;
     }
@@ -98,14 +98,14 @@ namespace Lore {
       setFillColor( Color( r, g, b, a ) );
     }
 
-    inline void setSize( const Vec2& size )
+    inline void setSize( const glm::vec2& size )
     {
       _size = size;
     }
 
     inline void setSize( const real w, const real h )
     {
-      setSize( Vec2( w, h ) );
+      setSize( glm::vec2( w, h ) );
     }
 
     inline void setBorderWidth( const real width )
@@ -119,7 +119,7 @@ namespace Lore {
 
     Color _borderColor { StockColor::White };
     Color _fillColor { 1.f, 1.f, 1.f, 0.3f };
-    Vec2 _size { 1.f, 1.f };
+    glm::vec2 _size { 1.f, 1.f };
     real _borderWidth { 0.04f };
 
   };

@@ -77,9 +77,9 @@ namespace Lore {
 
     // Conversion.
 
-    static Vec2 ToVec2( const string& str );
+    static glm::vec2 ToVec2( const string& str );
 
-    static Vec4 ToVec4( const string& str );
+    static glm::vec4 ToVec4( const string& str );
 
   private:
 

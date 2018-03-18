@@ -70,7 +70,7 @@ namespace Lore {
     ///
     /// \brief Updates the matrix entry in the instanced buffer for the specified
     /// instance ID.
-    void updateInstancedMatrix( const size_t idx, const Matrix4& matrix );
+    void updateInstancedMatrix( const size_t idx, const glm::mat4& matrix );
 
     //
     // Helper functions.

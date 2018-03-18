@@ -45,44 +45,44 @@ using namespace LocalNS;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Camera::setPosition( const Vec2& pos )
+void Camera::setPosition( const glm::vec2& pos )
 {
-  setPosition( Vec3( pos ) );
+  setPosition( glm::vec3( pos.x, pos.y, 0.f ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Camera::setPosition( const real x, const real y )
 {
-  setPosition( x, y, 0.f ); // Call Vec3 function with z-value of zero.
+  setPosition( x, y, 0.f ); // Call glm::vec3 function with z-value of zero.
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Camera::setPosition( const real x, const real y, const real z )
 {
-  setPosition( Vec3( x, y, 0.f ) );
+  setPosition( glm::vec3( x, y, 0.f ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Camera::translate( const Vec2& offset )
+void Camera::translate( const glm::vec2& offset )
 {
-  translate( Vec3( offset ) );
+  translate( glm::vec3( offset.x, offset.y, 0.f ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Camera::translate( const real xOffset, const real yOffset )
 {
-  translate( xOffset, yOffset, 0.f ); // Call Vec3 function with z-value of zero.
+  translate( xOffset, yOffset, 0.f ); // Call glm::vec3 function with z-value of zero.
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Camera::translate( const real xOffset, const real yOffset, const real zOffset )
 {
-  translate( Vec3( xOffset, yOffset, zOffset ) );
+  translate( glm::vec3( xOffset, yOffset, zOffset ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -118,14 +118,14 @@ string Camera::getName() const
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Vec3 Camera::getPosition() const
+glm::vec3 Camera::getPosition() const
 {
   return _position;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Matrix4 Camera::getViewMatrix()
+glm::mat4 Camera::getViewMatrix()
 {
   if ( _viewMatrixDirty ) {
     _updateViewMatrix();
@@ -151,7 +151,7 @@ void Camera::updateTracking( const real aspectRatio )
     return;
   }
 
-  const Vec3 nodePos = _trackingNode->getPosition();
+  const glm::vec3 nodePos = _trackingNode->getPosition();
 
   switch ( _trackingStyle ) {
   default:
@@ -176,7 +176,7 @@ void Camera::_dirty()
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Camera2D::setPosition( const Vec3& pos )
+void Camera2D::setPosition( const glm::vec3& pos )
 {
   _position = pos / _zoom;
   _dirty();
@@ -184,7 +184,7 @@ void Camera2D::setPosition( const Vec3& pos )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Camera2D::translate( const Vec3& offset )
+void Camera2D::translate( const glm::vec3& offset )
 {
   _position += offset / _zoom;
   _dirty();
@@ -194,10 +194,10 @@ void Camera2D::translate( const Vec3& offset )
 
 void Camera2D::_updateViewMatrix()
 {
-  Vec3 scale( _zoom, _zoom, 1.f );
+  glm::vec3 scale( _zoom, _zoom, 1.f );
   _position.z = 0.f;
   _view = Math::CreateTransformationMatrix( _position,
-                                            Quaternion(),
+                                            glm::quat( 1.f, 0.f, 0.f, 0.f ),
                                             scale );
 
   // Wtf? Have to invert x/y values...not sure why at the moment.
@@ -211,7 +211,7 @@ void Camera2D::_updateViewMatrix()
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Camera3D::setPosition( const Vec3& pos )
+void Camera3D::setPosition( const glm::vec3& pos )
 {
   _position = pos;
   _dirty();
@@ -219,7 +219,7 @@ void Camera3D::setPosition( const Vec3& pos )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Camera3D::translate( const Vec3& offset )
+void Camera3D::translate( const glm::vec3& offset )
 {
   _position += offset;
   _dirty();
@@ -227,7 +227,7 @@ void Camera3D::translate( const Vec3& offset )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Camera3D::lookAt( const Vec3& eye, const Vec3& target, const Vec3& up )
+void Camera3D::lookAt( const glm::vec3& eye, const glm::vec3& target, const glm::vec3& up )
 {
   _position = eye;
   _target = target;
@@ -240,7 +240,7 @@ void Camera3D::lookAt( const Vec3& eye, const Vec3& target, const Vec3& up )
 
 void Camera3D::_updateViewMatrix()
 {
-  _view = Math::LookAtRH( _position, _position + _target, _up );
+  _view = glm::lookAt( _position, _position + _target, _up );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
