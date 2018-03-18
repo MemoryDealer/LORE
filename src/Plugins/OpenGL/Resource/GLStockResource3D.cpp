@@ -198,15 +198,18 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
   // Setup default values for calculating pixel.
   src += "vec4 texSample = vec4(1.0, 1.0, 1.0, 1.0);";
 
-//   if ( textured ) {
-//     src += "texSample = texture(tex, TexCoord + texSampleOffset);";
-//     src += "if ( texSample.a < 0.1 ) {";
-//     src += "  discard;";
-//     src += "}";
-//   }
+  src += "texSample = material.ambient;";
+
+  if ( textured ) {
+    src += "texSample = texture(tex, TexCoord + texSampleOffset);";
+    src += "if ( texSample.a < 0.1 ) {";
+    src += "  discard;";
+    src += "}";
+  }
 
   // Apply alpha blending from material.
-  src += "texSample.a *= material.diffuse.a;";
+  //src += "texSample.a *= material.diffuse.a;";
+  
 
 //   if ( lit ) {
 //     src += "vec3 lighting = material.ambient.rgb * sceneAmbient.rgb;";

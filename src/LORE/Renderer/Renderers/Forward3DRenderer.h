@@ -74,6 +74,11 @@ namespace Lore {
                        const RenderQueue& queue,
                        const glm::mat4& viewProjection ) const;
 
+    // Uploads texture data to GPU.
+    void _updateTextureData( const MaterialPtr material,
+                             const GPUProgramPtr program,
+                             const NodePtr node ) const;
+
     // Uploads lighting data to GPU.
     void _updateLighting( const MaterialPtr material,
                           const GPUProgramPtr program,

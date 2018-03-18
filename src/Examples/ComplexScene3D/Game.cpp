@@ -28,6 +28,15 @@
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+namespace LocalNS {
+
+  static Game* GameInstance = nullptr;
+
+}
+using namespace LocalNS;
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 Game::Game()
 {
   // Create a Lore context which is required for all Lore functionality.
@@ -40,6 +49,11 @@ Game::Game()
 
   // Allow the DebugUI.
   Lore::DebugUI::Enable();
+
+  Lore::Input::SetMouseMovedCallback( Game::onMouseMove );
+  Lore::Input::SetCursorEnabled( false );
+
+  GameInstance = this;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -66,12 +80,12 @@ void Game::loadScene()
 {
   // Create a scene with default skybox color.
   _scene = _context->createScene( "core", Lore::RendererType::Forward3D );
-  _scene->setSkyboxColor( Lore::StockColor::Green );
+  _scene->setSkyboxColor( Lore::StockColor::Black );
   _scene->setAmbientLightColor( Lore::Color( 0.75f, 0.75f, 0.75f, 1.f ) );
 
   // Create a camera to view the scene.
   _camera = _context->createCamera( "core", Lore::Camera::Type::Type3D );
-  _camera->lookAt( glm::vec3(), glm::vec3( 0.f, 0.f, 1.f ), glm::vec3( 0.f, 1.f, 0.f ) );
+  _camera->lookAt( glm::vec3( 0.f ), glm::vec3( 0.f, 0.f, -1.f ), glm::vec3( 0.f, 1.f, 0.f ) );
 
   // TODO: This is a hack that should be taken care of internally.
   Lore::CLI::SetActiveScene( _scene );
@@ -90,12 +104,21 @@ void Game::loadScene()
 
   // Add a cube.
 
-  Lore::EntityPtr cubeEntity = Lore::Resource::CreateEntity( "cube", Lore::VertexBuffer::Type::Quad );
-  cubeEntity->getMaterial()->ambient = Lore::StockColor::Blue;
+  Lore::EntityPtr cubeEntity = Lore::Resource::CreateEntity( "cube", Lore::VertexBuffer::Type::TexturedQuad );
+ // cubeEntity->getMaterial()->ambient = Lore::StockColor::Blue;
+  //cubeEntity->getMaterial()->diffuse = Lore::StockColor::Blue;
+  cubeEntity->setSprite( Lore::Resource::GetSprite( "block" ) );
   auto node = _scene->createNode( "cube" );
   node->attachObject( cubeEntity );
-  node->setPosition( 0.f, 0.f, 1.f );
-  //node->rotate( glm::vec3( 0.f, 1.f, 0.f ), Lore::glm::degrees( 180.f ) );
+  node->setPosition( 0.f, 0.f, -10.f );
+  //node->scale( 0.10f );
+  
+  for ( int i = 1; i < 20; ++i ) {
+    auto node = _scene->createNode( "cubeCopy" + std::to_string( i ) );
+    node->attachObject( cubeEntity );
+    node->setPosition( ( Lore::real )i, 0.f, -10.f );
+    //node->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( 180.f ) );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -103,22 +126,29 @@ void Game::loadScene()
 void Game::processInput()
 {
   // Player movement.
-  constexpr const Lore::real PlayerSpeed = 0.01f;
+  constexpr const Lore::real PlayerSpeed = 0.05f;
   glm::vec3 playerOffset( 0.f );
   if ( Lore::Input::GetKeyState( Lore::Keycode::W ) ) {
-    playerOffset.z -= PlayerSpeed;
+    playerOffset += PlayerSpeed * _camera->getTarget();
   }
   if ( Lore::Input::GetKeyState( Lore::Keycode::A ) ) {
-    playerOffset.x -= PlayerSpeed;
+    playerOffset -= glm::normalize( glm::cross( _camera->getTarget(), glm::vec3( 0.f, 1.f, 0.f ) ) ) * PlayerSpeed;
   }
   if ( Lore::Input::GetKeyState( Lore::Keycode::S ) ) {
-    playerOffset.z += PlayerSpeed;
+    playerOffset -= PlayerSpeed * _camera->getTarget();
   }
   if ( Lore::Input::GetKeyState( Lore::Keycode::D ) ) {
-    playerOffset.x += PlayerSpeed;
+    playerOffset += glm::normalize( glm::cross( _camera->getTarget(), glm::vec3( 0.f, 1.f, 0.f ) ) ) * PlayerSpeed;
   }
-  if ( playerOffset.x != 0.f || playerOffset.y != 0.f ) {
+  if ( playerOffset.x != 0.f || playerOffset.z != 0.f ) {
     _camera->translate( playerOffset );
+  }
+
+  if ( Lore::Input::GetKeyState( Lore::Keycode::Left ) ) {
+    _camera->yaw( -1.f );
+  }
+  if ( Lore::Input::GetKeyState( Lore::Keycode::Right ) ) {
+    _camera->yaw( 1.f );
   }
 }
 
@@ -126,14 +156,17 @@ void Game::processInput()
 
 void Game::update()
 {
-  static float blockOffset = 0.f;
-  float blockExtraOffset = 0.f;
-  int i = 0;
-  for ( auto& block : _floatingBlocks ) {
-    block->setPosition( block->getPosition().x, std::sinf( blockOffset ) * 0.5f + blockExtraOffset );
-    block->rotate( ( i++ % 2 == 0 ) ? glm::vec3( 0.f, 0.f, 1.f ) : glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( 0.31f ) );
-  }
-  blockOffset += 0.01f;
+   static float blockOffset = 0.f;
+//   float blockExtraOffset = 0.f;
+//   int i = 0;
+//   for ( auto& block : _floatingBlocks ) {
+//     block->setPosition( block->getPosition().x, std::sinf( blockOffset ) * 0.5f + blockExtraOffset );
+//     block->rotate( ( i++ % 2 == 0 ) ? glm::vec3( 0.f, 0.f, 1.f ) : glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( 0.31f ) );
+//   }
+   blockOffset += 0.01f;
+  auto node = _scene->getNode( "cube" );
+  //node->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( 0.001f ) );
+  node->setPosition( 0.f, 0.f, -10.f + 3.f * std::sinf( blockOffset ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -141,6 +174,31 @@ void Game::update()
 void Game::render()
 {
   _context->renderFrame();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Game::onMouseMove( const int32_t x, const int32_t y )
+{
+  static int32_t lastX = 400;
+  static int32_t lastY = 300;
+
+  const auto xOffset = x - lastX;
+  const auto yOffset = y - lastY;
+  lastX = x;
+  lastY = y;
+
+  const Lore::real sensitivity = 0.1f;
+  auto camera = GameInstance->getCamera();
+  camera->yaw( xOffset * sensitivity );
+  camera->pitch( -yOffset * sensitivity );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Lore::CameraPtr Game::getCamera() const
+{
+  return _camera;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

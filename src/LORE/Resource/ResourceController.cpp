@@ -362,6 +362,13 @@ EntityPtr Resource::CreateEntity( const string& name, const VertexBuffer::Type& 
   }
     break;
 
+  case VertexBuffer::Type::TexturedCube:
+  {
+    auto material = StockResource::GetMaterial( "StandardTextured3D" );
+    entity->setMaterial( material->clone( "StandardTextured3D_" + name ) );
+  }
+    break;
+
   }
 
   return entity;

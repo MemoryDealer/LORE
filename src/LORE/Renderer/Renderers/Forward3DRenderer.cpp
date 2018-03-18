@@ -185,14 +185,11 @@ void Forward3DRenderer::present( const RenderView& rv,
 
   // Setup view-projection matrix.
   // TODO: Take viewport dimensions into account. Cache more things inside window.
-//   const glm::mat4 projection = Math::OrthoRH( -aspectRatio, aspectRatio,
-//                                             -1.f, 1.f,
-//                                             1500.f, -1500.f );
   const glm::mat4 projection = glm::perspective( glm::radians( 45.f ),
                                                  aspectRatio,
                                                  0.1f, 1000.f );
 
-  const glm::mat4 viewProjection = rv.camera->getViewMatrix() * projection;
+  const glm::mat4 viewProjection = projection * rv.camera->getViewMatrix();
 
   for ( const auto& activeQueue : _activeQueues ) {
     RenderQueue& queue = activeQueue.second;
@@ -255,7 +252,7 @@ void Forward3DRenderer::_renderSolids( const ScenePtr scene,
     // Render each node associated with this entity.
     for ( const auto& node : nodes ) {
       if ( material->sprite && material->sprite->getTextureCount() ) {
-        //_updateTextureData( material, program, node );
+        _updateTextureData( material, program, node );
       }
 
       // Get the model matrix from the node.
@@ -275,6 +272,29 @@ void Forward3DRenderer::_renderSolids( const ScenePtr scene,
     // Rendering this entity is complete.
     vertexBuffer->unbind();
   }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Forward3DRenderer::_updateTextureData( const MaterialPtr material,
+                                            const GPUProgramPtr program,
+                                            const NodePtr node ) const
+{
+  size_t spriteFrame = 0;
+  const auto spc = node->getSpriteController();
+  if ( spc ) {
+    spriteFrame = spc->getActiveFrame();
+  }
+
+  const TexturePtr texture = material->sprite->getTexture( spriteFrame );
+  texture->bind(); // TODO: Multi-texturing.
+  program->setUniformVar( "texSampleOffset", material->getTexCoordOffset() );
+
+  const Rect sampleRegion = material->getTexSampleRegion();
+  program->setUniformVar( "texSampleRegion.x", sampleRegion.x );
+  program->setUniformVar( "texSampleRegion.y", sampleRegion.y );
+  program->setUniformVar( "texSampleRegion.w", sampleRegion.w );
+  program->setUniformVar( "texSampleRegion.h", sampleRegion.h );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

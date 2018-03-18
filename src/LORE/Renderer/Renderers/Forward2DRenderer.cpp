@@ -156,7 +156,7 @@ void Forward2DRenderer::present( const RenderView& rv, const WindowPtr window )
   rv.scene->updateSceneGraph();
 
   const real aspectRatio = (rv.renderTarget) ? rv.renderTarget->getAspectRatio() : window->getAspectRatio();
-  rv.camera->updateTracking( aspectRatio );
+  rv.camera->updateTracking();
 
   if ( rv.renderTarget ) {
     rv.renderTarget->bind();
@@ -186,7 +186,7 @@ void Forward2DRenderer::present( const RenderView& rv, const WindowPtr window )
                                            -1.f, 1.f,
                                            1500.f, -1500.f );
 
-  const glm::mat4 viewProjection = rv.camera->getViewMatrix() * projection;
+  const glm::mat4 viewProjection = projection * rv.camera->getViewMatrix();
 
   // Render skybox before scene node entities.
   renderSkybox( rv, aspectRatio, projection );

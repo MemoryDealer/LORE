@@ -153,6 +153,10 @@ namespace Lore {
 
     void translate( const real xOffset, const real yOffset );
 
+    void translate( const glm::vec3& offset );
+
+    void translate( const real xOffset, const real yOffset, const real zOffset );
+
     void rotate( const real angle, const TransformSpace& ts = TransformSpace::Local );
 
     void rotate( const glm::vec3& axis, const real angle, const TransformSpace& ts = TransformSpace::Local );

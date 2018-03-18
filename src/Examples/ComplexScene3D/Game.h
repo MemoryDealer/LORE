@@ -48,6 +48,16 @@ public:
 
   void render();
 
+  //
+  // Callbacks.
+
+  static void onMouseMove( const int32_t x, const int32_t y );
+
+  //
+  // Getters.
+
+  Lore::CameraPtr getCamera() const;
+
 private:
 
   // This class is the owner of the Lore context, so it must use a unique_ptr.

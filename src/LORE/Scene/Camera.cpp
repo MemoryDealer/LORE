@@ -125,11 +125,17 @@ glm::vec3 Camera::getPosition() const
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+glm::vec3 Camera::getTarget() const
+{
+  return _target;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 glm::mat4 Camera::getViewMatrix()
 {
   if ( _viewMatrixDirty ) {
     _updateViewMatrix();
-    _viewMatrixDirty = false;
   }
 
   return _view;
@@ -145,7 +151,7 @@ void Camera::trackNode( NodePtr node, const TrackingStyle& mode )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Camera::updateTracking( const real aspectRatio )
+void Camera::updateTracking()
 {
   if ( !_trackingNode ) {
     return;
@@ -156,7 +162,7 @@ void Camera::updateTracking( const real aspectRatio )
   switch ( _trackingStyle ) {
   default:
   case TrackingStyle::Simple:
-    _position.x = nodePos.x / aspectRatio;
+    _position.x = nodePos.x;
     _position.y = nodePos.y;
     break;
   }
@@ -227,6 +233,31 @@ void Camera3D::translate( const glm::vec3& offset )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void Camera3D::pitch( const real amount )
+{
+  _pitch += amount;
+
+  // Limit pitching.
+  if ( _pitch > 89.f ) {
+    _pitch = 89.f;
+  } 
+  else if ( _pitch < -89.f ) {
+    _pitch = -89.f;
+  }
+
+  _dirty();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Camera3D::yaw( const real amount )
+{
+  _yaw += amount;
+  _dirty();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void Camera3D::lookAt( const glm::vec3& eye, const glm::vec3& target, const glm::vec3& up )
 {
   _position = eye;
@@ -240,7 +271,16 @@ void Camera3D::lookAt( const glm::vec3& eye, const glm::vec3& target, const glm:
 
 void Camera3D::_updateViewMatrix()
 {
+  // Update target vector.
+  glm::vec3 target { 0.f };
+  target.x = std::cosf( glm::radians( _yaw ) ) * std::cosf( glm::radians( _pitch ) );
+  target.y = std::sinf( glm::radians( _pitch ) );
+  target.z = std::sinf( glm::radians( _yaw ) ) * std::cosf( glm::radians( _pitch ) );
+  _target = glm::normalize( target );
+
   _view = glm::lookAt( _position, _position + _target, _up );
+
+  _viewMatrixDirty = false;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -72,6 +72,10 @@ namespace Lore {
 
     virtual void translate( const glm::vec3& offset ) = 0;
 
+    virtual void pitch( const real amount ) = 0;
+
+    virtual void yaw( const real amount ) = 0;
+
     virtual void lookAt( const glm::vec3& pos, const glm::vec3& target, const glm::vec3& up ) = 0;
 
     //
@@ -80,6 +84,8 @@ namespace Lore {
     string getName() const;
 
     glm::vec3 getPosition() const;
+
+    glm::vec3 getTarget() const;
 
     glm::mat4 getViewMatrix();
 
@@ -92,7 +98,7 @@ namespace Lore {
 
     void trackNode( NodePtr node, const TrackingStyle& mode = TrackingStyle::Simple );
 
-    void updateTracking( const real aspectRatio );
+    void updateTracking();
 
   protected:
 
@@ -108,6 +114,7 @@ namespace Lore {
     string _name { };
 
     glm::vec3 _position { 0.f };
+    glm::vec3 _target { 0.f };
     glm::mat4 _view { 0.f };
     real _zoom { 1.f };
 
@@ -135,6 +142,10 @@ namespace Lore {
 
     void translate( const glm::vec3& offset ) override;
 
+    void pitch( const real amount ) override { }
+
+    void yaw( const real amount ) override { }
+
     void lookAt( const glm::vec3& pos, const glm::vec3& target, const glm::vec3& up ) override { }
 
   protected:
@@ -160,6 +171,10 @@ namespace Lore {
 
     void translate( const glm::vec3& offset ) override;
 
+    void pitch( const real amount ) override;
+
+    void yaw( const real amount ) override;
+
     void lookAt( const glm::vec3& pos, const glm::vec3& target, const glm::vec3& up ) override;
 
   protected:
@@ -168,8 +183,10 @@ namespace Lore {
 
   private:
 
-    glm::vec3 _target { };
     glm::vec3 _up {};
+
+    real _pitch { 0.f };
+    real _yaw { -90.f };
 
   };
 

@@ -228,9 +228,9 @@ void Node::setPosition( const glm::vec3& position )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Node::setPosition( const real x, const real y, const real z1 )
+void Node::setPosition( const real x, const real y, const real z )
 {
-  setPosition( glm::vec2( x, y ) );
+  setPosition( glm::vec3( x, y, z ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -246,6 +246,21 @@ void Node::translate( const glm::vec2& offset )
 void Node::translate( const real xOffset, const real yOffset )
 {
   translate( glm::vec2( xOffset, yOffset ) );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Node::translate( const glm::vec3& offset )
+{
+  _transform.position += offset;
+  _dirty();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Node::translate( const real xOffset, const real yOffset, const real zOffset )
+{
+  translate( glm::vec3( xOffset, yOffset, zOffset ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

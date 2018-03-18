@@ -95,21 +95,27 @@ void StockResourceController::createStockResources()
   // Create stock meshes (uses previously created vertex buffers from ResourceController's constructor).
 
   {
-    auto mesh = _controller->create<Mesh>( "TexturedQuad" );
-    mesh->setVertexBuffer( _controller->get<VertexBuffer>( "TexturedQuad" ) );
-    _meshTable.insert( { VertexBuffer::Type::TexturedQuad, mesh } );
-  }
-
-  {
     auto mesh = _controller->create<Mesh>( "Quad" );
     mesh->setVertexBuffer( _controller->get<VertexBuffer>( "Quad" ) );
     _meshTable.insert( { VertexBuffer::Type::Quad, mesh } );
   }
 
   {
+    auto mesh = _controller->create<Mesh>( "TexturedQuad" );
+    mesh->setVertexBuffer( _controller->get<VertexBuffer>( "TexturedQuad" ) );
+    _meshTable.insert( { VertexBuffer::Type::TexturedQuad, mesh } );
+  }
+
+  {
     auto mesh = _controller->create<Mesh>( "Cube" );
     mesh->setVertexBuffer( _controller->get<VertexBuffer>( "Cube" ) );
     _meshTable.insert( { VertexBuffer::Type::Cube, mesh } );
+  }
+
+  {
+    auto mesh = _controller->create<Mesh>( "TexturedCube" );
+    mesh->setVertexBuffer( _controller->get<VertexBuffer>( "TexturedCube" ) );
+    _meshTable.insert( { VertexBuffer::Type::TexturedCube, mesh } );
   }
 
   //
