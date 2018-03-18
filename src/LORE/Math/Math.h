@@ -1,3 +1,4 @@
+#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE
@@ -24,26 +25,57 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Math.h"
+#include "Rectangle.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-using namespace Lore;
+namespace Lore {
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+  enum class TransformSpace
+  {
+    Local,
+    Parent,
+    World
+  };
 
-const real Math::PI = real( 4.0f * atan( 1.0f ) );
-const real Math::TWO_PI = real( 2.f * PI );
-const real Math::HALF_PI = real( 0.5f * PI );
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-const real Math::_FDegToRad = PI / real( 180.f );
-const real Math::_FRadToDeg = real( 180.f ) / PI;
+  namespace Math {
 
-const Vec3 Math::POSITIVE_X_AXIS = Vec3( 1.f, 0.f, 0.f );
-const Vec3 Math::NEGATIVE_X_AXIS = Vec3( -1.f, 0.f, 0.f );
-const Vec3 Math::POSITIVE_Y_AXIS = Vec3( 0.f, 1.f, 0.f );
-const Vec3 Math::NEGATIVE_Y_AXIS = Vec3( 0.f, -1.f, 0.f );
-const Vec3 Math::POSITIVE_Z_AXIS = Vec3( 0.f, 0.f, 1.f );
-const Vec3 Math::NEGATIVE_Z_AXIS = Vec3( 0.f, 0.f, -1.f );
+    inline static glm::mat4 CreateTransformationMatrix( const glm::vec3& pos,
+                                                        const glm::quat& orientation,
+                                                        const glm::vec3& scale )
+    {
+      glm::mat4 m( 1.f );
+
+      glm::mat3 rot3x3 = glm::mat3_cast( orientation );
+
+      // Setup scale, rotation, and translation. 
+      m[0][0] = scale.x * rot3x3[0][0];
+      m[1][0] = scale.y * rot3x3[0][1];
+      m[2][0] = scale.z * rot3x3[0][2];
+      m[3][0] = pos.x;
+
+      m[0][1] = scale.x * rot3x3[1][0];
+      m[1][1] = scale.y * rot3x3[1][1];
+      m[2][1] = scale.z * rot3x3[1][2];
+      m[3][1] = pos.y;
+
+      m[0][2] = scale.x * rot3x3[2][0];
+      m[1][2] = scale.y * rot3x3[2][1];
+      m[2][2] = scale.z * rot3x3[2][2];
+      m[3][2] = pos.z;
+
+      m[0][3] = m[1][3] = m[2][3] = 0.f;
+      m[3][3] = 1.f;
+
+      return m;
+    }
+
+  }
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
