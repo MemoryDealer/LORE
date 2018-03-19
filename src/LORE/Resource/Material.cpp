@@ -55,6 +55,8 @@ MaterialPtr Material::clone( const string& newName )
   material->lighting = lighting;
   material->ambient = ambient;
   material->diffuse = diffuse;
+  material->specular = specular;
+  material->shininess = shininess;
   material->sprite = sprite;
   material->program = program;
   material->blendingMode = blendingMode;

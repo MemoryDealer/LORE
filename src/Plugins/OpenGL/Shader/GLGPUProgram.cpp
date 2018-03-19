@@ -200,14 +200,22 @@ void GLGPUProgram::updateLights( const Lore::RenderQueue::LightList& lights )
     // Update all light properties.
 
     auto posID = glGetUniformLocation( _program, ( idx + ".pos" ).c_str() );
-    auto colorID = glGetUniformLocation( _program, ( idx + ".color" ).c_str() );
+    auto ambientID = glGetUniformLocation( _program, ( idx + ".ambient" ).c_str() );
+    auto diffuseID = glGetUniformLocation( _program, ( idx + ".diffuse" ).c_str() );
+    auto specularID = glGetUniformLocation( _program, ( idx + ".specular" ).c_str() );
     auto constantID = glGetUniformLocation( _program, ( idx + ".constant" ).c_str() );
     auto linearID = glGetUniformLocation( _program, ( idx + ".linear" ).c_str() );
     auto quadraticID = glGetUniformLocation( _program, ( idx + ".quadratic" ).c_str() );
     auto intensityID = glGetUniformLocation( _program, ( idx + ".intensity" ).c_str() );
 
-    glUniform2f( posID, lightData.pos.x, lightData.pos.y );
-    glUniform3f( colorID, light->getColor().r, light->getColor().g, light->getColor().b );
+    const auto ambient = light->getAmbient();
+    const auto diffuse = light->getDiffuse();
+    const auto specular = light->getSpecular();
+
+    glUniform3f( posID, lightData.pos.x, lightData.pos.y, lightData.pos.z );
+    glUniform3f( ambientID, ambient.r, ambient.g, ambient.b );
+    glUniform3f( diffuseID, diffuse.r, diffuse.g, diffuse.b );
+    glUniform3f( specularID, specular.r, specular.g, specular.b );
     glUniform1f( constantID, light->getConstant() );
     glUniform1f( linearID, light->getLinear() );
     glUniform1f( quadraticID, light->getQuadratic() );

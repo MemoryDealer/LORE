@@ -62,6 +62,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
   uint32_t layoutLocation = 0;
   src += "layout (location = " + std::to_string( layoutLocation++ ) + ") in vec3 vertex;";
+  src += "layout (location = " + std::to_string( layoutLocation++ ) + ") in vec3 normal;";
   if ( textured ) {
     src += "layout (location = " + std::to_string( layoutLocation++ ) + ") in vec2 texCoord;";
   }
@@ -91,33 +92,37 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
   if ( lit ) {
     src += "uniform mat4 model;";
-    src += "out vec2 FragPos;";
+    src += "out vec3 FragPos;";
+    src += "out vec3 Normal;";
   }
 
   //
   // main function.
 
   src += "void main(){";
+  {
+    if ( lit ) {
+      if ( instanced ) {
+        src += "FragPos = vec3(instanceMatrix * vec4(vertex, 1.0));";
+      }
+      else {
+        src += "FragPos = vec3(model * vec4(vertex, 1.0));";
+      }
+      src += "Normal = mat3(transpose(inverse(model))) * normal;";
+      //src += "Normal = normal;";
+    }
 
-  if ( instanced ) {
-    src += "gl_Position = transform * instanceMatrix * vec4(vertex, 1.0);";
-  }
-  else {
-    src += "gl_Position = transform * vec4(vertex, 1.0);";
-  }
-  if ( textured ) {
-    src += "TexCoord = vec2(texCoord.x * texSampleRegion.w + texSampleRegion.x, texCoord.y * texSampleRegion.h + texSampleRegion.y);";
-  }
+    if ( textured ) {
+      src += "TexCoord = vec2(texCoord.x * texSampleRegion.w + texSampleRegion.x, texCoord.y * texSampleRegion.h + texSampleRegion.y);";
+    }
 
-  if ( lit ) {
     if ( instanced ) {
-      src += "FragPos = (instanceMatrix * vec4(vertex, 1.0)).xy;";
+      src += "gl_Position = transform * instanceMatrix * vec4(vertex, 1.0);";
     }
     else {
-      src += "FragPos = (model * vec4(vertex, 1.0)).xy;";
+      src += "gl_Position = transform * vec4(vertex, 1.0);";
     }
   }
-
   src += "}";
 
   // Compile vertex shader.
@@ -138,19 +143,21 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
   //
   // Uniforms and ins.
 
-  if ( textured ) {
-    src += "uniform sampler2D tex;";
-  }
+  src += "uniform vec3 viewPos;";
 
-  if ( textured ) {
+  //if ( textured ) {
     src += "in vec2 TexCoord;";
     src += "uniform vec2 texSampleOffset = vec2(1.0, 1.0);";
-  }
+  //}
 
   // Material.
   src += "struct Material {";
+  src += "sampler2D diffuseTexture;";
+  src += "sampler2D specularTexture;";
   src += "vec4 ambient;";
   src += "vec4 diffuse;";
+  src += "vec4 specular;";
+  src += "float shininess;";
   src += "};";
   src += "uniform Material material;";
 
@@ -161,7 +168,9 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
   if ( lit ) {
     src += "struct Light {";
     src += "vec3 pos;";
-    src += "vec3 color;";
+    src += "vec3 ambient;";
+    src += "vec3 diffuse;";
+    src += "vec3 specular;";
     src += "float constant;";
     src += "float linear;";
     src += "float quadratic;";
@@ -173,58 +182,71 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
     src += "uniform vec4 sceneAmbient;";
 
-    src += "in vec2 FragPos;";
+    src += "in vec3 FragPos;";
+    src += "in vec3 Normal;";
 
     //
     // Light functions.
 
+    //
     // Point light.
-//     src += "vec3 CalcPointLight(Light l) {";
-//     
-//     src += "const float d = length(l.pos - FragPos);";
-//     src += "const float att = l.intensity / (l.constant + l.linear * d + l.quadratic * pow(d, 2.0));";
-// 
-//     src += "const vec3 lDiffuse = l.color * material.diffuse.rgb * att;";
-//     src += "return lDiffuse;";
-// 
-//     src += "}";
+
+    src += "vec3 CalcPointLight(Light light, vec3 normal, vec3 viewDir) {";
+    {
+      src += "vec3 lightDir = normalize(light.pos - FragPos);";
+
+      // Diffuse shading.
+      src += "float diff = max(dot(normal, lightDir), 0.0);";
+
+      // Specular shading.
+      src += "vec3 reflectDir = reflect(-lightDir, normal);";
+      src += "float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);";
+
+      // Attenuation.
+      src += "float distance = length(light.pos - FragPos);";
+      src += "float attenuation = light.intensity / (light.constant + light.linear * distance + light.quadratic * (distance * distance));";
+
+      // Combine results.
+      src += "vec3 ambient = light.ambient * vec3(texture(material.diffuseTexture, TexCoord));";
+      src += "vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuseTexture, TexCoord));";
+      src += "vec3 specular = light.specular * spec * vec3(texture(material.specularTexture, TexCoord));";
+      src += "ambient *= attenuation;";
+      src += "diffuse *= attenuation;";
+      src += "specular *= attenuation;";
+      src += "return (ambient + diffuse + specular);";
+    }
+    src += "}";
   }
 
   //
   // main function.
 
   src += "void main(){";
+  {
+    src += "vec3 result = vec3(0.0, 0.0, 0.0);";
 
-  // Setup default values for calculating pixel.
-  src += "vec4 texSample = vec4(1.0, 1.0, 1.0, 1.0);";
+    if ( lit ) {
+      src += "vec3 norm = normalize(Normal);";
+      src += "vec3 viewDir = normalize(viewPos - FragPos);";
 
-  src += "texSample = material.ambient;";
+      // Point lights.
+      src += "for(int i = 0; i < numLights; i++) {";
+      {
+        src += "result += CalcPointLight(lights[i], norm, viewDir);";
+      }
+      src += "}";
+    }
+    else {
+      src += "result = vec3(1.0, 1.0, 1.0);";
+    }
 
-  if ( textured ) {
-    src += "texSample = texture(tex, TexCoord + texSampleOffset);";
-    src += "if ( texSample.a < 0.1 ) {";
-    src += "  discard;";
-    src += "}";
+    //src += "result *= (material.ambient.rgb + material.diffuse.rgb);";
+
+    // Final pixel.
+    src += "pixel = vec4(result, 1.0);";
   }
-
-  // Apply alpha blending from material.
-  //src += "texSample.a *= material.diffuse.a;";
-  
-
-//   if ( lit ) {
-//     src += "vec3 lighting = material.ambient.rgb * sceneAmbient.rgb;";
-// 
-//     src += "for(int i=0; i<numLights; ++i){";
-//     src += "  lighting += CalcPointLight(lights[i]);";
-//     src += "}";
-// 
-//     src += "texSample *= vec4(lighting, 1.0);";
-//   }
-
-  // Final pixel.
-  src += "pixel = texSample;";
-
   src += "}";
+
   auto fsptr = _controller->create<Shader>( name + "_FS" );
   fsptr->init( Shader::Type::Fragment );
   if ( !fsptr->loadFromSource( src ) ) {
@@ -254,8 +276,11 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     program->addUniformVar( "model" );
     program->addUniformVar( "material.ambient" );
     program->addUniformVar( "material.diffuse" );
+    program->addUniformVar( "material.specular" );
+    program->addUniformVar( "material.shininess" );
     program->addUniformVar( "numLights" );
     program->addUniformVar( "sceneAmbient" );
+    program->addUniformVar( "viewPos" );
   }
 
   if ( textured ) {

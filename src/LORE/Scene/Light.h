@@ -40,16 +40,25 @@ namespace Lore {
 
   public:
 
-    Light();
-
-    virtual ~Light() override;
+    Light() = default;
+    ~Light() override = default;
 
     //
     // Getters.
 
-    inline Color getColor() const
+    inline Color getAmbient() const
     {
-      return _color;
+      return _ambient;
+    }
+
+    inline Color getDiffuse() const
+    {
+      return _diffuse;
+    }
+
+    inline Color getSpecular() const
+    {
+      return _specular;
     }
 
     inline real getRange() const
@@ -80,9 +89,19 @@ namespace Lore {
     //
     // Setters.
 
-    inline void setColor( const Color& color )
+    inline void setAmbient( const Color& color )
     {
-      _color=color;
+      _ambient = color;
+    }
+
+    inline void setDiffuse( const Color& color )
+    {
+      _diffuse = color;
+    }
+
+    inline void setSpecular( const Color& color )
+    {
+      _specular = color;
     }
 
     inline void setAttenuation( const real range,
@@ -112,14 +131,16 @@ namespace Lore {
 
   private:
 
-    Color _color;
+    Color _ambient { StockColor::Black };
+    Color _diffuse { StockColor::White };
+    Color _specular { StockColor::White };
 
     // Attenuation.
-    real _range;
-    real _constant;
-    real _linear;
-    real _quadratic;
-    real _intensity;
+    real _range { 7.f };
+    real _constant { 1.f };
+    real _linear { .09f };
+    real _quadratic { .032f };
+    real _intensity { 1.f };
 
   };
 

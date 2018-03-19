@@ -195,7 +195,7 @@ void Forward3DRenderer::present( const RenderView& rv,
     RenderQueue& queue = activeQueue.second;
 
     // Render solids.
-    _renderSolids( rv.scene, queue, viewProjection );
+    _renderSolids( rv, queue, viewProjection );
   }
 
   _clearRenderQueues();
@@ -228,10 +228,12 @@ void Forward3DRenderer::_activateQueue( const uint id,
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Forward3DRenderer::_renderSolids( const ScenePtr scene,
+void Forward3DRenderer::_renderSolids( const RenderView& rv,
                                        const RenderQueue& queue,
                                        const glm::mat4& viewProjection ) const
 {
+  const ScenePtr scene = rv.scene;
+
   // Render non-instanced solids.
   for ( auto& pair : queue.solids ) {
     const EntityPtr entity = pair.first;
@@ -243,6 +245,8 @@ void Forward3DRenderer::_renderSolids( const ScenePtr scene,
 
     program->use();
     vertexBuffer->bind();
+
+    program->setUniformVar( "viewPos", rv.camera->getPosition() );
 
     // Lighting data will be the same for all nodes.
     if ( material->lighting ) {
@@ -287,7 +291,8 @@ void Forward3DRenderer::_updateTextureData( const MaterialPtr material,
   }
 
   const TexturePtr texture = material->sprite->getTexture( spriteFrame );
-  texture->bind(); // TODO: Multi-texturing.
+  texture->bind( 0 ); // TODO: Multi-texturing.
+  texture->bind( 1 );
   program->setUniformVar( "texSampleOffset", material->getTexCoordOffset() );
 
   const Rect sampleRegion = material->getTexSampleRegion();
@@ -307,6 +312,8 @@ void Forward3DRenderer::_updateLighting( const MaterialPtr material,
   // Update material uniforms.
   program->setUniformVar( "material.ambient", material->ambient );
   program->setUniformVar( "material.diffuse", material->diffuse );
+  program->setUniformVar( "material.specular", material->specular );
+  program->setUniformVar( "material.shininess", material->shininess );
   program->setUniformVar( "sceneAmbient", scene->getAmbientLightColor() );
 
   // Update uniforms for light data.

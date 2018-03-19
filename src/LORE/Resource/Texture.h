@@ -49,7 +49,7 @@ namespace Lore {
 
     virtual void create( const int width, const int height, const Color& color ) = 0;
 
-    virtual void bind() = 0;
+    virtual void bind( const uint32_t idx = 0 ) = 0;
 
   };
 

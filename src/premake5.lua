@@ -121,18 +121,6 @@ project "Example_ComplexScene3D"
     links { "LORE" }
     postbuildcommands { "{COPY} ../../../res/ ../../../bin/%{cfg.buildcfg}/Run/res/" }
 
-project "Driver"
-    location "Driver"
-    kind "ConsoleApp"
-    language "C++"
-    defines { "_HAS_CXX17" }
-    files {
-        "Driver/**.cpp",
-        "Driver/TODO.TXT"
-    }
-    links { "LORE" }
-    postbuildcommands { "{COPY} ../../res/ ../../bin/%{cfg.buildcfg}/Run/res/" }
-
 --
 -- Tests
 

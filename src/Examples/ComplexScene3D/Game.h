@@ -74,6 +74,8 @@ private:
 
   std::vector<Lore::NodePtr> _floatingBlocks {};
 
+  std::vector<Lore::NodePtr> _lights {};
+
 };
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

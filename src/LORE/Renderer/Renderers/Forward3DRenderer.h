@@ -70,7 +70,7 @@ namespace Lore {
     void _activateQueue( const uint id,
                         RenderQueue& rq );
 
-    void _renderSolids( const ScenePtr scene,
+    void _renderSolids( const RenderView& rv,
                        const RenderQueue& queue,
                        const glm::mat4& viewProjection ) const;
 

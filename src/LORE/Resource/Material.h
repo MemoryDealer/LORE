@@ -104,6 +104,8 @@ namespace Lore {
     bool lighting { true };
     Color ambient { StockColor::White };
     Color diffuse { StockColor::White };
+    Color specular { StockColor::White };
+    real shininess { 32.f };
     SpritePtr sprite { nullptr };
     GPUProgramPtr program { nullptr };
 

@@ -135,57 +135,88 @@ void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
       -1.0,  1.0, -1.0,
       1.0,  1.0, -1.0
     };
-    _indices = { 0, 1, 2, 3, 7, 1, 5, 4, 7, 6, 2, 4, 0, 1 }; //bottom
+    _indices = { 0, 1, 2, 3, 7, 1, 5, 4, 7, 6, 2, 4, 0, 1 };
 
     addAttribute( AttributeType::Float, 3 );
     break;
 
   case VertexBuffer::Type::TexturedCube:
-    _mode = GL_TRIANGLE_STRIP;
+    _mode = GL_TRIANGLES;
+//     _vertices = {
+//       -1.0, -1.0,  1.0,   0.f, 0.f,
+//       1.0, -1.0,  1.0,    1.f, 0.f,
+//       -1.0,  1.0,  1.0,   0.f, 1.f,
+//       1.0,  1.0,  1.0,    1.f, 1.f,
+//       -1.0, -1.0, -1.0,   1.f, 1.f,
+//       1.0, -1.0, -1.0,    0.f, 1.f,
+//       -1.0,  1.0, -1.0,   1.f, 0.f,
+//       1.0,  1.0, -1.0,    0.f, 0.f
+//     };
+//     _indices = { 0, 1, 2, 3, 7, 1, 5, 4, 7, 6, 2, 4, 0, 1 };
+//     _vertices = {
+//       -1.f, -1.f, -1.f,   0.f, 0.f,
+//       1.f, -1.f, -1.f,    1.f, 0.f,
+//       1.f, 1.f, -1.f,     1.f, 1.f,
+//       -1.f, 1.f, -1.f,    0.f, 1.f,
+//       -1.f, -1.f, 1.f,    0.f, 1.f,
+//       1.f, -1.f, 1.f,     1.f, 1.f,
+//       1.f, 1.f, 1.f,      1.f, 0.f,
+//       -1.f, 1.f, 1.f,     0.f, 0.f
+//     };
+//     _indices = {
+//       0, 1, 3, 3, 1, 2,
+//       1, 5, 2, 2, 5, 6,
+//       5, 4, 6, 6, 4, 7,
+//       4, 0, 7, 7, 0, 3,
+//       3, 2, 7, 7, 2, 6,
+//       4, 5, 0, 0, 5, 1
+//     };
+
     _vertices = {
-      -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-      0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-      0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-      0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-      -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-      -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+      -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
+      0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
+      0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
+      0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
+      -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f,
+      -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
 
-      -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-      0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-      0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-      0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-      -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-      -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+      -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
+      0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  0.0f,
+      0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+      0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+      -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  1.0f,
+      -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
 
-      -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-      -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-      -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-      -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-      -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-      -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+      -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+      -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+      -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+      -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+      -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+      -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
 
-      0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-      0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-      0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-      0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-      0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-      0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+      0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+      0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+      0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+      0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+      0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+      0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
 
-      -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-      0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-      0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-      0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-      -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-      -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+      -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
+      0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  1.0f,
+      0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+      0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+      -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  0.0f,
+      -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
 
-      -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-      0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-      0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-      0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-      -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-      -0.5f,  0.5f, -0.5f,  0.0f, 1.0f };
-    _indices = { 0, 1, 2, 3 };
+      -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
+      0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  1.0f,
+      0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+      0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+      -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
+      -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f
+    };
 
+    addAttribute( AttributeType::Float, 3 );
     addAttribute( AttributeType::Float, 3 );
     addAttribute( AttributeType::Float, 2 );
     break;
@@ -193,15 +224,17 @@ void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
 
   glGenVertexArrays( 1, &_vao );
   glGenBuffers( 1, &_vbo );
-  glGenBuffers( 1, &_ebo );
 
   glBindVertexArray( _vao );
 
   glBindBuffer( GL_ARRAY_BUFFER, _vbo );
   glBufferData( GL_ARRAY_BUFFER, sizeof( GLfloat ) * _vertices.size(), _vertices.data(), GL_STATIC_DRAW );
 
-  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, _ebo );
-  glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( GLuint ) * _indices.size(), _indices.data(), GL_STATIC_DRAW );
+  if ( !_indices.empty() ) {
+    glGenBuffers( 1, &_ebo );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, _ebo );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( GLuint ) * _indices.size(), _indices.data(), GL_STATIC_DRAW );
+  }
 
   // Attributes.
   GLsizei idx = 0;
@@ -322,6 +355,10 @@ void GLVertexBuffer::draw( const size_t instanceCount )
     glBufferData( GL_ARRAY_BUFFER, _instancedMatrices.size() * sizeof( glm::mat4 ), &_instancedMatrices.data()[0], GL_STATIC_DRAW );
     glDrawElementsInstanced( _mode, static_cast< GLsizei >( _indices.size() ), GL_UNSIGNED_INT, nullptr, static_cast< GLsizei >( instanceCount ) );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    break;
+
+  case VertexBuffer::Type::TexturedCube:
+    glDrawArrays( _mode, 0, 36 );
     break;
   }
 }

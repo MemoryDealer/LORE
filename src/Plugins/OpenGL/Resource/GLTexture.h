@@ -47,7 +47,7 @@ namespace Lore { namespace OpenGL {
 
         virtual void create( const int width, const int height, const Color& color ) override;
 
-        virtual void bind() override;
+        virtual void bind( const uint32_t idx ) override;
 
         //
         // Getters.

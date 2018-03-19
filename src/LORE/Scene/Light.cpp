@@ -31,27 +31,3 @@
 using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-Light::Light()
-  : _color( StockColor::Black )
-  , _range( 7.f )
-  , _constant( 1.f )
-  , _linear( 0.7f )
-  , _quadratic( 1.8f )
-  , _intensity( 1.f )
-{
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-Light::~Light()
-{
-  _color = StockColor::Black;
-  _range = 7.f;
-  _constant = 1.f;
-  _linear = 0.7f;
-  _quadratic = 1.8f;
-  _intensity = 1.f;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

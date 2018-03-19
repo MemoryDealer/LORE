@@ -122,7 +122,7 @@ int main( int argc, char** argv )
   sonicNode->attachObject( sonicEntity );
 
   auto sonicLight = scene->createLight( "sonic-light" );
-  sonicLight->setColor( Lore::StockColor::White );
+  sonicLight->setDiffuse( Lore::StockColor::White );
   sonicNode->attachObject( sonicLight );
 
   //

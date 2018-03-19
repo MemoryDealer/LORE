@@ -80,12 +80,12 @@ void Game::loadScene()
 {
   // Create a scene with default skybox color.
   _scene = _context->createScene( "core", Lore::RendererType::Forward3D );
-  _scene->setSkyboxColor( Lore::StockColor::Black );
+  _scene->setSkyboxColor( Lore::Color( 0.3f, 0.8f, 0.75f, 1.f ) );
   _scene->setAmbientLightColor( Lore::Color( 0.75f, 0.75f, 0.75f, 1.f ) );
 
   // Create a camera to view the scene.
   _camera = _context->createCamera( "core", Lore::Camera::Type::Type3D );
-  _camera->lookAt( glm::vec3( 0.f ), glm::vec3( 0.f, 0.f, -1.f ), glm::vec3( 0.f, 1.f, 0.f ) );
+  _camera->lookAt( glm::vec3( 0.f, 2.f, 0.f ), glm::vec3( 0.f, 0.f, -1.f ), glm::vec3( 0.f, 1.f, 0.f ) );
 
   // TODO: This is a hack that should be taken care of internally.
   Lore::CLI::SetActiveScene( _scene );
@@ -104,8 +104,8 @@ void Game::loadScene()
 
   // Add a cube.
 
-  Lore::EntityPtr cubeEntity = Lore::Resource::CreateEntity( "cube", Lore::VertexBuffer::Type::TexturedQuad );
- // cubeEntity->getMaterial()->ambient = Lore::StockColor::Blue;
+  Lore::EntityPtr cubeEntity = Lore::Resource::CreateEntity( "cube", Lore::VertexBuffer::Type::TexturedCube );
+  cubeEntity->getMaterial()->ambient = Lore::StockColor::Blue;
   //cubeEntity->getMaterial()->diffuse = Lore::StockColor::Blue;
   cubeEntity->setSprite( Lore::Resource::GetSprite( "block" ) );
   auto node = _scene->createNode( "cube" );
@@ -116,9 +116,20 @@ void Game::loadScene()
   for ( int i = 1; i < 20; ++i ) {
     auto node = _scene->createNode( "cubeCopy" + std::to_string( i ) );
     node->attachObject( cubeEntity );
-    node->setPosition( ( Lore::real )i, 0.f, -10.f );
+    node->setPosition( ( Lore::real )i * 2.f, 0.f, -10.f );
     //node->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( 180.f ) );
   }
+
+  auto light = _scene->createLight( "core" );
+  light->setAmbient( Lore::Color( 0.25f, 0.25f, 0.25f, 1.f ) );
+  light->setIntensity( 100.f );
+  auto lightEntity = Lore::Resource::CreateEntity( "light", Lore::VertexBuffer::Type::Cube );
+  lightEntity->getMaterial()->ambient = Lore::StockColor::White;
+  auto light0 = _scene->createNode( "light0" );
+  light0->attachObject( light );
+  light0->attachObject( lightEntity );
+  light0->setPosition( 1.f, 4.f, -5.f );
+  light0->scale( 0.25f );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -140,7 +151,13 @@ void Game::processInput()
   if ( Lore::Input::GetKeyState( Lore::Keycode::D ) ) {
     playerOffset += glm::normalize( glm::cross( _camera->getTarget(), glm::vec3( 0.f, 1.f, 0.f ) ) ) * PlayerSpeed;
   }
-  if ( playerOffset.x != 0.f || playerOffset.z != 0.f ) {
+  if ( Lore::Input::GetKeyState( Lore::Keycode::E ) ) {
+    playerOffset.y += PlayerSpeed;
+  }
+  if ( Lore::Input::GetKeyState( Lore::Keycode::Q ) ) {
+    playerOffset.y -= PlayerSpeed;
+  }
+  if ( playerOffset.x != 0.f || playerOffset.y != 0.f || playerOffset.z != 0.f ) {
     _camera->translate( playerOffset );
   }
 
@@ -165,7 +182,7 @@ void Game::update()
 //   }
    blockOffset += 0.01f;
   auto node = _scene->getNode( "cube" );
-  //node->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( 0.001f ) );
+  node->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( 0.0001f ) );
   node->setPosition( 0.f, 0.f, -10.f + 3.f * std::sinf( blockOffset ) );
 }
 
@@ -191,7 +208,7 @@ void Game::onMouseMove( const int32_t x, const int32_t y )
   const Lore::real sensitivity = 0.1f;
   auto camera = GameInstance->getCamera();
   camera->yaw( xOffset * sensitivity );
-  camera->pitch( -yOffset * sensitivity );
+  camera->pitch( yOffset * sensitivity );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

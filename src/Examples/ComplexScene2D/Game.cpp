@@ -35,7 +35,7 @@ Game::Game()
   _context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
 
   // Create a window and set it to the active window.
-  _window = _context->createWindow( "Complex Scene", 640, 480, Lore::RendererType::Forward2D );
+  _window = _context->createWindow( "Complex Scene 2D", 640, 480, Lore::RendererType::Forward2D );
   _window->setActive();
 
   // Allow the DebugUI.
@@ -175,7 +175,7 @@ void Game::loadScene()
     // Add some lights to the torches.
 
     Lore::LightPtr torchLight = _scene->createLight( "torch" + std::to_string( i ) );
-    torchLight->setColor( Lore::Color( 1.f, .69f, .4f, 1.f ) );
+    torchLight->setDiffuse( Lore::Color( 1.f, .69f, .4f, 1.f ) );
     torchNode->attachObject( torchLight );
   }
 

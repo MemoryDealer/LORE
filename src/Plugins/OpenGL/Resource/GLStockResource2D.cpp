@@ -160,8 +160,10 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
   // Lighting.
   if ( lit ) {
     src += "struct Light {";
-    src += "vec2 pos;";
-    src += "vec3 color;";
+    src += "vec3 pos;";
+    src += "vec3 ambient;";
+    src += "vec3 diffuse;";
+    src += "vec3 specular;";
     src += "float constant;";
     src += "float linear;";
     src += "float quadratic;";
@@ -181,10 +183,10 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
     // Point light.
     src += "vec3 CalcPointLight(Light l) {";
 
-    src += "const float d = length(l.pos - FragPos);";
+    src += "const float d = length(l.pos.xy - FragPos);";
     src += "const float att = l.intensity / (l.constant + l.linear * d + l.quadratic * pow(d, 2.0));";
 
-    src += "const vec3 lDiffuse = l.color * material.diffuse.rgb * att;";
+    src += "const vec3 lDiffuse = l.diffuse * material.diffuse.rgb * att;";
     src += "return lDiffuse;";
 
     src += "}";
