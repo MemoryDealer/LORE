@@ -409,6 +409,7 @@ void Node::_updateWorldTransform( const glm::mat4& m )
   glm::mat4 s( 1.f );
   s[0][0] = _transform.derivedScale.x;
   s[1][1] = _transform.derivedScale.y;
+  s[2][2] = _transform.derivedScale.z;
 
   _transform.world = m * s;
 }
