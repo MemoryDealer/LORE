@@ -320,9 +320,17 @@ void Node::scale( const glm::vec2& s )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void Node::scale( const glm::vec3& s )
+{
+  _transform.scale *= s;
+  _dirty();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void Node::scale( const real s )
 {
-  glm::vec2 ss( s, s );
+  glm::vec3 ss( s, s, s );
   scale( ss );
 }
 

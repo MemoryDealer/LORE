@@ -50,7 +50,9 @@ namespace Lore {
   public:
 
     using NodeMap = Registry<std::unordered_map, Node>;
-    using LightMap = Registry<std::unordered_map, Light>;
+    using DirectionalLightMap = Registry<std::map, DirectionalLight>;
+    using PointLightMap = Registry<std::unordered_map, PointLight>;
+    using SpotLightMap = Registry<std::unordered_map, SpotLight>;
 
   public:
 
@@ -65,10 +67,11 @@ namespace Lore {
 
     NodePtr getNode( const string& name );
 
-    LightPtr createLight( const string& name );
+    DirectionalLightPtr createDirectionalLight( const string& name );
+    PointLightPtr createPointLight( const string& name );
 
     void destroyLight( LightPtr light );
-    void destroyLight( const string& name );
+    void destroyLight( const Light::Type type, const string& name );
 
     ///
     /// \brief Traverses scene graph and updates node transforms based on parent nodes.
@@ -120,9 +123,31 @@ namespace Lore {
       return _ambientLightColor;
     }
 
-    inline LightPtr getLight( const string& name ) const
+    inline LightPtr getLight( const Light::Type type, const string& name ) const
     {
-      return _lights.get( name );
+      switch ( type ) {
+      default:
+        return nullptr;
+
+      case Light::Type::Directional:
+        return _directionalLights.get( name );
+
+      case Light::Type::Point:
+        return _pointLights.get( name );
+
+      case Light::Type::Spot:
+        return _spotLights.get( name );
+      }
+    }
+
+    inline const DirectionalLightMap& getDirectionalLights() const
+    {
+      return _directionalLights;
+    }
+
+    inline uint32_t getDirectionalLightCount() const
+    {
+      return static_cast< uint32_t >( _directionalLights.size() );
     }
 
     inline SkyboxPtr getSkybox() const
@@ -154,7 +179,9 @@ namespace Lore {
 
     Color _ambientLightColor { StockColor::Black };
 
-    LightMap _lights {};
+    DirectionalLightMap _directionalLights {};
+    PointLightMap _pointLights {};
+    SpotLightMap _spotLights {};
 
     SkyboxPtr _skybox { nullptr };
 

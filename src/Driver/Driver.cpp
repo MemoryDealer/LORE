@@ -121,7 +121,7 @@ int main( int argc, char** argv )
   sonicEntity->getMaterial()->diffuse.a = 0.5f;
   sonicNode->attachObject( sonicEntity );
 
-  auto sonicLight = scene->createLight( "sonic-light" );
+  auto sonicLight = scene->createPointLight( "sonic-light" );
   sonicLight->setDiffuse( Lore::StockColor::White );
   sonicNode->attachObject( sonicLight );
 

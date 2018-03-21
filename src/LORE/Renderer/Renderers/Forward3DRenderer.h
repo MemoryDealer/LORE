@@ -83,7 +83,7 @@ namespace Lore {
     void _updateLighting( const MaterialPtr material,
                           const GPUProgramPtr program,
                           const ScenePtr scene,
-                          const RenderQueue::LightList& lightData ) const;
+                          const RenderQueue::LightData& lightData ) const;
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 

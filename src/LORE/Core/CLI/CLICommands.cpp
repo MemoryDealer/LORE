@@ -102,7 +102,7 @@ namespace LocalNS {
         auto lightColor = CLI::ToVec4( lightColorStr );
 
         try {
-          auto light = CLI::GetActiveScene()->getLight( lightName );
+          auto light = CLI::GetActiveScene()->getLight( Lore::Light::Type::Point, lightName );
           light->setDiffuse( lightColor );
         }
         catch ( const Lore::Exception& e ) {

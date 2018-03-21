@@ -84,9 +84,12 @@ void Context::initConfiguration()
   // Setup default memory pool settings. (TODO: Move out of Context.cpp).
   _poolCluster.registerPool<Skybox>( 4 );
 
+  _poolCluster.registerPool<DirectionalLight>( 2 );
+  _poolCluster.registerPool<PointLight>( 16 );
+  _poolCluster.registerPool<SpotLight>( 4 );
+
   _poolCluster.registerPool<Box>( 100024 );
   _poolCluster.registerPool<Entity>( 16 );
-  _poolCluster.registerPool<Light>( 32 );
   _poolCluster.registerPool<Material>( 32 );
   _poolCluster.registerPool<Mesh>( 8 );
   _poolCluster.registerPool<Node>( 10024 );

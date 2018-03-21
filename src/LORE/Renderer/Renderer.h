@@ -49,7 +49,8 @@ namespace Lore {
       transparents.clear();
       boxes.clear();
       textboxes.clear();
-      lights.clear();
+      lights.directionalLights.clear();
+      lights.pointLights.clear();
     }
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -68,8 +69,9 @@ namespace Lore {
 
     struct LightData
     {
-      LightPtr light { nullptr };
-      glm::vec3 pos { 0.f };
+      std::vector<DirectionalLightPtr> directionalLights;
+      std::vector<std::pair<PointLightPtr, glm::vec3>> pointLights;
+      
     };
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -81,7 +83,6 @@ namespace Lore {
     using TransparentsMap = std::multimap<real, EntityNodePair>;
     using BoxList = std::vector<BoxData>;
     using TextboxList = std::vector<TextboxData>;
-    using LightList = std::vector<LightData>;
 
     // Lore supports 100 render queues, rendered in order from 0-99.
     static const uint32_t Skybox = 0;
@@ -95,7 +96,7 @@ namespace Lore {
     TransparentsMap transparents {};
     BoxList boxes {};
     TextboxList textboxes {};
-    LightList lights {};
+    LightData lights {};
 
   };
 

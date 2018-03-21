@@ -64,9 +64,17 @@ Scene::~Scene()
   _nodes.clear();
 
   // Clear all lights.
-  auto lightIt = _lights.getIterator();
-  while ( lightIt.hasMore() ) {
-    destroyLight( lightIt.getNext() );
+  auto dirLightIt = _directionalLights.getIterator();
+  while ( dirLightIt.hasMore() ) {
+    destroyLight( dirLightIt.getNext() );
+  }
+  auto pointLightIt = _pointLights.getIterator();
+  while ( pointLightIt.hasMore() ) {
+    destroyLight( pointLightIt.getNext() );
+  }
+  auto spotLightIt = _pointLights.getIterator();
+  while ( spotLightIt.hasMore() ) {
+    destroyLight( spotLightIt.getNext() );
   }
 }
 
@@ -116,12 +124,22 @@ NodePtr Scene::getNode( const string& name )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-LightPtr Scene::createLight( const string& name )
+DirectionalLightPtr Scene::createDirectionalLight( const string& name )
 {
-  auto light = MemoryAccess::GetPrimaryPoolCluster()->create<Light>();
+  auto light = MemoryAccess::GetPrimaryPoolCluster()->create<DirectionalLight>();
   light->setName( name );
+  _directionalLights.insert( name, light );
 
-  _lights.insert( name, light );
+  return light;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+PointLightPtr Scene::createPointLight( const string& name )
+{
+  auto light = MemoryAccess::GetPrimaryPoolCluster()->create<PointLight>();
+  light->setName( name );
+  _pointLights.insert( name, light );
 
   return light;
 }
@@ -130,18 +148,35 @@ LightPtr Scene::createLight( const string& name )
 
 void Scene::destroyLight( LightPtr light )
 {
-  destroyLight( light->getName() );
+  destroyLight( light->getType(), light->getName() );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Scene::destroyLight( const string& name )
+void Scene::destroyLight( const Light::Type type, const string& name )
 {
-  auto light = _lights.get( name );
+  LightPtr light = nullptr;
+  switch ( type ) {
+  default:
+    break;
 
-  if ( light ) {
-    MemoryAccess::GetPrimaryPoolCluster()->destroy<Light>( light );
-    _lights.remove( name );
+  case Light::Type::Directional:
+    light = _directionalLights.get( name );
+    MemoryAccess::GetPrimaryPoolCluster()->destroy<DirectionalLight>( static_cast< DirectionalLightPtr >( light ) );
+    _directionalLights.remove( name );
+    break;
+
+  case Light::Type::Point:
+    light = _pointLights.get( name );
+    MemoryAccess::GetPrimaryPoolCluster()->destroy<PointLight>( static_cast< PointLightPtr >( light ) );
+    _pointLights.remove( name );
+    break;
+
+  case Light::Type::Spot:
+    light = _spotLights.get( name );
+    MemoryAccess::GetPrimaryPoolCluster()->destroy<SpotLight>( static_cast< SpotLightPtr >( light ) );
+    _spotLights.remove( name );
+    break;
   }
 }
 

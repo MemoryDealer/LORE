@@ -144,11 +144,18 @@ void Forward3DRenderer::addLight( LightPtr light,
   _activateQueue( queueId, _queues[queueId] );
   RenderQueue& queue = _queues.at( queueId );
 
-  RenderQueue::LightData data;
-  data.light = light;
-  data.pos = node->getDerivedPosition();
+  switch ( light->getType() ) {
+  default:
+    break;
 
-  queue.lights.push_back( data );
+  case Light::Type::Directional:
+    queue.lights.directionalLights.push_back( static_cast< DirectionalLightPtr >( light ) );
+    break;
+
+  case Light::Type::Point:
+    queue.lights.pointLights.emplace_back( static_cast< PointLightPtr >( light ), node->getDerivedPosition() );
+    break;
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -158,6 +165,13 @@ void Forward3DRenderer::present( const RenderView& rv,
 {
   // Build render queues for this RenderView.
   rv.scene->updateSceneGraph();
+
+  // Add directional lights.
+  auto dirLightIt = rv.scene->getDirectionalLights().getConstIterator();
+  while ( dirLightIt.hasMore() ) {
+    auto dirLight = dirLightIt.getNext();
+    addLight( dirLight, nullptr );
+  }
 
   const real aspectRatio = ( rv.renderTarget ) ? rv.renderTarget->getAspectRatio() : window->getAspectRatio();
 
@@ -307,7 +321,7 @@ void Forward3DRenderer::_updateTextureData( const MaterialPtr material,
 void Forward3DRenderer::_updateLighting( const MaterialPtr material,
                                          const GPUProgramPtr program,
                                          const ScenePtr scene,
-                                         const RenderQueue::LightList& lights ) const
+                                         const RenderQueue::LightData& lights ) const
 {
   // Update material uniforms.
   program->setUniformVar( "material.ambient", material->ambient );
@@ -317,7 +331,9 @@ void Forward3DRenderer::_updateLighting( const MaterialPtr material,
   program->setUniformVar( "sceneAmbient", scene->getAmbientLightColor() );
 
   // Update uniforms for light data.
-  program->setUniformVar( "numLights", static_cast< int >( lights.size() ) );
+  program->setUniformVar( "numDirLights", static_cast<int>( lights.directionalLights.size() ) );
+  program->setUniformVar( "numPointLights", static_cast<int>( lights.pointLights.size() ) );
+
   program->updateLights( lights );
 }
 

@@ -37,8 +37,9 @@ namespace Lore {
 
   struct UberProgramParameters
   {
-    unsigned int maxLights { 4 };
-    unsigned int numTextures { 1 };
+    uint32_t maxDirectionalLights { 2 };
+    uint32_t maxPointLights { 8 };
+    uint32_t numTextures { 1 };
     bool instanced { false };
   };
 

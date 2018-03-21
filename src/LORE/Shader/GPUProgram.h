@@ -83,9 +83,11 @@ namespace Lore {
 
       virtual void setUniformVar( const string& id, const real r ) = 0;
 
+      virtual void setUniformVar( const string& id, const uint32_t i ) = 0;
+
       virtual void setUniformVar( const string& id, const int i ) = 0;
 
-      virtual void updateLights( const RenderQueue::LightList& lights ) = 0;
+      virtual void updateLights( const RenderQueue::LightData& lights ) = 0;
 
   protected:
 

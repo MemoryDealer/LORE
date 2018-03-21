@@ -76,7 +76,7 @@ void StockResourceController::createStockResources()
 
     UberProgramParameters params;
 
-    params.maxLights = 0;
+    params.maxPointLights = params.maxDirectionalLights = 0;
     auto& srf = _factories.at( RendererType::Forward2D );
     srf->createUberProgram( "UnlitTexturedRTT", params );
   }
@@ -179,7 +179,7 @@ void StockResourceController::createRendererStockResources( const RendererType t
   // Unlit programs.
   {
     UberProgramParameters params;
-    params.maxLights = 0;
+    params.maxPointLights = params.maxDirectionalLights = 0;
 
     srf->createUberProgram( "UnlitTextured" + suffix, params );
 

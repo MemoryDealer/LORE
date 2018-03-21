@@ -1,5 +1,7 @@
 --- Features ---
 -Cleanup Node class, rename functions for local/world/full transform
+-Custom shaders - perhaps a callback bound to custom GPUProgram's to update uniforms and skip auto update functions in renderer
+  (detect if GPUProgram is a stock program)
 -Also a regression in math tests for vector division, introduced somewhere during AABBs (was temporarily address with higher epsilon)
 -Debug tools - view memory pools for each type, hover over to view details
 -Add frame count mode to animations rather than delta time

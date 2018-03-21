@@ -141,11 +141,18 @@ void Forward2DRenderer::addLight( LightPtr light, const NodePtr node )
   activateQueue( queueId, _queues[queueId] );
   RenderQueue& queue = _queues.at( queueId );
 
-  RenderQueue::LightData data;
-  data.light = light;
-  data.pos = node->getDerivedPosition();
+  switch ( light->getType() ) {
+  default:
+    break;
 
-  queue.lights.push_back( data );
+  case Light::Type::Directional:
+    queue.lights.directionalLights.push_back( static_cast< DirectionalLightPtr >( light ) );
+    break;
+
+  case Light::Type::Point:
+    queue.lights.pointLights.emplace_back( static_cast< PointLightPtr >( light ), node->getDerivedPosition() );
+    break;
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -701,15 +708,19 @@ void Forward2DRenderer::renderUI( const UIPtr ui,
 void Forward2DRenderer::_updateLighting( const MaterialPtr material,
                                        const GPUProgramPtr program,
                                        const ScenePtr scene,
-                                       const RenderQueue::LightList& lights ) const
+                                       const RenderQueue::LightData& lights ) const
 {
   // Update material uniforms.
   program->setUniformVar( "material.ambient", material->ambient );
   program->setUniformVar( "material.diffuse", material->diffuse );
+  program->setUniformVar( "material.specular", material->specular );
+  program->setUniformVar( "material.shininess", material->shininess );
   program->setUniformVar( "sceneAmbient", scene->getAmbientLightColor() );
 
   // Update uniforms for light data.
-  program->setUniformVar( "numLights", static_cast< int >( lights.size() ) );
+  program->setUniformVar( "numDirectionalLights", static_cast< int >( lights.directionalLights.size() ) );
+  program->setUniformVar( "numPointLights", static_cast< int >( lights.pointLights.size() ) );
+
   program->updateLights( lights );
 }
 

@@ -33,15 +33,24 @@
 
 namespace Lore {
 
-  class Light final : public Alloc<Light>
+  class Light
   {
 
     LORE_OBJECT_BODY()
 
   public:
 
+    enum class Type
+    {
+      Directional,
+      Point,
+      Spot
+    };
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
     Light() = default;
-    ~Light() override = default;
+    virtual ~Light() = default;
 
     //
     // Getters.
@@ -59,6 +68,105 @@ namespace Lore {
     inline Color getSpecular() const
     {
       return _specular;
+    }
+
+    inline Type getType() const
+    {
+      return _type;
+    }
+
+    //
+    // Setters.
+
+    inline void setAmbient( const Color& color )
+    {
+      _ambient = color;
+    }
+
+    inline void setDiffuse( const Color& color )
+    {
+      _diffuse = color;
+    }
+
+    inline void setSpecular( const Color& color )
+    {
+      _specular = color;
+    }
+
+  protected:
+
+    Type _type { Type::Directional };
+
+  private:
+
+    friend class Node;
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    Color _ambient { StockColor::Black };
+    Color _diffuse { StockColor::White };
+    Color _specular { StockColor::White };
+
+  };
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  class DirectionalLight final : public Light, public Alloc<DirectionalLight>
+  {
+
+  public:
+
+    DirectionalLight() = default;
+    ~DirectionalLight() override = default;
+
+    inline void setDirection( const glm::vec3& direction )
+    {
+      _direction = direction;
+    }
+
+    inline void setDirection( const real x, const real y, const real z )
+    {
+      setDirection( glm::vec3( x, y, z ) );
+    }
+
+    inline glm::vec3 getDirection() const
+    {
+      return _direction;
+    }
+
+  private:
+
+    glm::vec3 _direction;
+
+  };
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  ///
+  /// \class MovableLight
+  /// \brief A light that can be attached to a scene node.
+  class MovableLight : public Light
+  {
+
+  public:
+
+    MovableLight() = default;
+    ~MovableLight() override = default;
+
+    inline void setAttenuation( const real intensity,
+                                const real constant,
+                                const real linear,
+                                const real quadratic )
+    {
+      _intensity = intensity;
+      _constant = constant;
+      _linear = linear;
+      _quadratic = quadratic;
+    }
+
+    inline void setIntensity( const real intensity )
+    {
+      _intensity = intensity;
     }
 
     inline real getConstant() const
@@ -81,55 +189,46 @@ namespace Lore {
       return _intensity;
     }
 
-    //
-    // Setters.
-
-    inline void setAmbient( const Color& color )
-    {
-      _ambient = color;
-    }
-
-    inline void setDiffuse( const Color& color )
-    {
-      _diffuse = color;
-    }
-
-    inline void setSpecular( const Color& color )
-    {
-      _specular = color;
-    }
-
-    inline void setAttenuation( const real intensity,
-                                const real constant,
-                                const real linear,
-                                const real quadratic )
-    {
-      _intensity=intensity;
-      _constant=constant;
-      _linear=linear;
-      _quadratic=quadratic;
-    }
-
-    inline void setIntensity( const real intensity )
-    {
-      _intensity=intensity;
-    }
-
   private:
-
-    friend class Node;
-
-  private:
-
-    Color _ambient { StockColor::Black };
-    Color _diffuse { StockColor::White };
-    Color _specular { StockColor::White };
 
     // Attenuation.
     real _constant { 1.f };
     real _linear { .09f };
     real _quadratic { .032f };
     real _intensity { 1.f };
+
+  };
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  class PointLight final : public MovableLight, public Alloc<PointLight>
+  {
+
+  public:
+
+    PointLight()
+    {
+      _type = Type::Point;
+    }
+    ~PointLight() override = default;
+
+  private:
+
+
+  };
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  class SpotLight : public MovableLight, public Alloc<SpotLight>
+  {
+
+  public:
+
+    SpotLight()
+    {
+      _type = Type::Spot;
+    }
+    ~SpotLight() override = default;
 
   };
 

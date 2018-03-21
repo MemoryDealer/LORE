@@ -167,6 +167,8 @@ namespace Lore {
 
     void scale( const glm::vec2& s );
 
+    void scale( const glm::vec3& s );
+
     void scale( const real s );
 
     void setDepth( const real depth )

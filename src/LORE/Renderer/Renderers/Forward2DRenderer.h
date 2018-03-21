@@ -103,7 +103,7 @@ namespace Lore {
     void _updateLighting( const MaterialPtr material,
                           const GPUProgramPtr program,
                           const ScenePtr scene,
-                          const RenderQueue::LightList& lightData ) const;
+                          const RenderQueue::LightData& lightData ) const;
 
     // Returns modifier matrix for node to account for x/y flipping.
     glm::mat4 _calculateFlipMatrix( const NodePtr node ) const;

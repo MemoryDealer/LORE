@@ -46,7 +46,7 @@ GLStockResource2DFactory::GLStockResource2DFactory( Lore::ResourceControllerPtr 
 Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& name, const Lore::UberProgramParameters& params )
 {
   const bool textured = ( params.numTextures > 0 );
-  const bool lit = ( params.maxLights > 0 );
+  const bool lit = !!( params.maxDirectionalLights || params.maxPointLights );
   const bool instanced = params.instanced;
   const string header = "#version " +
     std::to_string( APIVersion::GetMajor() ) + std::to_string( APIVersion::GetMinor() ) + "0" +
@@ -170,8 +170,8 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
     src += "float intensity;";
     src += "};";
 
-    src += "uniform Light lights[" + std::to_string( params.maxLights ) + "];";
-    src += "uniform int numLights;";
+    src += "uniform Light pointLights[" + std::to_string( params.maxPointLights ) + "];";
+    src += "uniform int numPointLights;";
 
     src += "uniform vec4 sceneAmbient;";
 
@@ -213,8 +213,8 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
   if ( lit ) {
     src += "vec3 lighting = material.ambient.rgb * sceneAmbient.rgb;";
 
-    src += "for(int i=0; i<numLights; ++i){";
-    src += "  lighting += CalcPointLight(lights[i]);";
+    src += "for(int i=0; i<numPointLights; ++i){";
+    src += "  lighting += CalcPointLight(pointLights[i]);";
     src += "}";
 
     src += "texSample *= vec4(lighting, 1.0);";
@@ -253,7 +253,7 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
     program->addUniformVar( "model" );
     program->addUniformVar( "material.ambient" );
     program->addUniformVar( "material.diffuse" );
-    program->addUniformVar( "numLights" );
+    program->addUniformVar( "numPointLights" );
     program->addUniformVar( "sceneAmbient" );
   }
 

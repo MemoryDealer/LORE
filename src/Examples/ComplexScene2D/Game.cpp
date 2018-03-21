@@ -174,7 +174,7 @@ void Game::loadScene()
     //
     // Add some lights to the torches.
 
-    Lore::LightPtr torchLight = _scene->createLight( "torch" + std::to_string( i ) );
+    auto torchLight = _scene->createPointLight( "torch" + std::to_string( i ) );
     torchLight->setDiffuse( Lore::Color( 1.f, .69f, .4f, 1.f ) );
     torchNode->attachObject( torchLight );
   }

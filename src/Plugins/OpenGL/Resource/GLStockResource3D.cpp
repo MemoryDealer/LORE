@@ -46,7 +46,7 @@ GLStockResource3DFactory::GLStockResource3DFactory( Lore::ResourceControllerPtr 
 Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& name, const Lore::UberProgramParameters& params )
 {
   const bool textured = ( params.numTextures > 0 );
-  const bool lit = ( params.maxLights > 0 );
+  const bool lit = !!( params.maxDirectionalLights || params.maxPointLights );
   const bool instanced = params.instanced;
   const string header = "#version " +
     std::to_string( APIVersion::GetMajor() ) + std::to_string( APIVersion::GetMinor() ) + "0" +
@@ -166,19 +166,33 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
   // Lighting.
   if ( lit ) {
-    src += "struct Light {";
-    src += "vec3 pos;";
-    src += "vec3 ambient;";
-    src += "vec3 diffuse;";
-    src += "vec3 specular;";
-    src += "float constant;";
-    src += "float linear;";
-    src += "float quadratic;";
-    src += "float intensity;";
+    src += "struct DirectionalLight {";
+    {
+      src += "vec3 direction;";
+      src += "vec3 ambient;";
+      src += "vec3 diffuse;";
+      src += "vec3 specular;";
+    }
     src += "};";
 
-    src += "uniform Light lights[" + std::to_string( params.maxLights ) + "];";
-    src += "uniform int numLights;";
+    src += "struct PointLight {";
+    {
+      src += "vec3 pos;";
+      src += "vec3 ambient;";
+      src += "vec3 diffuse;";
+      src += "vec3 specular;";
+      src += "float constant;";
+      src += "float linear;";
+      src += "float quadratic;";
+      src += "float intensity;";
+    }
+    src += "};";
+
+    src += "uniform DirectionalLight dirLights[" + std::to_string( params.maxDirectionalLights ) + "];";
+    src += "uniform int numDirLights;";
+
+    src += "uniform PointLight pointLights[" + std::to_string( params.maxPointLights ) + "];";
+    src += "uniform int numPointLights;";
 
     src += "uniform vec4 sceneAmbient;";
 
@@ -189,9 +203,38 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     // Light functions.
 
     //
+    // Directional light.
+
+    src += "vec3 CalcDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir) {";
+    {
+      src += "vec3 lightDir = normalize(-light.direction);";
+
+      // Diffuse shading.
+      src += "float diff = max(dot(normal, lightDir), 0.0);";
+
+      // Specular shading.
+      src += "vec3 reflectDir = reflect(-lightDir, normal);";
+      src += "float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);";
+
+      // Combine results.
+      if ( textured ) {
+        src += "vec3 ambient = light.ambient * vec3(texture(material.diffuseTexture, TexCoord));";
+        src += "vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuseTexture, TexCoord));";
+        src += "vec3 specular = light.specular * spec * vec3(texture(material.specularTexture, TexCoord));";
+      }
+      else {
+        src += "vec3 ambient = light.ambient * vec3(material.ambient);";
+        src += "vec3 diffuse = light.diffuse * diff * vec3(material.diffuse);";
+        src += "vec3 specular = light.specular * spec * vec3(material.specular);";
+      }
+      src += "return (ambient + diffuse + specular);";
+    }
+    src += "}";
+
+    //
     // Point light.
 
-    src += "vec3 CalcPointLight(Light light, vec3 normal, vec3 viewDir) {";
+    src += "vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir) {";
     {
       src += "vec3 lightDir = normalize(light.pos - FragPos);";
 
@@ -236,10 +279,17 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       src += "vec3 norm = normalize(Normal);";
       src += "vec3 viewDir = normalize(viewPos - FragPos);";
 
-      // Point lights.
-      src += "for(int i = 0; i < numLights; i++) {";
+      // Directional lights.
+      src += "for(int i = 0; i < numDirLights; ++i) {";
       {
-        src += "result += CalcPointLight(lights[i], norm, viewDir);";
+        src += "result += CalcDirectionalLight(dirLights[i], norm, viewDir);";
+      }
+      src += "}";
+
+      // Point lights.
+      src += "for(int i = 0; i < numPointLights; ++i) {";
+      {
+        src += "result += CalcPointLight(pointLights[i], norm, viewDir);";
       }
       src += "}";
     }
@@ -285,7 +335,8 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     program->addUniformVar( "material.diffuse" );
     program->addUniformVar( "material.specular" );
     program->addUniformVar( "material.shininess" );
-    program->addUniformVar( "numLights" );
+    program->addUniformVar( "numDirLights" );
+    program->addUniformVar( "numPointLights" );
     program->addUniformVar( "sceneAmbient" );
     program->addUniformVar( "viewPos" );
   }

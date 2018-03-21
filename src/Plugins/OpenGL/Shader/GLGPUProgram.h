@@ -38,39 +38,34 @@ namespace Lore { namespace OpenGL {
     public:
 
         GLGPUProgram();
-
-        virtual ~GLGPUProgram() override;
+        ~GLGPUProgram() override;
 
         void init() override;
 
-        virtual void attachShader( ShaderPtr shader ) override;
+        void attachShader( ShaderPtr shader ) override;
 
-        virtual bool link() override;
+        bool link() override;
 
-        virtual void use() override;
+        void use() override;
 
         //
         // Uniform value updating.
 
-        virtual void addTransformVar( const string& id ) override;
+        void addTransformVar( const string& id ) override;
 
-        virtual void setTransformVar( const glm::mat4& m ) override;
+        void setTransformVar( const glm::mat4& m ) override;
 
-        virtual void addUniformVar( const string& id ) override;
+        void addUniformVar( const string& id ) override;
 
-        virtual void setUniformVar( const string& id, const glm::mat4& m ) override;
+        void setUniformVar( const string& id, const glm::mat4& m ) override;
+        void setUniformVar( const string& id, const glm::vec2& v ) override;
+        void setUniformVar( const string& id, const glm::vec3& v ) override;
+        void setUniformVar( const string& id, const glm::vec4& v ) override;
+        void setUniformVar( const string& id, const real r ) override;
+        void setUniformVar( const string& id, const uint32_t i ) override;
+        void setUniformVar( const string& id, const int i ) override;
 
-        virtual void setUniformVar( const string& id, const glm::vec2& v ) override;
-
-        virtual void setUniformVar( const string& id, const glm::vec3& v ) override;
-
-        virtual void setUniformVar( const string& id, const glm::vec4& v ) override;
-
-        virtual void setUniformVar( const string& id, const real r ) override;
-
-        virtual void setUniformVar( const string& id, const int i ) override;
-
-        virtual void updateLights( const RenderQueue::LightList& lights ) override;
+        void updateLights( const RenderQueue::LightData& lights ) override;
 
     private:
 

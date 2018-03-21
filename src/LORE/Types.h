@@ -41,6 +41,7 @@ namespace Lore {
   class Box;
   class Camera;
   class Context;
+  class DirectionalLight;
   class Entity;
   class Font;
   class GPUProgram;
@@ -50,6 +51,7 @@ namespace Lore {
   class Material;
   class Mesh;
   class Node;
+  class PointLight;
   class PostProcessor;
   class Renderer;
   class RenderTarget;
@@ -57,6 +59,7 @@ namespace Lore {
   class ResourceGroup;
   class Scene;
   class Shader;
+  class SpotLight;
   class Sprite;
   class SpriteAnimationSet;
   class SpriteController;
@@ -78,6 +81,7 @@ namespace Lore {
   using BoxPtr = Box*;
   using CameraPtr = Camera*;
   using ContextPtr = Context*;
+  using DirectionalLightPtr = DirectionalLight*;
   using FontPtr = Font*;
   using EntityPtr = Entity*;
   using GPUProgramPtr = GPUProgram*;
@@ -87,6 +91,7 @@ namespace Lore {
   using MaterialPtr = Material*;
   using MeshPtr = Mesh*;
   using NodePtr = Node*;
+  using PointLightPtr = PointLight*;
   using PostProcessorPtr = PostProcessor*;
   using RendererPtr = Renderer*;
   using RenderTargetPtr = RenderTarget*;
@@ -94,6 +99,7 @@ namespace Lore {
   using ResourceGroupPtr = ResourceGroup*;
   using ScenePtr = Scene*;
   using ShaderPtr = Shader*;
+  using SpotLightPtr = SpotLight*;
   using SpritePtr = Sprite*;
   using SpriteAnimationSetPtr = SpriteAnimationSet*;
   using SpriteControllerPtr = SpriteController*;

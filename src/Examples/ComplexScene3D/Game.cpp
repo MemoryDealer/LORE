@@ -104,10 +104,10 @@ void Game::loadScene()
 
   // Add a cube.
 
-  Lore::EntityPtr cubeEntity = Lore::Resource::CreateEntity( "cube", Lore::VertexBuffer::Type::Cube );
+  Lore::EntityPtr cubeEntity = Lore::Resource::CreateEntity( "cube", Lore::VertexBuffer::Type::TexturedCube );
 
   //cubeEntity->getMaterial()->diffuse = Lore::StockColor::Blue;
-  //cubeEntity->setSprite( Lore::Resource::GetSprite( "block" ) );
+  cubeEntity->setSprite( Lore::Resource::GetSprite( "block" ) );
   auto node = _scene->createNode( "cube" );
   node->attachObject( cubeEntity );
   node->setPosition( 0.f, 0.f, -10.f );
@@ -120,7 +120,19 @@ void Game::loadScene()
     //node->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( 180.f ) );
   }
 
-  auto light = _scene->createLight( "core" );
+  //
+  // Lighting.
+
+  // Directional light.
+  auto dirLight = _scene->createDirectionalLight( "dir1" );
+  dirLight->setDirection( -.5f, -.2f, -.5f );
+
+  auto dirLight2 = _scene->createDirectionalLight( "dir2" );
+  dirLight2->setDirection( 5.f, -.3f, -5.f );
+  dirLight2->setDiffuse( Lore::StockColor::Red );
+  dirLight2->setSpecular( Lore::StockColor::Red );
+
+  auto light = _scene->createPointLight( "core" );
   light->setAmbient( Lore::Color( 0.25f, 0.25f, 0.25f, 1.f ) );
 //   light->setDiffuse( Lore::StockColor::Blue );
 //   light->setSpecular( Lore::StockColor::Blue );
@@ -133,7 +145,7 @@ void Game::loadScene()
   light0->setPosition( 1.f, 4.f, -5.f );
   light0->scale( 0.25f );
 
-  auto light2 = _scene->createLight( "core2" );
+  auto light2 = _scene->createPointLight( "core2" );
   light2->setAttenuation( 3.5f, 0.5f, 0.25f, 0.01f );
   light2->setAmbient( Lore::Color( 0.f, 0.2f, 0.f, 1.f ) );
   light2->setDiffuse( Lore::StockColor::Green );
