@@ -104,10 +104,10 @@ void Game::loadScene()
 
   // Add a cube.
 
-  Lore::EntityPtr cubeEntity = Lore::Resource::CreateEntity( "cube", Lore::VertexBuffer::Type::TexturedCube );
-  cubeEntity->getMaterial()->ambient = Lore::StockColor::Blue;
+  Lore::EntityPtr cubeEntity = Lore::Resource::CreateEntity( "cube", Lore::VertexBuffer::Type::Cube );
+
   //cubeEntity->getMaterial()->diffuse = Lore::StockColor::Blue;
-  cubeEntity->setSprite( Lore::Resource::GetSprite( "block" ) );
+  //cubeEntity->setSprite( Lore::Resource::GetSprite( "block" ) );
   auto node = _scene->createNode( "cube" );
   node->attachObject( cubeEntity );
   node->setPosition( 0.f, 0.f, -10.f );
@@ -122,7 +122,9 @@ void Game::loadScene()
 
   auto light = _scene->createLight( "core" );
   light->setAmbient( Lore::Color( 0.25f, 0.25f, 0.25f, 1.f ) );
-  light->setIntensity( 100.f );
+//   light->setDiffuse( Lore::StockColor::Blue );
+//   light->setSpecular( Lore::StockColor::Blue );
+  light->setAttenuation( 3.5f, 0.5f, 0.25f, 0.01f );
   auto lightEntity = Lore::Resource::CreateEntity( "light", Lore::VertexBuffer::Type::Cube );
   lightEntity->getMaterial()->ambient = Lore::StockColor::White;
   auto light0 = _scene->createNode( "light0" );
@@ -130,6 +132,17 @@ void Game::loadScene()
   light0->attachObject( lightEntity );
   light0->setPosition( 1.f, 4.f, -5.f );
   light0->scale( 0.25f );
+
+  auto light2 = _scene->createLight( "core2" );
+  light2->setAttenuation( 3.5f, 0.5f, 0.25f, 0.01f );
+  light2->setAmbient( Lore::Color( 0.f, 0.2f, 0.f, 1.f ) );
+  light2->setDiffuse( Lore::StockColor::Green );
+  light2->setSpecular( Lore::StockColor::Green );
+  auto light2Node = _scene->createNode( "light2" );
+  light2Node->attachObject( light2 );
+  light2Node->attachObject( lightEntity );
+  light2Node->scale( 0.25f );
+  light2Node->setPosition( 4.f, 5.f, -6.f );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -184,6 +197,9 @@ void Game::update()
   auto node = _scene->getNode( "cube" );
   node->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( 0.0001f ) );
   node->setPosition( 0.f, 0.f, -10.f + 3.f * std::sinf( blockOffset ) );
+
+  node = _scene->getNode( "light2" );
+  node->setPosition( 6.f + 5.f * std::sinf( blockOffset ), node->getPosition().y, node->getPosition().z );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

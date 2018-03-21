@@ -61,11 +61,6 @@ namespace Lore {
       return _specular;
     }
 
-    inline real getRange() const
-    {
-      return _range;
-    }
-
     inline real getConstant() const
     {
       return _constant;
@@ -104,20 +99,15 @@ namespace Lore {
       _specular = color;
     }
 
-    inline void setAttenuation( const real range,
+    inline void setAttenuation( const real intensity,
                                 const real constant,
                                 const real linear,
                                 const real quadratic )
     {
-      _range=range;
+      _intensity=intensity;
       _constant=constant;
       _linear=linear;
       _quadratic=quadratic;
-    }
-
-    inline void setRange( const real range )
-    {
-      _range=range;
     }
 
     inline void setIntensity( const real intensity )
@@ -136,7 +126,6 @@ namespace Lore {
     Color _specular { StockColor::White };
 
     // Attenuation.
-    real _range { 7.f };
     real _constant { 1.f };
     real _linear { .09f };
     real _quadratic { .032f };

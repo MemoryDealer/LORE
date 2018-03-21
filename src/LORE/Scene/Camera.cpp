@@ -235,7 +235,8 @@ void Camera3D::translate( const glm::vec3& offset )
 
 void Camera3D::pitch( const real amount )
 {
-  _pitch += amount;
+  // Have to reverse direction here, possibly related to Camera2D::_updateViewMatrix() requiring reversal.
+  _pitch -= amount;
 
   // Limit pitching.
   if ( _pitch > 89.f ) {

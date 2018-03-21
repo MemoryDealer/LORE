@@ -207,9 +207,16 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       src += "float attenuation = light.intensity / (light.constant + light.linear * distance + light.quadratic * (distance * distance));";
 
       // Combine results.
-      src += "vec3 ambient = light.ambient * vec3(texture(material.diffuseTexture, TexCoord));";
-      src += "vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuseTexture, TexCoord));";
-      src += "vec3 specular = light.specular * spec * vec3(texture(material.specularTexture, TexCoord));";
+      if ( textured ) {
+        src += "vec3 ambient = light.ambient * vec3(texture(material.diffuseTexture, TexCoord));";
+        src += "vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuseTexture, TexCoord));";
+        src += "vec3 specular = light.specular * spec * vec3(texture(material.specularTexture, TexCoord));";
+      }
+      else {
+        src += "vec3 ambient = light.ambient * vec3(material.ambient);";
+        src += "vec3 diffuse = light.diffuse * diff * vec3(material.diffuse);";
+        src += "vec3 specular = light.specular * spec * vec3(material.specular);";
+      }
       src += "ambient *= attenuation;";
       src += "diffuse *= attenuation;";
       src += "specular *= attenuation;";
