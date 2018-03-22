@@ -141,6 +141,7 @@ Lore::VertexBuffer::Vertices GLFont::generateVertices( const char c,
 void GLFont::bindTexture( const char c )
 {
   const Glyph& glyph = _glyphs.at( c );
+  glActiveTexture( GL_TEXTURE0 );
   glBindTexture( GL_TEXTURE_2D, glyph.textureID );
 }
 

@@ -74,6 +74,21 @@ namespace Lore {
                        const RenderQueue& queue,
                        const glm::mat4& viewProjection ) const;
 
+    void _renderTransparents( const RenderView& rv,
+                              const RenderQueue& queue,
+                              const glm::mat4& viewProjection ) const;
+
+    void _renderBoxes( const RenderQueue& queue,
+                       const glm::mat4& viewProjection ) const;
+
+    void _renderTextboxes( const RenderQueue& queue,
+                           const glm::mat4& viewProjection ) const;
+
+    void _renderUI( const UIPtr ui,
+                    const RenderView& rv,
+                    const real aspectRatio,
+                    const glm::mat4& proj ) const;
+
     // Uploads texture data to GPU.
     void _updateTextureData( const MaterialPtr material,
                              const GPUProgramPtr program,

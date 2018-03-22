@@ -47,21 +47,57 @@ GPUProgram::~GPUProgram()
 
 void GPUProgram::attachShader( ShaderPtr shader )
 {
-    const Shader::Type type = shader->getType();
+  const Shader::Type type = shader->getType();
 
-    _shaders[type] = shader;
+  _shaders[type] = shader;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 ShaderPtr GPUProgram::getAttachedShader( const Shader::Type& type )
 {
-    auto lookup = _shaders.find( type );
-    if ( _shaders.end() != lookup ) {
-        return lookup->second;
-    }
+  auto lookup = _shaders.find( type );
+  if ( _shaders.end() != lookup ) {
+    return lookup->second;
+  }
 
-    throw Lore::Exception( "Attached shader type not in GPUProgram " );
+  throw Lore::Exception( "Attached shader type not in GPUProgram " );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GPUProgram::updateUniforms( const RenderView& rv,
+                                 const MaterialPtr material,
+                                 const RenderQueue::LightData& lights )
+{
+  if ( _uniformUpdater ) {
+    _uniformUpdater( rv, this, material, lights );
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GPUProgram::updateNodeUniforms( const MaterialPtr material,
+                                     const NodePtr node,
+                                     const glm::mat4& viewProjection )
+{
+  if ( _uniformNodeUpdater ) {
+    _uniformNodeUpdater( this, material, node, viewProjection );
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GPUProgram::setUniformUpdater( const UniformUpdater updater )
+{
+  _uniformUpdater = updater;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GPUProgram::setUniformNodeUpdater( const UniformNodeUpdater updater )
+{
+  _uniformNodeUpdater = updater;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

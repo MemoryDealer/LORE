@@ -27,6 +27,8 @@
 #include "GLStockResource.h"
 
 #include <LORE/Core/APIVersion.h>
+#include <LORE/Resource/Material.h>
+#include <LORE/Resource/Sprite.h>
 
 #include <Plugins/OpenGL/Resource/GLResourceController.h>
 
@@ -339,6 +341,26 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     program->addUniformVar( "numPointLights" );
     program->addUniformVar( "sceneAmbient" );
     program->addUniformVar( "viewPos" );
+
+    for ( uint32_t i = 0; i < params.maxDirectionalLights; ++i ) {
+      const string idx( "dirLights[" + std::to_string( i ) + "]" );
+      program->addUniformVar( idx + ".ambient" );
+      program->addUniformVar( idx + ".diffuse" );
+      program->addUniformVar( idx + ".specular" );
+      program->addUniformVar( idx + ".direction" );
+    }
+
+    for ( uint32_t i = 0; i < params.maxPointLights; ++i ) {
+      const string idx( "pointLights[" + std::to_string( i ) + "]" );
+      program->addUniformVar( idx + ".pos" );
+      program->addUniformVar( idx + ".ambient" );
+      program->addUniformVar( idx + ".diffuse" );
+      program->addUniformVar( idx + ".specular" );
+      program->addUniformVar( idx + ".constant" );
+      program->addUniformVar( idx + ".linear" );
+      program->addUniformVar( idx + ".quadratic" );
+      program->addUniformVar( idx + ".intensity" );
+    }
   }
 
   if ( textured ) {
@@ -348,6 +370,91 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     program->addUniformVar( "texSampleRegion.w" );
     program->addUniformVar( "texSampleRegion.h" );
   }
+
+  // Setup uniform updaters.
+
+  auto UniformUpdater = []( const RenderView& rv,
+                            const GPUProgramPtr program,
+                            const MaterialPtr material,
+                            const RenderQueue::LightData& lights ) {
+    if ( material->lighting ) {
+      program->setUniformVar( "viewPos", rv.camera->getPosition() );
+
+      // Update material uniforms.
+      program->setUniformVar( "material.ambient", material->ambient );
+      program->setUniformVar( "material.diffuse", material->diffuse );
+      program->setUniformVar( "material.specular", material->specular );
+      program->setUniformVar( "material.shininess", material->shininess );
+      program->setUniformVar( "sceneAmbient", rv.scene->getAmbientLightColor() );
+
+      // Update uniforms for light data.
+      program->setUniformVar( "numDirLights", static_cast< int >( lights.directionalLights.size() ) );
+      program->setUniformVar( "numPointLights", static_cast< int >( lights.pointLights.size() ) );
+
+      int i = 0;
+      for ( const auto& directionalLight : lights.directionalLights ) {
+        const string idx( "dirLights[" + std::to_string( i++ ) + "]" );
+        program->setUniformVar( idx + ".ambient", glm::vec3( directionalLight->getAmbient() ) );
+        program->setUniformVar( idx + ".diffuse", glm::vec3( directionalLight->getDiffuse() ) );
+        program->setUniformVar( idx + ".specular", glm::vec3( directionalLight->getSpecular() ) );
+        program->setUniformVar( idx + ".direction", glm::vec3( directionalLight->getDirection() ) );
+      }
+
+      i = 0;
+      for ( const auto& pair : lights.pointLights ) {
+        const string idx( "pointLights[" + std::to_string( i++ ) + "]" );
+        const auto pointLight = pair.first;
+        const auto pos = pair.second;
+
+        program->setUniformVar( idx + ".pos", glm::vec3( pos ) );
+        program->setUniformVar( idx + ".ambient", glm::vec3( pointLight->getAmbient() ) );
+        program->setUniformVar( idx + ".diffuse", glm::vec3( pointLight->getDiffuse() ) );
+        program->setUniformVar( idx + ".specular", glm::vec3( pointLight->getSpecular() ) );
+        program->setUniformVar( idx + ".constant", pointLight->getConstant() );
+        program->setUniformVar( idx + ".linear", pointLight->getLinear() );
+        program->setUniformVar( idx + ".quadratic", pointLight->getQuadratic() );
+        program->setUniformVar( idx + ".intensity", pointLight->getIntensity() );
+      }
+    }
+  };
+
+  auto UniformNodeUpdater = [] ( const GPUProgramPtr program,
+                                 const MaterialPtr material,
+                                 const NodePtr node,
+                                 const glm::mat4& viewProjection ) {
+    // Update texture data.
+    if ( material->sprite && material->sprite->getTextureCount() ) {
+      size_t spriteFrame = 0;
+      const auto spc = node->getSpriteController();
+      if ( spc ) {
+        spriteFrame = spc->getActiveFrame();
+      }
+
+      const TexturePtr texture = material->sprite->getTexture( spriteFrame );
+      texture->bind( 0 ); // TODO: Multi-texturing.
+      texture->bind( 1 );
+      program->setUniformVar( "texSampleOffset", material->getTexCoordOffset() );
+
+      const Rect sampleRegion = material->getTexSampleRegion();
+      program->setUniformVar( "texSampleRegion.x", sampleRegion.x );
+      program->setUniformVar( "texSampleRegion.y", sampleRegion.y );
+      program->setUniformVar( "texSampleRegion.w", sampleRegion.w );
+      program->setUniformVar( "texSampleRegion.h", sampleRegion.h );
+    }
+
+    // Apply model-view-projection matrix.
+    const glm::mat4 model = node->getFullTransform();
+    const glm::mat4 mvp = viewProjection * model;
+    program->setTransformVar( mvp );
+
+    // Supply model matrix for lighting calculations.
+    if ( material->lighting ) {
+      program->setUniformVar( "model", model );
+    }
+  };
+
+  program->setUniformUpdater( UniformUpdater );
+  program->setUniformNodeUpdater( UniformNodeUpdater );
 
   return program;
 }
@@ -461,6 +568,9 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createSkyboxProgram( const string&
   if ( !program->link() ) {
     throw Lore::Exception( "Failed to link GPUProgram " + name );
   }
+
+  //
+  // Add uniforms.
 
   program->addTransformVar( "transform" );
 

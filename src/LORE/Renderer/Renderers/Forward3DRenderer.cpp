@@ -212,6 +212,19 @@ void Forward3DRenderer::present( const RenderView& rv,
     _renderSolids( rv, queue, viewProjection );
   }
 
+  // Render UI.
+  if ( rv.ui ) {
+    _renderUI( rv.ui, rv, aspectRatio, projection );
+  }
+
+  // Render debug UI if enabled.
+  if ( DebugUI::IsStatsUIEnabled() ) {
+    _renderUI( DebugUI::GetStatsUI(), rv, aspectRatio, projection );
+  }
+  if ( DebugUI::IsConsoleEnabled() ) {
+    _renderUI( DebugUI::GetConsoleUI(), rv, aspectRatio, projection );
+  }
+
   _clearRenderQueues();
 }
 
@@ -257,33 +270,15 @@ void Forward3DRenderer::_renderSolids( const RenderView& rv,
     const VertexBufferPtr vertexBuffer = entity->getMesh()->getVertexBuffer();
     const GPUProgramPtr program = material->program;
 
-    program->use();
     vertexBuffer->bind();
-
-    program->setUniformVar( "viewPos", rv.camera->getPosition() );
-
-    // Lighting data will be the same for all nodes.
-    if ( material->lighting ) {
-      _updateLighting( material, program, scene, queue.lights );
-    }
+    program->use();
+    _api->getLastError();
+    program->updateUniforms( rv, material, queue.lights );
+    _api->getLastError();
 
     // Render each node associated with this entity.
     for ( const auto& node : nodes ) {
-      if ( material->sprite && material->sprite->getTextureCount() ) {
-        _updateTextureData( material, program, node );
-      }
-
-      // Get the model matrix from the node.
-      glm::mat4 model = node->getFullTransform();
-
-      // Calculate model-view-projection matrix for this object.
-      const glm::mat4 mvp = viewProjection * model;
-      program->setTransformVar( mvp );
-
-      if ( material->lighting ) {
-        program->setUniformVar( "model", model );
-      }
-
+      program->updateNodeUniforms( material, node, viewProjection );
       vertexBuffer->draw();
     }
 
@@ -291,6 +286,259 @@ void Forward3DRenderer::_renderSolids( const RenderView& rv,
     vertexBuffer->unbind();
   }
 }
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Forward3DRenderer::_renderTransparents( const RenderView& rv,
+                                             const RenderQueue& queue,
+                                             const glm::mat4& viewProjection ) const
+{
+  _api->setBlendingEnabled( true );
+
+  // Render in reverse order, so the farthest back is rendered first.
+  for ( auto it = queue.transparents.rbegin(); it != queue.transparents.rend(); ++it ) {
+    const EntityPtr entity = it->second.first;
+    NodePtr node = it->second.second;
+
+    const MaterialPtr material = entity->getMaterial();
+    GPUProgramPtr program = material->program;
+    VertexBufferPtr vertexBuffer = entity->getMesh()->getVertexBuffer();
+
+    if ( entity->isInstanced() ) {
+      node = entity->getInstanceControllerNode();
+      vertexBuffer = entity->getInstancedVertexBuffer();
+      switch ( vertexBuffer->getType() ) {
+      default:
+        throw Lore::Exception( "Instanced entity must have an instanced vertex buffer" );
+
+      case VertexBuffer::Type::QuadInstanced:
+        program = StockResource::GetGPUProgram( "StandardInstanced2D" );
+        break;
+
+      case VertexBuffer::Type::TexturedQuadInstanced:
+        program = StockResource::GetGPUProgram( "StandardTexturedInstanced2D" );
+        break;
+      }
+    }
+
+    // Set blending mode using material settings.
+    _api->setBlendingFunc( material->blendingMode.srcFactor, material->blendingMode.dstFactor );
+
+    program->use();
+    vertexBuffer->bind();
+
+    if ( material->sprite && material->sprite->getTextureCount() ) {
+      _updateTextureData( material, program, node );
+    }
+
+    glm::mat4 model = node->getFullTransform();
+    if ( entity->isInstanced() ) {
+      model = viewProjection;
+    }
+
+    if ( material->lighting ) {
+      _updateLighting( material, program, rv.scene, queue.lights );
+      program->setUniformVar( "model", model );
+    }
+
+    // Calculate model-view-projection matrix for this object.
+    if ( entity->isInstanced() ) {
+      program->setTransformVar( model );
+    }
+    else {
+      glm::mat4 mvp = viewProjection * model;
+      program->setTransformVar( mvp );
+    }
+
+    // Draw the entity.
+    vertexBuffer->draw( entity->getInstanceCount() );
+    vertexBuffer->unbind();
+  }
+
+  _api->setBlendingEnabled( false );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Forward3DRenderer::_renderBoxes( const RenderQueue& queue,
+                                      const glm::mat4& viewProjection ) const
+{
+  _api->setBlendingEnabled( true );
+  _api->setBlendingFunc( Material::BlendFactor::SrcAlpha, Material::BlendFactor::OneMinusSrcAlpha );
+
+  GPUProgramPtr program = StockResource::GetGPUProgram( "StandardBox2D" );
+  VertexBufferPtr vb = StockResource::GetVertexBuffer( "TexturedQuad" );
+
+  program->use();
+  vb->bind();
+
+  for ( const RenderQueue::BoxData& data : queue.boxes ) {
+    BoxPtr box = data.box;
+    program->setUniformVar( "borderColor", box->getBorderColor() );
+    program->setUniformVar( "fillColor", box->getFillColor() );
+    program->setUniformVar( "borderWidth", box->getBorderWidth() );
+    program->setUniformVar( "scale", glm::vec2( data.model[0][0], data.model[1][1] ) * box->getSize() );
+
+    // Apply box scaling to final transform.
+    glm::mat4 model = data.model;
+    model[0][0] *= box->getWidth();
+    model[1][1] *= box->getHeight();
+    program->setTransformVar( viewProjection * model );
+
+    vb->draw();
+  }
+
+  vb->unbind();
+  _api->setBlendingEnabled( false );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Forward3DRenderer::_renderTextboxes( const RenderQueue& queue,
+                                          const glm::mat4& viewProjection ) const
+{
+  _api->setBlendingEnabled( true );
+  _api->setBlendingFunc( Material::BlendFactor::SrcAlpha, Material::BlendFactor::OneMinusSrcAlpha );
+
+  GPUProgramPtr program = StockResource::GetGPUProgram( "StandardText" );
+  VertexBufferPtr vb = StockResource::GetVertexBuffer( "StandardText" );
+
+  program->use();
+  vb->bind();
+
+  for ( auto& data : queue.textboxes ) {
+    TextboxPtr textbox = data.textbox;
+    string text = textbox->getText();
+    FontPtr font = textbox->getFont();
+
+    // TODO: Use a better design for this relationship.
+    program->setUniformVar( "projection", viewProjection );
+    program->setUniformVar( "depth", data.model[3][2] );
+    program->setUniformVar( "color", textbox->getTextColor() );
+
+    // Render each character.
+    real x = data.model[3][0];
+    const real y = data.model[3][1];
+    const real scale = 1.f;
+    for ( char & c : text ) {
+      // Generate vertices to draw glyph and bind its associated texture.
+      auto vertices = font->generateVertices( c,
+                                              x,
+                                              y,
+                                              scale );
+      font->bindTexture( c );
+
+      vb->draw( vertices );
+
+      x = font->advanceGlyphX( c, x, scale );
+    }
+
+  }
+
+  vb->unbind();
+  _api->setBlendingEnabled( false );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Forward3DRenderer::_renderUI( const UIPtr ui,
+                                   const RenderView& rv,
+                                   const real aspectRatio,
+                                   const glm::mat4& proj ) const
+{
+  auto panelIt = ui->getPanelIterator();
+
+  RenderQueue queue;
+  constexpr const real DepthOffset = -1101.f;
+
+  std::vector<Node> nodes;
+  nodes.resize( 10 );
+  int idx = 0;
+
+  // For each panel.
+  while ( panelIt.hasMore() ) {
+    auto panel = panelIt.getNext();
+    const glm::vec2 panelOrigin = panel->getOrigin();
+
+    // For each element in this panel.
+    auto elementIt = panel->getElementIterator();
+    while ( elementIt.hasMore() ) {
+      auto element = elementIt.getNext();
+      if ( !element->isVisible() ) {
+        continue;
+      }
+
+      auto elementPos = panelOrigin + element->getPosition();
+      auto elementDimensions = element->getDimensions();
+      elementPos.x *= aspectRatio;
+      elementDimensions.x *= aspectRatio;
+
+      // Build list of entity data and textboxes to render.
+      auto entity = element->getEntity();
+      if ( entity ) {
+        auto mat = entity->getMaterial();
+
+        Node& node = nodes[idx++];
+        node.setName( element->getName() );
+        node.setPosition( elementPos );
+        node.setScale( elementDimensions );
+        node.setDepth( element->getDepth() + DepthOffset ); // Offset UI element depth beyond scene node depth.
+        node.updateWorldTransform();
+
+        if ( mat->blendingMode.enabled ) {
+          RenderQueue::EntityNodePair pair { entity, &node };
+          queue.transparents.insert( { node.getDepth(), pair } );
+        }
+        else {
+          if ( entity->isInstanced() ) {
+            RenderQueue::InstancedEntitySet& set = queue.instancedSolids;
+            // Only add instanced entities that haven't been processed yet.
+            if ( set.find( entity ) == set.end() ) {
+              set.insert( entity );
+            }
+          }
+          else {
+            RenderQueue::NodeList& solidNodes = queue.solids[entity];
+            solidNodes.push_back( &node );
+          }
+        }
+      }
+
+      auto box = element->getBox();
+      if ( box ) {
+        RenderQueue::BoxData bd;
+        bd.box = box;
+        glm::quat q( 1.f, 0.f, 0.f, 0.f );
+        bd.model = Math::CreateTransformationMatrix( glm::vec3( elementPos.x, elementPos.y, 0.f ), q, glm::vec3( elementDimensions.x, elementDimensions.y, 1.f ) );
+        bd.model[3][2] = element->getDepth() + DepthOffset;
+        queue.boxes.push_back( bd );
+      }
+
+      auto textbox = element->getTextbox();
+      if ( textbox ) {
+        RenderQueue::TextboxData td;
+        td.textbox = textbox;
+        glm::quat q( 1.f, 0.f, 0.f, 0.f );
+        td.model = Math::CreateTransformationMatrix( glm::vec3( elementPos.x, elementPos.y, 0.f ), q, glm::vec3( 1.f ) );
+        td.model[3][2] = element->getDepth() + DepthOffset - 0.01f; // Give text a little room over boxes.
+        queue.textboxes.push_back( td );
+      }
+    }
+  }
+
+  const glm::mat4 projection = glm::ortho( -aspectRatio, aspectRatio,
+                                           -1.f, 1.f,
+                                           1500.f, -1500.f );
+
+  // Now render the UI elements.
+  _renderSolids( rv, queue, projection );
+  _renderTransparents( rv, queue, projection );
+  _renderBoxes( queue, projection );
+  _renderTextboxes( queue, projection );
+
+  _api->setBlendingEnabled( false );
+}
+
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 

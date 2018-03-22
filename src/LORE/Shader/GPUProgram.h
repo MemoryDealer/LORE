@@ -42,60 +42,81 @@ namespace Lore {
 
   public:
 
-      GPUProgram();
-      virtual ~GPUProgram();
+    using UniformUpdater = void(*)( const RenderView&, const GPUProgramPtr, const MaterialPtr, const RenderQueue::LightData& );
+    using UniformNodeUpdater = void( *)( const GPUProgramPtr, const MaterialPtr, const NodePtr, const glm::mat4& );
 
-      virtual void init() = 0;
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-      virtual void attachShader( ShaderPtr shader );
+    GPUProgram();
+    virtual ~GPUProgram();
 
-      virtual ShaderPtr getAttachedShader( const Shader::Type& type );
+    virtual void init() = 0;
 
-      virtual bool link() = 0;
+    virtual void attachShader( ShaderPtr shader );
 
-      virtual void use() = 0;
+    virtual ShaderPtr getAttachedShader( const Shader::Type& type );
 
-      inline bool hasAttachedShader( const Shader::Type& type )
-      {
-          return ( _shaders.find( type ) != _shaders.end() );
-      }
+    virtual bool link() = 0;
 
-      //
-      // Getters.
+    virtual void use() = 0;
 
+    inline bool hasAttachedShader( const Shader::Type& type )
+    {
+      return ( _shaders.find( type ) != _shaders.end() );
+    }
 
-      //
-      // Uniform value updating.
+    void updateUniforms( const RenderView& rv,
+                         const MaterialPtr material,
+                         const RenderQueue::LightData& lights );
 
-      virtual void addTransformVar( const string& id ) = 0;
+    void updateNodeUniforms( const MaterialPtr material,
+                             const NodePtr node,
+                             const glm::mat4& viewProjection );
 
-      virtual void setTransformVar( const glm::mat4& m ) = 0;
+    //
+    // Getters.
 
-      virtual void addUniformVar( const string& id ) = 0;
+    //
+    // Setters.
 
-      virtual void setUniformVar( const string& id, const glm::mat4& m ) = 0;
+    void setUniformUpdater( const UniformUpdater updater );
+    void setUniformNodeUpdater( const UniformNodeUpdater updater );
 
-      virtual void setUniformVar( const string& id, const glm::vec2& v ) = 0;
+    //
+    // Uniform value updating.
 
-      virtual void setUniformVar( const string& id, const glm::vec3& v ) = 0;
+    virtual void addTransformVar( const string& id ) = 0;
 
-      virtual void setUniformVar( const string& id, const glm::vec4& v ) = 0;
+    virtual void setTransformVar( const glm::mat4& m ) = 0;
 
-      virtual void setUniformVar( const string& id, const real r ) = 0;
+    virtual void addUniformVar( const string& id ) = 0;
 
-      virtual void setUniformVar( const string& id, const uint32_t i ) = 0;
+    virtual void setUniformVar( const string& id, const glm::mat4& m ) = 0;
 
-      virtual void setUniformVar( const string& id, const int i ) = 0;
+    virtual void setUniformVar( const string& id, const glm::vec2& v ) = 0;
 
-      virtual void updateLights( const RenderQueue::LightData& lights ) = 0;
+    virtual void setUniformVar( const string& id, const glm::vec3& v ) = 0;
+
+    virtual void setUniformVar( const string& id, const glm::vec4& v ) = 0;
+
+    virtual void setUniformVar( const string& id, const real r ) = 0;
+
+    virtual void setUniformVar( const string& id, const uint32_t i ) = 0;
+
+    virtual void setUniformVar( const string& id, const int i ) = 0;
+
+    virtual void updateLights( const RenderQueue::LightData& lights ) = 0;
 
   protected:
 
-      using ShaderMap = std::unordered_map<Shader::Type, ShaderPtr>;
+    using ShaderMap = std::unordered_map<Shader::Type, ShaderPtr>;
 
   protected:
 
-      ShaderMap _shaders;
+    ShaderMap _shaders;
+
+    UniformUpdater _uniformUpdater { nullptr };
+    UniformNodeUpdater _uniformNodeUpdater { nullptr };
 
   };
 
