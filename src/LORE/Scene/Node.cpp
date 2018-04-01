@@ -306,8 +306,22 @@ void Node::rotate( const glm::quat& q, const TransformSpace& ts )
 
 void Node::setScale( const glm::vec2& scale )
 {
-  _transform.scale = glm::vec3( scale.x, scale.y, 1.f );
+  setScale( glm::vec3( scale.x, scale.y, 1.f ) );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Node::setScale( const glm::vec3& scale )
+{
+  _transform.scale = scale;
   _dirty();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Node::setScale( const real s )
+{
+  setScale( glm::vec3( s, s, s ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

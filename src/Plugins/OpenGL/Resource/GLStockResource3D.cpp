@@ -147,10 +147,10 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
   src += "uniform vec3 viewPos;";
 
-  //if ( textured ) {
+  if ( textured ) {
     src += "in vec2 TexCoord;";
     src += "uniform vec2 texSampleOffset = vec2(1.0, 1.0);";
-  //}
+  }
 
   // Material.
   src += "struct Material {";
@@ -302,7 +302,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     //src += "result *= (material.ambient.rgb + material.diffuse.rgb);";
 
     // Final pixel.
-    src += "pixel = vec4(result, 1.0);";
+    src += "pixel = vec4(result, material.diffuse.a);";
   }
   src += "}";
 

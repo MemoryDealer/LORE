@@ -165,6 +165,10 @@ namespace Lore {
 
     void setScale( const glm::vec2& scale );
 
+    void setScale( const glm::vec3& scale );
+
+    void setScale( const real s );
+
     void scale( const glm::vec2& s );
 
     void scale( const glm::vec3& s );

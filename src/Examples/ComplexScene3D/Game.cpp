@@ -104,10 +104,12 @@ void Game::loadScene()
 
   // Add a cube.
 
-  Lore::EntityPtr cubeEntity = Lore::Resource::CreateEntity( "cube", Lore::VertexBuffer::Type::TexturedCube );
+  Lore::EntityPtr cubeEntity = Lore::Resource::CreateEntity( "cube", Lore::VertexBuffer::Type::Cube );
 
-  //cubeEntity->getMaterial()->diffuse = Lore::StockColor::Blue;
-  cubeEntity->setSprite( Lore::Resource::GetSprite( "block" ) );
+  cubeEntity->getMaterial()->diffuse = Lore::StockColor::Blue;
+  //cubeEntity->getMaterial()->blendingMode.enabled = true;
+  cubeEntity->getMaterial()->diffuse.a = 0.5f;
+  //cubeEntity->setSprite( Lore::Resource::GetSprite( "block" ) );
   auto node = _scene->createNode( "cube" );
   node->attachObject( cubeEntity );
   node->setPosition( 0.f, 0.f, -10.f );
@@ -209,6 +211,7 @@ void Game::update()
   auto node = _scene->getNode( "cube" );
   node->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( 0.0001f ) );
   node->setPosition( 0.f, 0.f, -10.f + 3.f * std::sinf( blockOffset ) );
+  node->setScale( std::sinf( blockOffset ) );
 
   node = _scene->getNode( "light2" );
   node->setPosition( 6.f + 5.f * std::sinf( blockOffset ), node->getPosition().y, node->getPosition().z );

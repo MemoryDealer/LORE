@@ -208,8 +208,8 @@ void Forward3DRenderer::present( const RenderView& rv,
   for ( const auto& activeQueue : _activeQueues ) {
     RenderQueue& queue = activeQueue.second;
 
-    // Render solids.
     _renderSolids( rv, queue, viewProjection );
+    _renderTransparents( rv, queue, viewProjection );
   }
 
   // Render UI.
@@ -272,9 +272,7 @@ void Forward3DRenderer::_renderSolids( const RenderView& rv,
 
     vertexBuffer->bind();
     program->use();
-    _api->getLastError();
     program->updateUniforms( rv, material, queue.lights );
-    _api->getLastError();
 
     // Render each node associated with this entity.
     for ( const auto& node : nodes ) {
@@ -324,31 +322,11 @@ void Forward3DRenderer::_renderTransparents( const RenderView& rv,
     // Set blending mode using material settings.
     _api->setBlendingFunc( material->blendingMode.srcFactor, material->blendingMode.dstFactor );
 
-    program->use();
     vertexBuffer->bind();
 
-    if ( material->sprite && material->sprite->getTextureCount() ) {
-      _updateTextureData( material, program, node );
-    }
-
-    glm::mat4 model = node->getFullTransform();
-    if ( entity->isInstanced() ) {
-      model = viewProjection;
-    }
-
-    if ( material->lighting ) {
-      _updateLighting( material, program, rv.scene, queue.lights );
-      program->setUniformVar( "model", model );
-    }
-
-    // Calculate model-view-projection matrix for this object.
-    if ( entity->isInstanced() ) {
-      program->setTransformVar( model );
-    }
-    else {
-      glm::mat4 mvp = viewProjection * model;
-      program->setTransformVar( mvp );
-    }
+    program->use();
+    program->updateUniforms( rv, material, queue.lights );
+    program->updateNodeUniforms( material, node, viewProjection );
 
     // Draw the entity.
     vertexBuffer->draw( entity->getInstanceCount() );
@@ -537,52 +515,6 @@ void Forward3DRenderer::_renderUI( const UIPtr ui,
   _renderTextboxes( queue, projection );
 
   _api->setBlendingEnabled( false );
-}
-
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Forward3DRenderer::_updateTextureData( const MaterialPtr material,
-                                            const GPUProgramPtr program,
-                                            const NodePtr node ) const
-{
-  size_t spriteFrame = 0;
-  const auto spc = node->getSpriteController();
-  if ( spc ) {
-    spriteFrame = spc->getActiveFrame();
-  }
-
-  const TexturePtr texture = material->sprite->getTexture( spriteFrame );
-  texture->bind( 0 ); // TODO: Multi-texturing.
-  texture->bind( 1 );
-  program->setUniformVar( "texSampleOffset", material->getTexCoordOffset() );
-
-  const Rect sampleRegion = material->getTexSampleRegion();
-  program->setUniformVar( "texSampleRegion.x", sampleRegion.x );
-  program->setUniformVar( "texSampleRegion.y", sampleRegion.y );
-  program->setUniformVar( "texSampleRegion.w", sampleRegion.w );
-  program->setUniformVar( "texSampleRegion.h", sampleRegion.h );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Forward3DRenderer::_updateLighting( const MaterialPtr material,
-                                         const GPUProgramPtr program,
-                                         const ScenePtr scene,
-                                         const RenderQueue::LightData& lights ) const
-{
-  // Update material uniforms.
-  program->setUniformVar( "material.ambient", material->ambient );
-  program->setUniformVar( "material.diffuse", material->diffuse );
-  program->setUniformVar( "material.specular", material->specular );
-  program->setUniformVar( "material.shininess", material->shininess );
-  program->setUniformVar( "sceneAmbient", scene->getAmbientLightColor() );
-
-  // Update uniforms for light data.
-  program->setUniformVar( "numDirLights", static_cast<int>( lights.directionalLights.size() ) );
-  program->setUniformVar( "numPointLights", static_cast<int>( lights.pointLights.size() ) );
-
-  program->updateLights( lights );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
