@@ -99,6 +99,8 @@ namespace Lore {
     RenderQueueList _queues { };
     ActiveRenderQueueList _activeQueues { };
 
+    CameraPtr _camera { nullptr };
+
   };
 
 }

@@ -83,7 +83,7 @@ void Forward3DRenderer::addRenderData( EntityPtr entity,
 
   if ( blended ) {
     RenderQueue::EntityNodePair pair { entity, node };
-    queue.transparents.insert( { node->getDepth(), pair } );
+    queue.transparents.insert( { glm::length( _camera->getPosition() - node->getPosition() ), pair } );
   }
   else {
     if ( entity->isInstanced() ) {
@@ -163,6 +163,8 @@ void Forward3DRenderer::addLight( LightPtr light,
 void Forward3DRenderer::present( const RenderView& rv,
                                  const WindowPtr window )
 {
+  _camera = rv.camera;
+
   // Build render queues for this RenderView.
   rv.scene->updateSceneGraph();
 
