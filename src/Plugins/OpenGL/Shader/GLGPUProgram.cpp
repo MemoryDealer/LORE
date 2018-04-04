@@ -258,8 +258,9 @@ GLuint GLGPUProgram::_getUniform( const string& id )
 {
   auto lookup = _uniforms.find( id );
   if ( _uniforms.end() == lookup ) {
-    log_warning( "Tried to get uniform " + id + " in " + _name + " which does not exist" );
-    return -1;
+    log_warning( "Uniform " + id + " was not found, adding anyway" );
+    addUniformVar( id );
+    lookup = _uniforms.find( id );
   }
 
   // Return uniform GLuint value.
