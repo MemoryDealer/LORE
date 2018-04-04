@@ -75,11 +75,11 @@ namespace Lore {
                             const real aspectRatio,
                             const glm::mat4& proj );
 
-    void renderSolids( const ScenePtr scene,
+    void renderSolids( const RenderView& rv,
                        const RenderQueue& queue,
                        const glm::mat4& viewProjection ) const;
 
-    void renderTransparents( const Lore::ScenePtr scene,
+    void renderTransparents( const RenderView& rv,
                              const RenderQueue& queue,
                               const glm::mat4& viewProjection ) const;
 
@@ -90,7 +90,7 @@ namespace Lore {
                           const glm::mat4& viewProjection ) const;
 
     void renderUI( const UIPtr ui,
-                   const ScenePtr scene,
+                   const RenderView& rv,
                    const real aspectRatio,
                    const glm::mat4& proj ) const;
 
@@ -104,9 +104,6 @@ namespace Lore {
                           const GPUProgramPtr program,
                           const ScenePtr scene,
                           const RenderQueue::LightData& lightData ) const;
-
-    // Returns modifier matrix for node to account for x/y flipping.
-    glm::mat4 _calculateFlipMatrix( const NodePtr node ) const;
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 

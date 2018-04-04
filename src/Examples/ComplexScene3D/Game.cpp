@@ -104,12 +104,9 @@ void Game::loadScene()
 
   // Add a cube.
 
-  Lore::EntityPtr cubeEntity = Lore::Resource::CreateEntity( "cube", Lore::VertexBuffer::Type::Cube );
+  Lore::EntityPtr cubeEntity = Lore::Resource::CreateEntity( "cube", Lore::VertexBuffer::Type::TexturedCube );
 
-  cubeEntity->getMaterial()->diffuse = Lore::StockColor::Blue;
-  //cubeEntity->getMaterial()->blendingMode.enabled = true;
-  cubeEntity->getMaterial()->diffuse.a = 0.5f;
-  //cubeEntity->setSprite( Lore::Resource::GetSprite( "block" ) );
+  cubeEntity->setSprite( Lore::Resource::GetSprite( "block" ) );
   auto node = _scene->createNode( "cube" );
   node->attachObject( cubeEntity );
   node->setPosition( 0.f, 0.f, -10.f );
@@ -120,6 +117,16 @@ void Game::loadScene()
     node->attachObject( cubeEntity );
     node->setPosition( ( Lore::real )i * 2.f, 0.f, -10.f );
     //node->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( 180.f ) );
+  }
+
+  Lore::EntityPtr transparentCubeEntity = Lore::Resource::CreateEntity( "transparent-cube", Lore::VertexBuffer::Type::Cube );
+  transparentCubeEntity->getMaterial()->diffuse = Lore::StockColor::Blue;
+  transparentCubeEntity->getMaterial()->blendingMode.enabled = true;
+  transparentCubeEntity->getMaterial()->diffuse.a = 0.5f;
+  for ( int i = 0; i < 20; ++i ) {
+    auto node = _scene->createNode( "transparentCube" + std::to_string( i ) );
+    node->attachObject( transparentCubeEntity );
+    node->setPosition( ( Lore::real )i * -2.f, 0.f, -10.f );
   }
 
   //

@@ -207,19 +207,19 @@ void Game::loadScene()
   auto& layerFar = skybox->addLayer( "far" );
   layerFar.setSprite( Lore::Resource::GetSprite( "bg-far" ) );
   layerFar.setDepth( 990.f );
-  layerFar.setParallax( glm::vec2( 0.3f, 0.08f ) );
+  layerFar.setParallax( glm::vec2( 0.1f, 0.08f ) );
 
   // Add middle layer with lighter parallax.
   auto& layerMiddle = skybox->addLayer( "middle" );
   layerMiddle.setSprite( Lore::Resource::GetSprite( "bg-middle" ) );
   layerMiddle.setDepth( 980.f );
-  layerMiddle.setParallax( glm::vec2( .5f, .10f ) );
+  layerMiddle.setParallax( glm::vec2( .3f, .10f ) );
 
   // Add closest layer with the least amount of parallax.
   auto& layerForeground = skybox->addLayer( "foreground" );
   layerForeground.setSprite( Lore::Resource::GetSprite( "bg-foreground" ) );
   layerForeground.setDepth( 970.f );
-  layerForeground.setParallax( glm::vec2( .7f, 0.12f ) );
+  layerForeground.setParallax( glm::vec2( .5f, 0.12f ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -387,6 +387,26 @@ SpriteControllerPtr Node::getSpriteController() const
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+glm::mat4 Node::getFlipMatrix() const
+{
+  if ( !_spriteController ) {
+    return glm::mat4( 1.f );
+  }
+
+  glm::vec3 scale( 1.f, 1.f, 1.f );
+  if ( _spriteController->getXFlipped() ) {
+    scale.x = -1.f;
+  }
+  if ( _spriteController->getYFlipped() ) {
+    scale.y = -1.f;
+  }
+
+  glm::quat q( 1.f, 0.f, 0.f, 0.f );
+  return Math::CreateTransformationMatrix( glm::vec3( 0.f ), q, scale );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Node::_dirty()

@@ -319,6 +319,7 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
                                 const MaterialPtr material,
                                 const NodePtr node,
                                 const glm::mat4& viewProjection ) {
+
     // Update texture data.
     if ( material->sprite && material->sprite->getTextureCount() ) {
       size_t spriteFrame = 0;
@@ -340,8 +341,9 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
     }
 
     // Apply model-view-projection matrix.
-    const glm::mat4 model = node->getFullTransform();
-    const glm::mat4 mvp = viewProjection * model;
+    glm::mat4 model = node->getFullTransform();
+    model[3][2] = node->getDepth(); // Override depth in 2D.
+    const glm::mat4 mvp = viewProjection * model * node->getFlipMatrix();
     program->setTransformVar( mvp );
 
     // Supply model matrix for lighting calculations.
@@ -350,8 +352,49 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
     }
   };
 
+  auto InstancedUniformNodeUpdater = []( const GPUProgramPtr program,
+                                         const MaterialPtr material,
+                                         const NodePtr node,
+                                         const glm::mat4& viewProjection ) {
+    // Update texture data.
+    if ( material->sprite && material->sprite->getTextureCount() ) {
+      size_t spriteFrame = 0;
+      const auto spc = node->getSpriteController();
+      if ( spc ) {
+        spriteFrame = spc->getActiveFrame();
+      }
+
+      const TexturePtr texture = material->sprite->getTexture( spriteFrame );
+      texture->bind( 0 ); // TODO: Multi-texturing.
+      texture->bind( 1 );
+      program->setUniformVar( "texSampleOffset", material->getTexCoordOffset() );
+
+      const Rect sampleRegion = material->getTexSampleRegion();
+      program->setUniformVar( "texSampleRegion.x", sampleRegion.x );
+      program->setUniformVar( "texSampleRegion.y", sampleRegion.y );
+      program->setUniformVar( "texSampleRegion.w", sampleRegion.w );
+      program->setUniformVar( "texSampleRegion.h", sampleRegion.h );
+    }
+
+    // Apply model-view-projection matrix.
+    glm::mat4 transform = viewProjection;
+    // TODO: Depth overriding breaks instanced rendering.
+    //transform[3][2] = node->getDepth(); // Override depth in 2D.
+    program->setTransformVar( transform * node->getFlipMatrix() );
+
+    // Supply model matrix for lighting calculations.
+    if ( material->lighting ) {
+      program->setUniformVar( "model", transform );
+    }
+  };
+
   program->setUniformUpdater( UniformUpdater );
-  program->setUniformNodeUpdater( UniformNodeUpdater );
+  if ( instanced ) {
+    program->setUniformNodeUpdater( InstancedUniformNodeUpdater );
+  }
+  else {
+    program->setUniformNodeUpdater( UniformNodeUpdater );
+  }
 
   return program;
 }

@@ -203,10 +203,10 @@ void Forward2DRenderer::present( const RenderView& rv, const WindowPtr window )
     RenderQueue& queue = activeQueue.second;
 
     // Render solids.
-    renderSolids( rv.scene, queue, viewProjection );
+    renderSolids( rv, queue, viewProjection );
 
     // Render transparents.
-    renderTransparents( rv.scene, queue, viewProjection );
+    renderTransparents( rv, queue, viewProjection );
 
     // Render boxes.
     renderBoxes( queue, viewProjection );
@@ -247,15 +247,15 @@ void Forward2DRenderer::present( const RenderView& rv, const WindowPtr window )
 
   // Render UI.
   if ( rv.ui ) {
-    renderUI( rv.ui, rv.scene, aspectRatio, projection );
+    renderUI( rv.ui, rv, aspectRatio, projection );
   }
 
   // Render debug UI if enabled.
   if ( DebugUI::IsStatsUIEnabled() ) {
-    renderUI( DebugUI::GetStatsUI(), rv.scene, aspectRatio, projection );
+    renderUI( DebugUI::GetStatsUI(), rv, aspectRatio, projection );
   }
   if ( DebugUI::IsConsoleEnabled() ) {
-    renderUI( DebugUI::GetConsoleUI(), rv.scene, aspectRatio, projection );
+    renderUI( DebugUI::GetConsoleUI(), rv, aspectRatio, projection );
   }
 
   if ( rv.renderTarget ) {
@@ -360,9 +360,9 @@ void Forward2DRenderer::renderSkybox( const RenderView& rv,
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Forward2DRenderer::renderSolids( const ScenePtr scene,
-                                    const RenderQueue& queue,
-                                    const glm::mat4& viewProjection ) const
+void Forward2DRenderer::renderSolids( const RenderView& rv,
+                                      const RenderQueue& queue,
+                                      const glm::mat4& viewProjection ) const
 {
   // Render instanced solids.
   for ( const auto& entity : queue.instancedSolids ) {
@@ -386,23 +386,11 @@ void Forward2DRenderer::renderSolids( const ScenePtr scene,
       break;
     }
 
-    program->use();
     vertexBuffer->bind();
+    program->use();
 
-    if ( material->sprite && material->sprite->getTextureCount() ) {
-      _updateTextureData( material, program, node );
-    }
-
-    if ( material->lighting ) {
-      _updateLighting( material, program, scene, queue.lights );
-      // Use view-projection for lighting calculations.
-      program->setUniformVar( "model", viewProjection );
-    }
-
-    // Apply the view-projection for instanced rendering.
-    glm::mat4 flipMatrix = _calculateFlipMatrix( node );
-    flipMatrix[3][2] = node->getDepth();
-    program->setTransformVar( viewProjection * flipMatrix );
+    program->updateUniforms( rv, material, queue.lights );
+    program->updateNodeUniforms( material, node, viewProjection );
 
     vertexBuffer->draw( entity->getInstanceCount() );
     vertexBuffer->unbind();
@@ -417,32 +405,13 @@ void Forward2DRenderer::renderSolids( const ScenePtr scene,
     const VertexBufferPtr vertexBuffer = entity->getMesh()->getVertexBuffer();
     const GPUProgramPtr program = material->program;
 
-    program->use();
     vertexBuffer->bind();
-
-    // Lighting data will be the same for all nodes.
-    if ( material->lighting ) {
-      _updateLighting( material, program, scene, queue.lights );
-    }
+    program->use();
+    program->updateUniforms( rv, material, queue.lights );
 
     // Render each node associated with this entity.
     for ( const auto& node : nodes ) {
-      if ( material->sprite && material->sprite->getTextureCount() ) {
-        _updateTextureData( material, program, node );
-      }
-
-      // Get the model matrix from the node.
-      glm::mat4 model = node->getFullTransform();
-      model[3][2] = node->getDepth();
-
-      // Calculate model-view-projection matrix for this object.
-      const glm::mat4 mvp = viewProjection * model * _calculateFlipMatrix( node );
-      program->setTransformVar( mvp );
-
-      if ( material->lighting ) {
-        program->setUniformVar( "model", model );
-      }
-
+      program->updateNodeUniforms( material, node, viewProjection );
       vertexBuffer->draw();
     }
 
@@ -453,7 +422,7 @@ void Forward2DRenderer::renderSolids( const ScenePtr scene,
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Forward2DRenderer::renderTransparents( const ScenePtr scene,
+void Forward2DRenderer::renderTransparents( const RenderView& rv,
                                           const RenderQueue& queue,
                                           const glm::mat4& viewProjection ) const
 {
@@ -489,34 +458,11 @@ void Forward2DRenderer::renderTransparents( const ScenePtr scene,
     // Set blending mode using material settings.
     _api->setBlendingFunc( material->blendingMode.srcFactor, material->blendingMode.dstFactor );
 
-    program->use();
     vertexBuffer->bind();
+    program->use();
 
-    if ( material->sprite && material->sprite->getTextureCount() ) {
-      _updateTextureData( material, program, node );
-    }
-
-    glm::mat4 model = node->getFullTransform();
-    if ( entity->isInstanced() ) {
-      model = viewProjection;
-    }
-
-    if ( material->lighting ) {
-      _updateLighting( material, program, scene, queue.lights );
-      program->setUniformVar( "model", model );
-    }
-
-    // Get the model matrix from the node.
-    model[3][2] = node->getDepth();
-
-    // Calculate model-view-projection matrix for this object.
-    if ( entity->isInstanced() ) {
-      program->setTransformVar( model * _calculateFlipMatrix( node ) );
-    }
-    else {
-      glm::mat4 mvp = viewProjection * model * _calculateFlipMatrix( node );
-      program->setTransformVar( mvp );
-    }
+    program->updateUniforms( rv, material, queue.lights );
+    program->updateNodeUniforms( material, node, viewProjection );
 
     // Draw the entity.
     vertexBuffer->draw( entity->getInstanceCount() );
@@ -610,7 +556,7 @@ void Forward2DRenderer::renderTextboxes( const RenderQueue& queue,
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Forward2DRenderer::renderUI( const UIPtr ui,
-                                const ScenePtr scene,
+                                const RenderView& rv,
                                 const real aspectRatio,
                                 const glm::mat4& proj ) const
 {
@@ -695,8 +641,8 @@ void Forward2DRenderer::renderUI( const UIPtr ui,
   }
 
   // Now render the UI elements.
-  renderSolids( scene, queue, proj );
-  renderTransparents( scene, queue, proj );
+  renderSolids( rv, queue, proj );
+  renderTransparents( rv, queue, proj );
   renderBoxes( queue, proj );
   renderTextboxes( queue, proj );
 
@@ -745,27 +691,6 @@ void Forward2DRenderer::_updateTextureData( const MaterialPtr material,
   program->setUniformVar( "texSampleRegion.y", sampleRegion.y );
   program->setUniformVar( "texSampleRegion.w", sampleRegion.w );
   program->setUniformVar( "texSampleRegion.h", sampleRegion.h );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-glm::mat4 Forward2DRenderer::_calculateFlipMatrix( const NodePtr node ) const
-{
-  auto spc = node->getSpriteController();
-  if ( !spc ) {
-    return glm::mat4( 1.f );
-  }
-
-  glm::vec3 scale( 1.f, 1.f, 1.f );
-  if ( spc->getXFlipped() ) {
-    scale.x = -1.f;
-  }
-  if ( spc->getYFlipped() ) {
-    scale.y = -1.f;
-  }
-
-  glm::quat q( 1.f, 0.f, 0.f, 0.f );
-  return Math::CreateTransformationMatrix( glm::vec3( 0.f ), q, scale );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

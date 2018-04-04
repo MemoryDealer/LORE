@@ -244,6 +244,8 @@ namespace Lore {
 
     SpriteControllerPtr getSpriteController() const;
 
+    glm::mat4 getFlipMatrix() const;
+
 
     //
     // Deleted functions/operators.
