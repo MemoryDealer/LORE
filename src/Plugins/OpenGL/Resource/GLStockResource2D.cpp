@@ -261,6 +261,18 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
     program->addUniformVar( "material.shininess" );
     program->addUniformVar( "numPointLights" );
     program->addUniformVar( "sceneAmbient" );
+
+    for ( uint32_t i = 0; i < params.maxPointLights; ++i ) {
+      const string idx( "pointLights[" + std::to_string( i ) + "]" );
+      program->addUniformVar( idx + ".pos" );
+      program->addUniformVar( idx + ".ambient" );
+      program->addUniformVar( idx + ".diffuse" );
+      program->addUniformVar( idx + ".specular" );
+      program->addUniformVar( idx + ".constant" );
+      program->addUniformVar( idx + ".linear" );
+      program->addUniformVar( idx + ".quadratic" );
+      program->addUniformVar( idx + ".intensity" );
+    }
   }
 
   if ( textured ) {
@@ -289,15 +301,6 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
       program->setUniformVar( "numPointLights", static_cast< int >( lights.pointLights.size() ) );
 
       int i = 0;
-      for ( const auto& directionalLight : lights.directionalLights ) {
-        const string idx( "dirLights[" + std::to_string( i++ ) + "]" );
-        program->setUniformVar( idx + ".ambient", glm::vec3( directionalLight->getAmbient() ) );
-        program->setUniformVar( idx + ".diffuse", glm::vec3( directionalLight->getDiffuse() ) );
-        program->setUniformVar( idx + ".specular", glm::vec3( directionalLight->getSpecular() ) );
-        program->setUniformVar( idx + ".direction", glm::vec3( directionalLight->getDirection() ) );
-      }
-
-      i = 0;
       for ( const auto& pair : lights.pointLights ) {
         const string idx( "pointLights[" + std::to_string( i++ ) + "]" );
         const auto pointLight = pair.first;
