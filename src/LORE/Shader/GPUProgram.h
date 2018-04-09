@@ -105,8 +105,6 @@ namespace Lore {
 
     virtual void setUniformVar( const string& id, const int i ) = 0;
 
-    virtual void updateLights( const RenderQueue::LightData& lights ) = 0;
-
   protected:
 
     using ShaderMap = std::unordered_map<Shader::Type, ShaderPtr>;

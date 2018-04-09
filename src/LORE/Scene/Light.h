@@ -153,12 +153,12 @@ namespace Lore {
     MovableLight() = default;
     ~MovableLight() override = default;
 
-    inline void setAttenuation( const real intensity,
+    inline void setAttenuation( const real range,
                                 const real constant,
                                 const real linear,
                                 const real quadratic )
     {
-      _intensity = intensity;
+      _range = range;
       _constant = constant;
       _linear = linear;
       _quadratic = quadratic;
@@ -184,6 +184,11 @@ namespace Lore {
       return _quadratic;
     }
 
+    inline real getRange() const
+    {
+      return _range;
+    }
+
     inline real getIntensity() const
     {
       return _intensity;
@@ -192,9 +197,11 @@ namespace Lore {
   private:
 
     // Attenuation.
+    real _range { 1.f };
     real _constant { 1.f };
-    real _linear { .09f };
-    real _quadratic { .032f };
+    real _linear { .7f };
+    real _quadratic { 1.8f };
+
     real _intensity { 1.f };
 
   };

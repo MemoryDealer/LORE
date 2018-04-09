@@ -175,7 +175,8 @@ void Game::loadScene()
     // Add some lights to the torches.
 
     auto torchLight = _scene->createPointLight( "torch" + std::to_string( i ) );
-    torchLight->setDiffuse( Lore::Color( 1.f, .69f, .4f, 1.f ) );
+    //torchLight->setDiffuse( Lore::Color( 1.f, .69f, .4f, 1.f ) );
+    torchLight->setAttenuation( 1.f, 1.f, 0.7f, 1.8f );
     torchNode->attachObject( torchLight );
   }
 
@@ -219,7 +220,7 @@ void Game::loadScene()
   auto& layerForeground = skybox->addLayer( "foreground" );
   layerForeground.setSprite( Lore::Resource::GetSprite( "bg-foreground" ) );
   layerForeground.setDepth( 970.f );
-  layerForeground.setParallax( glm::vec2( .5f, 0.12f ) );
+  layerForeground.setParallax( glm::vec2( .4f, 0.12f ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

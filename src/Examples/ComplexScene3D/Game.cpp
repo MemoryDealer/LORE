@@ -143,6 +143,7 @@ void Game::loadScene()
 
   auto light = _scene->createPointLight( "core" );
   light->setAmbient( Lore::Color( 0.25f, 0.25f, 0.25f, 1.f ) );
+  //light->setIntensity( 5.f );
 //   light->setDiffuse( Lore::StockColor::Blue );
 //   light->setSpecular( Lore::StockColor::Blue );
   light->setAttenuation( 3.5f, 0.5f, 0.25f, 0.01f );
@@ -159,6 +160,7 @@ void Game::loadScene()
   light2->setAmbient( Lore::Color( 0.f, 0.2f, 0.f, 1.f ) );
   light2->setDiffuse( Lore::StockColor::Green );
   light2->setSpecular( Lore::StockColor::Green );
+  light2->setIntensity( 4.f );
   auto light2Node = _scene->createNode( "light2" );
   light2Node->attachObject( light2 );
   light2Node->attachObject( lightEntity );

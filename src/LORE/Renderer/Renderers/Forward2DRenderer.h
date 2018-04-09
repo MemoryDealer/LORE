@@ -94,17 +94,6 @@ namespace Lore {
                    const real aspectRatio,
                    const glm::mat4& proj ) const;
 
-    // Uploads texture data to GPU.
-    void _updateTextureData( const MaterialPtr material,
-                             const GPUProgramPtr program,
-                             const NodePtr node ) const;
-
-    // Uploads lighting data to GPU.
-    void _updateLighting( const MaterialPtr material,
-                          const GPUProgramPtr program,
-                          const ScenePtr scene,
-                          const RenderQueue::LightData& lightData ) const;
-
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     using RenderQueueList = std::vector<RenderQueue>;

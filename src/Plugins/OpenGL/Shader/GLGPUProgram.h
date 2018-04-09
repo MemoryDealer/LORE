@@ -65,8 +65,6 @@ namespace Lore { namespace OpenGL {
         void setUniformVar( const string& id, const uint32_t i ) override;
         void setUniformVar( const string& id, const int i ) override;
 
-        void updateLights( const RenderQueue::LightData& lights ) override;
-
     private:
 
         using UniformMap = std::unordered_map<string, GLint>;

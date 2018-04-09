@@ -183,6 +183,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       src += "vec3 ambient;";
       src += "vec3 diffuse;";
       src += "vec3 specular;";
+      src += "float range;";
       src += "float constant;";
       src += "float linear;";
       src += "float quadratic;";
@@ -249,7 +250,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
       // Attenuation.
       src += "float distance = length(light.pos - FragPos);";
-      src += "float attenuation = light.intensity / (light.constant + light.linear * distance + light.quadratic * (distance * distance));";
+      src += "float attenuation = light.range * light.intensity / (light.constant + light.linear * distance + light.quadratic * (distance * distance));";
 
       // Combine results.
       if ( textured ) {
@@ -356,6 +357,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       program->addUniformVar( idx + ".ambient" );
       program->addUniformVar( idx + ".diffuse" );
       program->addUniformVar( idx + ".specular" );
+      program->addUniformVar( idx + ".range" );
       program->addUniformVar( idx + ".constant" );
       program->addUniformVar( idx + ".linear" );
       program->addUniformVar( idx + ".quadratic" );
@@ -410,6 +412,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
         program->setUniformVar( idx + ".ambient", glm::vec3( pointLight->getAmbient() ) );
         program->setUniformVar( idx + ".diffuse", glm::vec3( pointLight->getDiffuse() ) );
         program->setUniformVar( idx + ".specular", glm::vec3( pointLight->getSpecular() ) );
+        program->setUniformVar( idx + ".range", pointLight->getRange() );
         program->setUniformVar( idx + ".constant", pointLight->getConstant() );
         program->setUniformVar( idx + ".linear", pointLight->getLinear() );
         program->setUniformVar( idx + ".quadratic", pointLight->getQuadratic() );

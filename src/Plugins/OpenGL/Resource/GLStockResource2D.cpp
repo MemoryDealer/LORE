@@ -168,6 +168,7 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
     src += "vec3 ambient;";
     src += "vec3 diffuse;";
     src += "vec3 specular;";
+    src += "float range;";
     src += "float constant;";
     src += "float linear;";
     src += "float quadratic;";
@@ -188,7 +189,7 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
     src += "vec3 CalcPointLight(Light l) {";
 
     src += "const float d = length(l.pos.xy - FragPos);";
-    src += "const float att = l.intensity / (l.constant + l.linear * d + l.quadratic * pow(d, 2.0));";
+    src += "const float att = l.range * l.intensity / (l.constant + l.linear * d + l.quadratic * pow(d, 2.0));";
 
     src += "const vec3 lDiffuse = l.diffuse * material.diffuse.rgb * att;";
     src += "return lDiffuse;";
@@ -268,6 +269,7 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
       program->addUniformVar( idx + ".ambient" );
       program->addUniformVar( idx + ".diffuse" );
       program->addUniformVar( idx + ".specular" );
+      program->addUniformVar( idx + ".range" );
       program->addUniformVar( idx + ".constant" );
       program->addUniformVar( idx + ".linear" );
       program->addUniformVar( idx + ".quadratic" );
@@ -310,6 +312,7 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
         program->setUniformVar( idx + ".ambient", glm::vec3( pointLight->getAmbient() ) );
         program->setUniformVar( idx + ".diffuse", glm::vec3( pointLight->getDiffuse() ) );
         program->setUniformVar( idx + ".specular", glm::vec3( pointLight->getSpecular() ) );
+        program->setUniformVar( idx + ".range", pointLight->getRange() );
         program->setUniformVar( idx + ".constant", pointLight->getConstant() );
         program->setUniformVar( idx + ".linear", pointLight->getLinear() );
         program->setUniformVar( idx + ".quadratic", pointLight->getQuadratic() );
