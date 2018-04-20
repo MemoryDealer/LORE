@@ -54,6 +54,14 @@ namespace Lore {
       Point
     };
 
+    enum class CullingMode
+    {
+      None,
+      Front,
+      Back,
+      FrontAndBack
+    };
+
   public:
 
     virtual ~IRenderAPI() = default;
@@ -62,6 +70,8 @@ namespace Lore {
     // General.
 
     virtual void setPolygonMode( const PolygonMode& mode ) = 0;
+
+    virtual void setCullingMode( const CullingMode mode ) = 0;
 
     //
     // Viewport.

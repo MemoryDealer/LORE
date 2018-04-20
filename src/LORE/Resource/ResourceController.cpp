@@ -346,28 +346,42 @@ EntityPtr Resource::CreateEntity( const string& name, const VertexBuffer::Type& 
     auto material = StockResource::GetMaterial( "Standard2D" );
     entity->setMaterial( material->clone( "Standard2D_" + name ) );
   }
-    break;
+  break;
 
   case VertexBuffer::Type::TexturedQuad:
   {
     auto material = StockResource::GetMaterial( "StandardTextured2D" );
     entity->setMaterial( material->clone( "StandardTextured2D_" + name ) );
   }
-    break;
+  break;
 
   case VertexBuffer::Type::Cube:
   {
     auto material = StockResource::GetMaterial( "Standard3D" );
     entity->setMaterial( material->clone( "Standard3D_" + name ) );
   }
-    break;
+  break;
 
   case VertexBuffer::Type::TexturedCube:
   {
     auto material = StockResource::GetMaterial( "StandardTextured3D" );
     entity->setMaterial( material->clone( "StandardTextured3D_" + name ) );
   }
-    break;
+  break;
+
+  case VertexBuffer::Type::Quad3D:
+  {
+    auto material = StockResource::GetMaterial( "Standard3D" );
+    entity->setMaterial( material->clone( "Standard3D_" + name ) );
+  }
+  break;
+
+  case VertexBuffer::Type::TexturedQuad3D:
+  {
+    auto material = StockResource::GetMaterial( "StandardTextured3D" );
+    entity->setMaterial( material->clone( "StandardTextured3D_" + name ) );
+  }
+  break;
 
   }
 

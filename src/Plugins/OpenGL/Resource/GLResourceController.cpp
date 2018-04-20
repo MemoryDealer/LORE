@@ -71,6 +71,12 @@ GLResourceController::GLResourceController()
 
   auto texturedCubeVB = create<VertexBuffer>( "TexturedCube" );
   texturedCubeVB->init( VertexBuffer::Type::TexturedCube );
+
+  auto quad3DVB = create<VertexBuffer>( "Quad3D" );
+  quad3DVB->init( VertexBuffer::Type::Quad3D );
+
+  auto texturedQuad3DVB = create<VertexBuffer>( "TexturedQuad3D" );
+  texturedQuad3DVB->init( VertexBuffer::Type::TexturedQuad3D );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

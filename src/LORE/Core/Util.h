@@ -55,6 +55,9 @@ namespace Lore {
     template<typename Key, typename T, typename ... ExtraParams>
     using HashTable = std::unordered_map<Key, T, HashType<Key>, ExtraParams ...>;
 
+    template<typename Key, typename T, typename ... ExtraParams>
+    using MultiHashTable = std::unordered_multimap<Key, T, HashType<Key>, ExtraParams ...>;
+
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     ///

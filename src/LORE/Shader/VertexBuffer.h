@@ -47,6 +47,8 @@ namespace Lore {
       Skybox2D,
       Cube,
       TexturedCube,
+      Quad3D,
+      TexturedQuad3D,
       Text
     };
 

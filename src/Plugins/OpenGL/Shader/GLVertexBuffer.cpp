@@ -123,6 +123,53 @@ void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
   //
   // 3D.
 
+  case VertexBuffer::Type::Quad3D:
+    // Generate quad with normals.
+    _mode = GL_TRIANGLES;
+    _vertices = { 
+      -0.5f, -0.5f, 0.f,  0.0f,  0.0f, -1.0f,
+      0.5f, -0.5f, 0.f,  0.0f,  0.0f, -1.0f,
+      0.5f,  0.5f, 0.f,  0.0f,  0.0f, -1.0f,
+      0.5f,  0.5f, 0.f,  0.0f,  0.0f, -1.0f,
+      -0.5f,  0.5f, 0.f,  0.0f,  0.0f, -1.0f,
+      -0.5f, -0.5f, 0.f,  0.0f,  0.0f, -1.0f,
+
+      -0.5f, -0.5f,  0.0001f,  0.0f,  0.0f,  1.0f,
+      0.5f, -0.5f,  0.0001f,  0.0f,  0.0f,  1.0f,
+      0.5f,  0.5f,  0.0001f,  0.0f,  0.0f,  1.0f,
+      0.5f,  0.5f,  0.0001f,  0.0f,  0.0f,  1.0f,
+      -0.5f,  0.5f,  0.0001f,  0.0f,  0.0f,  1.0f,
+      -0.5f, -0.5f,  0.0001f,  0.0f,  0.0f,  1.0f
+    };
+
+    addAttribute( AttributeType::Float, 3 );
+    addAttribute( AttributeType::Float, 3 );
+    break;
+
+  case VertexBuffer::Type::TexturedQuad3D:
+    // Generate quad with normals and texture coordinates.
+    _mode = GL_TRIANGLES;
+    _vertices = {
+      -0.5f, -0.5f, 0.f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
+      0.5f, -0.5f, 0.f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
+      0.5f,  0.5f, 0.f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
+      0.5f,  0.5f, 0.f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
+      -0.5f,  0.5f, 0.f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f,
+      -0.5f, -0.5f, 0.f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
+
+      -0.5f, -0.5f,  0.0001f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
+      0.5f, -0.5f,  0.0001f,  0.0f,  0.0f,  1.0f,  1.0f,  0.0f,
+      0.5f,  0.5f,  0.0001f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+      0.5f,  0.5f,  0.0001f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+      -0.5f,  0.5f,  0.0001f,  0.0f,  0.0f,  1.0f,  0.0f,  1.0f,
+      -0.5f, -0.5f,  0.0001f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f
+    };
+
+    addAttribute( AttributeType::Float, 3 );
+    addAttribute( AttributeType::Float, 3 );
+    addAttribute( AttributeType::Float, 2 );
+    break;
+
   case VertexBuffer::Type::Cube:
     _mode = GL_TRIANGLES;
     _vertices = {
@@ -393,6 +440,11 @@ void GLVertexBuffer::draw( const size_t instanceCount )
   case VertexBuffer::Type::Cube:
   case VertexBuffer::Type::TexturedCube:
     glDrawArrays( _mode, 0, 36 );
+    break;
+
+  case VertexBuffer::Type::Quad3D:
+  case VertexBuffer::Type::TexturedQuad3D:
+    glDrawArrays( _mode, 0, 12 );
     break;
   }
 }

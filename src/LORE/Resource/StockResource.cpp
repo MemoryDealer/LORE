@@ -118,6 +118,18 @@ void StockResourceController::createStockResources()
     _meshTable.insert( { VertexBuffer::Type::TexturedCube, mesh } );
   }
 
+  {
+    auto mesh = _controller->create<Mesh>( "Quad3D" );
+    mesh->setVertexBuffer( _controller->get<VertexBuffer>( "Quad3D" ) );
+    _meshTable.insert( { VertexBuffer::Type::Quad3D, mesh } );
+  }
+
+  {
+    auto mesh = _controller->create<Mesh>( "TexturedQuad3D" );
+    mesh->setVertexBuffer( _controller->get<VertexBuffer>( "TexturedQuad3D" ) );
+    _meshTable.insert( { VertexBuffer::Type::TexturedQuad3D, mesh } );
+  }
+
   //
   // Font stock resources.
 
@@ -254,7 +266,11 @@ void StockResourceController::createRendererStockResources( const RendererType t
 
 MeshPtr StockResourceController::getMesh( const VertexBuffer::Type& type )
 {
-  return _meshTable.at( type );
+  auto it = _meshTable.find( type );
+  if ( _meshTable.end() != it ) {
+    return it->second;
+  }
+  return nullptr;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

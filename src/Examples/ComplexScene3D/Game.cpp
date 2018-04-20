@@ -129,6 +129,25 @@ void Game::loadScene()
     node->setPosition( ( Lore::real )i * -2.f, 0.f, -10.f );
   }
 
+  // Add a quad.
+
+  Lore::EntityPtr quad = Lore::Resource::CreateEntity( "quad", Lore::VertexBuffer::Type::Quad3D );
+  quad->getMaterial()->diffuse = Lore::StockColor::White;
+  auto quadNode = _scene->createNode( "quad0" );
+  quadNode->setPosition( -3.f, 0.f, -2.f );
+  quadNode->attachObject( quad );
+  quadNode->scale( 20.f );
+
+  // Add a textured quad.
+
+  Lore::EntityPtr texturedQuad = Lore::Resource::CreateEntity( "texturedQuad", Lore::VertexBuffer::Type::TexturedQuad3D );
+  texturedQuad->setSprite( Lore::Resource::GetSprite( "block" ) );
+  texturedQuad->getMaterial()->setTextureScrollSpeed( glm::vec2( 0.01f, 0.f ) );
+  auto textureQuadNode = _scene->createNode( "texturedQuad0" );
+  textureQuadNode->attachObject( texturedQuad );
+  textureQuadNode->setPosition( 5.f, 0.f, 10.f );
+  textureQuadNode->scale( 20.f );
+
   //
   // Lighting.
 
@@ -144,8 +163,8 @@ void Game::loadScene()
   auto light = _scene->createPointLight( "core" );
   light->setAmbient( Lore::Color( 0.25f, 0.25f, 0.25f, 1.f ) );
   //light->setIntensity( 5.f );
-//   light->setDiffuse( Lore::StockColor::Blue );
-//   light->setSpecular( Lore::StockColor::Blue );
+  light->setDiffuse( Lore::StockColor::Blue );
+  light->setSpecular( Lore::StockColor::Green );
   light->setAttenuation( 3.5f, 0.5f, 0.25f, 0.01f );
   auto lightEntity = Lore::Resource::CreateEntity( "light", Lore::VertexBuffer::Type::Cube );
   lightEntity->getMaterial()->ambient = Lore::StockColor::White;
@@ -158,11 +177,11 @@ void Game::loadScene()
   auto light2 = _scene->createPointLight( "core2" );
   light2->setAttenuation( 3.5f, 0.5f, 0.25f, 0.01f );
   light2->setAmbient( Lore::Color( 0.f, 0.2f, 0.f, 1.f ) );
-  light2->setDiffuse( Lore::StockColor::Green );
-  light2->setSpecular( Lore::StockColor::Green );
+  //light2->setDiffuse( Lore::StockColor::Green );
+  //light2->setSpecular( Lore::StockColor::Green );
   light2->setIntensity( 4.f );
   auto light2Node = _scene->createNode( "light2" );
-  light2Node->attachObject( light2 );
+  //light2Node->attachObject( light2 );
   light2Node->attachObject( lightEntity );
   light2Node->scale( 0.25f );
   light2Node->setPosition( 4.f, 5.f, -6.f );
@@ -224,6 +243,9 @@ void Game::update()
 
   node = _scene->getNode( "light2" );
   node->setPosition( 6.f + 5.f * std::sinf( blockOffset ), node->getPosition().y, node->getPosition().z );
+
+  node = _scene->getNode( "texturedQuad0" );
+  node->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( 0.0002f ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

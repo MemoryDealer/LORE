@@ -101,6 +101,32 @@ void RenderAPI::setPolygonMode( const Lore::IRenderAPI::PolygonMode& mode )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void RenderAPI::setCullingMode( const IRenderAPI::CullingMode mode )
+{
+  switch ( mode ) {
+  default:
+    glDisable( GL_CULL_FACE );
+    break;
+
+  case CullingMode::Front:
+    glEnable( GL_CULL_FACE );
+    glCullFace( GL_FRONT );
+    break;
+
+  case CullingMode::Back:
+    glEnable( GL_CULL_FACE );
+    glCullFace( GL_BACK );
+    break;
+
+  case CullingMode::FrontAndBack:
+    glEnable( GL_CULL_FACE );
+    glCullFace( GL_FRONT_AND_BACK );
+    break;
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void RenderAPI::clearColor( const real r,
                             const real g,
                             const real b,

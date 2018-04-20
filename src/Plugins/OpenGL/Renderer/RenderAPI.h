@@ -41,19 +41,21 @@ namespace Lore { namespace OpenGL {
     //
     // General.
 
-    virtual void setPolygonMode( const PolygonMode& mode ) override;
+    void setPolygonMode( const PolygonMode& mode ) override;
+
+    void setCullingMode( const CullingMode mode ) override;
 
     //
     // Viewport.
 
-    virtual void clearColor( const real r,
+    void clearColor( const real r,
                              const real g,
                              const real b,
                              const real a ) override;
 
-    virtual void clear() override;
+    void clear() override;
 
-    virtual void setViewport( const uint32_t x,
+    void setViewport( const uint32_t x,
                               const uint32_t y,
                               const uint32_t width,
                               const uint32_t height ) override;
@@ -61,25 +63,25 @@ namespace Lore { namespace OpenGL {
     //
     // Framebuffers.
 
-    virtual void bindDefaultFramebuffer() override;
+    void bindDefaultFramebuffer() override;
 
     //
     // Depth testing.
 
-    virtual void setDepthTestEnabled( const bool enabled ) override;
+    void setDepthTestEnabled( const bool enabled ) override;
 
     //
     // Blending.
 
-    virtual void setBlendingEnabled( const bool enabled ) override;
+    void setBlendingEnabled( const bool enabled ) override;
 
-    virtual void setBlendingFunc( const Material::BlendFactor& src, const Material::BlendFactor& dst ) override;
+    void setBlendingFunc( const Material::BlendFactor& src, const Material::BlendFactor& dst ) override;
 
     //
     // Debugging.
 #ifdef _DEBUG
 
-    virtual void getLastError( const string& prefix ) override
+    void getLastError( const string& prefix ) override
     {
       printf( "E: %s\t%d\n", prefix.c_str(), glGetError() );
     }

@@ -124,7 +124,7 @@ namespace Lore {
 
   protected:
 
-    using MeshTable = Util::HashTable<VertexBuffer::Type, MeshPtr>;
+    using MeshTable = Util::MultiHashTable<VertexBuffer::Type, MeshPtr>;
     using StockResourceFactoryMap = std::map<RendererType, std::unique_ptr<StockResourceFactory>>;
 
   protected:
