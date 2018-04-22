@@ -1,6 +1,7 @@
 --- Features ---
--Fix gl 1282 regression
 -Cleanup Node class, rename functions for local/world/full transform
+-Custom shaders - perhaps a callback bound to custom GPUProgram's to update uniforms and skip auto update functions in renderer
+  (detect if GPUProgram is a stock program)
 -Also a regression in math tests for vector division, introduced somewhere during AABBs (was temporarily address with higher epsilon)
 -Debug tools - view memory pools for each type, hover over to view details
 -Add frame count mode to animations rather than delta time
@@ -13,13 +14,13 @@
 -Normal mapping
 -Input: Mouse clicks hitting nodes (provide helper function that converts mouse coordinates to world)
   -Add key/mouse listeners
--Spriteless backgrounds - custom shaders for cool effects
+-Spriteless skyboxs - custom shaders for cool effects
 -Node animations, Camera tracks - key frames
   Animation system for nodes with key frames
 -Self-illumination for all lights
 -Replace current boxes with regular rect and line drawing?
 -CPU Particle systems
--Camera zooming should affect background scale
+-Camera zooming should affect skybox scale
 -Proper cleanup of resources
   Write a massive test for loading a huge scene, test number of "in use" memory pool items before/after destruction
 -Compositors: visualize depth buffer (https://learnopengl.com/#!Advanced-OpenGL/Depth-testing)

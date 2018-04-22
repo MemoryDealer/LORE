@@ -1,6 +1,6 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
-// This source file is part of LORE2D
+// This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
 // Copyright (c) 2016-2017 Jordan Sparks
@@ -26,8 +26,8 @@
 
 #include "GLResourceController.h"
 
-#include <LORE2D/Resource/Material.h>
-#include <LORE2D/Scene/Camera.h>
+#include <LORE/Resource/Material.h>
+#include <LORE/Scene/Camera.h>
 
 #include <Plugins/OpenGL/Resource/GLFont.h>
 #include <Plugins/OpenGL/Resource/GLStockResource.h>
@@ -60,11 +60,23 @@ GLResourceController::GLResourceController()
   addDestructionFunctor<VertexBuffer>( std::bind( &GLResourceController::destroyVertexBuffer, this, std::placeholders::_1 ) );
 
   // Create default vertex buffers.
+  auto quadVB = create<VertexBuffer>( "Quad" );
+  quadVB->init( VertexBuffer::Type::Quad );
+
   auto texturedQuadVB = create<VertexBuffer>( "TexturedQuad" );
   texturedQuadVB->init( VertexBuffer::Type::TexturedQuad );
 
-  auto quadVB = create<VertexBuffer>( "Quad" );
-  quadVB->init( VertexBuffer::Type::Quad );
+  auto cubeVB = create<VertexBuffer>( "Cube" );
+  cubeVB->init( VertexBuffer::Type::Cube );
+
+  auto texturedCubeVB = create<VertexBuffer>( "TexturedCube" );
+  texturedCubeVB->init( VertexBuffer::Type::TexturedCube );
+
+  auto quad3DVB = create<VertexBuffer>( "Quad3D" );
+  quad3DVB->init( VertexBuffer::Type::Quad3D );
+
+  auto texturedQuad3DVB = create<VertexBuffer>( "TexturedQuad3D" );
+  texturedQuad3DVB->init( VertexBuffer::Type::TexturedQuad3D );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

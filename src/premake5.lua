@@ -1,25 +1,31 @@
 ----------------------------
--- LORE2D Premake5 script --
+-- LORE Premake5 script --
 ----------------------------
 
 targetdir "../bin/%{cfg.buildcfg}/Run"
 objdir "../bin/%{cfg.buildcfg}/Obj"
 debugdir "../bin/%{cfg.buildcfg}/Run"
 
-includedirs { ".", "%{prj.location}", "%{sln.location}/Plugins/ThirdParty", "%{sln.location}/External",
-               "%{sln.location}/External/freetype2", "%{sln.location}/External/rapidjson/include" }
+includedirs { ".",
+              "%{prj.location}",
+              "%{sln.location}/External",
+              "%{sln.location}/External/freetype2",
+              "%{sln.location}/External/rapidjson/include",
+              "%{sln.location}/External/glm",
+              "%{sln.location}/Plugins/ThirdParty"
+            }
 libdirs { "../lib/x64/%{cfg.buildcfg}" }
 architecture "x86_64"
 characterset ( "MBCS" )
 
-
+--
 -- Solution
 
-solution "LORE2D"
+solution "LORE"
     configurations { "Debug", "Release" }
     startproject "Example_ComplexScene"
 
-
+--
 -- Configurations
 
 filter "configurations:Debug"
@@ -30,7 +36,9 @@ filter "configurations:Release"
     defines { "NDEBUG" }
     optimize "On"
 
+--
 -- Systems
+
 filter "system:MacOSX"
     cppdialect "C++14"
 
@@ -38,19 +46,18 @@ filter "system:MacOSX"
 --buildoptions { "/std:c++latest" }
 
 --
--- Project(s)
---
+-- Projects
 
-project "LORE2D"
-    location "LORE2D"
+project "LORE"
+    location "LORE"
     kind "SharedLib"
     language "C++"
     defines { "__Lore_Exports__", "_HAS_CXX17" }
     pchheader "_pch.h"
-    pchsource "LORE2D/_pch.cpp"
+    pchsource "LORE/_pch.cpp"
     forceincludes { "_pch.h" }
     files {
-        "LORE2D/**.h", "LORE2D/**.cpp"
+        "LORE/**.h", "LORE/**.cpp"
     }
     postbuildcommands { "{COPY} ../../res/ ../../bin/%{cfg.buildcfg}/Run/res/" }
 
@@ -58,7 +65,7 @@ project "Plugin_OpenGL"
     location "Plugins/OpenGL"
     kind "SharedLib"
     language "C++"
-    libdirs { "../bin/%{cfg.buildcfg}/Run" } -- Location of LORE2D.lib after build.
+    libdirs { "../bin/%{cfg.buildcfg}/Run" } -- Location of LORE.lib after build.
     defines { "__LoreOpenGL_Exports__", "_HAS_CXX17" }
     pchheader "_pch.h"
     pchsource "Plugins/OpenGL/_pch.cpp"
@@ -66,7 +73,7 @@ project "Plugin_OpenGL"
     files {
         "Plugins/OpenGL/**.h", "Plugins/OpenGL/**.cpp"
     }
-    links { "LORE2D", "glad", "freetype" }
+    links { "LORE", "glad", "freetype" }
 
     -- OS-specific options
     filter { "system:Windows" }
@@ -89,31 +96,33 @@ project "glad"
 
 --
 -- Examples
---
 
-project "Example_ComplexScene"
-    location "Examples/ComplexScene"
+project "Example_ComplexScene2D"
+    location "Examples/ComplexScene2D"
     kind "ConsoleApp"
     language "C++"
     defines { "_HAS_CXX17" }
     files { 
-        "Examples/ComplexScene/**.h",
-        "Examples/ComplexScene/**.cpp"
+        "Examples/ComplexScene2D/**.h",
+        "Examples/ComplexScene2D/**.cpp"
     }
-    links { "LORE2D" }
+    links { "LORE" }
     postbuildcommands { "{COPY} ../../../res/ ../../../bin/%{cfg.buildcfg}/Run/res/" }
 
-project "Driver"
-    location "Driver"
+project "Example_ComplexScene3D"
+    location "Examples/ComplexScene3D"
     kind "ConsoleApp"
     language "C++"
     defines { "_HAS_CXX17" }
-    files {
-        "Driver/**.cpp",
-        "Driver/TODO.TXT"
+    files { 
+        "Examples/ComplexScene3D/**.h",
+        "Examples/ComplexScene3D/**.cpp"
     }
-    links { "LORE2D" }
-    postbuildcommands { "{COPY} ../../res/ ../../bin/%{cfg.buildcfg}/Run/res/" }
+    links { "LORE" }
+    postbuildcommands { "{COPY} ../../../res/ ../../../bin/%{cfg.buildcfg}/Run/res/" }
+
+--
+-- Tests
 
 project "Tests"
     location "Tests"
@@ -124,5 +133,5 @@ project "Tests"
     files {
         "Tests/**.h", "Tests/**.hpp", "Tests/**.cpp", "Tests/**.json"
     }
-    links { "LORE2D" }
+    links { "LORE" }
     postbuildcommands { "{COPY} data/ ../../bin/%{cfg.buildcfg}/Run/TestData/" }

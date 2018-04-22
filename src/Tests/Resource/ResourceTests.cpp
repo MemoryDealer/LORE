@@ -1,6 +1,6 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
-// This source file is part of LORE2D
+// This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
 // Copyright (c) 2016-2017 Jordan Sparks
@@ -34,7 +34,7 @@ TEST_CASE( "Load and unload resources in code", "[resource]" )
   TEST_CREATE_CONTEXT();
 
   // Create a window which is required for resources.
-  auto window = context->createWindow( "Test", 50, 50 );
+  auto window = context->createWindow( "Test", 50, 50, Lore::RendererType::Forward2D );
 
   constexpr const size_t size = 4;
   const std::vector<Lore::string> names = { "1", "2", "3", "4" };
@@ -44,7 +44,7 @@ TEST_CASE( "Load and unload resources in code", "[resource]" )
     REQUIRE( Lore::Resource::CreateEntity( names[i], Lore::VertexBuffer::Type::TexturedQuad ) );
     REQUIRE( Lore::Resource::CreateGPUProgram( names[i] ) );
     REQUIRE( Lore::Resource::CreateMaterial( names[i] ) );
-    REQUIRE( Lore::Resource::CreateMesh( names[i], Lore::VertexBuffer::Type::Quad ) );
+    REQUIRE( Lore::Resource::CreateMesh( names[i], Lore::VertexBuffer::Type::Custom ) );
     REQUIRE( Lore::Resource::CreateRenderTarget( names[i], 640, 480 ) );
     REQUIRE( Lore::Resource::CreateShader( names[i] + "_FS", Lore::Shader::Type::Fragment ) );
     REQUIRE( Lore::Resource::CreateShader( names[i] + "_VS", Lore::Shader::Type::Vertex ) );
@@ -103,7 +103,7 @@ TEST_CASE( "Load and unload resources in code, different group", "[resource]" )
   TEST_CREATE_CONTEXT();
 
   // Create a window which is required for resources.
-  auto window = context->createWindow( "Test", 50, 50 );
+  auto window = context->createWindow( "Test", 50, 50, Lore::RendererType::Forward2D );
 
   constexpr const size_t size = 4;
   const std::vector<Lore::string> names = { "1", "2", "3", "4" };
@@ -114,7 +114,7 @@ TEST_CASE( "Load and unload resources in code, different group", "[resource]" )
     REQUIRE( Lore::Resource::CreateEntity( names[i], Lore::VertexBuffer::Type::TexturedQuad, groupName ) );
     REQUIRE( Lore::Resource::CreateGPUProgram( names[i], groupName ) );
     REQUIRE( Lore::Resource::CreateMaterial( names[i], groupName ) );
-    REQUIRE( Lore::Resource::CreateMesh( names[i], Lore::VertexBuffer::Type::Quad, groupName ) );
+    REQUIRE( Lore::Resource::CreateMesh( names[i], Lore::VertexBuffer::Type::Custom, groupName ) );
     REQUIRE( Lore::Resource::CreateRenderTarget( names[i], 640, 480, groupName ) );
     REQUIRE( Lore::Resource::CreateShader( names[i] + "_FS", Lore::Shader::Type::Fragment, groupName ) );
     REQUIRE( Lore::Resource::CreateShader( names[i] + "_VS", Lore::Shader::Type::Vertex, groupName ) );

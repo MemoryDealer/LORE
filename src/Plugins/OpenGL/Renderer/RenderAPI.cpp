@@ -1,6 +1,6 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
-// This source file is part of LORE2D
+// This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
 // Copyright (c) 2016-2017 Jordan Sparks
@@ -95,6 +95,32 @@ void RenderAPI::setPolygonMode( const Lore::IRenderAPI::PolygonMode& mode )
 
   case Lore::IRenderAPI::PolygonMode::Point:
     glPolygonMode( GL_FRONT_AND_BACK, GL_POINT );
+    break;
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void RenderAPI::setCullingMode( const IRenderAPI::CullingMode mode )
+{
+  switch ( mode ) {
+  default:
+    glDisable( GL_CULL_FACE );
+    break;
+
+  case CullingMode::Front:
+    glEnable( GL_CULL_FACE );
+    glCullFace( GL_FRONT );
+    break;
+
+  case CullingMode::Back:
+    glEnable( GL_CULL_FACE );
+    glCullFace( GL_BACK );
+    break;
+
+  case CullingMode::FrontAndBack:
+    glEnable( GL_CULL_FACE );
+    glCullFace( GL_FRONT_AND_BACK );
     break;
   }
 }

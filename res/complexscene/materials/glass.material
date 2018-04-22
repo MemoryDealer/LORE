@@ -2,7 +2,7 @@
   "name":"glass1",
   "settings": {
     "sprite":"glass1",
-    "StockProgram":"StandardTextured",
+    "StockProgram":"StandardTextured2D",
     "diffuse":[1.0, 1.0, 1.0, 0.7],
     "blend":true,
     "sampleregion":[0.0, 0.0, 1.0, 1.0]

@@ -1,6 +1,6 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
-// This source file is part of LORE2D
+// This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
 // Copyright (c) 2016-2017 Jordan Sparks
@@ -124,8 +124,21 @@ void GLTexture::create( const int width, const int height, const Lore::Color& co
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLTexture::bind()
+void GLTexture::bind( const uint32_t idx )
 {
+  GLenum activeTexture;
+  switch ( idx ) {
+  default:
+  case 0:
+    activeTexture = GL_TEXTURE0;
+    break;
+
+  case 1:
+    activeTexture = GL_TEXTURE1;
+    break;
+  }
+
+  glActiveTexture(activeTexture);
   glBindTexture( GL_TEXTURE_2D, _id );
 }
 

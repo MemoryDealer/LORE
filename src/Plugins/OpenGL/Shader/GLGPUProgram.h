@@ -1,7 +1,7 @@
 #pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
-// This source file is part of LORE2D
+// This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
 // Copyright (c) 2016-2017 Jordan Sparks
@@ -25,9 +25,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Shader/GPUProgram.h>
-
-#include <Plugins/OpenGL/Math/MathConverter.h>
+#include <LORE/Shader/GPUProgram.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -40,41 +38,32 @@ namespace Lore { namespace OpenGL {
     public:
 
         GLGPUProgram();
-
-        virtual ~GLGPUProgram() override;
+        ~GLGPUProgram() override;
 
         void init() override;
 
-        virtual void attachShader( ShaderPtr shader ) override;
+        void attachShader( ShaderPtr shader ) override;
 
-        virtual bool link() override;
+        bool link() override;
 
-        virtual void use() override;
+        void use() override;
 
         //
         // Uniform value updating.
 
-        virtual void addTransformVar( const string& id ) override;
+        void addTransformVar( const string& id ) override;
 
-        virtual void setTransformVar( const Matrix4& m ) override;
+        void setTransformVar( const glm::mat4& m ) override;
 
-        virtual void addUniformVar( const string& id ) override;
+        void addUniformVar( const string& id ) override;
 
-        virtual void setUniformVar( const string& id, const Matrix4& m ) override;
-
-        virtual void setUniformVar( const string& id, const Vec2& v ) override;
-
-        virtual void setUniformVar( const string& id, const Vec3& v ) override;
-
-        virtual void setUniformVar( const string& id, const Vec4& v ) override;
-
-        virtual void setUniformVar( const string& id, const real r ) override;
-
-        virtual void setUniformVar( const string& id, const int i ) override;
-
-        virtual void updateLights( const RenderQueue::LightList& lights ) override;
-
-        void setUniformVar( const string& id, const glm::mat4x4& m );
+        void setUniformVar( const string& id, const glm::mat4& m ) override;
+        void setUniformVar( const string& id, const glm::vec2& v ) override;
+        void setUniformVar( const string& id, const glm::vec3& v ) override;
+        void setUniformVar( const string& id, const glm::vec4& v ) override;
+        void setUniformVar( const string& id, const real r ) override;
+        void setUniformVar( const string& id, const uint32_t i ) override;
+        void setUniformVar( const string& id, const int i ) override;
 
     private:
 
@@ -84,7 +73,7 @@ namespace Lore { namespace OpenGL {
 
         GLuint _getUniform( const string& id );
 
-        void _updateUniform( const GLint id, const Lore::Matrix4& m );
+        void _updateUniform( const GLint id, const glm::mat4& m );
 
     private:
 

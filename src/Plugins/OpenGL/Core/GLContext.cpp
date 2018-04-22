@@ -1,6 +1,6 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
-// This source file is part of LORE2D
+// This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
 // Copyright (c) 2016-2017 Jordan Sparks
@@ -119,9 +119,9 @@ void Context::initConfiguration()
 
   // Setup default memory pool settings.
   _poolCluster.registerPool<Font, GLFont>( 4 );
-  _poolCluster.registerPool<GPUProgram, GLGPUProgram>( 16 );
+  _poolCluster.registerPool<GPUProgram, GLGPUProgram>( 64 );
   _poolCluster.registerPool<RenderTarget, GLRenderTarget>( 4 );
-  _poolCluster.registerPool<Shader, GLShader>( 32 );
+  _poolCluster.registerPool<Shader, GLShader>( 64 );
   _poolCluster.registerPool<Texture, GLTexture>( 64 );
   _poolCluster.registerPool<VertexBuffer, GLVertexBuffer>( 32 );
   _poolCluster.registerPool<Window, GLWindow>( 1 );
@@ -141,10 +141,11 @@ void Context::renderFrame( const float lagMultiplier )
 Lore::WindowPtr Context::createWindow( const string& title,
                                        const uint width,
                                        const uint height,
+                                       const Lore::RendererType rendererTypeMask,
                                        const Lore::Window::Mode& mode )
 {
   auto window = _poolCluster.create<Window, GLWindow>();
-  window->init( title, width, height );
+  window->init( title, width, height, rendererTypeMask );
   window->setMode( mode );
   _windowRegistry.insert( title, window );
 

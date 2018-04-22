@@ -1,7 +1,7 @@
 #pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
-// This source file is part of LORE2D
+// This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
 // Copyright (c) 2016-2017 Jordan Sparks
@@ -25,7 +25,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Resource/Texture.h>
+#include <LORE/Resource/Texture.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -47,7 +47,7 @@ namespace Lore { namespace OpenGL {
 
         virtual void create( const int width, const int height, const Color& color ) override;
 
-        virtual void bind() override;
+        virtual void bind( const uint32_t idx ) override;
 
         //
         // Getters.

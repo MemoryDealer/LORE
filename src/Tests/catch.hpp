@@ -6504,7 +6504,7 @@ namespace Catch {
         CONSOLE_SCREEN_BUFFER_INFO csbiInfo;
         GetConsoleScreenBufferInfo( stdoutHandle, &csbiInfo );
         originalForegroundAttributes = csbiInfo.wAttributes & ~( BACKGROUND_GREEN | BACKGROUND_RED | BACKGROUND_BLUE | BACKGROUND_INTENSITY );
-        originalBackgroundAttributes = csbiInfo.wAttributes & ~( FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY );
+        originalSkyboxAttributes = csbiInfo.wAttributes & ~( FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY );
       }
 
       virtual void use( Colour::Code _colourCode ) override
@@ -6531,11 +6531,11 @@ namespace Catch {
     private:
       void setTextAttribute( WORD _textAttribute )
       {
-        SetConsoleTextAttribute( stdoutHandle, _textAttribute | originalBackgroundAttributes );
+        SetConsoleTextAttribute( stdoutHandle, _textAttribute | originalSkyboxAttributes );
       }
       HANDLE stdoutHandle;
       WORD originalForegroundAttributes;
-      WORD originalBackgroundAttributes;
+      WORD originalSkyboxAttributes;
     };
 
     IColourImpl* platformColourInstance()

@@ -1,6 +1,6 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
-// This source file is part of LORE2D
+// This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
 // Copyright (c) 2016-2017 Jordan Sparks
@@ -26,8 +26,8 @@
 
 #include "GLGPUProgram.h"
 
-#include <LORE2D/Scene/Light.h>
-#include <LORE2D/Shader/Shader.h>
+#include <LORE/Scene/Light.h>
+#include <LORE/Shader/Shader.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -114,7 +114,7 @@ void GLGPUProgram::addTransformVar( const string& id )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLGPUProgram::setTransformVar( const Lore::Matrix4& m )
+void GLGPUProgram::setTransformVar( const glm::mat4& m )
 {
   _updateUniform( _transform, m );
 }
@@ -129,7 +129,7 @@ void GLGPUProgram::addUniformVar( const string& id )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLGPUProgram::setUniformVar( const string& id, const Lore::Matrix4& m )
+void GLGPUProgram::setUniformVar( const string& id, const glm::mat4& m )
 {
   auto uniform = _getUniform( id );
   if ( -1 != uniform ) {
@@ -139,34 +139,31 @@ void GLGPUProgram::setUniformVar( const string& id, const Lore::Matrix4& m )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLGPUProgram::setUniformVar( const string& id, const Lore::Vec2& v )
+void GLGPUProgram::setUniformVar( const string& id, const glm::vec2& v )
 {
   auto uniform = _getUniform( id );
   if ( -1 != uniform ) {
-    glm::vec2 glmv = MathConverter::LoreToGLM( v );
-    glUniform2fv( uniform, 1, glm::value_ptr( glmv ) );
+    glUniform2fv( uniform, 1, glm::value_ptr( v ) );
   }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLGPUProgram::setUniformVar( const string& id, const Lore::Vec3& v )
+void GLGPUProgram::setUniformVar( const string& id, const glm::vec3& v )
 {
   auto uniform = _getUniform( id );
   if ( -1 != uniform ) {
-    glm::vec3 glmv = MathConverter::LoreToGLM( v );
-    glUniform3fv( uniform, 1, glm::value_ptr( glmv ) );
+    glUniform3fv( uniform, 1, glm::value_ptr( v ) );
   }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLGPUProgram::setUniformVar( const string& id, const Lore::Vec4& v )
+void GLGPUProgram::setUniformVar( const string& id, const glm::vec4& v )
 {
   auto uniform = _getUniform( id );
   if ( -1 != uniform ) {
-    glm::vec4 glmv = MathConverter::LoreToGLM( v );
-    glUniform4fv( uniform, 1, glm::value_ptr( glmv ) );
+    glUniform4fv( uniform, 1, glm::value_ptr( v ) );
   }
 }
 
@@ -182,51 +179,21 @@ void GLGPUProgram::setUniformVar( const string& id, const real r )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void GLGPUProgram::setUniformVar( const string& id, const uint32_t i )
+{
+  auto uniform = _getUniform( id );
+  if ( -1 != uniform ) {
+    glUniform1ui( uniform, static_cast< GLuint >( i ) );
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void GLGPUProgram::setUniformVar( const string& id, const int i )
 {
   auto uniform = _getUniform( id );
   if ( -1 != uniform ) {
     glUniform1i( uniform, static_cast<GLint>( i ) );
-  }
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void GLGPUProgram::updateLights( const Lore::RenderQueue::LightList& lights )
-{
-  int i = 0;
-  for( const auto& lightData : lights ) {
-    const string idx( "lights[" + std::to_string( i ) + "]" );
-    const auto light = lightData.light;
-
-    //
-    // Update all light properties.
-
-    auto posID = glGetUniformLocation( _program, ( idx + ".pos" ).c_str() );
-    auto colorID = glGetUniformLocation( _program, ( idx + ".color" ).c_str() );
-    auto constantID = glGetUniformLocation( _program, ( idx + ".constant" ).c_str() );
-    auto linearID = glGetUniformLocation( _program, ( idx + ".linear" ).c_str() );
-    auto quadraticID = glGetUniformLocation( _program, ( idx + ".quadratic" ).c_str() );
-    auto intensityID = glGetUniformLocation( _program, ( idx + ".intensity" ).c_str() );
-
-    glUniform2f( posID, lightData.pos.x, lightData.pos.y );
-    glUniform3f( colorID, light->getColor().r, light->getColor().g, light->getColor().b );
-    glUniform1f( constantID, light->getConstant() );
-    glUniform1f( linearID, light->getLinear() );
-    glUniform1f( quadraticID, light->getQuadratic() );
-    glUniform1f( intensityID, light->getIntensity() );
-
-    ++i;
-  }
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void GLGPUProgram::setUniformVar( const string& id, const glm::mat4x4& m )
-{
-  auto uniform = _getUniform( id );
-  if ( -1 != uniform ) {
-    glUniformMatrix4fv( uniform, 1, GL_FALSE, glm::value_ptr( m ) );
   }
 }
 
@@ -247,10 +214,9 @@ GLuint GLGPUProgram::_getUniform( const string& id )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLGPUProgram::_updateUniform( const GLint id, const Lore::Matrix4& m )
+void GLGPUProgram::_updateUniform( const GLint id, const glm::mat4& m )
 {
-  glm::mat4x4 mm = MathConverter::LoreToGLM( m );
-  glUniformMatrix4fv( id, 1, GL_FALSE, glm::value_ptr( mm ) );
+  glUniformMatrix4fv( id, 1, GL_FALSE, glm::value_ptr( m ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

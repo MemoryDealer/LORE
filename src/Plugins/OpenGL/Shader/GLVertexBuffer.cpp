@@ -1,6 +1,6 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
-// This source file is part of LORE2D
+// This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
 // Copyright (c) 2016-2017 Jordan Sparks
@@ -25,8 +25,6 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 #include "GLVertexBuffer.h"
-
-#include <Plugins/OpenGL/Math/MathConverter.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -69,12 +67,15 @@ void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
     // Attributes should be added by the caller.
     break;
 
+  //
+  // 2D.
+
   case VertexBuffer::Type::Quad:
     _mode = GL_TRIANGLE_STRIP;
     _vertices = { -0.1f, -0.1f,
-      -0.1f, 0.1f,
-      0.1f, -0.1f,
-      0.1f, 0.1f };
+                  -0.1f, 0.1f,
+                  0.1f, -0.1f,
+                  0.1f, 0.1f };
     _indices = { 0, 1, 2, 3 };
 
     addAttribute( AttributeType::Float, 2 );
@@ -83,21 +84,21 @@ void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
   case VertexBuffer::Type::TexturedQuad:
     _mode = GL_TRIANGLE_STRIP;
     _vertices = { -0.1f, -0.1f,     0.f, 0.f,
-      -0.1f, 0.1f,      0.f, 1.f,
-      0.1f, -0.1f,      1.f, 0.f,
-      0.1f, 0.1f,       1.f, 1.f };
+                  -0.1f, 0.1f,      0.f, 1.f,
+                  0.1f, -0.1f,      1.f, 0.f,
+                  0.1f, 0.1f,       1.f, 1.f };
     _indices = { 0, 1, 2, 3 };
 
     addAttribute( AttributeType::Float, 2 );
     addAttribute( AttributeType::Float, 2 );
     break;
 
-  case VertexBuffer::Type::Background:
+  case VertexBuffer::Type::Skybox2D:
     _mode = GL_TRIANGLE_STRIP;
     _vertices = { -1.f, -1.f,     0.f, 0.f,
-      -1.f, 1.f,      0.f, 1.f,
-      1.f, -1.f,      1.f, 0.f,
-      1.f, 1.f,       1.f, 1.f };
+                  -1.f, 1.f,      0.f, 1.f,
+                  1.f, -1.f,      1.f, 0.f,
+                  1.f, 1.f,       1.f, 1.f };
     _indices = { 0, 1, 2, 3 };
 
     addAttribute( AttributeType::Float, 2 );
@@ -118,19 +119,205 @@ void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
     glBindVertexArray( 0 );
     _attributes.clear();
     return; // Early return for special case.
+
+  //
+  // 3D.
+
+  case VertexBuffer::Type::Quad3D:
+    // Generate quad with normals.
+    _mode = GL_TRIANGLES;
+    // These quads currently render two quads with opposing normals to provide accurate lighting on both sides.
+    // However it may be preferable to only have a single quad with one normal, and let the user render two
+    // quads if they desire this behavior.
+    _vertices = { 
+      -0.5f, -0.5f, 0.f,  0.0f,  0.0f, -1.0f,
+      0.5f, -0.5f, 0.f,  0.0f,  0.0f, -1.0f,
+      0.5f,  0.5f, 0.f,  0.0f,  0.0f, -1.0f,
+      0.5f,  0.5f, 0.f,  0.0f,  0.0f, -1.0f,
+      -0.5f,  0.5f, 0.f,  0.0f,  0.0f, -1.0f,
+      -0.5f, -0.5f, 0.f,  0.0f,  0.0f, -1.0f,
+
+      -0.5f, -0.5f,  0.001f,  0.0f,  0.0f,  1.0f,
+      0.5f, -0.5f,  0.001f,  0.0f,  0.0f,  1.0f,
+      0.5f,  0.5f,  0.001f,  0.0f,  0.0f,  1.0f,
+      0.5f,  0.5f,  0.001f,  0.0f,  0.0f,  1.0f,
+      -0.5f,  0.5f,  0.001f,  0.0f,  0.0f,  1.0f,
+      -0.5f, -0.5f,  0.001f,  0.0f,  0.0f,  1.0f
+    };
+
+    addAttribute( AttributeType::Float, 3 );
+    addAttribute( AttributeType::Float, 3 );
+    break;
+
+  case VertexBuffer::Type::TexturedQuad3D:
+    // Generate quad with normals and texture coordinates.
+    _mode = GL_TRIANGLES;
+    _vertices = {
+      -0.5f, -0.5f, 0.f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
+      0.5f, -0.5f, 0.f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
+      0.5f,  0.5f, 0.f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
+      0.5f,  0.5f, 0.f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
+      -0.5f,  0.5f, 0.f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f,
+      -0.5f, -0.5f, 0.f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
+
+      -0.5f, -0.5f,  0.001f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
+      0.5f, -0.5f,  0.001f,  0.0f,  0.0f,  1.0f,  1.0f,  0.0f,
+      0.5f,  0.5f,  0.001f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+      0.5f,  0.5f,  0.001f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+      -0.5f,  0.5f,  0.001f,  0.0f,  0.0f,  1.0f,  0.0f,  1.0f,
+      -0.5f, -0.5f,  0.001f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f
+    };
+
+    addAttribute( AttributeType::Float, 3 );
+    addAttribute( AttributeType::Float, 3 );
+    addAttribute( AttributeType::Float, 2 );
+    break;
+
+  case VertexBuffer::Type::Cube:
+    _mode = GL_TRIANGLES;
+    _vertices = {
+      -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+      0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+      0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+      0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+      -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+      -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+
+      -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+      0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+      0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+      0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+      -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+      -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+
+      -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+      -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+      -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+      -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+      -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+      -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+
+      0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+      0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+      0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+      0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+      0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+      0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+
+      -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+      0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+      0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+      0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+      -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+      -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+
+      -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+      0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+      0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+      0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+      -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+      -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+    };
+
+    addAttribute( AttributeType::Float, 3 );
+    addAttribute( AttributeType::Float, 3 );
+    break;
+
+  case VertexBuffer::Type::TexturedCube:
+    _mode = GL_TRIANGLES;
+//     _vertices = {
+//       -1.0, -1.0,  1.0,   0.f, 0.f,
+//       1.0, -1.0,  1.0,    1.f, 0.f,
+//       -1.0,  1.0,  1.0,   0.f, 1.f,
+//       1.0,  1.0,  1.0,    1.f, 1.f,
+//       -1.0, -1.0, -1.0,   1.f, 1.f,
+//       1.0, -1.0, -1.0,    0.f, 1.f,
+//       -1.0,  1.0, -1.0,   1.f, 0.f,
+//       1.0,  1.0, -1.0,    0.f, 0.f
+//     };
+//     _indices = { 0, 1, 2, 3, 7, 1, 5, 4, 7, 6, 2, 4, 0, 1 };
+//     _vertices = {
+//       -1.f, -1.f, -1.f,   0.f, 0.f,
+//       1.f, -1.f, -1.f,    1.f, 0.f,
+//       1.f, 1.f, -1.f,     1.f, 1.f,
+//       -1.f, 1.f, -1.f,    0.f, 1.f,
+//       -1.f, -1.f, 1.f,    0.f, 1.f,
+//       1.f, -1.f, 1.f,     1.f, 1.f,
+//       1.f, 1.f, 1.f,      1.f, 0.f,
+//       -1.f, 1.f, 1.f,     0.f, 0.f
+//     };
+//     _indices = {
+//       0, 1, 3, 3, 1, 2,
+//       1, 5, 2, 2, 5, 6,
+//       5, 4, 6, 6, 4, 7,
+//       4, 0, 7, 7, 0, 3,
+//       3, 2, 7, 7, 2, 6,
+//       4, 5, 0, 0, 5, 1
+//     };
+
+    _vertices = {
+      -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
+      0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
+      0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
+      0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
+      -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f,
+      -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
+
+      -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
+      0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  0.0f,
+      0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+      0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+      -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  1.0f,
+      -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
+
+      -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+      -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+      -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+      -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+      -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+      -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+
+      0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+      0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+      0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+      0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+      0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+      0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+
+      -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
+      0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  1.0f,
+      0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+      0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+      -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  0.0f,
+      -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
+
+      -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
+      0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  1.0f,
+      0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+      0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+      -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
+      -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f
+    };
+
+    addAttribute( AttributeType::Float, 3 );
+    addAttribute( AttributeType::Float, 3 );
+    addAttribute( AttributeType::Float, 2 );
+    break;
   }
 
   glGenVertexArrays( 1, &_vao );
   glGenBuffers( 1, &_vbo );
-  glGenBuffers( 1, &_ebo );
 
   glBindVertexArray( _vao );
 
   glBindBuffer( GL_ARRAY_BUFFER, _vbo );
   glBufferData( GL_ARRAY_BUFFER, sizeof( GLfloat ) * _vertices.size(), _vertices.data(), GL_STATIC_DRAW );
 
-  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, _ebo );
-  glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( GLuint ) * _indices.size(), _indices.data(), GL_STATIC_DRAW );
+  if ( !_indices.empty() ) {
+    glGenBuffers( 1, &_ebo );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, _ebo );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( GLuint ) * _indices.size(), _indices.data(), GL_STATIC_DRAW );
+  }
 
   // Attributes.
   GLsizei idx = 0;
@@ -207,12 +394,8 @@ void GLVertexBuffer::initInstanced( const Type& type, const size_t maxCount )
   for ( GLuint attribIdx = 2; attribIdx < 6; ++attribIdx ) {
     glEnableVertexAttribArray( attribIdx );
     glVertexAttribPointer( attribIdx, 4, GL_FLOAT, GL_FALSE, sizeof( glm::mat4 ), reinterpret_cast< void* >( ( attribIdx - 2 ) * sizeof( glm::vec4 ) ) );
+    glVertexAttribDivisor( attribIdx, 1 );
   }
-
-  glVertexAttribDivisor( 2, 1 );
-  glVertexAttribDivisor( 3, 1 );
-  glVertexAttribDivisor( 4, 1 );
-  glVertexAttribDivisor( 5, 1 );
 
   glBindVertexArray( 0 );
 
@@ -221,9 +404,9 @@ void GLVertexBuffer::initInstanced( const Type& type, const size_t maxCount )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLVertexBuffer::updateInstanced( const size_t idx, const Lore::Matrix4& matrix )
+void GLVertexBuffer::updateInstanced( const size_t idx, const glm::mat4& matrix )
 {
-  _instancedMatrices[idx] = MathConverter::LoreToGLM( matrix );
+  _instancedMatrices[idx] = matrix;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -255,6 +438,16 @@ void GLVertexBuffer::draw( const size_t instanceCount )
     glBufferData( GL_ARRAY_BUFFER, _instancedMatrices.size() * sizeof( glm::mat4 ), &_instancedMatrices.data()[0], GL_STATIC_DRAW );
     glDrawElementsInstanced( _mode, static_cast< GLsizei >( _indices.size() ), GL_UNSIGNED_INT, nullptr, static_cast< GLsizei >( instanceCount ) );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    break;
+
+  case VertexBuffer::Type::Cube:
+  case VertexBuffer::Type::TexturedCube:
+    glDrawArrays( _mode, 0, 36 );
+    break;
+
+  case VertexBuffer::Type::Quad3D:
+  case VertexBuffer::Type::TexturedQuad3D:
+    glDrawArrays( _mode, 0, 12 );
     break;
   }
 }

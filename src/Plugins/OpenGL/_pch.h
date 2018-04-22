@@ -1,7 +1,7 @@
 #pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
-// This source file is part of LORE2D
+// This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
 // Copyright (c) 2016-2017 Jordan Sparks
@@ -29,8 +29,8 @@
 #include "Exports.h"
 #include "Types.h"
 
-// LORE2D.
-#include <LORE2D/LorePrerequisites.h>
+// LORE.
+#include <LORE/LorePrerequisites.h>
 
 // C++/STL.
 #include <memory>
@@ -38,9 +38,5 @@
 // GLFW.
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
-// GLM.
-#include <Plugins/ThirdParty/glm/glm.hpp>
-#include <Plugins/ThirdParty/glm/gtc/matrix_transform.hpp>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

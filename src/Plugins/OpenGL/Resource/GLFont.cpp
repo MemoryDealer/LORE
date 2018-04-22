@@ -1,6 +1,6 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
-// This source file is part of LORE2D
+// This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
 // Copyright (c) 2016-2017 Jordan Sparks
@@ -93,8 +93,8 @@ void GLFont::loadFromFile( const string& file, const uint32_t size )
     Glyph glyph = {
       texture,
       static_cast<GLuint>( face->glyph->advance.x ),
-      Lore::IVec2( face->glyph->bitmap.width, face->glyph->bitmap.rows ),
-      Lore::IVec2( face->glyph->bitmap_left, face->glyph->bitmap_top )
+      glm::tvec2<uint32_t>( face->glyph->bitmap.width, face->glyph->bitmap.rows ),
+      glm::tvec2<uint32_t>( face->glyph->bitmap_left, face->glyph->bitmap_top )
     };
 
     _glyphs.insert( { c, glyph } );
@@ -141,6 +141,7 @@ Lore::VertexBuffer::Vertices GLFont::generateVertices( const char c,
 void GLFont::bindTexture( const char c )
 {
   const Glyph& glyph = _glyphs.at( c );
+  glActiveTexture( GL_TEXTURE0 );
   glBindTexture( GL_TEXTURE_2D, glyph.textureID );
 }
 

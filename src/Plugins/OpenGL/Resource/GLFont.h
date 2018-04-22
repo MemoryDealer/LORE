@@ -1,7 +1,7 @@
 #pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
-// This source file is part of LORE2D
+// This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
 // Copyright (c) 2016-2017 Jordan Sparks
@@ -25,9 +25,9 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Math/Math.h>
-#include <LORE2D/Memory/Alloc.h>
-#include <LORE2D/Resource/Font.h>
+#include <LORE/Math/Math.h>
+#include <LORE/Memory/Alloc.h>
+#include <LORE/Resource/Font.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -43,8 +43,8 @@ namespace Lore { namespace OpenGL {
     {
       GLuint textureID;
       GLuint advance;
-      IVec2 size;
-      IVec2 bearing;
+      glm::tvec2<uint32_t> size;
+      glm::tvec2<uint32_t> bearing;
     };
 
   public:

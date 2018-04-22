@@ -1,7 +1,7 @@
 #pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
-// This source file is part of LORE2D
+// This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
 // Copyright (c) 2016-2017 Jordan Sparks
@@ -25,7 +25,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Shader/VertexBuffer.h>
+#include <LORE/Shader/VertexBuffer.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -44,7 +44,7 @@ namespace Lore { namespace OpenGL {
         void init( const Lore::VertexBuffer::Type& type ) override;
         void initInstanced( const Type& type, const size_t maxCount ) override;
 
-        void updateInstanced( const size_t idx, const Matrix4& matrix ) override;
+        void updateInstanced( const size_t idx, const glm::mat4& matrix ) override;
 
         void bind() override;
         void unbind() override;

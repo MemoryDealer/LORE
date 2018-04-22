@@ -1,7 +1,7 @@
 #pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
-// This source file is part of LORE2D
+// This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
 // Copyright (c) 2016-2017 Jordan Sparks
@@ -25,29 +25,55 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE2D/Resource/StockResource.h>
+#include <LORE/Resource/StockResource.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore { namespace OpenGL {
 
-    class StockResourceController : public Lore::StockResourceController
-    {
+  class GLStockResource2DFactory final : public Lore::StockResourceFactory
+  {
 
-    public:
+  public:
 
-        StockResourceController();
-        virtual ~StockResourceController() override;
+    GLStockResource2DFactory( ResourceControllerPtr controller );
+    ~GLStockResource2DFactory() override = default;
 
-        //
-        // Factory functions.
+    virtual GPUProgramPtr createUberProgram( const string& name, const Lore::UberProgramParameters& params ) override;
+    virtual GPUProgramPtr createSkyboxProgram( const string& name, const SkyboxProgramParameters& params ) override;
+    virtual GPUProgramPtr createBoxProgram( const string& name ) override;
 
-        virtual GPUProgramPtr createUberProgram( const string& name, const Lore::UberProgramParameters& params ) override;
-        virtual GPUProgramPtr createBackgroundProgram( const string& name, const BackgroundProgramParameters& params ) override;
-        virtual GPUProgramPtr createBoxProgram( const string& name ) override;
-        virtual GPUProgramPtr createTextProgram( const string& name ) override;
+  };
 
-    };
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  class GLStockResource3DFactory final : public Lore::StockResourceFactory
+  {
+
+  public:
+
+    GLStockResource3DFactory( ResourceControllerPtr controller );
+    ~GLStockResource3DFactory() override = default;
+
+    virtual GPUProgramPtr createUberProgram( const string& name, const Lore::UberProgramParameters& params ) override;
+    virtual GPUProgramPtr createSkyboxProgram( const string& name, const SkyboxProgramParameters& params ) override;
+    virtual GPUProgramPtr createBoxProgram( const string& name ) override;
+
+  };
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  class GLStockResourceController final : public Lore::StockResourceController
+  {
+
+  public:
+
+    GLStockResourceController();
+    ~GLStockResourceController() override = default;
+
+    virtual GPUProgramPtr createTextProgram( const string& name ) override;
+
+  };
 
 }}
 
