@@ -40,7 +40,7 @@ namespace Lore {
 
     virtual void serialize( const string& file ) override;
 
-    virtual void deserialize( const string& file ) override;
+    virtual bool deserialize( const string& file ) override;
 
   };
 

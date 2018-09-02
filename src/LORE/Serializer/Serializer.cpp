@@ -84,9 +84,9 @@ void Serializer::serialize( const string& file )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Serializer::deserialize( const string& file )
+bool Serializer::deserialize( const string& file )
 {
-  _component->deserialize( file );
+  return _component->deserialize( file );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -88,22 +88,23 @@ ResourceFileProcessor::ResourceFileProcessor( const string& file, const Serializ
 : _file( file )
 , _type( type )
 {
-  process();
+  _hasData = process();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void ResourceFileProcessor::process()
+bool ResourceFileProcessor::process()
 {
   switch ( _type ) {
   default:
-    _serializer.deserialize( _file );
-    break;
+    return _serializer.deserialize( _file );
 
   case SerializableResource::Texture:
     // Don't try to deserialize texture files.
-    break;
+    return true;
   }
+
+  return false;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -125,6 +126,13 @@ string ResourceFileProcessor::getName() const
 SerializableResource ResourceFileProcessor::getType() const
 {
   return _type;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+bool ResourceFileProcessor::hasData() const
+{
+  return _hasData;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

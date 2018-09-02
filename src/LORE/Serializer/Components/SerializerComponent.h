@@ -42,7 +42,7 @@ namespace Lore {
 
     virtual void serialize( const string& file ) { }
 
-    virtual void deserialize( const string& file ) { }
+    virtual bool deserialize( const string& file ) { return false; }
 
     //
     // Values.

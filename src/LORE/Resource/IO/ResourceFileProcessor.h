@@ -45,11 +45,16 @@ namespace Lore {
     ResourceFileProcessor( const string& file, const SerializableResource type );
     ~ResourceFileProcessor() = default;
 
-    void process();
+    ///
+    /// \brief Loads any data needed from the resource file.
+    /// \returns True if file has any relevant data.
+    bool process();
 
     string getName() const;
 
     SerializableResource getType() const;
+
+	bool hasData() const;
 
     void load( const string& groupName, ResourceControllerPtr resourceController );
 
@@ -64,6 +69,7 @@ namespace Lore {
     string _file {};
     SerializableResource _type {};
     mutable Serializer _serializer {};
+	bool _hasData { false };
 
   };
 
