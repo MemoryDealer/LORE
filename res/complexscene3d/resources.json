@@ -1,0 +1,9 @@
+{
+  "Core": [
+    "res/complexscene3d/animations",
+    "res/complexscene3d/fonts",
+    "res/complexscene3d/materials",
+    "res/complexscene3d/sprites",
+    "res/complexscene3d/textures"
+  ]
+}
