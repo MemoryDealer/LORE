@@ -478,35 +478,23 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createSkyboxProgram( const string&
   //
   // Layout.
 
-  src += "layout (location = 0) in vec2 vertex;";
-  src += "layout (location = 1) in vec2 texCoord;";
-
-  //
-  // Structs.
-
-  src += "struct Rect {";
-  src += "float x;";
-  src += "float y;";
-  src += "float w;";
-  src += "float h;";
-  src += "};";
+  src += "layout (location = 0) in vec3 pos;";
 
   //
   // Uniforms and outs.
 
-  src += "uniform mat4 transform;";
-  src += "uniform Rect texSampleRegion;";
+  src += "out vec3 TexCoords;";
 
-  src += "out vec2 TexCoord;";
+  src += "uniform mat4 viewProjection;";
 
   //
   // main function.
 
   src += "void main(){";
-
-  src += "gl_Position = transform * vec4(vertex, transform[3][2], 1.0);";
-  src += "TexCoord = vec2(texCoord.x * texSampleRegion.w + texSampleRegion.x, texCoord.y * texSampleRegion.h + texSampleRegion.y);";
-
+  {
+    src += "TexCoords = pos;";
+    src += "gl_Position = viewProjection * vec4(pos, 1.0);";
+  }
   src += "}";
 
   auto vsptr = _controller->create<Shader>( name + "_VS" );
@@ -523,33 +511,22 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createSkyboxProgram( const string&
   src.clear();
   src = header;
 
-  src += "uniform sampler2D tex;";
-  src += "in vec2 TexCoord;";
+  // Ins/outs and uniforms.
+
   src += "out vec4 pixel;";
 
-  // Material.
-  src += "struct Material {";
-  src += "vec4 diffuse;";
-  src += "};";
-  src += "uniform Material material;";
+  src += "in vec3 TexCoords;";
 
-  if ( params.scrolling ) {
-    src += "uniform vec2 texSampleOffset = vec2(1.0, 1.0);";
-  }
+  src += "uniform samplerCube skybox;";
 
   //
   // main function.
 
   src += "void main(){";
-
-  src += "pixel = texture(tex, TexCoord + texSampleOffset);";
-  src += "if ( pixel.a < 0.1 ) {";
-  src += "discard;";
-  src += "}";
-
-  // Apply alpha blending from material.
-  src += "pixel.a *= material.diffuse.a;";
-
+  {
+    // Sample the texture value from the cubemap.
+    src += "pixel = texture(skybox, TexCoords);";
+  }
   src += "}";
 
   auto fsptr = _controller->create<Shader>( name + "_FS" );
@@ -575,18 +552,28 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createSkyboxProgram( const string&
   //
   // Add uniforms.
 
-  program->addTransformVar( "transform" );
+  program->addUniformVar( "viewProjection" );
 
-  program->addUniformVar( "texSampleRegion.x" );
-  program->addUniformVar( "texSampleRegion.y" );
-  program->addUniformVar( "texSampleRegion.w" );
-  program->addUniformVar( "texSampleRegion.h" );
+  // Uniform updaters.
 
-  program->addUniformVar( "material.diffuse" );
+  auto UniformUpdater = []( const RenderView& rv,
+                            const GPUProgramPtr program,
+                            const MaterialPtr material,
+                            const RenderQueue::LightData& lights ) {
+    return;
+  };
 
-  if ( params.scrolling ) {
-    program->addUniformVar( "texSampleOffset" );
-  }
+  auto UniformNodeUpdater = []( const GPUProgramPtr program,
+                                const MaterialPtr material,
+                                const NodePtr node,
+                                const glm::mat4& viewProjection ) {
+    program->setUniformVar( "viewProjection", viewProjection );
+    auto texture = material->sprite->getTexture( 0 );
+    texture->bind();
+  };
+
+  program->setUniformUpdater( UniformUpdater );
+  program->setUniformNodeUpdater( UniformNodeUpdater );
 
   return program;
 }

@@ -54,6 +54,7 @@ Scene::Scene()
 Scene::~Scene()
 {
   _bgColor = StockColor::Black;
+  MemoryAccess::GetPrimaryPoolCluster()->destroy<Skybox>( _skybox );
   _renderer = nullptr;
 
   // Clear all nodes.

@@ -27,7 +27,7 @@
 
 #include <LORE/Core/Notification.h>
 #include <LORE/Core/Singleton.h>
-#include <LORE/Core/Util.h>
+#include <LORE/Util/Util.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 

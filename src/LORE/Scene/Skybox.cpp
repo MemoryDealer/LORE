@@ -45,9 +45,7 @@ Skybox::Skybox()
 Skybox::Layer& Skybox::addLayer( const string& name )
 {
   Layer layer( name );
-  auto material = StockResource::GetMaterial( "Skybox2D" );
-  layer.setMaterial( ResourceCast<Material>( material->clone( "bg_layer_" + name ) ) );
-  layer.getMaterial()->program = Lore::StockResource::GetGPUProgram( "Skybox2D" );
+  layer.setMaterial( ResourceCast<Material>( _materialTemplate->clone( "bg_layer_" + name ) ) );
 
   log_information( "Added layer " + name + " to skybox " + _name );
 
@@ -79,6 +77,13 @@ void Skybox::removeLayer( const string& name )
   _layers.erase( lookup );
 
   log_information( "Remove layer " + name + " from skybox " + _name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Skybox::setMaterialTemplate( const MaterialPtr material )
+{
+  _materialTemplate = material;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

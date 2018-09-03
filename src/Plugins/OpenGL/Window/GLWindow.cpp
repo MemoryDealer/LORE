@@ -90,6 +90,7 @@ void GLWindow::init( const string& title,
   _stockController->createStockResources();
 
   // Create stock resources needed for this window given the expected renderer type(s).
+  // TODO: Use configuration setting to initialize renderer type(s).
   _stockController->createRendererStockResources( RendererType::Forward2D );
   _stockController->createRendererStockResources( RendererType::Forward3D );
 

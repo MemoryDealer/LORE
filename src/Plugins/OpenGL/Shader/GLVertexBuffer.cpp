@@ -105,6 +105,55 @@ void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
     addAttribute( AttributeType::Float, 2 );
     break;
 
+  case VertexBuffer::Type::Skybox3D:
+    _mode = GL_TRIANGLES;
+    _vertices = {
+      -1000.0f,  1000.0f, -1000.0f,
+      -1000.0f, -1000.0f, -1000.0f,
+      1000.0f, -1000.0f, -1000.0f,
+      1000.0f, -1000.0f, -1000.0f,
+      1000.0f,  1000.0f, -1000.0f,
+      -1000.0f,  1000.0f, -1000.0f,
+
+      -1000.0f, -1000.0f,  1000.0f,
+      -1000.0f, -1000.0f, -1000.0f,
+      -1000.0f,  1000.0f, -1000.0f,
+      -1000.0f,  1000.0f, -1000.0f,
+      -1000.0f,  1000.0f,  1000.0f,
+      -1000.0f, -1000.0f,  1000.0f,
+
+      1000.0f, -1000.0f, -1000.0f,
+      1000.0f, -1000.0f,  1000.0f,
+      1000.0f,  1000.0f,  1000.0f,
+      1000.0f,  1000.0f,  1000.0f,
+      1000.0f,  1000.0f, -1000.0f,
+      1000.0f, -1000.0f, -1000.0f,
+
+      -1000.0f, -1000.0f,  1000.0f,
+      -1000.0f,  1000.0f,  1000.0f,
+      1000.0f,  1000.0f,  1000.0f,
+      1000.0f,  1000.0f,  1000.0f,
+      1000.0f, -1000.0f,  1000.0f,
+      -1000.0f, -1000.0f,  1000.0f,
+
+      -1000.0f,  1000.0f, -1000.0f,
+      1000.0f,  1000.0f, -1000.0f,
+      1000.0f,  1000.0f,  1000.0f,
+      1000.0f,  1000.0f,  1000.0f,
+      -1000.0f,  1000.0f,  1000.0f,
+      -1000.0f,  1000.0f, -1000.0f,
+
+      -1000.0f, -1000.0f, -1000.0f,
+      -1000.0f, -1000.0f,  1000.0f,
+      1000.0f, -1000.0f, -1000.0f,
+      1000.0f, -1000.0f, -1000.0f,
+      -1000.0f, -1000.0f,  1000.0f,
+      1000.0f, -1000.0f,  1000.0f
+    };
+
+    addAttribute( AttributeType::Float, 3 );
+    break;
+
   case VertexBuffer::Type::Text:
     _mode = GL_TRIANGLES;
     // Text VBs are a special case and require dynamic drawing.
@@ -442,6 +491,7 @@ void GLVertexBuffer::draw( const size_t instanceCount )
 
   case VertexBuffer::Type::Cube:
   case VertexBuffer::Type::TexturedCube:
+  case VertexBuffer::Type::Skybox3D:
     glDrawArrays( _mode, 0, 36 );
     break;
 

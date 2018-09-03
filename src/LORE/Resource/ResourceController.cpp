@@ -151,7 +151,9 @@ void ResourceController::loadGroup( const string& groupName )
   };
 
   // Load resource types in correct order so dependencies are ready.
-  std::vector<SerializableResource> typeOrder = { SerializableResource::Texture,
+  std::vector<SerializableResource> typeOrder = {
+    SerializableResource::Cubemap,
+    SerializableResource::Texture,
     SerializableResource::Sprite,
     SerializableResource::SpriteList,
     SerializableResource::SpriteAnimation,

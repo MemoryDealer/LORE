@@ -44,7 +44,7 @@ Game::Game()
   _context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
 
   // Create a window and set it to the active window.
-  _window = _context->createWindow( "Complex Scene 3D", 640, 480, Lore::RendererType::Forward3D );
+  _window = _context->createWindow( "Complex Scene 3D", 1280, 720, Lore::RendererType::Forward3D );
   _window->setActive();
 
   // Allow the DebugUI.
@@ -69,7 +69,7 @@ Game::~Game()
 void Game::loadResources()
 {
   // Index all resource locations for complex scene as specified in the configuration file.
-  Lore::Resource::LoadResourceConfiguration( "res/complexscene/resources.json" );
+  Lore::Resource::LoadResourceConfiguration( "res/complexscene3d/resources.json" );
   // Now load the Core resource group, which contains the resource locations we just indexed.
   Lore::Resource::LoadGroup( Lore::ResourceController::DefaultGroupName );
 }
@@ -85,7 +85,7 @@ void Game::loadScene()
 
   // Create a camera to view the scene.
   _camera = _context->createCamera( "core", Lore::Camera::Type::Type3D );
-  _camera->lookAt( glm::vec3( 0.f, 2.f, 0.f ), glm::vec3( 0.f, 0.f, -1.f ), glm::vec3( 0.f, 1.f, 0.f ) );
+  _camera->lookAt( glm::vec3( 0.f, 2.f, -15.f ), glm::vec3( 0.f, 0.f, -1.f ), glm::vec3( 0.f, 1.f, 0.f ) );
 
   // TODO: This is a hack that should be taken care of internally.
   Lore::CLI::SetActiveScene( _scene );
@@ -98,6 +98,10 @@ void Game::loadScene()
 
   // Add the RenderView to the window so it will render our scene.
   _window->addRenderView( rv );
+
+  // Setup skybox.
+  auto& skyboxLayer = _scene->getSkybox()->addLayer( "skyboxLayer1" );
+  skyboxLayer.setSprite( Lore::Resource::GetSprite( "skybox" ) );
 
   //
   // Setup is done, now we can add some contents to the scene.

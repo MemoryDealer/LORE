@@ -26,11 +26,11 @@
 
 #include "ResourceFileProcessor.h"
 
-#include <LORE/Core/Util.h>
 #include <LORE/Resource/Sprite.h>
 #include <LORE/Resource/ResourceController.h>
 #include <LORE/Resource/StockResource.h>
 #include <LORE/Scene/SpriteController.h>
+#include <LORE/Util/Util.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -61,14 +61,16 @@ void ResourceFileProcessor::LoadConfiguration( const string& file, ResourceContr
 SerializableResource ResourceFileProcessor::GetResourceFileType( const string& file )
 {
   static const std::multimap<string, SerializableResource> ExtensionMapping = {
-    { "spriteanimation", SerializableResource::SpriteAnimation },
+    { "cubemap", SerializableResource::Cubemap },
     { "font", SerializableResource::Font },
     { "material", SerializableResource::Material },
     { "sprite", SerializableResource::Sprite },
+    { "spriteanimation", SerializableResource::SpriteAnimation },
     { "spritelist", SerializableResource::SpriteList },
     { "bmp", SerializableResource::Texture },
     { "jpg", SerializableResource::Texture },
-    { "png", SerializableResource::Texture }
+    { "png", SerializableResource::Texture },
+    { "tga", SerializableResource::Texture }
   };
 
   const string extension = Util::GetFileExtension( file );
@@ -89,6 +91,7 @@ ResourceFileProcessor::ResourceFileProcessor( const string& file, const Serializ
 , _type( type )
 {
   _hasData = process();
+  _directory = Util::GetFileDir( file );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -142,6 +145,16 @@ void ResourceFileProcessor::load( const string& groupName, ResourceControllerPtr
   switch ( _type ) {
   default:
     break;
+
+  case SerializableResource::Cubemap: {
+    const string& name = _serializer.getValue( "name" ).toString();
+    auto cubemap = resourceController->create<Texture>( name );
+    processCubemap( cubemap );
+
+    // Automatically create a sprite of the same name as well.
+    auto sprite = resourceController->create<Sprite>( name );
+    sprite->addTexture( cubemap );
+  } break;
 
   case SerializableResource::SpriteAnimation: {
     auto animationSet = resourceController->create<SpriteAnimationSet>( getName(), groupName );
@@ -261,6 +274,22 @@ void ResourceFileProcessor::processSpriteList( const string& groupName, Resource
       sprite->addTexture( resourceController->get<Texture>( textureName, groupName ) );
     }
   }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void ResourceFileProcessor::processCubemap( TexturePtr cubemap )
+{
+  // Get full path to all textures specified in the cubemap file.
+  const auto& textures = _serializer.getValue( "textures" ).toArray();
+  std::vector<string> textureFiles;
+  for ( const auto& texture : textures ) {
+    const string fullTexturePath = _directory + "/" + texture.toString();
+    textureFiles.push_back( fullTexturePath );
+  }
+
+  // Load the cubemap.
+  cubemap->loadCubemap( textureFiles );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

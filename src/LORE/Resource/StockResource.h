@@ -25,11 +25,11 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE/Core/Util.h>
 #include <LORE/Resource/Material.h>
 #include <LORE/Resource/Mesh.h>
 #include <LORE/Resource/Registry.h>
 #include <LORE/Shader/GPUProgram.h>
+#include <LORE/Util/Util.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 

@@ -297,7 +297,7 @@ void Forward2DRenderer::renderSkybox( const RenderView& rv,
                                         const glm::mat4& proj )
 {
   SkyboxPtr skybox = rv.scene->getSkybox();
-  Skybox::LayerMap layers = skybox->getLayerMap();
+  const Skybox::LayerMap& layers = skybox->getLayerMap();
 
   VertexBufferPtr vb = StockResource::GetVertexBuffer( "Skybox2D" );
   vb->bind();

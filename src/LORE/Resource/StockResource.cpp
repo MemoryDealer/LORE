@@ -172,6 +172,10 @@ void StockResourceController::createRendererStockResources( const RendererType t
     
   case RendererType::Forward3D:
     suffix = "3D";
+    {
+      auto vb = _controller->create<VertexBuffer>( "Skybox" + suffix );
+      vb->init( VertexBuffer::Type::Skybox3D );
+    }
     break;
   }
 

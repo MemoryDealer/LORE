@@ -63,13 +63,15 @@ namespace Lore {
     void processAnimation( SpriteAnimationSetPtr animationSet, const SerializerValue& animations, ResourceControllerPtr resourceController );
     void processMaterial( MaterialPtr material, const SerializerValue& settings, ResourceControllerPtr resourceController );
     void processSpriteList( const string& groupName, ResourceControllerPtr resourceController );
+    void processCubemap( TexturePtr cubemap );
 
   private:
 
     string _file {};
+    string _directory {};
     SerializableResource _type {};
     mutable Serializer _serializer {};
-	bool _hasData { false };
+    bool _hasData { false };
 
   };
 
