@@ -493,7 +493,8 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createSkyboxProgram( const string&
   src += "void main(){";
   {
     src += "TexCoords = pos;";
-    src += "gl_Position = viewProjection * vec4(pos, 1.0);";
+    src += "vec4 opPos = viewProjection * vec4(pos, 1.0);";
+    src += "gl_Position = opPos.xyww;";
   }
   src += "}";
 

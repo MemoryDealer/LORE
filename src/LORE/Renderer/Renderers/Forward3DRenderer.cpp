@@ -207,12 +207,20 @@ void Forward3DRenderer::present( const RenderView& rv,
 
   const glm::mat4 viewProjection = projection * rv.camera->getViewMatrix();
 
-  _renderSkybox( rv, viewProjection );
-
+  // Render all solids first.
   for ( const auto& activeQueue : _activeQueues ) {
     RenderQueue& queue = activeQueue.second;
-
     _renderSolids( rv, queue, viewProjection );
+  }
+
+  // Render skybox.
+  _api->setDepthFunc( IRenderAPI::DepthFunc::LessEqual );
+  _renderSkybox( rv, viewProjection );
+  _api->setDepthFunc( IRenderAPI::DepthFunc::Less );
+
+  // Render any blended objects last.
+  for ( const auto& activeQueue : _activeQueues ) {
+    RenderQueue& queue = activeQueue.second;
     _renderTransparents( rv, queue, viewProjection );
   }
 
@@ -266,6 +274,8 @@ void Forward3DRenderer::_renderSkybox( const RenderView& rv,
   VertexBufferPtr vb = StockResource::GetVertexBuffer( "Skybox3D" );
   vb->bind();
 
+  _api->setDepthMaskEnabled( false );
+
   const Skybox::LayerMap& layers = skybox->getLayerMap();
   for ( const auto& pair : layers ) {
     const Skybox::Layer& layer = pair.second;
@@ -284,10 +294,13 @@ void Forward3DRenderer::_renderSkybox( const RenderView& rv,
       GPUProgramPtr program = material->program;
       program->use();
       program->updateUniforms( rv, material, emptyLightData );
+      // TODO: Pass in camera node when camera is updated to use a scene node.
       program->updateNodeUniforms( material, nullptr, viewProjection );
       vb->draw();
     }
   }
+
+  _api->setDepthMaskEnabled( true );
 
 
   vb->unbind();

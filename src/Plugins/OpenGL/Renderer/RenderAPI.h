@@ -70,8 +70,12 @@ namespace Lore { namespace OpenGL {
 
     void setDepthTestEnabled( const bool enabled ) override;
 
+    void setDepthMaskEnabled( const bool enabled ) override;
+
     //
     // Blending.
+
+    void setDepthFunc( const DepthFunc func ) override;
 
     void setBlendingEnabled( const bool enabled ) override;
 

@@ -62,6 +62,18 @@ namespace Lore {
       FrontAndBack
     };
 
+    enum class DepthFunc
+    {
+      Never,
+      Less,
+      LessEqual,
+      Equal,
+      Greater,
+      NotEqual,
+      GreaterEqual,
+      Always
+    };
+
   public:
 
     virtual ~IRenderAPI() = default;
@@ -96,10 +108,16 @@ namespace Lore {
     //
     // Depth testing.
 
+    
+
     virtual void setDepthTestEnabled( const bool enabled ) = 0;
+
+    virtual void setDepthMaskEnabled( const bool enabled ) = 0;
 
     //
     // Blending.
+
+    virtual void setDepthFunc( const DepthFunc func ) = 0;
 
     virtual void setBlendingEnabled( const bool enabled ) = 0;
 
