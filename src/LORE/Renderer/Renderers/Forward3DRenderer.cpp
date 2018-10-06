@@ -203,14 +203,24 @@ void Forward3DRenderer::present( const RenderView& rv,
   // TODO: Take viewport dimensions into account. Cache more things inside window.
   const glm::mat4 projection = glm::perspective( glm::radians( 45.f ),
                                                  aspectRatio,
-                                                 0.1f, 1000.f );
+                                                 0.1f, 20000.f );
 
   const glm::mat4 viewProjection = projection * rv.camera->getViewMatrix();
 
+  // Render all solids first.
   for ( const auto& activeQueue : _activeQueues ) {
     RenderQueue& queue = activeQueue.second;
-
     _renderSolids( rv, queue, viewProjection );
+  }
+
+  // Render skybox.
+  _api->setDepthFunc( IRenderAPI::DepthFunc::LessEqual );
+  _renderSkybox( rv, viewProjection );
+  _api->setDepthFunc( IRenderAPI::DepthFunc::Less );
+
+  // Render any blended objects last.
+  for ( const auto& activeQueue : _activeQueues ) {
+    RenderQueue& queue = activeQueue.second;
     _renderTransparents( rv, queue, viewProjection );
   }
 
@@ -253,6 +263,47 @@ void Forward3DRenderer::_activateQueue( const uint id,
   if ( _activeQueues.end() == lookup ) {
     _activeQueues.insert( { id, rq } );
   }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Forward3DRenderer::_renderSkybox( const RenderView& rv,
+                                       const glm::mat4& viewProjection ) const
+{
+  SkyboxPtr skybox = rv.scene->getSkybox();
+  VertexBufferPtr vb = StockResource::GetVertexBuffer( "Skybox3D" );
+  vb->bind();
+
+  _api->setDepthMaskEnabled( false );
+
+  const Skybox::LayerMap& layers = skybox->getLayerMap();
+  for ( const auto& pair : layers ) {
+    const Skybox::Layer& layer = pair.second;
+    MaterialPtr material = layer.getMaterial();
+
+    if ( material->sprite && material->sprite->getTextureCount() ) {
+      RenderQueue::LightData emptyLightData; // Not needed for skybox.
+
+      // Enable blending if set.
+      if ( material->blendingMode.enabled ) {
+        _api->setBlendingEnabled( true );
+        _api->setBlendingFunc( material->blendingMode.srcFactor, material->blendingMode.dstFactor );
+      }
+
+      // Setup GPUProgram.
+      GPUProgramPtr program = material->program;
+      program->use();
+      program->updateUniforms( rv, material, emptyLightData );
+      // TODO: Pass in camera node when camera is updated to use a scene node.
+      program->updateNodeUniforms( material, nullptr, viewProjection );
+      vb->draw();
+    }
+  }
+
+  _api->setDepthMaskEnabled( true );
+
+
+  vb->unbind();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

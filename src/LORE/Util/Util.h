@@ -25,14 +25,12 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+#include <LORE/Util/FileUtils.h>
+#include <LORE/Util/StringUtils.h>
 
-  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-  class Util
-  {
-
-  public:
+namespace Lore { namespace Util {
 
     //
     // Provide unordered_map that supports strongly typed enums as a key.
@@ -70,44 +68,6 @@ namespace Lore {
       return reinterpret_cast< size_t >( fp );
     }
 
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-    static void ToLower( string& str )
-    {
-      std::transform( str.begin(), str.end(), str.begin(), ::tolower );
-    }
-
-    static string ToLower( const string& str )
-    {
-      string lower( str );
-      ToLower( lower );
-      return lower;
-    }
-
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-    static string GetFileExtension( const string& file )
-    {
-      const auto idx = file.rfind( '.' );
-      if ( string::npos == idx ) {
-        return string( "" );
-      }
-
-      return file.substr( idx + 1, file.size() - idx );
-    }
-
-    ///
-    /// \brief Returns file name from a full file path.
-    static string GetFileName( const string& file )
-    {
-      const auto lastSlash = file.rfind( '/' ) + 1;
-      const auto dot = file.rfind( '.' );
-
-      return file.substr( lastSlash, dot - lastSlash );
-    }
-
-  };
-
-}
+}}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

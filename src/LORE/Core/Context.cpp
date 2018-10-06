@@ -148,6 +148,12 @@ ScenePtr Context::createScene( const string& name, const RendererType& rt )
 
   scene->setRenderer( rp );
 
+  // Setup skybox material for scene.
+  auto skybox = scene->getSkybox();
+  string skyboxMaterialName = ( rt == RendererType::Forward2D ) ? "Skybox2D" : "Skybox3D";
+  auto skyboxMaterial = StockResource::GetMaterial( skyboxMaterialName );
+  skybox->setMaterialTemplate( skyboxMaterial );
+
   lore_log( "Scene " + name + " created successfully" );
 
   return scene;

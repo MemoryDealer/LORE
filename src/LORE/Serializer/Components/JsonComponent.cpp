@@ -166,7 +166,7 @@ void JsonSerializerComponent::serialize( const string& file )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void JsonSerializerComponent::deserialize( const string& file )
+bool JsonSerializerComponent::deserialize( const string& file )
 {
   std::ifstream stream( file );
   if ( !stream.is_open() ) {
@@ -186,6 +186,11 @@ void JsonSerializerComponent::deserialize( const string& file )
 
   if ( doc.HasParseError() ) {
     throw Lore::Exception( "Parse error for JSON document: " + std::to_string( doc.GetParseError() ) );
+  }
+
+  if ( doc.IsNull() || ( doc.IsObject() && doc.GetObjectA().MemberCount() == 0 ) ) {
+    // Nothing to deserialize.
+    return false;
   }
 
   std::function<void(rapidjson::Value::ConstMemberIterator, SerializerValue&)> HandleValue =
@@ -285,6 +290,7 @@ void JsonSerializerComponent::deserialize( const string& file )
   }
 
   stream.close();
+  return true;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

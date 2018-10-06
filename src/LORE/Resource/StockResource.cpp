@@ -166,12 +166,16 @@ void StockResourceController::createRendererStockResources( const RendererType t
     suffix = "2D";
     {
       auto vb = _controller->create<VertexBuffer>( "Skybox" + suffix );
-      vb->init( VertexBuffer::Type::Skybox2D );
+      vb->init( VertexBuffer::Type::FullscreenQuad );
     }
     break;
     
   case RendererType::Forward3D:
     suffix = "3D";
+    {
+      auto vb = _controller->create<VertexBuffer>( "Skybox" + suffix );
+      vb->init( VertexBuffer::Type::Cubemap );
+    }
     break;
   }
 
@@ -254,6 +258,28 @@ void StockResourceController::createRendererStockResources( const RendererType t
     material->lighting = false;
     material->sprite = _controller->get<Sprite>( "White" );
     material->program = _controller->get<GPUProgram>( "Skybox" + suffix );
+  }
+
+  //
+  // Environment mapping resources.
+
+  {
+    EnvironmentMappingProgramParameters params;
+    params.mode = EnvironmentMappingProgramParameters::Mode::Reflect;
+    auto program = srf->createEnvironmentMappingProgram( "Reflect" + suffix, params );
+    if ( program ) {
+      auto material = _controller->create<Material>( "Reflect" + suffix );
+      material->lighting = false;
+      material->program = program;
+    }
+
+    params.mode = EnvironmentMappingProgramParameters::Mode::Refract;
+    program = srf->createEnvironmentMappingProgram( "Refract" + suffix, params );
+    if ( program ) {
+      auto material = _controller->create<Material>( "Refract" + suffix );
+      material->lighting = false;
+      material->program = program;
+    }
   }
 
   //

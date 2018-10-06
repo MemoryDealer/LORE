@@ -44,7 +44,7 @@ Game::Game()
   _context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
 
   // Create a window and set it to the active window.
-  _window = _context->createWindow( "Complex Scene 3D", 640, 480, Lore::RendererType::Forward3D );
+  _window = _context->createWindow( "Complex Scene 3D", 1280, 720, Lore::RendererType::Forward3D );
   _window->setActive();
 
   // Allow the DebugUI.
@@ -69,7 +69,7 @@ Game::~Game()
 void Game::loadResources()
 {
   // Index all resource locations for complex scene as specified in the configuration file.
-  Lore::Resource::LoadResourceConfiguration( "res/complexscene/resources.json" );
+  Lore::Resource::LoadResourceConfiguration( "res/complexscene3d/resources.json" );
   // Now load the Core resource group, which contains the resource locations we just indexed.
   Lore::Resource::LoadGroup( Lore::ResourceController::DefaultGroupName );
 }
@@ -85,7 +85,7 @@ void Game::loadScene()
 
   // Create a camera to view the scene.
   _camera = _context->createCamera( "core", Lore::Camera::Type::Type3D );
-  _camera->lookAt( glm::vec3( 0.f, 2.f, 0.f ), glm::vec3( 0.f, 0.f, -1.f ), glm::vec3( 0.f, 1.f, 0.f ) );
+  _camera->lookAt( glm::vec3( 0.f, 2.f, -15.f ), glm::vec3( 0.f, 0.f, -1.f ), glm::vec3( 0.f, 1.f, 0.f ) );
 
   // TODO: This is a hack that should be taken care of internally.
   Lore::CLI::SetActiveScene( _scene );
@@ -99,12 +99,16 @@ void Game::loadScene()
   // Add the RenderView to the window so it will render our scene.
   _window->addRenderView( rv );
 
+  // Setup skybox.
+  auto& skyboxLayer = _scene->getSkybox()->addLayer( "skyboxLayer1" );
+  skyboxLayer.setSprite( Lore::Resource::GetSprite( "skybox" ) );
+
   //
   // Setup is done, now we can add some contents to the scene.
 
   // Add a cube.
 
-  Lore::EntityPtr cubeEntity = Lore::Resource::CreateEntity( "cube", Lore::VertexBuffer::Type::TexturedCube );
+  Lore::EntityPtr cubeEntity = Lore::Resource::CreateEntity( "TexturedCube", Lore::VertexBuffer::Type::TexturedCube );
 
   cubeEntity->setSprite( Lore::Resource::GetSprite( "block" ) );
   auto node = _scene->createNode( "cube" );
@@ -119,7 +123,7 @@ void Game::loadScene()
     //node->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( 180.f ) );
   }
 
-  Lore::EntityPtr transparentCubeEntity = Lore::Resource::CreateEntity( "transparent-cube", Lore::VertexBuffer::Type::Cube );
+  Lore::EntityPtr transparentCubeEntity = Lore::Resource::CreateEntity( "TransparentCube", Lore::VertexBuffer::Type::Cube );
   transparentCubeEntity->getMaterial()->diffuse = Lore::StockColor::Blue;
   transparentCubeEntity->getMaterial()->blendingMode.enabled = true;
   transparentCubeEntity->getMaterial()->diffuse.a = 0.5f;
@@ -185,6 +189,26 @@ void Game::loadScene()
   light2Node->attachObject( lightEntity );
   light2Node->scale( 0.25f );
   light2Node->setPosition( 4.f, 5.f, -6.f );
+
+  //
+  // Environment mapping objects.
+
+  Lore::EntityPtr solidReflectCube = Lore::Resource::CreateEntity( "SolidCube", Lore::VertexBuffer::Type::Cube );
+  solidReflectCube->setMaterial( Lore::StockResource::GetMaterial( "Reflect3D" ) );
+  solidReflectCube->setSprite( Lore::Resource::GetSprite( "skybox" ) );
+
+  Lore::EntityPtr solidRefractCube = Lore::Resource::CreateEntity( "SolidRefractCube", Lore::VertexBuffer::Type::Cube );
+  solidRefractCube->setMaterial( Lore::StockResource::GetMaterial( "Refract3D" ) );
+  solidRefractCube->setSprite( Lore::Resource::GetSprite( "skybox" ) );
+
+  // Cubes.
+  auto reflectCube = _scene->createNode( "ReflectCube" );
+  reflectCube->attachObject( solidReflectCube );
+  reflectCube->setPosition( 0.f, 3.f, -10.f );
+
+  auto refractCube = _scene->createNode( "RefractCube" );
+  refractCube->attachObject( solidRefractCube );
+  refractCube->setPosition( 0.f, 6.f, -10.f );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -246,6 +270,12 @@ void Game::update()
 
   node = _scene->getNode( "texturedQuad0" );
   node->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( 0.0002f ) );
+
+  node = _scene->getNode( "ReflectCube" );
+  node->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( -0.00025f ) );
+
+  node = _scene->getNode( "RefractCube" );
+  node->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees(0.00025f ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

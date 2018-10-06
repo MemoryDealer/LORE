@@ -165,10 +165,56 @@ void RenderAPI::setDepthTestEnabled( const bool enabled )
 {
   if ( enabled ) {
     glEnable( GL_DEPTH_TEST );
-    glDepthFunc( GL_LESS );
   }
   else {
     glDisable( GL_DEPTH_TEST );
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void RenderAPI::setDepthMaskEnabled( const bool enabled )
+{
+  glDepthMask( ( enabled ) ? GL_TRUE : GL_FALSE );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void RenderAPI::setDepthFunc( const DepthFunc func )
+{
+  switch ( func ) {
+  default:
+  case DepthFunc::Never:
+    glDepthFunc( GL_NEVER );
+    break;
+
+  case DepthFunc::Less:
+    glDepthFunc( GL_LESS );
+    break;
+
+  case DepthFunc::LessEqual:
+    glDepthFunc( GL_LEQUAL );
+    break;
+    
+  case DepthFunc::Equal:
+    glDepthFunc( GL_EQUAL );
+    break;
+
+  case DepthFunc::Greater:
+    glDepthFunc( GL_GREATER );
+    break;
+
+  case DepthFunc::GreaterEqual:
+    glDepthFunc( GL_GEQUAL );
+    break;
+
+  case DepthFunc::NotEqual:
+    glDepthFunc( GL_NOTEQUAL );
+    break;
+
+  case DepthFunc::Always:
+    glDepthFunc( GL_ALWAYS );
+    break; 
   }
 }
 

@@ -31,41 +31,44 @@
 
 namespace Lore { namespace OpenGL {
 
-    class GLTexture : public Lore::Texture,
-                      public Alloc<GLTexture>
+  class GLTexture : public Lore::Texture,
+                    public Alloc<GLTexture>
+  {
+
+  public:
+
+    GLTexture() = default;
+
+    ~GLTexture() override;
+
+    void loadFromFile( const string& file ) override;
+
+    void loadCubemap( const std::vector<string>& files ) override;
+
+    void create( const uint32_t width, const uint32_t height ) override;
+
+    void create( const int width, const int height, const Color& color ) override;
+
+    void bind( const uint32_t idx ) override;
+
+    //
+    // Getters.
+
+    GLuint getID() const
     {
+        return _id;
+    }
 
-    public:
+  private:
 
-        GLTexture();
+    void _createGLTexture( const unsigned char* pixels, const int width, const int height, const bool genMipMaps = true );
 
-        virtual ~GLTexture() override;
+  private:
 
-        virtual void loadFromFile( const string& file ) override;
+    GLuint _id { 0 };
+    GLenum _target { GL_TEXTURE_2D };
 
-        virtual void create( const uint32_t width, const uint32_t height ) override;
-
-        virtual void create( const int width, const int height, const Color& color ) override;
-
-        virtual void bind( const uint32_t idx ) override;
-
-        //
-        // Getters.
-
-        GLuint getID() const
-        {
-            return _id;
-        }
-
-    private:
-
-        void _createGLTexture( const unsigned char* pixels, const int width, const int height, const bool genMipMaps = true );
-
-    private:
-
-        GLuint _id;
-
-    };
+  };
 
 }}
 

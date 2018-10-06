@@ -62,7 +62,7 @@ namespace Lore {
 
     void serialize( const string& file );
 
-    void deserialize( const string& file );
+    bool deserialize( const string& file );
 
     //
     // Values.

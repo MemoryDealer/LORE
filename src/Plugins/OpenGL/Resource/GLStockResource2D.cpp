@@ -533,6 +533,14 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createSkyboxProgram( const string&
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+Lore::GPUProgramPtr GLStockResource2DFactory::createEnvironmentMappingProgram( const string& name, const Lore::EnvironmentMappingProgramParameters& params )
+{
+  // Nothing in 2D for now.
+  return nullptr;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 Lore::GPUProgramPtr GLStockResource2DFactory::createBoxProgram( const string& name )
 {
   const string header = "#version " +

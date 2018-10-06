@@ -25,7 +25,6 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE/Core/Util.h>
 #include <LORE/Memory/Alloc.h>
 #include <LORE/Resource/Font.h>
 #include <LORE/Resource/Material.h>
@@ -41,6 +40,7 @@
 #include <LORE/Shader/VertexBuffer.h>
 #include <LORE/Window/RenderTarget.h>
 #include <LORE/UI/UI.h>
+#include <LORE/Util/Util.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 

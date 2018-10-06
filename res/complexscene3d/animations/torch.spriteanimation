@@ -1,0 +1,9 @@
+{
+  "name":"torch",
+  "animations": {
+    "flame": {
+      "frames":[0,1,2,3],
+      "deltaTimes":[100,100,100,100]
+    }
+  }
+}

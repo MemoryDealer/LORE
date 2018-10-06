@@ -29,6 +29,7 @@ namespace Lore {
 
   enum class SerializableResource
   {
+    Cubemap,
     Font,
     GPUProgram,
     Material,

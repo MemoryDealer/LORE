@@ -26,7 +26,7 @@
 
 #include "CLI.h"
 
-#include <LORE/Core/Util.h>
+#include <LORE/Util/Util.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 

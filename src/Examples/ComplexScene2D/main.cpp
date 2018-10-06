@@ -64,7 +64,8 @@ int main( int argc, char** argv )
     // Increment our lag counter to track how much "catching up" we need to do.
     lag += std::chrono::duration_cast< std::chrono::nanoseconds >( dt );
 
-    while ( lag > timestep ) {
+    // TODO: Fix timestep which was causing frame stuttering.
+    //while ( lag > timestep ) {
       lag -= timestep;
 
       //
@@ -78,7 +79,7 @@ int main( int argc, char** argv )
 
       game.processInput();
       game.update();
-    }
+    //}
 
     // We are done updating, render a frame.
     game.render();

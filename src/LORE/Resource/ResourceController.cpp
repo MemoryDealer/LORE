@@ -151,7 +151,9 @@ void ResourceController::loadGroup( const string& groupName )
   };
 
   // Load resource types in correct order so dependencies are ready.
-  std::vector<SerializableResource> typeOrder = { SerializableResource::Texture,
+  std::vector<SerializableResource> typeOrder = {
+    SerializableResource::Cubemap,
+    SerializableResource::Texture,
     SerializableResource::Sprite,
     SerializableResource::SpriteList,
     SerializableResource::SpriteAnimation,
@@ -232,15 +234,17 @@ void ResourceController::indexResourceFile( const string& file, const string& gr
 
   ResourceFileProcessor processor( file, resourceType );
 
-  // Store location of this resource file and its type.
-  ResourceGroup::IndexedResource index;
-  index.file = file;
-  index.type = resourceType;
-  index.loaded = false;
+  if ( processor.hasData() ) {
+    // Store location of this resource file and its type.
+    ResourceGroup::IndexedResource index;
+    index.file = file;
+    index.type = resourceType;
+    index.loaded = false;
 
-  // Insert index into resource group. This can be loaded/unloaded at will.
-  auto group = _getGroup( groupName );
-  group->addIndexedResource( processor.getName(), index );
+    // Insert index into resource group. This can be loaded/unloaded at will.
+    auto group = _getGroup( groupName );
+    group->addIndexedResource( processor.getName(), index );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

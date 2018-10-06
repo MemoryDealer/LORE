@@ -70,6 +70,9 @@ namespace Lore {
     void _activateQueue( const uint id,
                         RenderQueue& rq );
 
+    void _renderSkybox( const RenderView& rv,
+                        const glm::mat4& viewProjection ) const;
+
     void _renderSolids( const RenderView& rv,
                        const RenderQueue& queue,
                        const glm::mat4& viewProjection ) const;

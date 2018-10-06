@@ -118,6 +118,8 @@ namespace Lore {
     //
     // Setters.
 
+    void setMaterialTemplate( const MaterialPtr material );
+
     //
     // Getters.
 
@@ -129,6 +131,7 @@ namespace Lore {
   private:
 
     LayerMap _layers { };
+    MaterialPtr _materialTemplate { nullptr };
 
   };
 

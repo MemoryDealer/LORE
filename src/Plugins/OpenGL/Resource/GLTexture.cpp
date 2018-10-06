@@ -35,13 +35,6 @@ using namespace Lore::OpenGL;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-GLTexture::GLTexture()
-  : _id( 0 )
-{
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 GLTexture::~GLTexture()
 {
   glDeleteTextures( 1, &_id );
@@ -51,6 +44,7 @@ GLTexture::~GLTexture()
 
 void GLTexture::loadFromFile( const string& file )
 {
+  _target = GL_TEXTURE_2D;
   stbi_set_flip_vertically_on_load( 1 );
 
   int width, height, n;
@@ -60,11 +54,51 @@ void GLTexture::loadFromFile( const string& file )
     _createGLTexture( pixels, width, height );
 
     stbi_image_free( pixels );
-    glBindTexture( GL_TEXTURE_2D, 0 );
+    glBindTexture( _target, 0 );
   }
   else {
     throw Lore::Exception( "Unable to load texture at " + file );
   }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLTexture::loadCubemap( const std::vector<string>& files )
+{
+  _target = GL_TEXTURE_CUBE_MAP;
+
+  // Generate cubemap texture.
+  glGenTextures( 1, &_id );
+  glBindTexture( _target, _id );
+
+  // Load each cubemap texture.
+  int width, height, n;
+  for ( uint32_t i = 0; i < files.size(); ++i ) {
+    unsigned char* data = stbi_load( files[i].c_str(), &width, &height, &n, 0 );
+    if ( data ) {
+      glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                    0,
+                    GL_RGB,
+                    width,
+                    height,
+                    0,
+                    GL_RGB,
+                    GL_UNSIGNED_BYTE,
+                    data );
+    }
+    else {
+      throw Lore::Exception( "Unable to load cubemap texture " + files[i] );
+    }
+    stbi_image_free( data );
+  }
+
+  glTexParameteri( _target, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+  glTexParameteri( _target, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+  glTexParameteri( _target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+  glTexParameteri( _target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+  glTexParameteri( _target, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE );
+
+  glBindTexture( _target, 0 );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -139,7 +173,7 @@ void GLTexture::bind( const uint32_t idx )
   }
 
   glActiveTexture(activeTexture);
-  glBindTexture( GL_TEXTURE_2D, _id );
+  glBindTexture( _target, _id );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -148,19 +182,19 @@ void GLTexture::bind( const uint32_t idx )
 void GLTexture::_createGLTexture( const unsigned char* pixels, const int width, const int height, const bool genMipMaps )
 {
   glGenTextures( 1, &_id );
-  glBindTexture( GL_TEXTURE_2D, _id );
+  glBindTexture( _target, _id );
 
-  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+  glTexParameteri( _target, GL_TEXTURE_WRAP_S, GL_REPEAT );
+  glTexParameteri( _target, GL_TEXTURE_WRAP_T, GL_REPEAT );
 
-  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+  glTexParameteri( _target, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+  glTexParameteri( _target, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
   // Create the OpenGL texture.
-  glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
+  glTexImage2D( _target, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
 
   if ( genMipMaps ) {
-    glGenerateMipmap( GL_TEXTURE_2D );
+    glGenerateMipmap( _target );
   }
 }
 

@@ -39,9 +39,10 @@ namespace Lore { namespace OpenGL {
     GLStockResource2DFactory( ResourceControllerPtr controller );
     ~GLStockResource2DFactory() override = default;
 
-    virtual GPUProgramPtr createUberProgram( const string& name, const Lore::UberProgramParameters& params ) override;
-    virtual GPUProgramPtr createSkyboxProgram( const string& name, const SkyboxProgramParameters& params ) override;
-    virtual GPUProgramPtr createBoxProgram( const string& name ) override;
+    GPUProgramPtr createUberProgram( const string& name, const Lore::UberProgramParameters& params ) override;
+    GPUProgramPtr createSkyboxProgram( const string& name, const SkyboxProgramParameters& params ) override;
+    GPUProgramPtr createEnvironmentMappingProgram( const string& name, const EnvironmentMappingProgramParameters& params ) override;
+    GPUProgramPtr createBoxProgram( const string& name ) override;
 
   };
 
@@ -55,9 +56,10 @@ namespace Lore { namespace OpenGL {
     GLStockResource3DFactory( ResourceControllerPtr controller );
     ~GLStockResource3DFactory() override = default;
 
-    virtual GPUProgramPtr createUberProgram( const string& name, const Lore::UberProgramParameters& params ) override;
-    virtual GPUProgramPtr createSkyboxProgram( const string& name, const SkyboxProgramParameters& params ) override;
-    virtual GPUProgramPtr createBoxProgram( const string& name ) override;
+    GPUProgramPtr createUberProgram( const string& name, const Lore::UberProgramParameters& params ) override;
+    GPUProgramPtr createSkyboxProgram( const string& name, const SkyboxProgramParameters& params ) override;
+    GPUProgramPtr createEnvironmentMappingProgram( const string& name, const EnvironmentMappingProgramParameters& params ) override;
+    GPUProgramPtr createBoxProgram( const string& name ) override;
 
   };
 
