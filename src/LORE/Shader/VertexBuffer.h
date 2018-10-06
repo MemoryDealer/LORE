@@ -44,10 +44,10 @@ namespace Lore {
       TexturedQuad,
       QuadInstanced,
       TexturedQuadInstanced,
-      Skybox2D,
-      Skybox3D,
+      FullscreenQuad,
       Cube,
       TexturedCube,
+      Cubemap,
       Quad3D,
       TexturedQuad3D,
       Text

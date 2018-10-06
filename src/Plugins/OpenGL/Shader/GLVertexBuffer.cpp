@@ -93,7 +93,7 @@ void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
     addAttribute( AttributeType::Float, 2 );
     break;
 
-  case VertexBuffer::Type::Skybox2D:
+  case VertexBuffer::Type::FullscreenQuad:
     _mode = GL_TRIANGLE_STRIP;
     _vertices = { -1.f, -1.f,     0.f, 0.f,
                   -1.f, 1.f,      0.f, 1.f,
@@ -105,7 +105,7 @@ void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
     addAttribute( AttributeType::Float, 2 );
     break;
 
-  case VertexBuffer::Type::Skybox3D:
+  case VertexBuffer::Type::Cubemap:
     _mode = GL_TRIANGLES;
     _vertices = {
       -1000.0f,  1000.0f, -1000.0f,
@@ -491,7 +491,7 @@ void GLVertexBuffer::draw( const size_t instanceCount )
 
   case VertexBuffer::Type::Cube:
   case VertexBuffer::Type::TexturedCube:
-  case VertexBuffer::Type::Skybox3D:
+  case VertexBuffer::Type::Cubemap:
     glDrawArrays( _mode, 0, 36 );
     break;
 

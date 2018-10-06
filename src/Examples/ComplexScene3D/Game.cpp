@@ -108,7 +108,7 @@ void Game::loadScene()
 
   // Add a cube.
 
-  Lore::EntityPtr cubeEntity = Lore::Resource::CreateEntity( "cube", Lore::VertexBuffer::Type::TexturedCube );
+  Lore::EntityPtr cubeEntity = Lore::Resource::CreateEntity( "TexturedCube", Lore::VertexBuffer::Type::TexturedCube );
 
   cubeEntity->setSprite( Lore::Resource::GetSprite( "block" ) );
   auto node = _scene->createNode( "cube" );
@@ -123,7 +123,7 @@ void Game::loadScene()
     //node->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( 180.f ) );
   }
 
-  Lore::EntityPtr transparentCubeEntity = Lore::Resource::CreateEntity( "transparent-cube", Lore::VertexBuffer::Type::Cube );
+  Lore::EntityPtr transparentCubeEntity = Lore::Resource::CreateEntity( "TransparentCube", Lore::VertexBuffer::Type::Cube );
   transparentCubeEntity->getMaterial()->diffuse = Lore::StockColor::Blue;
   transparentCubeEntity->getMaterial()->blendingMode.enabled = true;
   transparentCubeEntity->getMaterial()->diffuse.a = 0.5f;
@@ -189,6 +189,26 @@ void Game::loadScene()
   light2Node->attachObject( lightEntity );
   light2Node->scale( 0.25f );
   light2Node->setPosition( 4.f, 5.f, -6.f );
+
+  //
+  // Environment mapping objects.
+
+  Lore::EntityPtr solidReflectCube = Lore::Resource::CreateEntity( "SolidCube", Lore::VertexBuffer::Type::Cube );
+  solidReflectCube->setMaterial( Lore::StockResource::GetMaterial( "Reflect3D" ) );
+  solidReflectCube->setSprite( Lore::Resource::GetSprite( "skybox" ) );
+
+  Lore::EntityPtr solidRefractCube = Lore::Resource::CreateEntity( "SolidRefractCube", Lore::VertexBuffer::Type::Cube );
+  solidRefractCube->setMaterial( Lore::StockResource::GetMaterial( "Refract3D" ) );
+  solidRefractCube->setSprite( Lore::Resource::GetSprite( "skybox" ) );
+
+  // Cubes.
+  auto reflectCube = _scene->createNode( "ReflectCube" );
+  reflectCube->attachObject( solidReflectCube );
+  reflectCube->setPosition( 0.f, 3.f, -10.f );
+
+  auto refractCube = _scene->createNode( "RefractCube" );
+  refractCube->attachObject( solidRefractCube );
+  refractCube->setPosition( 0.f, 6.f, -10.f );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -250,6 +270,12 @@ void Game::update()
 
   node = _scene->getNode( "texturedQuad0" );
   node->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( 0.0002f ) );
+
+  node = _scene->getNode( "ReflectCube" );
+  node->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( -0.00025f ) );
+
+  node = _scene->getNode( "RefractCube" );
+  node->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees(0.00025f ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

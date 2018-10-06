@@ -48,6 +48,16 @@ namespace Lore {
     bool scrolling { true };
   };
 
+  struct EnvironmentMappingProgramParameters
+  {
+    enum class Mode
+    {
+      Reflect,
+      Refract
+    };
+    Mode mode { Mode::Reflect };
+  };
+
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
   
   ///
@@ -67,6 +77,7 @@ namespace Lore {
 
     virtual GPUProgramPtr createUberProgram( const string& name, const UberProgramParameters& params ) = 0;
     virtual GPUProgramPtr createSkyboxProgram( const string& name, const SkyboxProgramParameters& params ) = 0;
+    virtual GPUProgramPtr createEnvironmentMappingProgram( const string& name, const EnvironmentMappingProgramParameters& params ) = 0;
     virtual GPUProgramPtr createBoxProgram( const string& name ) = 0;
 
   protected:

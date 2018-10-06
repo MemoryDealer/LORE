@@ -581,6 +581,145 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createSkyboxProgram( const string&
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+Lore::GPUProgramPtr GLStockResource3DFactory::createEnvironmentMappingProgram( const string& name, const Lore::EnvironmentMappingProgramParameters& params )
+{
+  const string header = "#version " +
+    std::to_string( APIVersion::GetMajor() ) + std::to_string( APIVersion::GetMinor() ) + "0" +
+    " core\n";
+
+  //
+  // Vertex shader.
+
+  string src = header;
+
+  //
+  // Layout.
+
+  src += "layout (location = 0) in vec3 pos;";
+  src += "layout (location = 1) in vec3 normal;";
+
+  //
+  // Uniforms and outs.
+
+  src += "out vec3 Position;";
+  src += "out vec3 Normal;";
+
+  src += "uniform mat4 model;";
+  src += "uniform mat4 viewProjection;";
+
+  //
+  // main function.
+
+  src += "void main(){";
+  {
+    src += "Normal = mat3(transpose(inverse(model))) * normal;";
+    src += "Position = vec3(model * vec4(pos, 1.0));";
+    src += "gl_Position = viewProjection * model * vec4(pos, 1.0);";
+  }
+  src += "}";
+
+  auto vsptr = _controller->create<Shader>( name + "_VS" );
+  vsptr->init( Shader::Type::Vertex );
+  if ( !vsptr->loadFromSource( src ) ) {
+    throw Lore::Exception( "Failed to compile skybox vertex shader for " + name );
+  }
+
+  // ::::::::::::::::::::::::::::::::: //
+
+  //
+  // Fragment shader.
+
+  src.clear();
+  src = header;
+
+  // Ins/outs and uniforms.
+
+  src += "out vec4 pixel;";
+
+  src += "in vec3 Position;";
+  src += "in vec3 Normal;";
+
+  src += "uniform vec3 cameraPos;";
+  src += "uniform samplerCube envTexture;";
+
+  //
+  // main function.
+
+  src += "void main(){";
+  {
+    switch ( params.mode ) {
+    default:
+    case Lore::EnvironmentMappingProgramParameters::Mode::Reflect:
+      src += "vec3 I = normalize(Position - cameraPos);";
+      src += "vec3 R = reflect(I, normalize(Normal));";
+      src += "pixel = vec4(texture(envTexture, R).rgb, 1.0);";
+      break;
+
+    case Lore::EnvironmentMappingProgramParameters::Mode::Refract:
+      src += "float ratio = 1.0 / 1.52;";
+      src += "vec3 I = normalize(Position - cameraPos);";
+      src += "vec3 R = refract(I, normalize(Normal), ratio);";
+      src += "pixel = vec4(texture(envTexture, R).rgb, 1.0);";
+      break;
+    }
+  }
+  src += "}";
+
+  auto fsptr = _controller->create<Shader>( name + "_FS" );
+  fsptr->init( Shader::Type::Fragment );
+  if ( !fsptr->loadFromSource( src ) ) {
+    throw Lore::Exception( "Failed to compile skybox fragment shader for " + name );
+  }
+
+  // ::::::::::::::::::::::::::::::::: //
+
+  //
+  // GPU program.
+
+  auto program = _controller->create<Lore::GPUProgram>( name );
+  program->init();
+  program->attachShader( vsptr );
+  program->attachShader( fsptr );
+
+  if ( !program->link() ) {
+    throw Lore::Exception( "Failed to link GPUProgram " + name );
+  }
+
+  //
+  // Add uniforms.
+
+  program->addUniformVar( "model" );
+  program->addUniformVar( "viewProjection" );
+  program->addUniformVar( "cameraPos" );
+
+  // Uniform updaters.
+
+  auto UniformUpdater = []( const RenderView& rv,
+                            const GPUProgramPtr program,
+                            const MaterialPtr material,
+                            const RenderQueue::LightData& lights ) {
+    program->setUniformVar( "cameraPos", rv.camera->getPosition() );
+  };
+
+  auto UniformNodeUpdater = []( const GPUProgramPtr program,
+                                const MaterialPtr material,
+                                const NodePtr node,
+                                const glm::mat4& viewProjection ) {
+    auto model = node->getFullTransform();
+    program->setUniformVar( "model", model );
+    program->setUniformVar( "viewProjection", viewProjection );
+    auto texture = material->sprite->getTexture( 0 );
+    texture->bind();
+  };
+
+  program->setUniformUpdater( UniformUpdater );
+  program->setUniformNodeUpdater( UniformNodeUpdater );
+
+  return program;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 Lore::GPUProgramPtr GLStockResource3DFactory::createBoxProgram( const string& name )
 {
   const string header = "#version " +
