@@ -71,20 +71,20 @@ TEST_CASE( "Complex JSON values correctly deserialized", "[serializer]" )
   auto object1 = serializer.getValue( "Object1" );
   REQUIRE( Lore::SerializerValue::Type::Container == object1.getType() );
   {
-    auto value1 = object1.get( "A" );
+    auto value1 = object1.getValue( "A" );
     REQUIRE( 1 == value1.toInt() );
 
-    auto value2 = object1.get( "B" );
+    auto value2 = object1.getValue( "B" );
     REQUIRE( 3.14f == value2.toReal() );
 
-    auto value3 = object1.get( "C" );
+    auto value3 = object1.getValue( "C" );
     REQUIRE( "Hello!" == value3.toString() );
   }
 
   auto object2 = serializer.getValue( "Object2" );
   REQUIRE( Lore::SerializerValue::Type::Container == object2.getType() );
   {
-    auto value1 = object2.get( "A" );
+    auto value1 = object2.getValue( "A" );
     REQUIRE( Lore::SerializerValue::Type::Array == value1.getType() );
     {
       auto& valueArray = value1.toArray();
@@ -93,14 +93,14 @@ TEST_CASE( "Complex JSON values correctly deserialized", "[serializer]" )
       }
     }
 
-    auto value2 = object2.get( "B" );
+    auto value2 = object2.getValue( "B" );
     REQUIRE( "Hello 2!" == value2.toString() );
   }
 
-  auto object3 = object2.get( "Object3" );
+  auto object3 = object2.getValue( "Object3" );
   REQUIRE( Lore::SerializerValue::Type::Container == object3.getType() );
   {
-    auto& value1 = object3.get( "A" );
+    auto& value1 = object3.getValue( "A" );
     REQUIRE( Lore::SerializerValue::Type::Array == value1.getType() );
     auto& valueArray = value1.toArray();
     REQUIRE( 3 == valueArray.size() );
@@ -199,15 +199,15 @@ TEST_CASE( "Values correctly written in JSON format", "[serializer]" )
     auto object1 = serializer.getValue( "Object1" );
     REQUIRE( Lore::SerializerValue::Type::Container == object1.getType() );
     {
-      auto v1 = object1.get( "A" );
+      auto v1 = object1.getValue( "A" );
       REQUIRE( Lore::SerializerValue::Type::String == v1.getType() );
       REQUIRE( "Hello object1!" == v1.toString() );
 
-      auto v2 = object1.get( "12345" );
+      auto v2 = object1.getValue( "12345" );
       REQUIRE( Lore::SerializerValue::Type::Int == v2.getType() );
       REQUIRE( 12345 == v2.toInt() );
 
-      auto array1 = object1.get( "array1" );
+      auto array1 = object1.getValue( "array1" );
       REQUIRE( Lore::SerializerValue::Type::Array == array1.getType() );
       SECTION( "Simple Array" )
       {
@@ -219,7 +219,7 @@ TEST_CASE( "Values correctly written in JSON format", "[serializer]" )
         }
       }
 
-      auto array2 = object1.get( "array2" );
+      auto array2 = object1.getValue( "array2" );
       REQUIRE( Lore::SerializerValue::Type::Array == array2.getType() );
       SECTION( "Array With Objects" )
       {
@@ -227,14 +227,14 @@ TEST_CASE( "Values correctly written in JSON format", "[serializer]" )
         REQUIRE( 5 == values.size() );
         for ( int i = 0; i < 5; ++i ) {
           REQUIRE( Lore::SerializerValue::Type::Container == values[i].getType() );
-          auto v = values[i].get( std::to_string( i ) );
+          auto v = values[i].getValue( std::to_string( i ) );
           REQUIRE( Lore::SerializerValue::Type::Int == v.getType() );
           REQUIRE( i == v.toInt() );
         }
 
         // Check array within the object within the array within the object within the root object.
         auto obj = values[4];
-        auto v = obj.get( "array" );
+        auto v = obj.getValue( "array" );
         REQUIRE( Lore::SerializerValue::Type::Array == v.getType() );
         auto arrayValues = v.toArray();
         for ( int i = 0; i < 3; ++i ) {

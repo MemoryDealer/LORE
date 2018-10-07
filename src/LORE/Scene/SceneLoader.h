@@ -25,6 +25,10 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE/Serializer/Serializer.h>
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 namespace Lore {
 
   ///
@@ -39,6 +43,17 @@ namespace Lore {
     ~SceneLoader() = default;
 
     bool load( const string& sceneFile, ScenePtr scene );
+
+  private:
+
+    void _loadProperties();
+    void _loadEntities();
+
+  private:
+
+    Serializer _serializer {};
+    ScenePtr _scene { nullptr };
+    string _resourceGroupName {};
 
   };
 

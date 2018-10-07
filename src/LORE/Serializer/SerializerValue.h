@@ -89,11 +89,16 @@ namespace Lore {
 
     const SerializerValue& operator[]( const string& key ) const
     {
-      return get( key );
+      return getValue( key );
     }
 
     //
     // Getters.
+
+    bool isNull() const
+    {
+      return ( _value.index() != 0 );
+    }
 
     string getKey() const
     {
@@ -105,7 +110,7 @@ namespace Lore {
       return ( _values.end() == _values.find( key ) );
     }
 
-    const SerializerValue& get( const string& key ) const
+    const SerializerValue& getValue( const string& key ) const
     {
       auto it = _values.find( key );
       if ( _values.end() == it ) {
@@ -142,6 +147,16 @@ namespace Lore {
     const Array& toArray() const
     {
       return GET_VARIANT<Array>( _value );
+    }
+
+    glm::vec3 toVec3() const
+    {
+      if ( Type::Array == getType() ) {
+        const auto& values = toArray();
+        assert( 3 == values.size() );
+        return glm::vec3( values[0].toReal(), values[1].toReal(), values[2].toReal() );
+      }
+      throw Lore::Exception( "Value not array type" );
     }
 
     glm::vec4 toVec4() const

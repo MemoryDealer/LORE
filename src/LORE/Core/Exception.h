@@ -65,10 +65,9 @@ namespace Lore {
 
         explicit ItemIdentityException( const string& what )
         : Exception( what )
-        {
-        }
+        {}
 
-        virtual string getDescription() const override
+        string getDescription() const override
         {
           return string( "ItemIdentityException: " + _what );
         }
@@ -87,12 +86,32 @@ namespace Lore {
 
       explicit MemoryException( const string& what )
         : Exception( what )
-      {
-      }
+      {}
 
-      virtual string getDescription() const override
+      string getDescription() const override
       {
         return string( "MemoryException: " + _what );
+      }
+
+    };
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    ///
+    /// \class SerializerException
+    /// \brief Thrown when an error occurs in LORE's serializer system.
+    class SerializerException : public Exception
+    {
+
+    public:
+
+      explicit SerializerException( const string& what )
+        : Exception( what )
+      {}
+
+      string getDescription() const override
+      {
+        return string( "SerializerException: " + _what );
       }
 
     };

@@ -1,7 +1,8 @@
 {
   "SceneProperties": {
     "Type": "Generic",
-    "AmbientLighting": [0.75, 0.75, 0.75]
+    "ResourceGroup": "Core",
+    "AmbientLight": [0.75, 0.75, 0.75]
   },
   "Entity": {
     "CheckeredFloor": {
