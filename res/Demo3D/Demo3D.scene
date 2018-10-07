@@ -1,0 +1,35 @@
+{
+  "SceneProperties": {
+    "Type": "Generic",
+    "AmbientLighting": [0.75, 0.75, 0.75]
+  },
+  "Entity": {
+    "CheckeredFloor": {
+      "VertexBufferType":"TexturedQuad",
+      "Sprite":"checkerboard",
+      "MaterialSettings": {
+        "ScrollSpeed": [0.01, 0.0]
+      }
+    }
+  },
+  "Lighting": {
+    "DirectionalLight1": {
+      "Type": "Directional",
+      "Direction": [-0.5, -0.2, -0.5],
+      "Diffuse": "White",
+      "Specular": "White"
+    }
+  },
+  "Layout": {
+    "InstancedNodes": {
+
+    },
+    "Nodes": {
+      "Floor0": {
+        "Entity": "CheckeredFloor",
+        "Position": [0.0, 0.0, 0.0],
+        "Orientation": [90.0, 0.0, 0.0]
+      }
+    }
+  }
+}
