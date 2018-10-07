@@ -25,40 +25,50 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE/Serializer/Serializer.h>
+#include <LORE/Lore.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+// A simple class to handle setup and processing for the complex scene.
+class Game final
+{
 
-  ///
-  /// \class SceneLoader
-  /// \brief Loads scene from JSON file format.
-  class LORE_EXPORT SceneLoader final
-  {
+public:
 
-  public:
+  Game();
+  ~Game();
 
-    SceneLoader() = default;
-    ~SceneLoader() = default;
+  void loadResources();
 
-    bool load( const string& sceneFile, ScenePtr scene );
+  void loadScene();
 
-  private:
+  void processInput();
 
-    void _loadProperties();
-    void _loadEntities();
-    void _loadLighting();
-    void _loadLayout();
+  void update();
 
-  private:
+  void render();
 
-    Serializer _serializer {};
-    ScenePtr _scene { nullptr };
-    string _resourceGroupName {};
+  //
+  // Callbacks.
 
-  };
+  static void onMouseMove( const int32_t x, const int32_t y );
 
-}
+  //
+  // Getters.
+
+  Lore::CameraPtr getCamera() const;
+
+private:
+
+  // This class is the owner of the Lore context, so it must use a unique_ptr.
+  // Most other Lore objects are accessed via raw pointers, since they are owned
+  // inside the Lore library.
+  std::unique_ptr<Lore::Context> _context { nullptr };
+  Lore::WindowPtr _window { nullptr };
+
+  Lore::ScenePtr _scene { nullptr };
+  Lore::CameraPtr _camera { nullptr };
+
+};
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

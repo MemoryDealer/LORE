@@ -2,7 +2,8 @@
   "SceneProperties": {
     "Type": "Generic",
     "ResourceGroup": "Core",
-    "AmbientLight": [0.75, 0.75, 0.75]
+    "SkyboxColor": [0.3, 0.8, 0.75],
+    "AmbientLightColor": [0.75, 0.75, 0.75]
   },
   "Entity": {
     "CheckeredFloor": {

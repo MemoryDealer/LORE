@@ -83,9 +83,11 @@ void SceneLoader::_loadProperties()
   const string SceneProperties = "SceneProperties";
   auto properties = _serializer.getValue( SceneProperties );
   if ( !properties.isNull() && SerializerValue::Type::Container == properties.getType() ) {
+    // Get the scene type.
     auto type = properties.getValue( "Type" );
     type.toString(); // Do nothing with scene type for now.
 
+    // Get resource group name for scene resources.
     auto resourceGroup = properties.getValue( "ResourceGroup" );
     if ( !resourceGroup.isNull() ) {
       _resourceGroupName = resourceGroup.toString();
@@ -94,8 +96,17 @@ void SceneLoader::_loadProperties()
       _resourceGroupName = ResourceController::DefaultGroupName;
     }
 
-    auto ambientLightColor = properties.getValue( "AmbientLight" );
-    _scene->setAmbientLightColor( Color( ambientLightColor.toVec3(), 1.f ) );
+    // Get the skybox color.
+    auto skyboxColor = properties.getValue( "SkyboxColor" );
+    if ( !skyboxColor.isNull() ) {
+      _scene->setSkyboxColor( Color( skyboxColor.toVec3(), 1.f ) );
+    }
+
+    // Get the ambient light color.
+    auto ambientLightColor = properties.getValue( "AmbientLightColor" );
+    if ( !ambientLightColor.isNull() ) {
+      _scene->setAmbientLightColor( Color( ambientLightColor.toVec3(), 1.f ) );
+    }
   }
 }
 
@@ -122,7 +133,7 @@ void SceneLoader::_loadEntities()
       auto entity = Resource::CreateEntity( entityName, StringToVertexBufferType( vbType.toString() ), _resourceGroupName );
 
       // Attach a sprite if specified.
-      auto spriteName = value.getValue( "SpriteName" );
+      auto spriteName = value.getValue( "Sprite" );
       if ( !spriteName.isNull() ) {
         entity->setSprite( Resource::GetSprite( spriteName.toString() ) );
       }
@@ -131,6 +142,20 @@ void SceneLoader::_loadEntities()
       // ....
     }
   }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void SceneLoader::_loadLighting()
+{
+
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void SceneLoader::_loadLayout()
+{
+
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

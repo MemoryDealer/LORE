@@ -97,6 +97,18 @@ project "glad"
 --
 -- Examples
 
+project "Demo3D"
+    location "Examples/Demo3D"
+    kind "ConsoleApp"
+    language "C++"
+    defines { "_HAS_CXX17" }
+    files {
+        "Examples/Demo3D/**.h",
+        "Examples/Demo3D/**.cpp"
+    }
+    links { "LORE" }
+    postbuildcommands { "{COPY} ../../../res/ ../../../bin/%{cfg.buildcfg}/Run/res/" }
+
 project "Example_ComplexScene2D"
     location "Examples/ComplexScene2D"
     kind "ConsoleApp"

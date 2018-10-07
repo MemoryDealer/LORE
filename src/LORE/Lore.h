@@ -58,6 +58,7 @@
 
 // Scene.
 #include <LORE/Scene/AABB.h>
+#include <LORE/Scene/SceneLoader.h>
 #include <LORE/Scene/Skybox.h>
 #include <LORE/Scene/SpriteController.h>
 

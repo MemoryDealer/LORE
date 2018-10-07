@@ -97,7 +97,8 @@ namespace Lore {
 
     bool isNull() const
     {
-      return ( _value.index() != 0 );
+      // Index 1 is NullType.
+      return ( 1 == _value.index() );
     }
 
     string getKey() const
@@ -114,7 +115,10 @@ namespace Lore {
     {
       auto it = _values.find( key );
       if ( _values.end() == it ) {
-        throw Lore::Exception( "Non-existent key lookup on const SerializerValue" );
+        // If not found, return a null value.
+        static SerializerValue nullValue {};
+        nullValue._value = NullType(); // Ensure null.
+        return nullValue;
       }
       return it->second;
     }
@@ -219,7 +223,8 @@ namespace Lore {
 
   private:
 
-    using ValueHolder = LORE_VARIANT<MONOSTATE, bool, string, int, real, Array>;
+    struct NullType { };
+    using ValueHolder = LORE_VARIANT<MONOSTATE, NullType, bool, string, int, real, Array>;
 
   private:
 
