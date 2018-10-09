@@ -42,7 +42,7 @@ namespace Lore {
     SceneLoader() = default;
     ~SceneLoader() = default;
 
-    bool load( const string& sceneFile, ScenePtr scene );
+    bool process( const string& sceneFile, ScenePtr scene );
 
   private:
 
@@ -50,6 +50,8 @@ namespace Lore {
     void _loadEntities();
     void _loadLighting();
     void _loadLayout();
+
+    void _processMaterialSettings( const SerializerValue& value, EntityPtr entity);
 
   private:
 

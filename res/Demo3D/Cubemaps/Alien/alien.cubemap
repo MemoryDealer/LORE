@@ -1,0 +1,11 @@
+{
+  "name":"alien-sky",
+  "textures":[
+    "criminal-impact_rt.tga",
+    "criminal-impact_lf.tga",
+    "criminal-impact_up.tga",
+    "criminal-impact_dn.tga",
+    "criminal-impact_ft.tga",
+    "criminal-impact_bk.tga"
+  ]
+}

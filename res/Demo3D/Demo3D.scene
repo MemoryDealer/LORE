@@ -3,6 +3,7 @@
     "Type": "Generic",
     "ResourceGroup": "Core",
     "SkyboxColor": [0.3, 0.8, 0.75],
+    "SkyboxSprite":"alien-sky",
     "AmbientLightColor": [0.75, 0.75, 0.75]
   },
   "Entity": {
@@ -30,7 +31,9 @@
       "Floor0": {
         "Entity": "CheckeredFloor",
         "Position": [0.0, 0.0, 0.0],
-        "Orientation": [90.0, 0.0, 0.0]
+        "Orientation": [90.0, 0.0, 0.0],
+        "Scale": 5.0,
+        "Children":[]
       }
     }
   }

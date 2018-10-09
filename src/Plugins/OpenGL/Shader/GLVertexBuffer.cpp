@@ -184,14 +184,14 @@ void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
       0.5f,  0.5f, 0.f,  0.0f,  0.0f, -1.0f,
       0.5f,  0.5f, 0.f,  0.0f,  0.0f, -1.0f,
       -0.5f,  0.5f, 0.f,  0.0f,  0.0f, -1.0f,
-      -0.5f, -0.5f, 0.f,  0.0f,  0.0f, -1.0f,
+      -0.5f, -0.5f, 0.f,  0.0f,  0.0f, -1.0f
 
-      -0.5f, -0.5f,  0.001f,  0.0f,  0.0f,  1.0f,
-      0.5f, -0.5f,  0.001f,  0.0f,  0.0f,  1.0f,
-      0.5f,  0.5f,  0.001f,  0.0f,  0.0f,  1.0f,
-      0.5f,  0.5f,  0.001f,  0.0f,  0.0f,  1.0f,
-      -0.5f,  0.5f,  0.001f,  0.0f,  0.0f,  1.0f,
-      -0.5f, -0.5f,  0.001f,  0.0f,  0.0f,  1.0f
+//       -0.5f, -0.5f,  0.001f,  0.0f,  0.0f,  1.0f,
+//       0.5f, -0.5f,  0.001f,  0.0f,  0.0f,  1.0f,
+//       0.5f,  0.5f,  0.001f,  0.0f,  0.0f,  1.0f,
+//       0.5f,  0.5f,  0.001f,  0.0f,  0.0f,  1.0f,
+//       -0.5f,  0.5f,  0.001f,  0.0f,  0.0f,  1.0f,
+//       -0.5f, -0.5f,  0.001f,  0.0f,  0.0f,  1.0f
     };
 
     addAttribute( AttributeType::Float, 3 );
@@ -207,14 +207,14 @@ void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
       0.5f,  0.5f, 0.f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
       0.5f,  0.5f, 0.f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
       -0.5f,  0.5f, 0.f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f,
-      -0.5f, -0.5f, 0.f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
-
-      -0.5f, -0.5f,  0.001f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
-      0.5f, -0.5f,  0.001f,  0.0f,  0.0f,  1.0f,  1.0f,  0.0f,
-      0.5f,  0.5f,  0.001f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
-      0.5f,  0.5f,  0.001f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
-      -0.5f,  0.5f,  0.001f,  0.0f,  0.0f,  1.0f,  0.0f,  1.0f,
-      -0.5f, -0.5f,  0.001f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f
+      -0.5f, -0.5f, 0.f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f
+// 
+//       -0.5f, -0.5f,  0.001f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
+//       0.5f, -0.5f,  0.001f,  0.0f,  0.0f,  1.0f,  1.0f,  0.0f,
+//       0.5f,  0.5f,  0.001f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+//       0.5f,  0.5f,  0.001f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+//       -0.5f,  0.5f,  0.001f,  0.0f,  0.0f,  1.0f,  0.0f,  1.0f,
+//       -0.5f, -0.5f,  0.001f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f
     };
 
     addAttribute( AttributeType::Float, 3 );
@@ -497,7 +497,7 @@ void GLVertexBuffer::draw( const size_t instanceCount )
 
   case VertexBuffer::Type::Quad3D:
   case VertexBuffer::Type::TexturedQuad3D:
-    glDrawArrays( _mode, 0, 12 );
+    glDrawArrays( _mode, 0, 6 );
     break;
   }
 }

@@ -38,10 +38,12 @@ namespace LocalNS {
   static Lore::VertexBuffer::Type StringToVertexBufferType( const Lore::string& str )
   {
     const std::unordered_map<Lore::string, Lore::VertexBuffer::Type> ConversionTable = {
-      { "Quad", Lore::VertexBuffer::Type::Quad },
-      { "TexturedQuad", Lore::VertexBuffer::Type::TexturedQuad }
+      { "Quad", Lore::VertexBuffer::Type::Quad3D },
+      { "TexturedQuad", Lore::VertexBuffer::Type::TexturedQuad3D },
+      { "Cube", Lore::VertexBuffer::Type::Cube },
+      { "TexturedCube", Lore::VertexBuffer::Type::TexturedCube }
     };
-
+    // TODO: Check scene's renderere type to use quad or quad3D.
     auto lookup = ConversionTable.find( str );
     if ( ConversionTable.end() != lookup ) {
       return lookup->second;
@@ -58,7 +60,7 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-bool SceneLoader::load( const string& sceneFile, ScenePtr scene )
+bool SceneLoader::process( const string& sceneFile, ScenePtr scene )
 {
   // Load the scene file into memory.
   if ( !_serializer.deserialize( sceneFile ) ) {
@@ -71,6 +73,11 @@ bool SceneLoader::load( const string& sceneFile, ScenePtr scene )
   // Load each section of the scene file according to priority.
   _loadProperties();
   _loadEntities();
+  _loadLighting();
+  _loadLayout();
+
+  // Store the location of the scene file inside the scene for reloading.
+  _scene->setSceneFile( sceneFile );
 
   return true;
 }
@@ -102,6 +109,14 @@ void SceneLoader::_loadProperties()
       _scene->setSkyboxColor( Color( skyboxColor.toVec3(), 1.f ) );
     }
 
+    // Get the skybox sprite.
+    auto skyboxSprite = properties.getValue( "SkyboxSprite" );
+    if ( !skyboxSprite.isNull() ) {
+      // TODO: Add multi-layer loading.
+      auto& skyboxLayer = _scene->getSkybox()->addLayer( "layer0" );
+      skyboxLayer.setSprite( Lore::Resource::GetSprite( skyboxSprite.toString()) );
+    }
+
     // Get the ambient light color.
     auto ambientLightColor = properties.getValue( "AmbientLightColor" );
     if ( !ambientLightColor.isNull() ) {
@@ -129,6 +144,19 @@ void SceneLoader::_loadEntities()
         throw Lore::SerializerException( "Entity value " + entityName + " did not specify vertex buffer type" );
       }
 
+      // HACK: See if entity already exists.
+      // TODO: Unload entities exclusively in Scene::reload()
+      bool found = true;
+      try {
+        Resource::GetEntity( entityName, _resourceGroupName );
+      }
+      catch ( const Lore::ItemIdentityException& ) {
+        found = false;
+      }
+      if ( found ) {
+        continue;
+      }
+
       // Create the entity.
       auto entity = Resource::CreateEntity( entityName, StringToVertexBufferType( vbType.toString() ), _resourceGroupName );
 
@@ -139,7 +167,7 @@ void SceneLoader::_loadEntities()
       }
 
       // Process material settings for the entity.
-      // ....
+      _processMaterialSettings( value, entity );
     }
   }
 }
@@ -155,7 +183,66 @@ void SceneLoader::_loadLighting()
 
 void SceneLoader::_loadLayout()
 {
+  const string Layout = "Layout";
+  auto layout = _serializer.getValue( Layout );
+  if ( layout.isNull() ) {
+    return;
+  }
+
+  // Loads individual nodes.
+  auto nodes = layout.getValue( "Nodes" );
+  if ( !nodes.isNull() ) {
+    for ( const auto& node : nodes.getValues() ) {
+      const string& nodeName = node.first;
+      const auto& nodeData = node.second;
+
+      // Create the node.
+      auto node = _scene->createNode( nodeName );
+
+      // Get the entity to attach to this node and attach it.
+      const auto& entityName = nodeData.getValue( "Entity" );
+      if ( !entityName.isNull() ) {
+        auto entity = Resource::GetEntity( entityName.toString(), _resourceGroupName );
+        node->attachObject( entity );
+      }
+
+      // Get the transform data.
+      auto position = nodeData.getValue( "Position" );
+      if ( !position.isNull() ) {
+        node->setPosition( position.toVec3() );
+      }
+
+      auto orientation = nodeData.getValue( "Orientation" );
+      if ( !orientation.isNull() ) {
+        const auto arraySize = orientation.toArray().size();
+        if ( 3 == arraySize ) {
+          node->setOrientation( orientation.toVec3() );
+        }
+        else if ( 4 == arraySize ) {
+          // This is a quaternion.
+          node->setOrientation( orientation.toVec4() );
+        }
+      }
+
+      auto scale = nodeData.getValue( "Scale" );
+      if ( !scale.isNull() ) {
+        if ( SerializerValue::Type::Real == scale.getType() ) {
+          node->setScale( scale.toReal() );
+        }
+        else if ( SerializerValue::Type::Array == scale.getType() ) {
+          node->setScale( scale.toVec3() );
+        }
+      }
+    }
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void SceneLoader::_processMaterialSettings( const SerializerValue& value, EntityPtr entity )
+{
 
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+

@@ -27,6 +27,7 @@
 #include "Skybox.h"
 
 #include <LORE/Core/Exception.h>
+#include <LORE/Resource/ResourceController.h>
 #include <LORE/Resource/StockResource.h>
 #include <LORE/Scene/SpriteController.h>
 
@@ -77,6 +78,17 @@ void Skybox::removeLayer( const string& name )
   _layers.erase( lookup );
 
   log_information( "Remove layer " + name + " from skybox " + _name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Skybox::removeAllLayers()
+{
+  // Delete materials cloned for each layer.
+  for ( const auto& layer : _layers ) {
+    Resource::DestroyMaterial( layer.second.getMaterial() );
+  }
+  _layers.clear();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

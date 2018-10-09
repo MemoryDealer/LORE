@@ -80,11 +80,10 @@ void Game::loadScene()
 {
   // Create a scene with default skybox color.
   _scene = _context->createScene( "core", Lore::RendererType::Forward3D );
-  _scene->setSkyboxColor( Lore::Color( 0.3f, 0.8f, 0.75f, 1.f ) );
 
   // Create a camera to view the scene.
   _camera = _context->createCamera( "core", Lore::Camera::Type::Type3D );
-  _camera->lookAt( glm::vec3( 0.f, 2.f, -15.f ), glm::vec3( 0.f, 0.f, -1.f ), glm::vec3( 0.f, 1.f, 0.f ) );
+  _camera->lookAt( glm::vec3( 0.f, 0.f, 12.f ), glm::vec3( 0.f, 0.f, -1.f ), glm::vec3( 0.f, 1.f, 0.f ) );
 
   // TODO: This is a hack that should be taken care of internally.
   Lore::CLI::SetActiveScene( _scene );
@@ -100,7 +99,7 @@ void Game::loadScene()
 
   // Load the scene from disk.
   Lore::SceneLoader loader;
-  loader.load( "res/demo3d/demo3d.scene", _scene );
+  loader.process( "res/demo3d/demo3d.scene", _scene );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -144,7 +143,8 @@ void Game::processInput()
 
 void Game::update()
 {
-
+  auto node = _scene->getNode( "Floor0" );
+  node->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( 0.001f ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

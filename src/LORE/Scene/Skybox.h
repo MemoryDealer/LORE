@@ -115,6 +115,8 @@ namespace Lore {
 
     void removeLayer( const string& name );
 
+    void removeAllLayers();
+
     //
     // Setters.
 

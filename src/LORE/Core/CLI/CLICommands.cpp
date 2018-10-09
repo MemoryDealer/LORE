@@ -36,11 +36,13 @@ namespace LocalNS {
   using Lore::string;
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+  // Scene layout and aesthetic commands.
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
   struct SetNodePos : public CLI::Command
   {
 
-    virtual string execute( string& args ) override
+    string execute( string& args ) override
     {
       if ( 2 == CLI::GetNumArgs( args ) ) {
         auto nodeName = CLI::ExtractNextArg( args );
@@ -67,7 +69,7 @@ namespace LocalNS {
   struct TranslateNode : public CLI::Command
   {
 
-    virtual string execute( string& args ) override
+    string execute( string& args ) override
     {
       if ( 2 == CLI::GetNumArgs( args ) ) {
         auto nodeName = CLI::ExtractNextArg( args );
@@ -94,7 +96,7 @@ namespace LocalNS {
   struct SetLightColor : public CLI::Command
   {
 
-    virtual string execute( string& args ) override
+    string execute( string& args ) override
     {
       if ( 2 == CLI::GetNumArgs( args ) ) {
         auto lightName = CLI::ExtractNextArg( args );
@@ -117,6 +119,21 @@ namespace LocalNS {
   };
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+  // Global commands.
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  struct ReloadScene : public CLI::Command
+  {
+
+    string execute( string& args ) override
+    {
+      CLI::GetActiveScene()->reload();
+      return string( "Scene reloaded." );
+    }
+
+  };
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 }
 using namespace LocalNS;
@@ -129,9 +146,13 @@ using namespace Lore;
 
 void CLI::Init()
 {
+  // Scene layout/aesthetic commands.
   CLI::RegisterCommand( new SetNodePos(), 2, "SetNodePos", "SetNodePosition");
   CLI::RegisterCommand( new TranslateNode(), 2, "TranslateNode", "MoveNode" );
   CLI::RegisterCommand( new SetLightColor(), 2, "SetLightColor", "slc" );
+
+  // Global commands.
+  CLI::RegisterCommand( new ReloadScene(), 2, "ReloadScene", "Reload" );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

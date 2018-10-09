@@ -33,6 +33,7 @@
 #include <LORE/Resource/ResourceController.h>
 #include <LORE/Resource/StockResource.h>
 #include <LORE/Scene/AABB.h>
+#include <LORE/Scene/SceneLoader.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -188,6 +189,27 @@ void Scene::updateSceneGraph()
   // Traverse the scene graph and update object transforms.
   Lore::SceneGraphVisitor sgv( getRootNode() );
   sgv.visit( _renderer );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Scene::reload()
+{
+  // Unload entities...
+  //Resource::UnloadGroup( "" );
+  auto nodeIt = _nodes.getIterator();
+  while( nodeIt.hasMore() ) {
+    auto node = nodeIt.getNext();
+    destroyNode( node );
+  }
+  _nodes.clear();
+  _directionalLights.clear();
+  _pointLights.clear();
+  _spotLights.clear();
+  _skybox->removeAllLayers();
+
+  SceneLoader loader;
+  loader.process( _sceneFile, this );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
