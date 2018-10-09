@@ -300,7 +300,15 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       src += "result = vec3(1.0, 1.0, 1.0);";
     }
 
-    //src += "result *= (material.ambient.rgb + material.diffuse.rgb);";
+    // Apply scene ambient lighting.
+    if ( lit ) {
+      if ( textured ) {
+        src += "result += sceneAmbient.xyz *  vec3(texture(material.diffuseTexture, TexCoord));";
+      }
+      else {
+        src += "result += sceneAmbient.xyz;";
+      }
+    }
 
     // Final pixel.
     src += "pixel = vec4(result, material.diffuse.a);";
