@@ -55,6 +55,7 @@ namespace Lore {
     void _loadLayout();
 
     void _processMaterialSettings( const SerializerValue& value, EntityPtr entity);
+    void _processNode( const string& nodeName, const SerializerValue& nodeData, const NodePtr parent = nullptr );
 
   private:
 

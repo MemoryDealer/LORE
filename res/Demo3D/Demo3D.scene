@@ -33,7 +33,13 @@
         "Position": [0.0, 0.0, 0.0],
         "Orientation": [90.0, 0.0, 0.0],
         "Scale": 5.0,
-        "Children":[]
+        "ChildNodes":{
+          "Floor0Child0": {
+            "Entity": "CheckeredFloor",
+            "Position": [8.0, 0.0, 0.0],
+            "Orientation": [90.0, 0.0, 0.0]
+          }
+        }
       }
     }
   }

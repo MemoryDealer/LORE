@@ -194,44 +194,7 @@ void SceneLoader::_loadLayout()
     for ( const auto& node : nodes.getValues() ) {
       const string& nodeName = node.first;
       const auto& nodeData = node.second;
-
-      // Create the node.
-      auto node = _scene->createNode( nodeName );
-
-      // Get the entity to attach to this node and attach it.
-      const auto& entityName = nodeData.getValue( "Entity" );
-      if ( !entityName.isNull() ) {
-        auto entity = Resource::GetEntity( entityName.toString(), _resourceGroupName );
-        node->attachObject( entity );
-      }
-
-      // Get the transform data.
-      auto position = nodeData.getValue( "Position" );
-      if ( !position.isNull() ) {
-        node->setPosition( position.toVec3() );
-      }
-
-      auto orientation = nodeData.getValue( "Orientation" );
-      if ( !orientation.isNull() ) {
-        const auto arraySize = orientation.toArray().size();
-        if ( 3 == arraySize ) {
-          node->setOrientation( orientation.toVec3() );
-        }
-        else if ( 4 == arraySize ) {
-          // This is a quaternion.
-          node->setOrientation( orientation.toVec4() );
-        }
-      }
-
-      auto scale = nodeData.getValue( "Scale" );
-      if ( !scale.isNull() ) {
-        if ( SerializerValue::Type::Real == scale.getType() ) {
-          node->setScale( scale.toReal() );
-        }
-        else if ( SerializerValue::Type::Array == scale.getType() ) {
-          node->setScale( scale.toVec3() );
-        }
-      }
+      _processNode( nodeName, nodeData );
     }
   }
 }
@@ -245,3 +208,65 @@ void SceneLoader::_processMaterialSettings( const SerializerValue& value, Entity
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void SceneLoader::_processNode( const string& nodeName, const SerializerValue& nodeData, const NodePtr parent )
+{
+  // Create the node.
+  NodePtr node = nullptr;
+  if ( parent ) {
+    node = parent->createChildNode( nodeName );
+  }
+  else {
+    node = _scene->createNode( nodeName );
+  }
+
+  // Get the entity to attach to this node and attach it.
+  const auto& entityName = nodeData.getValue( "Entity" );
+  if ( !entityName.isNull() ) {
+    auto entity = Resource::GetEntity( entityName.toString(), _resourceGroupName );
+    node->attachObject( entity );
+  }
+
+  // Get the transform data.
+  const auto& position = nodeData.getValue( "Position" );
+  if ( !position.isNull() ) {
+    node->setPosition( position.toVec3() );
+  }
+
+  const auto& orientation = nodeData.getValue( "Orientation" );
+  if ( !orientation.isNull() ) {
+    const auto arraySize = orientation.toArray().size();
+    if ( 3 == arraySize ) {
+      node->setOrientation( orientation.toVec3() );
+    }
+    else if ( 4 == arraySize ) {
+      // This is a quaternion.
+      node->setOrientation( orientation.toVec4() );
+    }
+  }
+
+  const auto& scale = nodeData.getValue( "Scale" );
+  if ( !scale.isNull() ) {
+    if ( SerializerValue::Type::Real == scale.getType() ) {
+      node->setScale( scale.toReal() );
+    }
+    else if ( SerializerValue::Type::Array == scale.getType() ) {
+      node->setScale( scale.toVec3() );
+    }
+  }
+
+  // Recursively load child nodes.
+  const auto& childNodes = nodeData.getValue( "ChildNodes" );
+  if ( SerializerValue::Type::Container == childNodes.getType() ) {
+    const auto& childNodeValues = childNodes.getValues();
+    for ( const auto& childNodeValue : childNodeValues ) {
+      const string& nodeName = childNodeValue.first;
+      const auto& nodeData = childNodeValue.second;
+      // Each child node value is a container.
+      if ( Lore::SerializerValue::Type::Container == nodeData.getType() ) {
+        _processNode( nodeName, nodeData, node );
+      }
+    }
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //s
