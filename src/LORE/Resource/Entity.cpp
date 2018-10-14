@@ -37,6 +37,9 @@ using namespace Lore;
 
 Entity::~Entity()
 {
+  if ( _material ) {
+    Resource::DestroyMaterial( _material );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

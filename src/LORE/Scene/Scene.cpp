@@ -208,7 +208,11 @@ void Scene::reload()
   _spotLights.clear();
   _skybox->removeAllLayers();
 
+  // Since entities are loaded as part of a scene file, unload all of them.
+
+
   SceneLoader loader;
+  loader.setUnloadEntities( true );
   loader.process( _sceneFile, this );
 }
 

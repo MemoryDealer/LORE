@@ -57,7 +57,7 @@ project "LORE"
     pchsource "LORE/_pch.cpp"
     forceincludes { "_pch.h" }
     files {
-        "LORE/**.h", "LORE/**.cpp"
+        "LORE/**.h", "LORE/**.cpp", "LORE/**.inl"
     }
     postbuildcommands { "{COPY} ../../res/ ../../bin/%{cfg.buildcfg}/Run/res/" }
 

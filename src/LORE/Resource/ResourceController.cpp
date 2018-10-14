@@ -257,8 +257,10 @@ ResourceGroupPtr ResourceController::_getGroup( const string& groupName )
     return lookup->second.get();
   }
 
-  log_warning( "Resource group " + groupName + " not found, using default resource group" );
-  return _defaultGroup;
+  log_information( "Resource group " + groupName + " not found, creating resource group" );
+  auto rg = std::make_shared<ResourceGroup>( groupName );
+  _groups.insert( { groupName, rg } );
+  return rg.get();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -699,6 +701,13 @@ void Resource::DestroyUI( UIPtr ui )
 void Resource::DestroyVertexBuffer( VertexBufferPtr vb )
 {
   ActiveContext->getResourceController()->destroy<VertexBuffer>( vb );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Resource::DestroyEntitiesInGroup( const string& groupName )
+{
+  ActiveContext->getResourceController()->destroyAllInGroup<Entity>( groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

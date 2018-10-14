@@ -1,7 +1,7 @@
 {
   "SceneProperties": {
     "Type": "Generic",
-    "ResourceGroup": "Core",
+    "ResourceGroup": "Demo3D",
     "SkyboxColor": [0.3, 0.8, 0.75],
     "SkyboxSprite":"alien-sky",
     "AmbientLightColor": [0.75, 0.75, 0.75]

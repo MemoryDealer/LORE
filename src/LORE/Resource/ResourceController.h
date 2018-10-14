@@ -342,6 +342,8 @@ namespace Lore {
     static void DestroyUI( UIPtr ui );
     static void DestroyVertexBuffer( VertexBufferPtr vb );
 
+    static void DestroyEntitiesInGroup( const string& groupName );
+
     //
     // Accessors.
 

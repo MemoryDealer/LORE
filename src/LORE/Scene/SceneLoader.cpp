@@ -43,7 +43,7 @@ namespace LocalNS {
       { "Cube", Lore::VertexBuffer::Type::Cube },
       { "TexturedCube", Lore::VertexBuffer::Type::TexturedCube }
     };
-    // TODO: Check scene's renderere type to use quad or quad3D.
+    // TODO: Check scene's renderer type to use quad or quad3D.
     auto lookup = ConversionTable.find( str );
     if ( ConversionTable.end() != lookup ) {
       return lookup->second;
@@ -80,6 +80,13 @@ bool SceneLoader::process( const string& sceneFile, ScenePtr scene )
   _scene->setSceneFile( sceneFile );
 
   return true;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void SceneLoader::setUnloadEntities( const bool unload )
+{
+  _unloadEntities = unload;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -129,6 +136,11 @@ void SceneLoader::_loadProperties()
 
 void SceneLoader::_loadEntities()
 {
+  if ( _unloadEntities ) {
+    // Unload all entities in the scene's resource group.
+    Resource::DestroyEntitiesInGroup( _resourceGroupName );
+  }
+
   const string SceneEntities = "Entity";
   auto entities = _serializer.getValue( SceneEntities );
   if ( !entities.isNull() && SerializerValue::Type::Container == entities.getType() ) {
@@ -142,19 +154,6 @@ void SceneLoader::_loadEntities()
       auto vbType = value.getValue( "VertexBufferType" );
       if ( vbType.isNull() ) {
         throw Lore::SerializerException( "Entity value " + entityName + " did not specify vertex buffer type" );
-      }
-
-      // HACK: See if entity already exists.
-      // TODO: Unload entities exclusively in Scene::reload()
-      bool found = true;
-      try {
-        Resource::GetEntity( entityName, _resourceGroupName );
-      }
-      catch ( const Lore::ItemIdentityException& ) {
-        found = false;
-      }
-      if ( found ) {
-        continue;
       }
 
       // Create the entity.

@@ -44,6 +44,9 @@ namespace Lore {
 
     bool process( const string& sceneFile, ScenePtr scene );
 
+    // If unload is true, all entities in scene's resource group will be unloaded first.
+    void setUnloadEntities( const bool unload );
+
   private:
 
     void _loadProperties();
@@ -58,6 +61,7 @@ namespace Lore {
     Serializer _serializer {};
     ScenePtr _scene { nullptr };
     string _resourceGroupName {};
+    bool _unloadEntities { false };
 
   };
 

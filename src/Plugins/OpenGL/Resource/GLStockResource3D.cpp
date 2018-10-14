@@ -306,7 +306,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
         src += "result += sceneAmbient.xyz *  vec3(texture(material.diffuseTexture, TexCoord));";
       }
       else {
-        src += "result += sceneAmbient.xyz;";
+        src += "result += sceneAmbient.xyz * material.ambient.xyz;";
       }
     }
 
