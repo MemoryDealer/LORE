@@ -4,7 +4,7 @@
     "ResourceGroup": "Demo3D",
     "SkyboxColor": [0.3, 0.8, 0.75],
     "SkyboxSprite":"alien-sky",
-    "AmbientLightColor": [0.75, 0.75, 0.75]
+    "AmbientLightColor": [0.05, 0.05, 0.05]
   },
   "Entity": {
     "CheckeredFloor": {
@@ -13,14 +13,27 @@
       "MaterialSettings": {
         "ScrollSpeed": [0.01, 0.0]
       }
+    },
+    "Light": {
+      "VertexBufferType": "Cube",
+      "MaterialSettings": {
+        "Ambient": [1.0, 1.0, 1.0]
+      }
     }
   },
   "Lighting": {
-    "DirectionalLight1": {
+    "DirectionalLight0": {
       "Type": "Directional",
       "Direction": [-0.5, -0.2, -0.5],
-      "Diffuse": "White",
-      "Specular": "White"
+      "Diffuse": [0.1, 0.1, 0.25],
+      "Specular": [0.1, 0.1, 0.25]
+    },
+    "PointLight0": {
+      "Type": "Point",
+      "Ambient": [1.0, 1.0, 1.0],
+      "Diffuse": [0.0, 1.0, 0.0],
+      "Specular": [0.0, 1.0, 0.0],
+      "Attenuation": [33.5, 0.5, 0.25, 0.01]
     }
   },
   "Layout": {
@@ -28,24 +41,16 @@
 
     },
     "Nodes": {
-      "Floor0": {
+      "MainFloor0": {
         "Entity": "CheckeredFloor",
-        "Position": [0.0, 0.0, 0.0],
         "Orientation": [90.0, 0.0, 0.0],
-        "Scale": 5.0,
-        "ChildNodes":{
-          "Floor0Child0": {
-            "Entity": "CheckeredFloor",
-            "Position": [8.0, 0.0, 0.0],
-            "Orientation": [90.0, 0.0, 0.0],
-            "ChildNodes": {
-              "Floor0Child0Child0": {
-                "Entity": "CheckeredFloor",
-                "Position": [0.0, 10.0, 0.0]
-              }
-            }
-          }
-        }
+        "Scale": 5.0
+      },
+      "FloatingLight": {
+        "Entity": "Light",
+        "Light": "PointLight0",
+        "Position": [0.0, 7.5, 0.0],
+        "Scale": 0.25
       }
     }
   }

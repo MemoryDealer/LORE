@@ -153,6 +153,16 @@ namespace Lore {
       return GET_VARIANT<Array>( _value );
     }
 
+    glm::vec2 toVec2() const
+    {
+      if ( Type::Array == getType() ) {
+        const auto& values = toArray();
+        assert( 2 == values.size() );
+        return glm::vec2( values[0].toReal(), values[1].toReal() );
+      }
+      throw Lore::Exception( "Value not array type" );
+    }
+
     glm::vec3 toVec3() const
     {
       if ( Type::Array == getType() ) {

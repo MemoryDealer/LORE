@@ -221,9 +221,9 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
       // Combine results.
       if ( textured ) {
-        src += "vec3 ambient = light.ambient * vec3(texture(material.diffuseTexture, TexCoord));";
-        src += "vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuseTexture, TexCoord));";
-        src += "vec3 specular = light.specular * spec * vec3(texture(material.specularTexture, TexCoord));";
+        src += "vec3 ambient = light.ambient * vec3(texture(material.diffuseTexture, TexCoord + texSampleOffset));";
+        src += "vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuseTexture, TexCoord + texSampleOffset));";
+        src += "vec3 specular = light.specular * spec * vec3(texture(material.specularTexture, TexCoord + texSampleOffset));";
       }
       else {
         src += "vec3 ambient = light.ambient * vec3(material.ambient);";
@@ -254,9 +254,9 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
       // Combine results.
       if ( textured ) {
-        src += "vec3 ambient = light.ambient * vec3(texture(material.diffuseTexture, TexCoord));";
-        src += "vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuseTexture, TexCoord));";
-        src += "vec3 specular = light.specular * spec * vec3(texture(material.specularTexture, TexCoord));";
+        src += "vec3 ambient = light.ambient * vec3(texture(material.diffuseTexture, TexCoord + texSampleOffset));";
+        src += "vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuseTexture, TexCoord + texSampleOffset));";
+        src += "vec3 specular = light.specular * spec * vec3(texture(material.specularTexture, TexCoord + texSampleOffset));";
       }
       else {
         src += "vec3 ambient = light.ambient * vec3(material.ambient);";
@@ -303,7 +303,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     // Apply scene ambient lighting.
     if ( lit ) {
       if ( textured ) {
-        src += "result += sceneAmbient.xyz *  vec3(texture(material.diffuseTexture, TexCoord));";
+        src += "result += sceneAmbient.xyz *  vec3(texture(material.diffuseTexture, TexCoord + texSampleOffset));";
       }
       else {
         src += "result += sceneAmbient.xyz * material.ambient.xyz;";

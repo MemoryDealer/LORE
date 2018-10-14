@@ -184,6 +184,24 @@ void Scene::destroyLight( const Light::Type type, const string& name )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void Scene::destroyAllLights()
+{
+  auto directionalLightIt = _directionalLights.getIterator();
+  while ( directionalLightIt.hasMore() ) {
+    destroyLight( directionalLightIt.getNext() );
+  }
+  auto pointLightIt = _pointLights.getIterator();
+  while ( pointLightIt.hasMore() ) {
+    destroyLight( pointLightIt.getNext() );
+  }
+  auto spotLightIt = _spotLights.getIterator();
+  while ( spotLightIt.hasMore() ) {
+    destroyLight( spotLightIt.getNext() );
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void Scene::updateSceneGraph()
 {
   // Traverse the scene graph and update object transforms.
@@ -202,10 +220,7 @@ void Scene::reload()
     auto node = nodeIt.getNext();
     destroyNode( node );
   }
-  _nodes.clear();
-  _directionalLights.clear();
-  _pointLights.clear();
-  _spotLights.clear();
+  destroyAllLights();
   _skybox->removeAllLayers();
 
   // Since entities are loaded as part of a scene file, unload all of them.

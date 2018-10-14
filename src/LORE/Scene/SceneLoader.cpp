@@ -95,7 +95,7 @@ void SceneLoader::setUnloadEntities( const bool unload )
 void SceneLoader::_loadProperties()
 {
   const string SceneProperties = "SceneProperties";
-  auto properties = _serializer.getValue( SceneProperties );
+  const auto& properties = _serializer.getValue( SceneProperties );
   if ( !properties.isNull() && SerializerValue::Type::Container == properties.getType() ) {
     // Get the scene type.
     auto type = properties.getValue( "Type" );
@@ -142,7 +142,7 @@ void SceneLoader::_loadEntities()
   }
 
   const string SceneEntities = "Entity";
-  auto entities = _serializer.getValue( SceneEntities );
+  const auto& entities = _serializer.getValue( SceneEntities );
   if ( !entities.isNull() && SerializerValue::Type::Container == entities.getType() ) {
     // Iterate over each entity entry and load them.
     auto entityValues = entities.getValues();
@@ -151,7 +151,7 @@ void SceneLoader::_loadEntities()
       const SerializerValue& value = entity.second;
 
       // Get the vertex buffer type.
-      auto vbType = value.getValue( "VertexBufferType" );
+      const auto& vbType = value.getValue( "VertexBufferType" );
       if ( vbType.isNull() ) {
         throw Lore::SerializerException( "Entity value " + entityName + " did not specify vertex buffer type" );
       }
@@ -160,13 +160,16 @@ void SceneLoader::_loadEntities()
       auto entity = Resource::CreateEntity( entityName, StringToVertexBufferType( vbType.toString() ), _resourceGroupName );
 
       // Attach a sprite if specified.
-      auto spriteName = value.getValue( "Sprite" );
+      const auto& spriteName = value.getValue( "Sprite" );
       if ( !spriteName.isNull() ) {
         entity->setSprite( Resource::GetSprite( spriteName.toString() ) );
       }
 
       // Process material settings for the entity.
-      _processMaterialSettings( value, entity );
+      const auto& materialSettings = value.getValue( "MaterialSettings" );
+      if ( !materialSettings.isNull() ) {
+        _processMaterialSettings( materialSettings, entity );
+      }
     }
   }
 }
@@ -175,7 +178,91 @@ void SceneLoader::_loadEntities()
 
 void SceneLoader::_loadLighting()
 {
+  const string Lighting = "Lighting";
+  const auto& lighting = _serializer.getValue( Lighting );
+  if ( !lighting.isNull() && SerializerValue::Type::Container == lighting.getType() ) {
+    // Iterate over each lighting entry.
+    auto lightingValues = lighting.getValues();
+    for ( const auto& lightingValue : lightingValues ) {
+      const auto& lightName = lightingValue.first;
+      const auto& lightData = lightingValue.second;
 
+      // Determine light type.
+      Light::Type type;
+      const auto& lightTypeValue = lightData.getValue( "Type" );
+      if ( SerializerValue::Type::String != lightTypeValue.getType() ) {
+        log_warning( "Invalid light type for light " + lightName );
+        continue;
+      }
+      const auto& lightType = lightTypeValue.toString();
+      if ( "Directional" == lightType ) {
+        type = Light::Type::Directional;
+      }
+      else if ( "Point" == lightType ) {
+        type = Light::Type::Point;
+      }
+      else if ( "Spot" == lightType || "Spotlight" == lightType ) {
+        type = Light::Type::Spot;
+      }
+      else {
+        log_warning( "Invalid light type for " + lightName + " - should be Directional, point, or spot" );
+      }
+
+      // Create the light in the scene.
+      LightPtr light = nullptr;
+      switch ( type ) {
+      default:
+        continue;
+
+      case Light::Type::Directional:
+        light = _scene->createDirectionalLight( lightName );
+        {
+          // Set direction.
+          const auto& directionValue = lightData.getValue( "Direction" );
+          if ( SerializerValue::Type::Array == directionValue.getType() ) {
+            static_cast<DirectionalLightPtr>( light )->setDirection( directionValue.toVec3() );
+          }
+        }
+        break;
+
+      case Light::Type::Point:
+        light = _scene->createPointLight( lightName );
+        {
+          // Set attenuation.
+          const auto& attenuationValue = lightData.getValue( "Attenuation" );
+          if ( SerializerValue::Type::Array == attenuationValue.getType() ) {
+            const auto& attenuation = attenuationValue.toVec4();
+            static_cast<PointLightPtr>( light )->setAttenuation( attenuation.x, attenuation.y, attenuation.z, attenuation.w );
+          }
+        }
+        break;
+
+      case Light::Type::Spot:
+        // TODO: Implement spotlights.
+        break;
+      }
+
+      // Gather color data.
+      Color ambient, diffuse, specular;
+      const auto& ambientValue = lightData.getValue( "Ambient" );
+      if ( SerializerValue::Type::Array == ambientValue.getType() ) {
+        ambient = glm::vec4( ambientValue.toVec3(), 1.f );
+      }
+      const auto& diffuseValue = lightData.getValue( "Diffuse" );
+      if ( SerializerValue::Type::Array == diffuseValue.getType() ) {
+        // TODO: Write helper parser functions for JSON.
+        diffuse = glm::vec4( diffuseValue.toVec3(), 1.f );
+      }
+      const auto& specularValue = lightData.getValue( "Specular" );
+      if ( SerializerValue::Type::Array == specularValue.getType() ) {
+        specular = glm::vec4( specularValue.toVec3(), 1.f );
+      }
+
+      light->setAmbient( ambient );
+      light->setDiffuse( diffuse );
+      light->setSpecular( specular );
+    }
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -183,7 +270,7 @@ void SceneLoader::_loadLighting()
 void SceneLoader::_loadLayout()
 {
   const string Layout = "Layout";
-  auto layout = _serializer.getValue( Layout );
+  const auto& layout = _serializer.getValue( Layout );
   if ( layout.isNull() ) {
     return;
   }
@@ -203,7 +290,31 @@ void SceneLoader::_loadLayout()
 
 void SceneLoader::_processMaterialSettings( const SerializerValue& value, EntityPtr entity )
 {
+  auto material = entity->getMaterial();
 
+  //
+  // Look for material settings.
+
+  // Colors.
+  const auto& ambient = value.getValue( "Ambient" );
+  if ( !ambient.isNull() ) {
+    material->ambient = glm::vec4( ambient.toVec3(), 1.f );
+  }
+  const auto& diffuse = value.getValue( "Diffuse" );
+  if ( !diffuse.isNull() ) {
+    material->diffuse = glm::vec4( diffuse.toVec3(), 1.f );
+  }
+  const auto& specular = value.getValue( "Specular" );
+  if ( !specular.isNull() ) {
+    material->specular = glm::vec4( specular.toVec3(), 1.f );
+  }
+
+  // Scrolling.
+  const auto& scrollSpeed = value.getValue( "ScrollSpeed" );
+  if ( !scrollSpeed.isNull() ) {
+    const auto scrollSpeedXY = scrollSpeed.toVec2();
+    material->setTextureScrollSpeed( scrollSpeedXY );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -224,6 +335,34 @@ void SceneLoader::_processNode( const string& nodeName, const SerializerValue& n
   if ( !entityName.isNull() ) {
     auto entity = Resource::GetEntity( entityName.toString(), _resourceGroupName );
     node->attachObject( entity );
+  }
+
+  // Get the light to attach to this node if any.
+  const auto& lightName = nodeData.getValue( "Light" );
+  if ( !lightName.isNull() && SerializerValue::Type::String == lightName.getType() ) {
+    bool lightFound = false;
+    // Look for point light of this name.
+    try {
+      auto pointLight = _scene->getLight( Light::Type::Point, lightName.toString() );
+      if ( pointLight ) {
+        lightFound = true;
+        node->attachObject( pointLight );
+      }
+    }
+    catch ( ItemIdentityException& ) { }
+
+    if ( !lightFound ) {
+      // Look for spotlight of this name.
+      try {
+        auto spotLight = _scene->getLight( Light::Type::Spot, lightName.toString() );
+        if ( spotLight ) {
+          node->attachObject( spotLight );
+        }
+      }
+      catch( ItemIdentityException& ){
+        log_error( "No light found with name " + lightName.toString() );
+      }
+    }
   }
 
   // Get the transform data.
