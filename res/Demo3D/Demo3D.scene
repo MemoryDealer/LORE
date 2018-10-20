@@ -8,11 +8,19 @@
   },
   "Entity": {
     "CheckeredFloor": {
-      "VertexBufferType":"TexturedCube",
-      "Instanced": 10,
+      "VertexBufferType":"TexturedQuad",
+      "Instanced": 50,
       "Sprite":"checkerboard",
       "MaterialSettings": {
         "ScrollSpeed": [0.01, 0.0]
+      }
+    },
+    "CheckeredCube": {
+      "VertexBufferType":"TexturedCube",
+      "Instanced": 50,
+      "Sprite":"checkerboard",
+      "MaterialSettings": {
+        "ScrollSpeed": [0.0, 0.0]
       }
     },
     "Light": {
@@ -41,14 +49,20 @@
     "Nodes": {
       "MainFloor0": {
         "Entity": "CheckeredFloor",
-        "Orientation": [90.0, 0.0, 0.0],
+        "Position": [0.0, 0.0, 10.0],
+        "Orientation": [-90.0, 0.0, 0.0],
         "Scale": 5.0
       },
       "MainFloor1": {
         "Entity": "CheckeredFloor",
-        "Position": [10.0, 0.0, 0.0],
-        "Orientation": [90.0, 0.0, 0.0],
+        "Position": [10.0, 0.0, 10.0],
+        "Orientation": [-90.0, 0.0, 0.0],
         "Scale": 5.0
+      },
+      "Cube0": {
+        "Entity": "CheckeredCube",
+        "Position": [0.0, 0.0, 0.0],
+        "Scale": 3.0
       },
       "FloatingLight": {
         "Entity": "Light",

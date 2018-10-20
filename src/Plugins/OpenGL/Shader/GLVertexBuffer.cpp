@@ -175,9 +175,6 @@ void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
   case VertexBuffer::Type::Quad3D:
     // Generate quad with normals.
     _mode = GL_TRIANGLE_STRIP;
-    // These quads currently render two quads with opposing normals to provide accurate lighting on both sides.
-    // However it may be preferable to only have a single quad with one normal, and let the user render two
-    // quads if they desire this behavior.
     // TODO: Combine Quad3D and Quad - have 2D renderer use normals etc.
     _vertices = { 
       -0.5f, -0.5f, 0.f,  0.0f,  0.0f, -1.0f,
@@ -186,13 +183,6 @@ void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
       0.5f,  0.5f, 0.f,  0.0f,  0.0f, -1.0f,
       -0.5f,  0.5f, 0.f,  0.0f,  0.0f, -1.0f,
       -0.5f, -0.5f, 0.f,  0.0f,  0.0f, -1.0f
-
-//       -0.5f, -0.5f,  0.001f,  0.0f,  0.0f,  1.0f,
-//       0.5f, -0.5f,  0.001f,  0.0f,  0.0f,  1.0f,
-//       0.5f,  0.5f,  0.001f,  0.0f,  0.0f,  1.0f,
-//       0.5f,  0.5f,  0.001f,  0.0f,  0.0f,  1.0f,
-//       -0.5f,  0.5f,  0.001f,  0.0f,  0.0f,  1.0f,
-//       -0.5f, -0.5f,  0.001f,  0.0f,  0.0f,  1.0f
     };
     _indices = { 0, 1, 2, 3, 4, 5 };
 
@@ -210,13 +200,6 @@ void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
       0.5f,  0.5f, 0.f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
       -0.5f,  0.5f, 0.f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f,
       -0.5f, -0.5f, 0.f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f
-// 
-//       -0.5f, -0.5f,  0.001f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
-//       0.5f, -0.5f,  0.001f,  0.0f,  0.0f,  1.0f,  1.0f,  0.0f,
-//       0.5f,  0.5f,  0.001f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
-//       0.5f,  0.5f,  0.001f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
-//       -0.5f,  0.5f,  0.001f,  0.0f,  0.0f,  1.0f,  0.0f,  1.0f,
-//       -0.5f, -0.5f,  0.001f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f
     };
    _indices = { 0, 1, 2, 3, 4, 5 };
 
