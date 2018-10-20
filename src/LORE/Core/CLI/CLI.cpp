@@ -221,6 +221,29 @@ glm::vec2 CLI::ToVec2( const string& str )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+glm::vec3 CLI::ToVec3( const string& str )
+{
+  std::istringstream tokenizer( str );
+  string x, y, z;
+  std::getline( tokenizer, x, ',' );
+  std::getline( tokenizer, y, ',' );
+  std::getline( tokenizer, z );
+
+  if ( x.empty() ) {
+    x = "0";
+  }
+  if ( y.empty() ) {
+    y = "0";
+  }
+  if ( z.empty() ) {
+    z = "0";
+  }
+
+  return glm::vec3( std::stof( x ), std::stof( y ), std::stof( z ) );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 glm::vec4 CLI::ToVec4( const string& str )
 {
   std::istringstream tokenizer( str );

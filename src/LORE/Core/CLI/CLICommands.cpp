@@ -74,7 +74,7 @@ namespace LocalNS {
       if ( 2 == CLI::GetNumArgs( args ) ) {
         auto nodeName = CLI::ExtractNextArg( args );
         auto offsetStr = CLI::ExtractNextArg( args );
-        auto offset = CLI::ToVec2( offsetStr );
+        auto offset = CLI::ToVec3( offsetStr );
 
         try {
           auto node = CLI::GetActiveScene()->getNode( nodeName );
