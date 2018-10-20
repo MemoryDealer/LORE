@@ -42,15 +42,21 @@ namespace Lore {
       Custom,
       Quad,
       TexturedQuad,
-      QuadInstanced,
-      TexturedQuadInstanced,
       FullscreenQuad,
       Cube,
       TexturedCube,
       Cubemap,
       Quad3D,
       TexturedQuad3D,
-      Text
+      Text,
+
+      // Instanced.
+      QuadInstanced,
+      TexturedQuadInstanced,
+      Quad3DInstanced,
+      TexturedQuad3DInstanced,
+      CubeInstanced,
+      TexturedCubeInstanced
     };
 
     enum class AttributeType

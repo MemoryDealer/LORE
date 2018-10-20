@@ -159,6 +159,13 @@ void SceneLoader::_loadEntities()
       // Create the entity.
       auto entity = Resource::CreateEntity( entityName, StringToVertexBufferType( vbType.toString() ), _resourceGroupName );
 
+      // Enable instancing if specified.
+      const auto& instanced = value.getValue( "Instanced" );
+      if ( !instanced.isNull() && SerializerValue::Type::Int == instanced.getType() ) {
+        const auto instanceCount = instanced.toInt();
+        entity->enableInstancing( instanceCount );
+      }
+
       // Attach a sprite if specified.
       const auto& spriteName = value.getValue( "Sprite" );
       if ( !spriteName.isNull() ) {

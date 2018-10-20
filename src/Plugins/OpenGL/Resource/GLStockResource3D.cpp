@@ -464,8 +464,46 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     }
   };
 
+  auto InstancedUniformNodeUpdater = []( const GPUProgramPtr program,
+                                const MaterialPtr material,
+                                const NodePtr node,
+                                const glm::mat4& viewProjection ) {
+    // Update texture data.
+    if ( material->sprite && material->sprite->getTextureCount() ) {
+      size_t spriteFrame = 0;
+      const auto spc = node->getSpriteController();
+      if ( spc ) {
+        spriteFrame = spc->getActiveFrame();
+      }
+
+      const TexturePtr texture = material->sprite->getTexture( spriteFrame );
+      texture->bind( 0 ); // TODO: Multi-texturing.
+      texture->bind( 1 );
+      program->setUniformVar( "texSampleOffset", material->getTexCoordOffset() );
+
+      const Rect sampleRegion = material->getTexSampleRegion();
+      program->setUniformVar( "texSampleRegion.x", sampleRegion.x );
+      program->setUniformVar( "texSampleRegion.y", sampleRegion.y );
+      program->setUniformVar( "texSampleRegion.w", sampleRegion.w );
+      program->setUniformVar( "texSampleRegion.h", sampleRegion.h );
+    }
+
+    // Apply view-projection matrix for instanced shaders.
+    program->setTransformVar( viewProjection );
+
+    // Supply model matrix for lighting calculations.
+    if ( material->lighting ) {
+      program->setUniformVar( "model", node->getFullTransform() );
+    }
+  };
+
   program->setUniformUpdater( UniformUpdater );
-  program->setUniformNodeUpdater( UniformNodeUpdater );
+  if ( instanced ) {
+    program->setUniformNodeUpdater( InstancedUniformNodeUpdater );
+  }
+  else {
+    program->setUniformNodeUpdater( UniformNodeUpdater );
+  }
 
   return program;
 }
