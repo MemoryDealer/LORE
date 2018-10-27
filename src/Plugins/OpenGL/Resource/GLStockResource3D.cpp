@@ -106,12 +106,12 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     if ( lit ) {
       if ( instanced ) {
         src += "FragPos = vec3(instanceMatrix * vec4(vertex, 1.0));";
+        src += "Normal = mat3(instanceMatrix) * normal;";
       }
       else {
         src += "FragPos = vec3(model * vec4(vertex, 1.0));";
+        src += "Normal = mat3(transpose(inverse(model))) * normal;";
       }
-      src += "Normal = mat3(transpose(inverse(model))) * normal;";
-      //src += "Normal = normal;";
     }
 
     if ( textured ) {
@@ -493,7 +493,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
     // Supply model matrix for lighting calculations.
     if ( material->lighting ) {
-      program->setUniformVar( "model", node->getFullTransform() );
+      program->setUniformVar( "model", viewProjection );
     }
   };
 

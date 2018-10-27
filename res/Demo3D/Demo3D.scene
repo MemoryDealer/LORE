@@ -17,7 +17,7 @@
     },
     "CheckeredCube": {
       "VertexBufferType":"TexturedCube",
-      "Instanced": 50,
+      "Instanced": 500,
       "Sprite":"checkerboard",
       "MaterialSettings": {
         "ScrollSpeed": [0.0, 0.0]

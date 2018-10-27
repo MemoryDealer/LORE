@@ -100,6 +100,14 @@ void Game::loadScene()
   // Load the scene from disk.
   Lore::SceneLoader loader;
   loader.process( "res/demo3d/demo3d.scene", _scene );
+
+  // Add some cubes to test instanced rendering.
+  for ( int i = 1; i < 450; ++i ) {
+    std::string cubeName = "cube" + std::to_string(i);
+    Lore::NodePtr node = _scene->createNode( cubeName );
+    node->attachObject( Lore::Resource::GetEntity( "CheckeredCube", "Demo3D" ) );
+    node->setPosition( i * 5.f, 0.f, 0.f );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
