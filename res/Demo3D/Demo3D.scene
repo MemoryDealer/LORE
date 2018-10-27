@@ -1,0 +1,75 @@
+{
+  "SceneProperties": {
+    "Type": "Generic",
+    "ResourceGroup": "Demo3D",
+    "SkyboxColor": [0.3, 0.8, 0.75],
+    "SkyboxSprite":"alien-sky",
+    "AmbientLightColor": [0.05, 0.05, 0.05]
+  },
+  "Entity": {
+    "CheckeredFloor": {
+      "VertexBufferType":"TexturedQuad",
+      "Instanced": 50,
+      "Sprite":"checkerboard",
+      "MaterialSettings": {
+        "ScrollSpeed": [0.01, 0.0]
+      }
+    },
+    "CheckeredCube": {
+      "VertexBufferType":"TexturedCube",
+      "Instanced": 500,
+      "Sprite":"checkerboard",
+      "MaterialSettings": {
+        "ScrollSpeed": [0.0, 0.0]
+      }
+    },
+    "Light": {
+      "VertexBufferType": "Cube",
+      "MaterialSettings": {
+        "Ambient": [1.0, 1.0, 1.0]
+      }
+    }
+  },
+  "Lighting": {
+    "DirectionalLight0": {
+      "Type": "Directional",
+      "Direction": [-0.5, -0.2, -0.5],
+      "Diffuse": [0.1, 0.1, 0.25],
+      "Specular": [0.1, 0.1, 0.25]
+    },
+    "PointLight0": {
+      "Type": "Point",
+      "Ambient": [0.05, 0.05, 0.05],
+      "Diffuse": [0.0, 1.0, 0.0],
+      "Specular": [0.0, 1.0, 0.0],
+      "Attenuation": [10.5, 0.5, 0.25, 0.01]
+    }
+  },
+  "Layout": {
+    "Nodes": {
+      "MainFloor0": {
+        "Entity": "CheckeredFloor",
+        "Position": [0.0, 0.0, 10.0],
+        "Orientation": [-90.0, 0.0, 0.0],
+        "Scale": 5.0
+      },
+      "MainFloor1": {
+        "Entity": "CheckeredFloor",
+        "Position": [10.0, 0.0, 10.0],
+        "Orientation": [-90.0, 0.0, 0.0],
+        "Scale": 5.0
+      },
+      "Cube0": {
+        "Entity": "CheckeredCube",
+        "Position": [0.0, 0.0, 0.0],
+        "Scale": 3.0
+      },
+      "FloatingLight": {
+        "Entity": "Light",
+        "Light": "PointLight0",
+        "Position": [0.0, 7.5, 0.0],
+        "Scale": 0.25
+      }
+    }
+  }
+}

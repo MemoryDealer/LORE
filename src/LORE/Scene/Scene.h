@@ -72,10 +72,13 @@ namespace Lore {
 
     void destroyLight( LightPtr light );
     void destroyLight( const Light::Type type, const string& name );
+    void destroyAllLights();
 
     ///
     /// \brief Traverses scene graph and updates node transforms based on parent nodes.
     void updateSceneGraph();
+
+    bool reload();
 
     //
     // Setters.
@@ -98,6 +101,11 @@ namespace Lore {
     inline void setSkybox( SkyboxPtr skybox )
     {
       _skybox = skybox;
+    }
+
+    inline void setSceneFile( const string& file )
+    {
+      _sceneFile = file;
     }
 
     //
@@ -184,6 +192,8 @@ namespace Lore {
     SpotLightMap _spotLights {};
 
     SkyboxPtr _skybox { nullptr };
+
+    string _sceneFile {};
 
   };
 

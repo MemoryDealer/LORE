@@ -93,6 +93,8 @@ namespace Lore {
 
     void removeChildNode( NodePtr child );
 
+    void removeAllChildNodes();
+
     NodePtr getChild( const string& name );
 
     ChildNodeIterator getChildNodeIterator();
@@ -156,6 +158,10 @@ namespace Lore {
     void translate( const glm::vec3& offset );
 
     void translate( const real xOffset, const real yOffset, const real zOffset );
+
+    void setOrientation( const glm::quat& orientation, const TransformSpace& ts = TransformSpace::Local );
+
+    void setOrientation( const glm::vec3& orientation, const TransformSpace& ts = TransformSpace::Local );
 
     void rotate( const real angle, const TransformSpace& ts = TransformSpace::Local );
 

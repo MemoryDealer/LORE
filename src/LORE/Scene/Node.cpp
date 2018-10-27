@@ -131,6 +131,13 @@ void Node::removeChildNode( NodePtr node )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void Node::removeAllChildNodes()
+{
+  _childNodes.clear();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 NodePtr Node::getChild( const string& name )
 {
   return _childNodes.get( name );
@@ -261,6 +268,20 @@ void Node::translate( const glm::vec3& offset )
 void Node::translate( const real xOffset, const real yOffset, const real zOffset )
 {
   translate( glm::vec3( xOffset, yOffset, zOffset ) );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Node::setOrientation( const glm::quat& orientation, const TransformSpace& ts )
+{
+  _transform.orientation = orientation;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Node::setOrientation( const glm::vec3& orientation, const TransformSpace& ts )
+{
+  rotate( glm::quat( glm::radians( orientation ) ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

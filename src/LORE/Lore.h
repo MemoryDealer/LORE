@@ -50,6 +50,7 @@
 #include <LORE/Resource/Box.h>
 #include <LORE/Resource/Entity.h>
 #include <LORE/Resource/Material.h>
+#include <LORE/Resource/Sprite.h>
 #include <LORE/Resource/StockResource.h>
 #include <LORE/Resource/Textbox.h>
 #include <LORE/Resource/Texture.h>
@@ -58,6 +59,7 @@
 
 // Scene.
 #include <LORE/Scene/AABB.h>
+#include <LORE/Scene/SceneLoader.h>
 #include <LORE/Scene/Skybox.h>
 #include <LORE/Scene/SpriteController.h>
 

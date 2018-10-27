@@ -81,7 +81,7 @@ void Game::loadScene()
   // Create a scene with default skybox color.
   _scene = _context->createScene( "core", Lore::RendererType::Forward3D );
   _scene->setSkyboxColor( Lore::Color( 0.3f, 0.8f, 0.75f, 1.f ) );
-  _scene->setAmbientLightColor( Lore::Color( 0.75f, 0.75f, 0.75f, 1.f ) );
+  _scene->setAmbientLightColor( Lore::Color( 0.15f, 0.15f, 0.15f, 1.f ) );
 
   // Create a camera to view the scene.
   _camera = _context->createCamera( "core", Lore::Camera::Type::Type3D );

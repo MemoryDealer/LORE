@@ -314,6 +314,40 @@ void Forward3DRenderer::_renderSolids( const RenderView& rv,
 {
   const ScenePtr scene = rv.scene;
 
+  // Render instanced solids.
+  for ( const auto& entity : queue.instancedSolids ) {
+    MaterialPtr material = entity->getMaterial();
+    VertexBufferPtr vertexBuffer = entity->getInstancedVertexBuffer();
+    GPUProgramPtr program = nullptr;
+
+    const NodePtr node = entity->getInstanceControllerNode();
+
+    // Acquire the correct GPUProgram for this instanced vertex buffer type.
+    switch ( vertexBuffer->getType() ) {
+    default:
+      throw Lore::Exception( "Instanced entity must have an instanced vertex buffer" );
+
+    case VertexBuffer::Type::Quad3DInstanced:
+    case VertexBuffer::Type::CubeInstanced:
+      program = StockResource::GetGPUProgram( "StandardInstanced3D" );
+      break;
+
+    case VertexBuffer::Type::TexturedQuad3DInstanced:
+    case VertexBuffer::Type::TexturedCubeInstanced:
+      program = StockResource::GetGPUProgram( "StandardTexturedInstanced3D" );
+      break;
+    }
+
+    vertexBuffer->bind();
+    program->use();
+
+    program->updateUniforms( rv, material, queue.lights );
+    program->updateNodeUniforms( material, node, viewProjection );
+
+    vertexBuffer->draw( entity->getInstanceCount() );
+    vertexBuffer->unbind();
+  }
+
   // Render non-instanced solids.
   for ( auto& pair : queue.solids ) {
     const EntityPtr entity = pair.first;

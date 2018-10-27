@@ -169,7 +169,7 @@ void StockResourceController::createRendererStockResources( const RendererType t
       vb->init( VertexBuffer::Type::FullscreenQuad );
     }
     break;
-    
+
   case RendererType::Forward3D:
     suffix = "3D";
     {

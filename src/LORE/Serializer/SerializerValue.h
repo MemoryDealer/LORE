@@ -89,11 +89,17 @@ namespace Lore {
 
     const SerializerValue& operator[]( const string& key ) const
     {
-      return get( key );
+      return getValue( key );
     }
 
     //
     // Getters.
+
+    bool isNull() const
+    {
+      // Index 1 is NullType.
+      return ( 1 == _value.index() );
+    }
 
     string getKey() const
     {
@@ -105,11 +111,14 @@ namespace Lore {
       return ( _values.end() == _values.find( key ) );
     }
 
-    const SerializerValue& get( const string& key ) const
+    const SerializerValue& getValue( const string& key ) const
     {
       auto it = _values.find( key );
       if ( _values.end() == it ) {
-        throw Lore::Exception( "Non-existent key lookup on const SerializerValue" );
+        // If not found, return a null value.
+        static SerializerValue nullValue {};
+        nullValue._value = NullType(); // Ensure null.
+        return nullValue;
       }
       return it->second;
     }
@@ -142,6 +151,26 @@ namespace Lore {
     const Array& toArray() const
     {
       return GET_VARIANT<Array>( _value );
+    }
+
+    glm::vec2 toVec2() const
+    {
+      if ( Type::Array == getType() ) {
+        const auto& values = toArray();
+        assert( 2 == values.size() );
+        return glm::vec2( values[0].toReal(), values[1].toReal() );
+      }
+      throw Lore::Exception( "Value not array type" );
+    }
+
+    glm::vec3 toVec3() const
+    {
+      if ( Type::Array == getType() ) {
+        const auto& values = toArray();
+        assert( 3 == values.size() );
+        return glm::vec3( values[0].toReal(), values[1].toReal(), values[2].toReal() );
+      }
+      throw Lore::Exception( "Value not array type" );
     }
 
     glm::vec4 toVec4() const
@@ -204,7 +233,8 @@ namespace Lore {
 
   private:
 
-    using ValueHolder = LORE_VARIANT<MONOSTATE, bool, string, int, real, Array>;
+    struct NullType { };
+    using ValueHolder = LORE_VARIANT<MONOSTATE, NullType, bool, string, int, real, Array>;
 
   private:
 

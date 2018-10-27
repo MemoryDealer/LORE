@@ -106,12 +106,12 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     if ( lit ) {
       if ( instanced ) {
         src += "FragPos = vec3(instanceMatrix * vec4(vertex, 1.0));";
+        src += "Normal = mat3(instanceMatrix) * normal;";
       }
       else {
         src += "FragPos = vec3(model * vec4(vertex, 1.0));";
+        src += "Normal = mat3(transpose(inverse(model))) * normal;";
       }
-      src += "Normal = mat3(transpose(inverse(model))) * normal;";
-      //src += "Normal = normal;";
     }
 
     if ( textured ) {
@@ -221,9 +221,9 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
       // Combine results.
       if ( textured ) {
-        src += "vec3 ambient = light.ambient * vec3(texture(material.diffuseTexture, TexCoord));";
-        src += "vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuseTexture, TexCoord));";
-        src += "vec3 specular = light.specular * spec * vec3(texture(material.specularTexture, TexCoord));";
+        src += "vec3 ambient = light.ambient * vec3(texture(material.diffuseTexture, TexCoord + texSampleOffset));";
+        src += "vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuseTexture, TexCoord + texSampleOffset));";
+        src += "vec3 specular = light.specular * spec * vec3(texture(material.specularTexture, TexCoord + texSampleOffset));";
       }
       else {
         src += "vec3 ambient = light.ambient * vec3(material.ambient);";
@@ -254,9 +254,9 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
       // Combine results.
       if ( textured ) {
-        src += "vec3 ambient = light.ambient * vec3(texture(material.diffuseTexture, TexCoord));";
-        src += "vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuseTexture, TexCoord));";
-        src += "vec3 specular = light.specular * spec * vec3(texture(material.specularTexture, TexCoord));";
+        src += "vec3 ambient = light.ambient * vec3(texture(material.diffuseTexture, TexCoord + texSampleOffset));";
+        src += "vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuseTexture, TexCoord + texSampleOffset));";
+        src += "vec3 specular = light.specular * spec * vec3(texture(material.specularTexture, TexCoord + texSampleOffset));";
       }
       else {
         src += "vec3 ambient = light.ambient * vec3(material.ambient);";
@@ -300,7 +300,15 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       src += "result = vec3(1.0, 1.0, 1.0);";
     }
 
-    //src += "result *= (material.ambient.rgb + material.diffuse.rgb);";
+    // Apply scene ambient lighting.
+    if ( lit ) {
+      if ( textured ) {
+        src += "result += sceneAmbient.xyz *  vec3(texture(material.diffuseTexture, TexCoord + texSampleOffset));";
+      }
+      else {
+        src += "result += sceneAmbient.xyz * material.ambient.xyz;";
+      }
+    }
 
     // Final pixel.
     src += "pixel = vec4(result, material.diffuse.a);";
@@ -456,8 +464,46 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     }
   };
 
+  auto InstancedUniformNodeUpdater = []( const GPUProgramPtr program,
+                                const MaterialPtr material,
+                                const NodePtr node,
+                                const glm::mat4& viewProjection ) {
+    // Update texture data.
+    if ( material->sprite && material->sprite->getTextureCount() ) {
+      size_t spriteFrame = 0;
+      const auto spc = node->getSpriteController();
+      if ( spc ) {
+        spriteFrame = spc->getActiveFrame();
+      }
+
+      const TexturePtr texture = material->sprite->getTexture( spriteFrame );
+      texture->bind( 0 ); // TODO: Multi-texturing.
+      texture->bind( 1 );
+      program->setUniformVar( "texSampleOffset", material->getTexCoordOffset() );
+
+      const Rect sampleRegion = material->getTexSampleRegion();
+      program->setUniformVar( "texSampleRegion.x", sampleRegion.x );
+      program->setUniformVar( "texSampleRegion.y", sampleRegion.y );
+      program->setUniformVar( "texSampleRegion.w", sampleRegion.w );
+      program->setUniformVar( "texSampleRegion.h", sampleRegion.h );
+    }
+
+    // Apply view-projection matrix for instanced shaders.
+    program->setTransformVar( viewProjection );
+
+    // Supply model matrix for lighting calculations.
+    if ( material->lighting ) {
+      program->setUniformVar( "model", viewProjection );
+    }
+  };
+
   program->setUniformUpdater( UniformUpdater );
-  program->setUniformNodeUpdater( UniformNodeUpdater );
+  if ( instanced ) {
+    program->setUniformNodeUpdater( InstancedUniformNodeUpdater );
+  }
+  else {
+    program->setUniformNodeUpdater( UniformNodeUpdater );
+  }
 
   return program;
 }

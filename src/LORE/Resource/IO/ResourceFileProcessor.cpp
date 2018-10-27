@@ -198,8 +198,8 @@ void ResourceFileProcessor::processAnimation( SpriteAnimationSetPtr animationSet
   for ( const auto& animation : animations.getValues() ) {
     const auto& name = animation.first;
     const auto& settings = animation.second;
-    const auto& frames = settings.get( "frames" ).toArray();
-    const auto& deltaTimes = settings.get( "deltaTimes" ).toArray();
+    const auto& frames = settings.getValue( "frames" ).toArray();
+    const auto& deltaTimes = settings.getValue( "deltaTimes" ).toArray();
 
     // Create an animation to add to the animation set.
     SpriteController::Animation animation;

@@ -80,6 +80,9 @@ namespace Lore {
     void insertResource( T* resource );
 
     template<typename T>
+    bool resourceExists( const string& id );
+
+    template<typename T>
     T* getResource( const string& id );
 
     template<typename T>
@@ -341,6 +344,8 @@ namespace Lore {
     static void DestroyTextbox( TextboxPtr textbox );
     static void DestroyUI( UIPtr ui );
     static void DestroyVertexBuffer( VertexBufferPtr vb );
+
+    static void DestroyEntitiesInGroup( const string& groupName );
 
     //
     // Accessors.

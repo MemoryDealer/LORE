@@ -33,6 +33,7 @@
 #include <LORE/Resource/ResourceController.h>
 #include <LORE/Resource/StockResource.h>
 #include <LORE/Scene/AABB.h>
+#include <LORE/Scene/SceneLoader.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -183,11 +184,53 @@ void Scene::destroyLight( const Light::Type type, const string& name )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void Scene::destroyAllLights()
+{
+  auto directionalLightIt = _directionalLights.getIterator();
+  while ( directionalLightIt.hasMore() ) {
+    destroyLight( directionalLightIt.getNext() );
+  }
+  auto pointLightIt = _pointLights.getIterator();
+  while ( pointLightIt.hasMore() ) {
+    destroyLight( pointLightIt.getNext() );
+  }
+  auto spotLightIt = _spotLights.getIterator();
+  while ( spotLightIt.hasMore() ) {
+    destroyLight( spotLightIt.getNext() );
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void Scene::updateSceneGraph()
 {
   // Traverse the scene graph and update object transforms.
   Lore::SceneGraphVisitor sgv( getRootNode() );
   sgv.visit( _renderer );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+bool Scene::reload()
+{
+  if ( _sceneFile.empty() ) {
+    log_warning( "No scene file found for scene, not reloading" );
+    return false;
+  }
+
+  auto nodeIt = _nodes.getIterator();
+  while( nodeIt.hasMore() ) {
+    auto node = nodeIt.getNext();
+    destroyNode( node );
+  }
+  destroyAllLights();
+  _skybox->removeAllLayers();
+
+  SceneLoader loader;
+  loader.setUnloadEntities( true );
+  loader.process( _sceneFile, this );
+
+  return true;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -37,6 +37,11 @@ using namespace Lore;
 
 Entity::~Entity()
 {
+  if ( _material ) {
+    Resource::DestroyMaterial( _material );
+  }
+
+  disableInstancing();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -72,13 +77,31 @@ size_t Entity::getInstanceCount() const
 void Entity::enableInstancing( const size_t max )
 {
   if ( isInstanced() ) {
-    throw Lore::Exception( "Instancing is already enabled" );
+   log_information( "Instancing is already enabled" );
+   return;
   }
 
   // Create an instanced vertex buffer.
   auto rc = Resource::GetResourceController();
   _instancedVertexBuffer = rc->create<VertexBuffer>( _name + "_instanced", getResourceGroupName() );
-  _instancedVertexBuffer->initInstanced( VertexBuffer::Type::TexturedQuadInstanced, max );
+
+  const std::map< VertexBuffer::Type, VertexBuffer::Type> InstancedVBMap = {
+    { VertexBuffer::Type::Quad, VertexBuffer::Type::QuadInstanced },
+    { VertexBuffer::Type::TexturedQuad, VertexBuffer::Type::TexturedQuadInstanced },
+    { VertexBuffer::Type::Quad3D, VertexBuffer::Type::Quad3DInstanced },
+    { VertexBuffer::Type::TexturedQuad3D, VertexBuffer::Type::TexturedQuad3DInstanced },
+    { VertexBuffer::Type::Cube, VertexBuffer::Type::CubeInstanced },
+    { VertexBuffer::Type::TexturedCube, VertexBuffer::Type::TexturedCubeInstanced }
+  };
+
+  // Determine which type of instanced vertex buffer to use.
+  const auto lookup = InstancedVBMap.find( _mesh->getVertexBuffer()->getType() );
+  if ( InstancedVBMap.end() != lookup ) {
+    _instancedVertexBuffer->initInstanced( lookup->second, max );
+  }
+  else {
+    throw Lore::Exception( "No valid instanced vertex buffer mapping" );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -86,9 +109,7 @@ void Entity::enableInstancing( const size_t max )
 void Entity::disableInstancing()
 {
   if ( isInstanced() ) {
-    auto rc = Resource::GetResourceController();
-
-    rc->destroy<VertexBuffer>( _instancedVertexBuffer );
+    Resource::DestroyVertexBuffer( _instancedVertexBuffer );
     _instancedVertexBuffer = nullptr;
   }
   _instanceCount = 0;
