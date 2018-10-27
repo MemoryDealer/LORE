@@ -211,10 +211,13 @@ void Scene::updateSceneGraph()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Scene::reload()
+bool Scene::reload()
 {
-  // Unload entities...
-  //Resource::UnloadGroup( "" );
+  if ( _sceneFile.empty() ) {
+    log_warning( "No scene file found for scene, not reloading" );
+    return false;
+  }
+
   auto nodeIt = _nodes.getIterator();
   while( nodeIt.hasMore() ) {
     auto node = nodeIt.getNext();
@@ -223,12 +226,11 @@ void Scene::reload()
   destroyAllLights();
   _skybox->removeAllLayers();
 
-  // Since entities are loaded as part of a scene file, unload all of them.
-
-
   SceneLoader loader;
   loader.setUnloadEntities( true );
   loader.process( _sceneFile, this );
+
+  return true;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

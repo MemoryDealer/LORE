@@ -127,8 +127,12 @@ namespace LocalNS {
 
     string execute( string& args ) override
     {
-      CLI::GetActiveScene()->reload();
-      return string( "Scene reloaded." );
+      if ( CLI::GetActiveScene()->reload() ) {
+        return string( "Scene reloaded." );
+      }
+      else {
+        return string( "Scene reload failed." );
+      }
     }
 
   };
