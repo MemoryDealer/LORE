@@ -35,6 +35,15 @@ inline void ResourceGroup::insertResource( T* resource )
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 template<typename T>
+inline bool ResourceGroup::resourceExists( const string& id )
+{
+  ResourceRegistry& registry = _resources[std::type_index( typeid( T ) )];
+  return registry.exists( id );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+template<typename T>
 inline T* ResourceGroup::getResource( const string& id )
 {
   ResourceRegistry& registry = _resources[std::type_index( typeid( T ) )];
@@ -94,7 +103,7 @@ ResourceController::create( const string& name, const string& groupName )
 template<typename ResourceType>
 inline bool ResourceController::resourceExists( const string& name, const string& groupName )
 {
-  return ( _getGroup( groupName )->getResource( name ) != nullptr );
+  return ( _getGroup( groupName )->resourceExists<ResourceType>( name ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -135,6 +144,8 @@ ResourceController::destroy( ResourceType* resource )
 template<typename ResourceType>
 inline void ResourceController::destroyAllInGroup( const string& groupName )
 {
+  const std::type_info& ti = typeid( ResourceType );
+  log_information( "Destroying all resources of type " + string( ti.name() ) + " in group " + groupName );
   const auto t = std::type_index( typeid( ResourceType ) );
   auto group = _getGroup( groupName );
   auto registry = group->_resources[t];

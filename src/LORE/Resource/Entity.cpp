@@ -77,7 +77,8 @@ size_t Entity::getInstanceCount() const
 void Entity::enableInstancing( const size_t max )
 {
   if ( isInstanced() ) {
-    throw Lore::Exception( "Instancing is already enabled" );
+   log_information( "Instancing is already enabled" );
+   return;
   }
 
   // Create an instanced vertex buffer.
@@ -108,9 +109,7 @@ void Entity::enableInstancing( const size_t max )
 void Entity::disableInstancing()
 {
   if ( isInstanced() ) {
-    auto rc = Resource::GetResourceController();
-
-    rc->destroy<VertexBuffer>( _instancedVertexBuffer );
+    Resource::DestroyVertexBuffer( _instancedVertexBuffer );
     _instancedVertexBuffer = nullptr;
   }
   _instanceCount = 0;

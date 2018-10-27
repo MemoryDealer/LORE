@@ -80,6 +80,9 @@ namespace Lore {
     void insertResource( T* resource );
 
     template<typename T>
+    bool resourceExists( const string& id );
+
+    template<typename T>
     T* getResource( const string& id );
 
     template<typename T>

@@ -336,6 +336,11 @@ BoxPtr Resource::CreateBox( const string& name, const string& groupName )
 
 EntityPtr Resource::CreateEntity( const string& name, const VertexBuffer::Type& vbType, const string& groupName )
 {
+  auto rc = ActiveContext->getResourceController();
+  if ( rc->resourceExists<Entity>( name, groupName ) ) {
+    log_information( "Entity " + name + " already exists, returning existing entity" );
+    return rc->get<Entity>( name, groupName );
+  }
   auto entity = ActiveContext->getResourceController()->create<Entity>( name, groupName );
 
   // Lookup stock mesh and assign it.
