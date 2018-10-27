@@ -31,8 +31,6 @@
 
 TEST_CASE( "Basic JSON values correctly deserialized", "[serializer]" )
 {
-  TEST_CREATE_CONTEXT();
-
   Lore::Serializer serializer;
 
   serializer.deserialize( "TestData/Serializer/Simple.json" );
@@ -55,16 +53,12 @@ TEST_CASE( "Basic JSON values correctly deserialized", "[serializer]" )
   auto value5 = serializer.getValue( "E" );
   REQUIRE( Lore::SerializerValue::Type::Bool == value5.getType() );
   REQUIRE( false == value5.toBool() );
-
-  TEST_DESTROY_CONTEXT();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 TEST_CASE( "Complex JSON values correctly deserialized", "[serializer]" )
 {
-  TEST_CREATE_CONTEXT();
-
   Lore::Serializer serializer;
   serializer.deserialize( "TestData/Serializer/Complex.json" );
 
@@ -115,16 +109,12 @@ TEST_CASE( "Complex JSON values correctly deserialized", "[serializer]" )
     REQUIRE( Lore::SerializerValue::Type::Int == a3.getType() );
     REQUIRE( 0 == a3.toInt() );
   }
-
-  TEST_DESTROY_CONTEXT();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 TEST_CASE( "Values correctly written in JSON format", "[serializer]" )
 {
-  TEST_CREATE_CONTEXT();
-
   const Lore::string path = "TestData/Serializer/Out.json";
 
   SECTION( "Write Data" )
@@ -245,8 +235,6 @@ TEST_CASE( "Values correctly written in JSON format", "[serializer]" )
       }
     }
   }
-
-  TEST_DESTROY_CONTEXT();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

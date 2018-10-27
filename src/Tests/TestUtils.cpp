@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE
@@ -25,42 +24,30 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Include this file for all Lore2D functionality.
+#include "TestUtils.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "LorePrerequisites.h"
+LoreTestHelper::LoreTestHelper()
+{
+  _context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
 
-// Config.
-#include <LORE/Config/Config.h>
+  _window = _context->createWindow( "Test", 16, 16, Lore::RendererType::Forward3D );
+  _window->setActive();
+}
 
-// Core.
-#include <LORE/Core/Context.h>
-#include <LORE/Core/Timer.h>
-#include <LORE/Core/CLI/CLI.h>
-#include <LORE/Core/DebugUI/DebugUI.h>
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Input.
-#include <LORE/Input/Input.h>
+LoreTestHelper::~LoreTestHelper()
+{
+  DestroyLoreContext( _context );
+}
 
-// Math.
-#include <LORE/Math/Math.h>
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// Resource.
-#include <LORE/Resource/Box.h>
-#include <LORE/Resource/Entity.h>
-#include <LORE/Resource/Material.h>
-#include <LORE/Resource/Sprite.h>
-#include <LORE/Resource/StockResource.h>
-#include <LORE/Resource/Textbox.h>
-#include <LORE/Resource/Texture.h>
-#include <LORE/UI/UI.h>
-#include <LORE/UI/UIElement.h>
-
-// Scene.
-#include <LORE/Scene/AABB.h>
-#include <LORE/Scene/SceneLoader.h>
-#include <LORE/Scene/Skybox.h>
-#include <LORE/Scene/SpriteController.h>
+Lore::ContextPtr LoreTestHelper::getContext() const
+{
+  return _context.get();
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

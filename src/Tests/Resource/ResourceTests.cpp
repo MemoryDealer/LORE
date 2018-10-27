@@ -31,10 +31,7 @@
 
 TEST_CASE( "Load and unload resources in code", "[resource]" )
 {
-  TEST_CREATE_CONTEXT();
-
-  // Create a window which is required for resources.
-  auto window = context->createWindow( "Test", 50, 50, Lore::RendererType::Forward2D );
+  LoreTestHelper helper;
 
   constexpr const size_t size = 4;
   const std::vector<Lore::string> names = { "1", "2", "3", "4" };
@@ -92,18 +89,13 @@ TEST_CASE( "Load and unload resources in code", "[resource]" )
     CHECK_THROWS( Lore::Resource::GetUI( names[i] ) );
     CHECK_THROWS( Lore::Resource::GetVertexBuffer( names[i] ) );
   }
-
-  TEST_DESTROY_CONTEXT();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 TEST_CASE( "Load and unload resources in code, different group", "[resource]" )
 {
-  TEST_CREATE_CONTEXT();
-
-  // Create a window which is required for resources.
-  auto window = context->createWindow( "Test", 50, 50, Lore::RendererType::Forward2D );
+  LoreTestHelper helper;
 
   constexpr const size_t size = 4;
   const std::vector<Lore::string> names = { "1", "2", "3", "4" };
@@ -162,8 +154,6 @@ TEST_CASE( "Load and unload resources in code, different group", "[resource]" )
     CHECK_THROWS( Lore::Resource::GetUI( names[i], groupName ) );
     CHECK_THROWS( Lore::Resource::GetVertexBuffer( names[i], groupName ) );
   }
-
-  TEST_DESTROY_CONTEXT();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

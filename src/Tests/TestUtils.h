@@ -46,15 +46,24 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 //
-// Object creation/setup.
+// Test util classes.
 
-// Creates a Lore context with the OpenGL renderer.
-#define TEST_CREATE_CONTEXT()\
-std::unique_ptr<Lore::Context> context;\
-context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );\
-REQUIRE( context.get() != nullptr );
+class LoreTestHelper final
+{
 
-#define TEST_DESTROY_CONTEXT() DestroyLoreContext( context )
+public:
+
+  LoreTestHelper();
+  ~LoreTestHelper();
+
+  Lore::ContextPtr getContext() const;
+
+private:
+
+  std::unique_ptr<Lore::Context> _context {};
+  Lore::WindowPtr _window {};
+
+};
 
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
