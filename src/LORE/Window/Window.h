@@ -32,115 +32,116 @@
 
 namespace Lore {
 
-    class LORE_EXPORT Window
+  class LORE_EXPORT Window
+  {
+
+  public:
+
+    enum class Mode
     {
-
-    public:
-
-        enum class Mode {
-            Windowed,
-            Fullscreen,
-            FullscreenBorderless
-        };
-
-    public:
-
-        Window();
-
-        virtual ~Window();
-
-        //
-        // Rendering.
-
-        virtual void renderFrame() { }
-
-        virtual void addRenderView( const RenderView& renderView );
-
-        void removeRenderView( const RenderView& renderView );
-        void removeRenderView( const string& name );
-
-        const RenderView& getRenderView( const string& name ) const;
-
-        void resetRenderViews();
-
-        //
-        // Modifiers.
-
-        virtual void setTitle( const string& title );
-
-        virtual void setDimensions( const int width, const int height );
-
-        virtual void setMode( const Mode& mode );
-
-        virtual void setActive() = 0;
-
-        //
-        // Getters.
-
-        inline string getTitle() const
-        {
-            return _title;
-        }
-
-        inline int getWidth() const
-        {
-            return _frameBufferWidth;
-        }
-
-        inline int getHeight() const
-        {
-            return _frameBufferHeight;
-        }
-
-        inline real getAspectRatio() const
-        {
-            return _aspectRatio;
-        }
-
-        inline void getDimensions( int& width, int& height )
-        {
-            width = _frameBufferWidth;
-            height = _frameBufferHeight;
-        }
-
-        ///
-        /// \brief Returns full width of window, including borders.
-        inline int getFullWidth() const
-        {
-            return _width;
-        }
-
-        ///
-        /// \brief Returns full height of window, including borders.
-        inline int getFullHeight() const
-        {
-            return _height;
-        }
-
-        const RenderView& getRenderView( const int32_t idx ) const;
-
-        ResourceControllerPtr getResourceController() const;
-
-        StockResourceControllerPtr getStockResourceController() const;
-
-    protected:
-
-        using RenderViewList = std::vector<RenderView>;
-
-    protected:
-
-        string _title;
-        int _width, _height;
-        int _frameBufferWidth, _frameBufferHeight;
-        real _aspectRatio;
-        Mode _mode;
-
-        RenderViewList _renderViews;
-
-        std::unique_ptr<ResourceController> _controller;
-        std::unique_ptr<StockResourceController> _stockController;
-
+      Windowed,
+      Fullscreen,
+      FullscreenBorderless
     };
+
+  public:
+
+    Window();
+
+    virtual ~Window();
+
+    //
+    // Rendering.
+
+    virtual void renderFrame() { }
+
+    virtual void addRenderView( const RenderView& renderView );
+
+    void removeRenderView( const RenderView& renderView );
+    void removeRenderView( const string& name );
+
+    const RenderView& getRenderView( const string& name ) const;
+
+    void resetRenderViews();
+
+    //
+    // Modifiers.
+
+    virtual void setTitle( const string& title );
+
+    virtual void setDimensions( const int width, const int height );
+
+    virtual void setMode( const Mode& mode );
+
+    virtual void setActive() = 0;
+
+    //
+    // Getters.
+
+    inline string getTitle() const
+    {
+      return _title;
+    }
+
+    inline int getWidth() const
+    {
+      return _frameBufferWidth;
+    }
+
+    inline int getHeight() const
+    {
+      return _frameBufferHeight;
+    }
+
+    inline real getAspectRatio() const
+    {
+      return _aspectRatio;
+    }
+
+    inline void getDimensions( int& width, int& height )
+    {
+      width = _frameBufferWidth;
+      height = _frameBufferHeight;
+    }
+
+    ///
+    /// \brief Returns full width of window, including borders.
+    inline int getFullWidth() const
+    {
+      return _width;
+    }
+
+    ///
+    /// \brief Returns full height of window, including borders.
+    inline int getFullHeight() const
+    {
+      return _height;
+    }
+
+    const RenderView& getRenderView( const int32_t idx ) const;
+
+    ResourceControllerPtr getResourceController() const;
+
+    StockResourceControllerPtr getStockResourceController() const;
+
+  protected:
+
+    using RenderViewList = std::vector<RenderView>;
+
+  protected:
+
+    string _title;
+    int _width, _height;
+    int _frameBufferWidth, _frameBufferHeight;
+    real _aspectRatio;
+    Mode _mode;
+
+    RenderViewList _renderViews;
+
+    std::unique_ptr<ResourceController> _controller;
+    std::unique_ptr<StockResourceController> _stockController;
+
+  };
 
 }
 

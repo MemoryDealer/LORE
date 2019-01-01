@@ -58,82 +58,82 @@ Window::~Window()
 
 void Window::addRenderView( const RenderView& renderView )
 {
-    // Verify this render view does not already exist.
-    for ( const auto& rv : _renderViews ) {
-        if ( rv == renderView ) {
-            throw Lore::Exception( "RenderView " + renderView.name +
-                                   " already exists in Window " + _title );
-        }
+  // Verify this render view does not already exist.
+  for ( const auto& rv : _renderViews ) {
+    if ( rv == renderView ) {
+      throw Lore::Exception( "RenderView " + renderView.name +
+                             " already exists in Window " + _title );
     }
+  }
 
-    lore_log( "Adding RenderView " + renderView.name + " to Window " + _title );
-    _renderViews.push_back( renderView );
+  lore_log( "Adding RenderView " + renderView.name + " to Window " + _title );
+  _renderViews.push_back( renderView );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Window::removeRenderView( const RenderView& renderView )
 {
-    removeRenderView( renderView.name );
+  removeRenderView( renderView.name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Window::removeRenderView( const string& name )
 {
-    for ( auto it = _renderViews.begin(); it != _renderViews.end(); ) {
-        const RenderView& rv = ( *it );
-        if ( rv.name == name ) {
-            lore_log( "Removing RenderView " + name + " from Window " + _title );
-            it = _renderViews.erase( it );
-            break;
-        }
-        else {
-            ++it;
-        }
+  for ( auto it = _renderViews.begin(); it != _renderViews.end(); ) {
+    const RenderView& rv = ( *it );
+    if ( rv.name == name ) {
+      lore_log( "Removing RenderView " + name + " from Window " + _title );
+      it = _renderViews.erase( it );
+      break;
     }
+    else {
+      ++it;
+    }
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 const RenderView& Window::getRenderView( const string& name ) const
 {
-    for ( const auto& rv : _renderViews ) {
-        if ( name == rv.name ) {
-            return rv;
-        }
+  for ( const auto& rv : _renderViews ) {
+    if ( name == rv.name ) {
+      return rv;
     }
+  }
 
-    throw Lore::Exception( "RenderView " + name + " does not exist in Window " + _title );
+  throw Lore::Exception( "RenderView " + name + " does not exist in Window " + _title );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Window::resetRenderViews()
 {
-    _renderViews.clear();
+  _renderViews.clear();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Window::setTitle( const string& title )
 {
-    _title = title;
+  _title = title;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Window::setDimensions( const int width, const int height )
 {
-    _width = width;
-    _height = height;
+  _width = width;
+  _height = height;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Window::setMode( const Mode& mode )
 {
-    _mode = mode;
+  _mode = mode;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -150,14 +150,14 @@ const RenderView& Window::getRenderView( const int32_t idx ) const
 
 ResourceControllerPtr Window::getResourceController() const
 {
-    return _controller.get();
+  return _controller.get();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 StockResourceControllerPtr Window::getStockResourceController() const
 {
-    return _stockController.get();
+  return _stockController.get();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
