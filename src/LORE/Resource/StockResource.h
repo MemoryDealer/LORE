@@ -26,7 +26,6 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 #include <LORE/Resource/Material.h>
-#include <LORE/Resource/Mesh.h>
 #include <LORE/Resource/Registry.h>
 #include <LORE/Shader/GPUProgram.h>
 #include <LORE/Util/Util.h>
@@ -131,19 +130,13 @@ namespace Lore {
       return _controller->get<ResourceType>( name );
     }
 
-    MeshPtr getMesh( const VertexBuffer::Type& type );
-
   protected:
 
-    using MeshTable = Util::MultiHashTable<VertexBuffer::Type, MeshPtr>;
     using StockResourceFactoryMap = std::map<RendererType, std::unique_ptr<StockResourceFactory>>;
 
   protected:
 
     std::unique_ptr<ResourceController> _controller { nullptr };
-
-    MeshTable _meshTable {};
-
     StockResourceFactoryMap _factories {};
 
   };
@@ -160,9 +153,9 @@ namespace Lore {
 
     static GPUProgramPtr GetGPUProgram( const string& name );
     static MaterialPtr GetMaterial( const string& name );
-    static MeshPtr GetMesh( const VertexBuffer::Type& type );
     static TexturePtr GetTexture( const string& name );
     static VertexBufferPtr GetVertexBuffer( const string& name );
+    static VertexBufferPtr GetVertexBuffer( const VertexBuffer::Type type );
     static FontPtr GetFont( const string& name );
 
   private:

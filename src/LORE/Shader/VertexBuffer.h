@@ -66,7 +66,6 @@ namespace Lore {
     };
 
     using Vertices = std::vector<real>;
-    using Matrices = std::vector<glm::mat4>;
 
   public:
 

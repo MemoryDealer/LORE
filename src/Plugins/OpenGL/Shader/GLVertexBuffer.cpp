@@ -514,7 +514,7 @@ void GLVertexBuffer::draw( const size_t instanceCount )
   case VertexBuffer::Type::TexturedCubeInstanced:
     glBindBuffer( GL_ARRAY_BUFFER, _instancedVBO );
     glBufferData( GL_ARRAY_BUFFER, _instancedMatrices.size() * sizeof( glm::mat4 ), &_instancedMatrices.data()[0], GL_STATIC_DRAW );
-    glDrawArraysInstanced( _mode, 0, 36, instanceCount );
+    glDrawArraysInstanced( _mode, 0, 36, static_cast<GLsizei>( instanceCount ) );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
     break;
 

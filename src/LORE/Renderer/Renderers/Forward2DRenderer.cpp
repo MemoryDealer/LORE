@@ -33,7 +33,6 @@
 #include <LORE/Resource/Entity.h>
 #include <LORE/Renderer/IRenderAPI.h>
 #include <LORE/Resource/Font.h>
-#include <LORE/Resource/Mesh.h>
 #include <LORE/Resource/Sprite.h>
 #include <LORE/Resource/StockResource.h>
 #include <LORE/Resource/Textbox.h>
@@ -402,7 +401,7 @@ void Forward2DRenderer::renderSolids( const RenderView& rv,
     const RenderQueue::NodeList& nodes = pair.second;
 
     const MaterialPtr material = entity->getMaterial();
-    const VertexBufferPtr vertexBuffer = entity->getMesh()->getVertexBuffer();
+    const VertexBufferPtr vertexBuffer = entity->getVertexBuffer();
     const GPUProgramPtr program = material->program;
 
     vertexBuffer->bind();
@@ -436,7 +435,7 @@ void Forward2DRenderer::renderTransparents( const RenderView& rv,
 
     const MaterialPtr material = entity->getMaterial();
     GPUProgramPtr program = material->program;
-    VertexBufferPtr vertexBuffer = entity->getMesh()->getVertexBuffer();
+    VertexBufferPtr vertexBuffer = entity->getVertexBuffer();
 
     if ( entity->isInstanced() ) {
       node = entity->getInstanceControllerNode();

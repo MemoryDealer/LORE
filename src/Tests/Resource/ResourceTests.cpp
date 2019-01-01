@@ -41,7 +41,6 @@ TEST_CASE( "Load and unload resources in code", "[resource]" )
     REQUIRE( Lore::Resource::CreateEntity( names[i], Lore::VertexBuffer::Type::TexturedQuad ) );
     REQUIRE( Lore::Resource::CreateGPUProgram( names[i] ) );
     REQUIRE( Lore::Resource::CreateMaterial( names[i] ) );
-    REQUIRE( Lore::Resource::CreateMesh( names[i], Lore::VertexBuffer::Type::Custom ) );
     REQUIRE( Lore::Resource::CreateRenderTarget( names[i], 640, 480 ) );
     REQUIRE( Lore::Resource::CreateShader( names[i] + "_FS", Lore::Shader::Type::Fragment ) );
     REQUIRE( Lore::Resource::CreateShader( names[i] + "_VS", Lore::Shader::Type::Vertex ) );
@@ -58,7 +57,6 @@ TEST_CASE( "Load and unload resources in code", "[resource]" )
     REQUIRE( Lore::Resource::GetEntity( names[i] ) );
     REQUIRE( Lore::Resource::GetGPUProgram( names[i] ) );
     REQUIRE( Lore::Resource::GetMaterial( names[i] ) );
-    REQUIRE( Lore::Resource::GetMesh( names[i] ) );
     REQUIRE( Lore::Resource::GetRenderTarget( names[i] ) );
     REQUIRE( Lore::Resource::GetShader( names[i] + "_FS" ) );
     REQUIRE( Lore::Resource::GetShader( names[i] + "_VS" ) );
@@ -78,7 +76,6 @@ TEST_CASE( "Load and unload resources in code", "[resource]" )
     CHECK_THROWS( Lore::Resource::GetFont( names[i] ) );
     CHECK_THROWS( Lore::Resource::GetGPUProgram( names[i] ) );
     CHECK_THROWS( Lore::Resource::GetMaterial( names[i] ) );
-    CHECK_THROWS( Lore::Resource::GetMesh( names[i] ) );
     CHECK_THROWS( Lore::Resource::GetRenderTarget( names[i] ) );
     CHECK_THROWS( Lore::Resource::GetShader( names[i] + "_FS" ) );
     CHECK_THROWS( Lore::Resource::GetShader( names[i] + "_VS" ) );
@@ -106,7 +103,6 @@ TEST_CASE( "Load and unload resources in code, different group", "[resource]" )
     REQUIRE( Lore::Resource::CreateEntity( names[i], Lore::VertexBuffer::Type::TexturedQuad, groupName ) );
     REQUIRE( Lore::Resource::CreateGPUProgram( names[i], groupName ) );
     REQUIRE( Lore::Resource::CreateMaterial( names[i], groupName ) );
-    REQUIRE( Lore::Resource::CreateMesh( names[i], Lore::VertexBuffer::Type::Custom, groupName ) );
     REQUIRE( Lore::Resource::CreateRenderTarget( names[i], 640, 480, groupName ) );
     REQUIRE( Lore::Resource::CreateShader( names[i] + "_FS", Lore::Shader::Type::Fragment, groupName ) );
     REQUIRE( Lore::Resource::CreateShader( names[i] + "_VS", Lore::Shader::Type::Vertex, groupName ) );
@@ -123,7 +119,6 @@ TEST_CASE( "Load and unload resources in code, different group", "[resource]" )
     REQUIRE( Lore::Resource::GetEntity( names[i], groupName ) );
     REQUIRE( Lore::Resource::GetGPUProgram( names[i], groupName ) );
     REQUIRE( Lore::Resource::GetMaterial( names[i], groupName ) );
-    REQUIRE( Lore::Resource::GetMesh( names[i], groupName ) );
     REQUIRE( Lore::Resource::GetRenderTarget( names[i], groupName ) );
     REQUIRE( Lore::Resource::GetShader( names[i] + "_FS", groupName ) );
     REQUIRE( Lore::Resource::GetShader( names[i] + "_VS", groupName ) );
@@ -143,7 +138,6 @@ TEST_CASE( "Load and unload resources in code, different group", "[resource]" )
     CHECK_THROWS( Lore::Resource::GetFont( names[i], groupName ) );
     CHECK_THROWS( Lore::Resource::GetGPUProgram( names[i], groupName ) );
     CHECK_THROWS( Lore::Resource::GetMaterial( names[i], groupName ) );
-    CHECK_THROWS( Lore::Resource::GetMesh( names[i], groupName ) );
     CHECK_THROWS( Lore::Resource::GetRenderTarget( names[i], groupName ) );
     CHECK_THROWS( Lore::Resource::GetShader( names[i] + "_FS", groupName ) );
     CHECK_THROWS( Lore::Resource::GetShader( names[i] + "_VS", groupName ) );

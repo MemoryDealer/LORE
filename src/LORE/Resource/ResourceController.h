@@ -28,7 +28,6 @@
 #include <LORE/Memory/Alloc.h>
 #include <LORE/Resource/Font.h>
 #include <LORE/Resource/Material.h>
-#include <LORE/Resource/Mesh.h>
 #include <LORE/Resource/IO/ResourceIndexer.h>
 #include <LORE/Resource/IO/SerializableResource.h>
 #include <LORE/Resource/IResource.h>
@@ -268,9 +267,6 @@ namespace Lore {
                                            const string& groupName = ResourceController::DefaultGroupName );
     static MaterialPtr CreateMaterial( const string& name,
                                        const string& groupName = ResourceController::DefaultGroupName );
-    static MeshPtr CreateMesh( const string& name,
-                               const VertexBuffer::Type& vbType,
-                               const string& groupName = ResourceController::DefaultGroupName );
     static RenderTargetPtr CreateRenderTarget( const string& name,
                                                const uint32_t width,
                                                const uint32_t height,
@@ -308,8 +304,6 @@ namespace Lore {
                                         const string& groupName = ResourceController::DefaultGroupName );
     static MaterialPtr GetMaterial( const string& name,
                                     const string& groupName = ResourceController::DefaultGroupName );
-    static MeshPtr GetMesh( const string& name,
-                            const string& groupName = ResourceController::DefaultGroupName );
     static RenderTargetPtr GetRenderTarget( const string& name,
                                             const string& groupName = ResourceController::DefaultGroupName );
     static ShaderPtr GetShader( const string& name,
@@ -335,7 +329,6 @@ namespace Lore {
     static void DestroyFont( FontPtr font );
     static void DestroyGPUProgram( GPUProgramPtr program );
     static void DestroyMaterial( MaterialPtr material );
-    static void DestroyMesh( MeshPtr mesh );
     static void DestroyRenderTarget( RenderTargetPtr rt );
     static void DestroyShader( ShaderPtr shader );
     static void DestroySprite( SpritePtr sprite );

@@ -92,45 +92,6 @@ void StockResourceController::createStockResources()
   }
 
   //
-  // Create stock meshes (uses previously created vertex buffers from ResourceController's constructor).
-
-  {
-    auto mesh = _controller->create<Mesh>( "Quad" );
-    mesh->setVertexBuffer( _controller->get<VertexBuffer>( "Quad" ) );
-    _meshTable.insert( { VertexBuffer::Type::Quad, mesh } );
-  }
-
-  {
-    auto mesh = _controller->create<Mesh>( "TexturedQuad" );
-    mesh->setVertexBuffer( _controller->get<VertexBuffer>( "TexturedQuad" ) );
-    _meshTable.insert( { VertexBuffer::Type::TexturedQuad, mesh } );
-  }
-
-  {
-    auto mesh = _controller->create<Mesh>( "Cube" );
-    mesh->setVertexBuffer( _controller->get<VertexBuffer>( "Cube" ) );
-    _meshTable.insert( { VertexBuffer::Type::Cube, mesh } );
-  }
-
-  {
-    auto mesh = _controller->create<Mesh>( "TexturedCube" );
-    mesh->setVertexBuffer( _controller->get<VertexBuffer>( "TexturedCube" ) );
-    _meshTable.insert( { VertexBuffer::Type::TexturedCube, mesh } );
-  }
-
-  {
-    auto mesh = _controller->create<Mesh>( "Quad3D" );
-    mesh->setVertexBuffer( _controller->get<VertexBuffer>( "Quad3D" ) );
-    _meshTable.insert( { VertexBuffer::Type::Quad3D, mesh } );
-  }
-
-  {
-    auto mesh = _controller->create<Mesh>( "TexturedQuad3D" );
-    mesh->setVertexBuffer( _controller->get<VertexBuffer>( "TexturedQuad3D" ) );
-    _meshTable.insert( { VertexBuffer::Type::TexturedQuad3D, mesh } );
-  }
-
-  //
   // Font stock resources.
 
   {
@@ -289,17 +250,6 @@ void StockResourceController::createRendererStockResources( const RendererType t
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-MeshPtr StockResourceController::getMesh( const VertexBuffer::Type& type )
-{
-  auto it = _meshTable.find( type );
-  if ( _meshTable.end() != it ) {
-    return it->second;
-  }
-  return nullptr;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -317,13 +267,6 @@ MaterialPtr StockResource::GetMaterial( const string& name )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-MeshPtr StockResource::GetMesh( const VertexBuffer::Type& type )
-{
-  return ActiveContext->getStockResourceController()->getMesh( type );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 TexturePtr StockResource::GetTexture( const string& name )
 {
   return ActiveContext->getStockResourceController()->get<Texture>( name );
@@ -334,6 +277,35 @@ TexturePtr StockResource::GetTexture( const string& name )
 VertexBufferPtr StockResource::GetVertexBuffer( const string& name )
 {
   return ActiveContext->getStockResourceController()->get<VertexBuffer>( name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+VertexBufferPtr StockResource::GetVertexBuffer( const VertexBuffer::Type type )
+{
+  switch ( type ) {
+  default:
+    log_warning( "Vertex buffer type not available for stock resource retrieval" );
+    return nullptr;
+
+  case VertexBuffer::Type::Quad:
+    return ActiveContext->getStockResourceController()->get<VertexBuffer>( "Quad" );
+
+  case VertexBuffer::Type::TexturedQuad:
+    return ActiveContext->getStockResourceController()->get<VertexBuffer>( "TexturedQuad" );
+
+  case VertexBuffer::Type::Quad3D:
+    return ActiveContext->getStockResourceController()->get<VertexBuffer>( "Quad3D" );
+
+  case VertexBuffer::Type::TexturedQuad3D:
+    return ActiveContext->getStockResourceController()->get<VertexBuffer>( "TexturedQuad3D" );
+
+  case VertexBuffer::Type::Cube:
+    return ActiveContext->getStockResourceController()->get<VertexBuffer>( "Cube" );
+
+  case VertexBuffer::Type::TexturedCube:
+    return ActiveContext->getStockResourceController()->get<VertexBuffer>( "TexturedCube" );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

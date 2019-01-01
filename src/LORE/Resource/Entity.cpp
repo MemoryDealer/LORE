@@ -52,7 +52,7 @@ EntityPtr Entity::clone( const string& name )
   auto entity = rc->create<Entity>( name, getResourceGroupName() );
 
   entity->_material = _material;
-  entity->_mesh = _mesh;
+  entity->_vertexBuffer = _vertexBuffer;
   entity->_renderQueue = _renderQueue;
 
   return entity;
@@ -95,7 +95,7 @@ void Entity::enableInstancing( const size_t max )
   };
 
   // Determine which type of instanced vertex buffer to use.
-  const auto lookup = InstancedVBMap.find( _mesh->getVertexBuffer()->getType() );
+  const auto lookup = InstancedVBMap.find( _vertexBuffer->getType() );
   if ( InstancedVBMap.end() != lookup ) {
     _instancedVertexBuffer->initInstanced( lookup->second, max );
   }
@@ -139,9 +139,9 @@ void Entity::setMaterial( MaterialPtr material )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Entity::setMesh( MeshPtr mesh )
+void Entity::setVertexBuffer( VertexBufferPtr buffer )
 {
-  _mesh = mesh;
+  _vertexBuffer = buffer;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -160,9 +160,9 @@ MaterialPtr Entity::getMaterial() const
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-MeshPtr Entity::getMesh() const
+VertexBufferPtr Entity::getVertexBuffer() const
 {
-  return _mesh;
+  return _vertexBuffer;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

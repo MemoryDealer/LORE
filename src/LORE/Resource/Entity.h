@@ -81,13 +81,13 @@ namespace Lore {
     // Modifiers.
 
     void setMaterial( MaterialPtr material ); 
-    void setMesh( MeshPtr mesh );
+    void setVertexBuffer( VertexBufferPtr buffer );
 
     //
     // Accessors.
 
     MaterialPtr getMaterial() const;
-    MeshPtr getMesh() const;
+    VertexBufferPtr getVertexBuffer() const;
     uint getRenderQueue() const;
     bool isInstanced() const;
     NodePtr getInstanceControllerNode() const;
@@ -103,7 +103,7 @@ namespace Lore {
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     MaterialPtr _material { nullptr };
-    MeshPtr _mesh { nullptr };
+    VertexBufferPtr _vertexBuffer { nullptr };
 
     // Only used if Entity is instanced.
     VertexBufferPtr _instancedVertexBuffer { nullptr };

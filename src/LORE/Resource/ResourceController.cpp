@@ -58,7 +58,6 @@ ResourceGroup::ResourceGroup( const string& name )
   _addResourceType<Entity>();
   _addResourceType<Font>();
   _addResourceType<Material>();
-  _addResourceType<Mesh>();
   _addResourceType<GPUProgram>();
   _addResourceType<RenderTarget>();
   _addResourceType<Shader>();
@@ -172,6 +171,7 @@ void ResourceController::unloadGroup( const string& groupName )
   // Unload everything from the index and any other resources not indexed.
   auto group = _getGroup( groupName );
   if ( !group ) {
+    log_warning( "Group " + groupName + " not found, not unloading" );
     return;
   }
 
@@ -180,7 +180,6 @@ void ResourceController::unloadGroup( const string& groupName )
   destroyAllInGroup<Font>( groupName );
   destroyAllInGroup<GPUProgram>( groupName );
   destroyAllInGroup<Material>( groupName );
-  destroyAllInGroup<Mesh>( groupName );
   destroyAllInGroup<RenderTarget>( groupName );
   destroyAllInGroup<Shader>( groupName );
   destroyAllInGroup<Sprite>( groupName );
@@ -343,8 +342,8 @@ EntityPtr Resource::CreateEntity( const string& name, const VertexBuffer::Type& 
   }
   auto entity = ActiveContext->getResourceController()->create<Entity>( name, groupName );
 
-  // Lookup stock mesh and assign it.
-  entity->setMesh( StockResource::GetMesh( vbType ) );
+  // Lookup stock vertex buffer and assign it.
+  entity->setVertexBuffer( StockResource::GetVertexBuffer( vbType ) );
 
   // Set default material.
   switch ( vbType ) {
@@ -413,35 +412,6 @@ GPUProgramPtr Resource::CreateGPUProgram( const string& name, const string& grou
 MaterialPtr Resource::CreateMaterial( const string& name, const string& groupName )
 {
   return ActiveContext->getResourceController()->create<Material>( name, groupName );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-MeshPtr Resource::CreateMesh( const string& name, const VertexBuffer::Type& vbType, const string& groupName )
-{
-  auto rc = ActiveContext->getResourceController();
-  auto mesh = rc->create<Mesh>( name, groupName );
-
-  // If this mesh type is a stock type, assign the corresponding vertex buffer.
-  switch ( vbType ) {
-  default:
-  case VertexBuffer::Type::Custom:
-    break;
-
-  case VertexBuffer::Type::Quad:
-    mesh->setVertexBuffer( rc->get<VertexBuffer>( "Quad" ) );
-    break;
-
-  case VertexBuffer::Type::Text:
-    mesh->setVertexBuffer( rc->get<VertexBuffer>( "Text" ) );
-    break;
-
-  case VertexBuffer::Type::TexturedQuad:
-    mesh->setVertexBuffer( rc->get<VertexBuffer>( "TexturedQuad" ) );
-    break;
-  }
-
-  return mesh;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -550,13 +520,6 @@ MaterialPtr Resource::GetMaterial( const string& name, const string& groupName )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-MeshPtr Resource::GetMesh( const string& name, const string& groupName )
-{
-  return ActiveContext->getResourceController()->get<Mesh>( name, groupName );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 RenderTargetPtr Resource::GetRenderTarget( const string& name, const string& groupName )
 {
   return ActiveContext->getResourceController()->get<RenderTarget>( name, groupName );
@@ -643,13 +606,6 @@ void Resource::DestroyGPUProgram( GPUProgramPtr program )
 void Resource::DestroyMaterial( MaterialPtr material )
 {
   ActiveContext->getResourceController()->destroy<Material>( material );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Resource::DestroyMesh( MeshPtr mesh )
-{
-  ActiveContext->getResourceController()->destroy<Mesh>( mesh );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
