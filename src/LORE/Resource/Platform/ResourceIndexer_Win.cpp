@@ -50,7 +50,7 @@ void ResourceIndexer::traverseDirectory( const string& directory, ResourceContro
   const string wildcard( "\\*.*" );
   windowsDirectory.append( wildcard );
   char buf[MAX_PATH] = { 0 };
-  strcpy( buf, windowsDirectory.c_str() );
+  strcpy_s( buf, sizeof(buf), windowsDirectory.c_str() );
 
   hFind = FindFirstFile( buf, &fd );
   do {
