@@ -9,9 +9,10 @@ debugdir "../bin/%{cfg.buildcfg}/Run"
 includedirs { ".",
               "%{prj.location}",
               "%{sln.location}/External",
+              "%{sln.location}/External/assimp/include",
               "%{sln.location}/External/freetype2",
-              "%{sln.location}/External/rapidjson/include",
               "%{sln.location}/External/glm",
+              "%{sln.location}/External/rapidjson/include",
               "%{sln.location}/Plugins/ThirdParty"
             }
 libdirs { "../lib/x64/%{cfg.buildcfg}" }
