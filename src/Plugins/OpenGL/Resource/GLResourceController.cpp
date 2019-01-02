@@ -34,7 +34,7 @@
 #include <Plugins/OpenGL/Resource/GLTexture.h>
 #include <Plugins/OpenGL/Shader/GLGPUProgram.h>
 #include <Plugins/OpenGL/Shader/GLShader.h>
-#include <Plugins/OpenGL/Shader/GLVertexBuffer.h>
+#include <Plugins/OpenGL/Shader/GLModel.h>
 #include <Plugins/OpenGL/Window/GLRenderTarget.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -51,32 +51,32 @@ GLResourceController::GLResourceController()
   addCreationFunctor<RenderTarget>( std::bind( &GLResourceController::createRenderTarget, this ) );
   addCreationFunctor<Shader>( std::bind( &GLResourceController::createShader, this ) );
   addCreationFunctor<Texture>( std::bind( &GLResourceController::createTexture, this ) );
-  addCreationFunctor<VertexBuffer>( std::bind( &GLResourceController::createVertexBuffer, this ) );
+  addCreationFunctor<Model>( std::bind( &GLResourceController::createModel, this ) );
   addDestructionFunctor<Font>( std::bind( &GLResourceController::destroyFont, this, std::placeholders::_1 ) );
   addDestructionFunctor<GPUProgram>( std::bind( &GLResourceController::destroyGPUProgram, this, std::placeholders::_1 ) );
   addDestructionFunctor<RenderTarget>( std::bind( &GLResourceController::destroyRenderTarget, this, std::placeholders::_1 ) );
   addDestructionFunctor<Shader>( std::bind( &GLResourceController::destroyShader, this, std::placeholders::_1 ) );
   addDestructionFunctor<Texture>( std::bind( &GLResourceController::destroyTexture, this, std::placeholders::_1 ) );
-  addDestructionFunctor<VertexBuffer>( std::bind( &GLResourceController::destroyVertexBuffer, this, std::placeholders::_1 ) );
+  addDestructionFunctor<Model>( std::bind( &GLResourceController::destroyModel, this, std::placeholders::_1 ) );
 
-  // Create default vertex buffers.
-  auto quadVB = create<VertexBuffer>( "Quad" );
-  quadVB->init( VertexBuffer::Type::Quad );
+  // Create default models.
+  auto quad = create<Model>( "Quad" );
+  quad->init( Model::Type::Quad );
 
-  auto texturedQuadVB = create<VertexBuffer>( "TexturedQuad" );
-  texturedQuadVB->init( VertexBuffer::Type::TexturedQuad );
+  auto texturedQuad = create<Model>( "TexturedQuad" );
+  texturedQuad->init( Model::Type::TexturedQuad );
 
-  auto cubeVB = create<VertexBuffer>( "Cube" );
-  cubeVB->init( VertexBuffer::Type::Cube );
+  auto cube = create<Model>( "Cube" );
+  cube->init( Model::Type::Cube );
 
-  auto texturedCubeVB = create<VertexBuffer>( "TexturedCube" );
-  texturedCubeVB->init( VertexBuffer::Type::TexturedCube );
+  auto texturedCube = create<Model>( "TexturedCube" );
+  texturedCube->init( Model::Type::TexturedCube );
 
-  auto quad3DVB = create<VertexBuffer>( "Quad3D" );
-  quad3DVB->init( VertexBuffer::Type::Quad3D );
+  auto quad3D = create<Model>( "Quad3D" );
+  quad3D->init( Model::Type::Quad3D );
 
-  auto texturedQuad3DVB = create<VertexBuffer>( "TexturedQuad3D" );
-  texturedQuad3DVB->init( VertexBuffer::Type::TexturedQuad3D );
+  auto texturedQuad3D = create<Model>( "TexturedQuad3D" );
+  texturedQuad3D->init( Model::Type::TexturedQuad3D );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -117,9 +117,9 @@ Lore::IResourcePtr GLResourceController::createTexture()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::IResourcePtr GLResourceController::createVertexBuffer()
+Lore::IResourcePtr GLResourceController::createModel()
 {
-  return MemoryAccess::GetPrimaryPoolCluster()->create<VertexBuffer, GLVertexBuffer>();
+  return MemoryAccess::GetPrimaryPoolCluster()->create<Model, GLModel>();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -159,9 +159,9 @@ void GLResourceController::destroyTexture( Lore::IResourcePtr resource )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLResourceController::destroyVertexBuffer( Lore::IResourcePtr resource )
+void GLResourceController::destroyModel( Lore::IResourcePtr resource )
 {
-  MemoryAccess::GetPrimaryPoolCluster()->destroy<VertexBuffer, GLVertexBuffer>( static_cast< VertexBufferPtr >( resource ) );
+  MemoryAccess::GetPrimaryPoolCluster()->destroy<Model, GLModel>( static_cast< ModelPtr >( resource ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

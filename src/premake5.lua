@@ -49,6 +49,8 @@ filter "system:MacOSX"
 --
 -- Projects
 
+startproject "Demo3D"
+
 project "LORE"
     location "LORE"
     kind "SharedLib"

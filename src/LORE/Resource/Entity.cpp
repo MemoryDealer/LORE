@@ -52,7 +52,7 @@ EntityPtr Entity::clone( const string& name )
   auto entity = rc->create<Entity>( name, getResourceGroupName() );
 
   entity->_material = _material;
-  entity->_vertexBuffer = _vertexBuffer;
+  entity->_model = _model;
   entity->_renderQueue = _renderQueue;
 
   return entity;
@@ -60,9 +60,9 @@ EntityPtr Entity::clone( const string& name )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-VertexBufferPtr Entity::getInstancedVertexBuffer() const
+ModelPtr Entity::getInstancedModel() const
 {
-  return _instancedVertexBuffer;
+  return _instancedModel;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -81,26 +81,26 @@ void Entity::enableInstancing( const size_t max )
    return;
   }
 
-  // Create an instanced vertex buffer.
+  // Create an instanced model.
   auto rc = Resource::GetResourceController();
-  _instancedVertexBuffer = rc->create<VertexBuffer>( _name + "_instanced", getResourceGroupName() );
+  _instancedModel = rc->create<Model>( _name + "_instanced", getResourceGroupName() );
 
-  const std::map< VertexBuffer::Type, VertexBuffer::Type> InstancedVBMap = {
-    { VertexBuffer::Type::Quad, VertexBuffer::Type::QuadInstanced },
-    { VertexBuffer::Type::TexturedQuad, VertexBuffer::Type::TexturedQuadInstanced },
-    { VertexBuffer::Type::Quad3D, VertexBuffer::Type::Quad3DInstanced },
-    { VertexBuffer::Type::TexturedQuad3D, VertexBuffer::Type::TexturedQuad3DInstanced },
-    { VertexBuffer::Type::Cube, VertexBuffer::Type::CubeInstanced },
-    { VertexBuffer::Type::TexturedCube, VertexBuffer::Type::TexturedCubeInstanced }
+  const std::map< Model::Type, Model::Type> InstancedModelMap = {
+    { Model::Type::Quad, Model::Type::QuadInstanced },
+    { Model::Type::TexturedQuad, Model::Type::TexturedQuadInstanced },
+    { Model::Type::Quad3D, Model::Type::Quad3DInstanced },
+    { Model::Type::TexturedQuad3D, Model::Type::TexturedQuad3DInstanced },
+    { Model::Type::Cube, Model::Type::CubeInstanced },
+    { Model::Type::TexturedCube, Model::Type::TexturedCubeInstanced }
   };
 
-  // Determine which type of instanced vertex buffer to use.
-  const auto lookup = InstancedVBMap.find( _vertexBuffer->getType() );
-  if ( InstancedVBMap.end() != lookup ) {
-    _instancedVertexBuffer->initInstanced( lookup->second, max );
+  // Determine which type of instanced model to use.
+  const auto lookup = InstancedModelMap.find( _model->getType() );
+  if ( InstancedModelMap.end() != lookup ) {
+    _instancedModel->initInstanced( lookup->second, max );
   }
   else {
-    throw Lore::Exception( "No valid instanced vertex buffer mapping" );
+    throw Lore::Exception( "No valid instanced model mapping" );
   }
 }
 
@@ -109,8 +109,8 @@ void Entity::enableInstancing( const size_t max )
 void Entity::disableInstancing()
 {
   if ( isInstanced() ) {
-    Resource::DestroyVertexBuffer( _instancedVertexBuffer );
-    _instancedVertexBuffer = nullptr;
+    Resource::DestroyModel( _instancedModel );
+    _instancedModel = nullptr;
   }
   _instanceCount = 0;
   _instanceControllerNode = nullptr;
@@ -139,9 +139,9 @@ void Entity::setMaterial( MaterialPtr material )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Entity::setVertexBuffer( VertexBufferPtr buffer )
+void Entity::setModel( ModelPtr buffer )
 {
-  _vertexBuffer = buffer;
+  _model = buffer;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -160,9 +160,9 @@ MaterialPtr Entity::getMaterial() const
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-VertexBufferPtr Entity::getVertexBuffer() const
+ModelPtr Entity::getModel() const
 {
-  return _vertexBuffer;
+  return _model;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -176,14 +176,14 @@ uint Entity::getRenderQueue() const
 
 bool Entity::isInstanced() const
 {
-  return !!( _instancedVertexBuffer );
+  return !!( _instancedModel );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Entity::updateInstancedMatrix( const size_t idx, const glm::mat4& matrix )
 {
-  _instancedVertexBuffer->updateInstanced( idx, matrix );
+  _instancedModel->updateInstanced( idx, matrix );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -35,7 +35,7 @@
 #include <Plugins/OpenGL/Resource/GLTexture.h>
 #include <Plugins/OpenGL/Shader/GLGPUProgram.h>
 #include <Plugins/OpenGL/Shader/GLShader.h>
-#include <Plugins/OpenGL/Shader/GLVertexBuffer.h>
+#include <Plugins/OpenGL/Shader/GLModel.h>
 #include <Plugins/OpenGL/Window/GLRenderTarget.h>
 #include <Plugins/OpenGL/Window/GLWindow.h>
 
@@ -123,7 +123,7 @@ void Context::initConfiguration()
   _poolCluster.registerPool<RenderTarget, GLRenderTarget>( 4 );
   _poolCluster.registerPool<Shader, GLShader>( 64 );
   _poolCluster.registerPool<Texture, GLTexture>( 64 );
-  _poolCluster.registerPool<VertexBuffer, GLVertexBuffer>( 32 );
+  _poolCluster.registerPool<Model, GLModel>( 32 );
   _poolCluster.registerPool<Window, GLWindow>( 1 );
 }
 

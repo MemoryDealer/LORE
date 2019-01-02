@@ -1,3 +1,4 @@
+#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE
@@ -24,37 +25,89 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "VertexBuffer.h"
+#include <LORE/Memory/Alloc.h>
+#include <LORE/Resource/IResource.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-using namespace Lore;
+namespace Lore {
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+  class LORE_EXPORT Model : public IResource
+  {
 
-VertexBuffer::VertexBuffer()
-: _type()
-, _attributes()
-{
+  public:
 
-}
+    enum class Type
+    {
+      Custom,
+      Quad,
+      TexturedQuad,
+      FullscreenQuad,
+      Cube,
+      TexturedCube,
+      Cubemap,
+      Quad3D,
+      TexturedQuad3D,
+      Text,
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+      // Instanced.
+      QuadInstanced,
+      TexturedQuadInstanced,
+      Quad3DInstanced,
+      TexturedQuad3DInstanced,
+      CubeInstanced,
+      TexturedCubeInstanced
+    };
 
-void VertexBuffer::addAttribute( const AttributeType& type, const uint size )
-{
-    Attribute att;
-    att.type = type;
-    att.size = size;
+    enum class AttributeType
+    {
+      Int,
+      Float
+    };
 
-    _attributes.push_back( att );
-}
+    using Vertices = std::vector<real>;
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+  public:
 
-VertexBuffer::Type VertexBuffer::getType() const
-{
-  return _type;
+    Model();
+    virtual ~Model() = default;
+
+    virtual void init( const Type& type ) = 0;
+
+    virtual void initInstanced( const Type& type, const size_t maxCount ) = 0;
+
+    virtual void updateInstanced( const size_t idx, const glm::mat4& matrix ) = 0;
+
+    void addAttribute( const AttributeType& type, const uint size );
+
+    virtual void bind() = 0;
+
+    virtual void unbind() = 0;
+
+    virtual void draw( const size_t instanceCount = 0 ) = 0;
+
+    virtual void draw( const Vertices& verts ) = 0;
+
+    //
+    // Accessors.
+
+    Type getType() const;
+
+  private:
+
+    struct Attribute
+    {
+      AttributeType type;
+      int size;
+    };
+
+  protected:
+
+    Type _type;
+    std::vector<Attribute> _attributes;
+
+  };
+
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

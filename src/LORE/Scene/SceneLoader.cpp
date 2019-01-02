@@ -29,26 +29,26 @@
 #include <LORE/Resource/Entity.h>
 #include <LORE/Resource/ResourceController.h>
 #include <LORE/Scene/Scene.h>
-#include <LORE/Shader/VertexBuffer.h>
+#include <LORE/Shader/Model.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace LocalNS {
 
-  static Lore::VertexBuffer::Type StringToVertexBufferType( const Lore::string& str )
+  static Lore::Model::Type StringToModelType( const Lore::string& str )
   {
-    const std::unordered_map<Lore::string, Lore::VertexBuffer::Type> ConversionTable = {
-      { "Quad", Lore::VertexBuffer::Type::Quad3D },
-      { "TexturedQuad", Lore::VertexBuffer::Type::TexturedQuad3D },
-      { "Cube", Lore::VertexBuffer::Type::Cube },
-      { "TexturedCube", Lore::VertexBuffer::Type::TexturedCube }
+    const std::unordered_map<Lore::string, Lore::Model::Type> ConversionTable = {
+      { "Quad", Lore::Model::Type::Quad3D },
+      { "TexturedQuad", Lore::Model::Type::TexturedQuad3D },
+      { "Cube", Lore::Model::Type::Cube },
+      { "TexturedCube", Lore::Model::Type::TexturedCube }
     };
     // TODO: Check scene's renderer type to use quad or quad3D.
     auto lookup = ConversionTable.find( str );
     if ( ConversionTable.end() != lookup ) {
       return lookup->second;
     }
-    throw Lore::Exception( "Invalid vertex buffer type specification" );
+    throw Lore::Exception( "Invalid model type specification" );
   }
 
 }
@@ -150,14 +150,14 @@ void SceneLoader::_loadEntities()
       const auto entityName = entity.first;
       const SerializerValue& value = entity.second;
 
-      // Get the vertex buffer type.
-      const auto& vbType = value.getValue( "VertexBufferType" );
-      if ( vbType.isNull() ) {
-        throw Lore::SerializerException( "Entity value " + entityName + " did not specify vertex buffer type" );
+      // Get the model type.
+      const auto& modelType = value.getValue( "ModelType" );
+      if ( modelType.isNull() ) {
+        throw Lore::SerializerException( "Entity value " + entityName + " did not specify model type" );
       }
 
       // Create the entity.
-      auto entity = Resource::CreateEntity( entityName, StringToVertexBufferType( vbType.toString() ), _resourceGroupName );
+      auto entity = Resource::CreateEntity( entityName, StringToModelType( modelType.toString() ), _resourceGroupName );
 
       // Enable instancing if specified.
       const auto& instanced = value.getValue( "Instanced" );

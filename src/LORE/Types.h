@@ -49,6 +49,7 @@ namespace Lore {
   class IResource;
   class Light;
   class Material;
+  class Model;
   class Node;
   class PointLight;
   class PostProcessor;
@@ -69,7 +70,6 @@ namespace Lore {
   class UI;
   class UIPanel;
   class UIElement;
-  class VertexBuffer;
   class Window;
 
   //
@@ -88,6 +88,7 @@ namespace Lore {
   using IResourcePtr = IResource*;
   using LightPtr = Light*;
   using MaterialPtr = Material*;
+  using ModelPtr = Model*;
   using NodePtr = Node*;
   using PointLightPtr = PointLight*;
   using PostProcessorPtr = PostProcessor*;
@@ -108,7 +109,6 @@ namespace Lore {
   using UIPtr = UI*;
   using UIPanelPtr = UIPanel*;
   using UIElementPtr = UIElement*;
-  using VertexBufferPtr = VertexBuffer*;
   using WindowPtr = Window*;
 
   //

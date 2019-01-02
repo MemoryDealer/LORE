@@ -102,10 +102,10 @@ void StockResourceController::createStockResources()
   }
 
   {
-    // Generate shaders and vertex buffer for text rendering.
+    // Generate shaders and model for text rendering.
     createTextProgram( "StandardText" );
-    auto vb = _controller->create<VertexBuffer>( "StandardText" );
-    vb->init( VertexBuffer::Type::Text );
+    auto model = _controller->create<Model>( "StandardText" );
+    model->init( Model::Type::Text );
   }
 }
 
@@ -126,16 +126,16 @@ void StockResourceController::createRendererStockResources( const RendererType t
   case RendererType::Forward2D:
     suffix = "2D";
     {
-      auto vb = _controller->create<VertexBuffer>( "Skybox" + suffix );
-      vb->init( VertexBuffer::Type::FullscreenQuad );
+      auto model = _controller->create<Model>( "Skybox" + suffix );
+      model->init( Model::Type::FullscreenQuad );
     }
     break;
 
   case RendererType::Forward3D:
     suffix = "3D";
     {
-      auto vb = _controller->create<VertexBuffer>( "Skybox" + suffix );
-      vb->init( VertexBuffer::Type::Cubemap );
+      auto model = _controller->create<Model>( "Skybox" + suffix );
+      model->init( Model::Type::Cubemap );
     }
     break;
   }
@@ -274,37 +274,37 @@ TexturePtr StockResource::GetTexture( const string& name )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-VertexBufferPtr StockResource::GetVertexBuffer( const string& name )
+ModelPtr StockResource::GetModel( const string& name )
 {
-  return ActiveContext->getStockResourceController()->get<VertexBuffer>( name );
+  return ActiveContext->getStockResourceController()->get<Model>( name );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-VertexBufferPtr StockResource::GetVertexBuffer( const VertexBuffer::Type type )
+ModelPtr StockResource::GetModel( const Model::Type type )
 {
   switch ( type ) {
   default:
-    log_warning( "Vertex buffer type not available for stock resource retrieval" );
+    log_warning( "Model type not available for stock resource retrieval" );
     return nullptr;
 
-  case VertexBuffer::Type::Quad:
-    return ActiveContext->getStockResourceController()->get<VertexBuffer>( "Quad" );
+  case Model::Type::Quad:
+    return ActiveContext->getStockResourceController()->get<Model>( "Quad" );
 
-  case VertexBuffer::Type::TexturedQuad:
-    return ActiveContext->getStockResourceController()->get<VertexBuffer>( "TexturedQuad" );
+  case Model::Type::TexturedQuad:
+    return ActiveContext->getStockResourceController()->get<Model>( "TexturedQuad" );
 
-  case VertexBuffer::Type::Quad3D:
-    return ActiveContext->getStockResourceController()->get<VertexBuffer>( "Quad3D" );
+  case Model::Type::Quad3D:
+    return ActiveContext->getStockResourceController()->get<Model>( "Quad3D" );
 
-  case VertexBuffer::Type::TexturedQuad3D:
-    return ActiveContext->getStockResourceController()->get<VertexBuffer>( "TexturedQuad3D" );
+  case Model::Type::TexturedQuad3D:
+    return ActiveContext->getStockResourceController()->get<Model>( "TexturedQuad3D" );
 
-  case VertexBuffer::Type::Cube:
-    return ActiveContext->getStockResourceController()->get<VertexBuffer>( "Cube" );
+  case Model::Type::Cube:
+    return ActiveContext->getStockResourceController()->get<Model>( "Cube" );
 
-  case VertexBuffer::Type::TexturedCube:
-    return ActiveContext->getStockResourceController()->get<VertexBuffer>( "TexturedCube" );
+  case Model::Type::TexturedCube:
+    return ActiveContext->getStockResourceController()->get<Model>( "TexturedCube" );
   }
 }
 

@@ -111,7 +111,7 @@ void GLFont::loadFromFile( const string& file, const uint32_t size )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::VertexBuffer::Vertices GLFont::generateVertices( const char c,
+Lore::Model::Vertices GLFont::generateVertices( const char c,
                                                        const real x,
                                                        const real y,
                                                        const real scale )
@@ -123,7 +123,7 @@ Lore::VertexBuffer::Vertices GLFont::generateVertices( const char c,
   const GLfloat w = glyph.size.x * scale * ScaleFactor;
   const GLfloat h = glyph.size.y * scale * ScaleFactor;
 
-  Lore::VertexBuffer::Vertices vertices = {
+  Lore::Model::Vertices vertices = {
     xpos, ypos + h, 0.f, 0.f,
     xpos, ypos,     0.f, 1.f,
     xpos + w, ypos, 1.f, 1.f,

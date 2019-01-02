@@ -24,7 +24,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "GLVertexBuffer.h"
+#include "GLModel.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -32,13 +32,13 @@ using namespace Lore::OpenGL;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-GLVertexBuffer::GLVertexBuffer()
+GLModel::GLModel()
 {
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-GLVertexBuffer::~GLVertexBuffer()
+GLModel::~GLModel()
 {
   glDeleteBuffers( 1, &_vbo );
   glDeleteBuffers( 1, &_vao );
@@ -48,21 +48,21 @@ GLVertexBuffer::~GLVertexBuffer()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
+void GLModel::init( const Lore::Model::Type& type )
 {
   _type = type;
 
   // First generate vertices and indices.
   switch ( _type ) {
   default:
-    throw Lore::Exception( "Unknown vertex buffer type" );
+    throw Lore::Exception( "Unknown model type" );
 
-  case VertexBuffer::Type::QuadInstanced:
-  case VertexBuffer::Type::TexturedQuadInstanced:
-    throw Lore::Exception( "VertexBuffer::initInstanced() should be called for instanced types" );
+  case Model::Type::QuadInstanced:
+  case Model::Type::TexturedQuadInstanced:
+    throw Lore::Exception( "Model::initInstanced() should be called for instanced types" );
     break;
 
-  case VertexBuffer::Type::Custom:
+  case Model::Type::Custom:
     _mode = GL_TRIANGLES;
     // Attributes should be added by the caller.
     break;
@@ -70,7 +70,7 @@ void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
   //
   // 2D.
 
-  case VertexBuffer::Type::Quad:
+  case Model::Type::Quad:
     _mode = GL_TRIANGLE_STRIP;
     _vertices = { -0.1f, -0.1f,
                   -0.1f, 0.1f,
@@ -81,7 +81,7 @@ void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
     addAttribute( AttributeType::Float, 2 );
     break;
 
-  case VertexBuffer::Type::TexturedQuad:
+  case Model::Type::TexturedQuad:
     _mode = GL_TRIANGLE_STRIP;
     _vertices = { -0.1f, -0.1f,     0.f, 0.f,
                   -0.1f, 0.1f,      0.f, 1.f,
@@ -93,7 +93,7 @@ void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
     addAttribute( AttributeType::Float, 2 );
     break;
 
-  case VertexBuffer::Type::FullscreenQuad:
+  case Model::Type::FullscreenQuad:
     _mode = GL_TRIANGLE_STRIP;
     _vertices = { -1.f, -1.f,     0.f, 0.f,
                   -1.f, 1.f,      0.f, 1.f,
@@ -105,7 +105,7 @@ void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
     addAttribute( AttributeType::Float, 2 );
     break;
 
-  case VertexBuffer::Type::Cubemap:
+  case Model::Type::Cubemap:
     _mode = GL_TRIANGLES;
     _vertices = {
       -1000.0f,  1000.0f, -1000.0f,
@@ -154,7 +154,7 @@ void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
     addAttribute( AttributeType::Float, 3 );
     break;
 
-  case VertexBuffer::Type::Text:
+  case Model::Type::Text:
     _mode = GL_TRIANGLES;
     // Text VBs are a special case and require dynamic drawing.
     glGenVertexArrays( 1, &_vao );
@@ -172,7 +172,7 @@ void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
   //
   // 3D.
 
-  case VertexBuffer::Type::Quad3D:
+  case Model::Type::Quad3D:
     // Generate quad with normals.
     _mode = GL_TRIANGLE_STRIP;
     // TODO: Combine Quad3D and Quad - have 2D renderer use normals etc.
@@ -190,7 +190,7 @@ void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
     addAttribute( AttributeType::Float, 3 );
     break;
 
-  case VertexBuffer::Type::TexturedQuad3D:
+  case Model::Type::TexturedQuad3D:
     // Generate quad with normals and texture coordinates.
     _mode = GL_TRIANGLE_STRIP;
     _vertices = {
@@ -208,7 +208,7 @@ void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
     addAttribute( AttributeType::Float, 2 );
     break;
 
-  case VertexBuffer::Type::Cube:
+  case Model::Type::Cube:
     _mode = GL_TRIANGLES;
     _vertices = {
       -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
@@ -258,7 +258,7 @@ void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
     addAttribute( AttributeType::Float, 3 );
     break;
 
-  case VertexBuffer::Type::TexturedCube:
+  case Model::Type::TexturedCube:
     _mode = GL_TRIANGLES;
 //     _vertices = {
 //       -1.0, -1.0,  1.0,   0.f, 0.f,
@@ -400,34 +400,34 @@ void GLVertexBuffer::init( const Lore::VertexBuffer::Type& type )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLVertexBuffer::initInstanced( const Type& type, const size_t maxCount )
+void GLModel::initInstanced( const Type& type, const size_t maxCount )
 {
   // First generate vertices and indices.
   switch ( type ) {
   default:
-    throw Lore::Exception( "VertexBuffer type must be instanced" );
+    throw Lore::Exception( "Model type must be instanced" );
 
-  case VertexBuffer::Type::QuadInstanced:
+  case Model::Type::QuadInstanced:
     init( Type::Quad );
     break;
 
-  case VertexBuffer::Type::TexturedQuadInstanced:
+  case Model::Type::TexturedQuadInstanced:
     init( Type::TexturedQuad );
     break;
 
-  case VertexBuffer::Type::Quad3DInstanced:
+  case Model::Type::Quad3DInstanced:
     init( Type::Quad3D );
     break;
 
-  case VertexBuffer::Type::TexturedQuad3DInstanced:
+  case Model::Type::TexturedQuad3DInstanced:
     init( Type::TexturedQuad3D );
     break;
 
-  case VertexBuffer::Type::CubeInstanced:
+  case Model::Type::CubeInstanced:
     init( Type::Cube );
     break;
 
-  case VertexBuffer::Type::TexturedCubeInstanced:
+  case Model::Type::TexturedCubeInstanced:
     init( Type::TexturedCube );
     break;
   }
@@ -453,8 +453,8 @@ void GLVertexBuffer::initInstanced( const Type& type, const size_t maxCount )
     }
     break;
 
-  case VertexBuffer::Type::QuadInstanced:
-  case VertexBuffer::Type::TexturedQuadInstanced:
+  case Model::Type::QuadInstanced:
+  case Model::Type::TexturedQuadInstanced:
     // Set the vertex attributes for instanced matrices.
     for ( GLuint attribIdx = 2; attribIdx < 6; ++attribIdx ) {
       glEnableVertexAttribArray( attribIdx );
@@ -472,60 +472,60 @@ void GLVertexBuffer::initInstanced( const Type& type, const size_t maxCount )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLVertexBuffer::updateInstanced( const size_t idx, const glm::mat4& matrix )
+void GLModel::updateInstanced( const size_t idx, const glm::mat4& matrix )
 {
   _instancedMatrices[idx] = matrix;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLVertexBuffer::bind()
+void GLModel::bind()
 {
   glBindVertexArray( _vao );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLVertexBuffer::unbind()
+void GLModel::unbind()
 {
   glBindVertexArray( 0 );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLVertexBuffer::draw( const size_t instanceCount )
+void GLModel::draw( const size_t instanceCount )
 {
   switch ( _type ) {
   default:
     glDrawElements( _mode, static_cast< GLsizei >( _indices.size() ), GL_UNSIGNED_INT, nullptr );
     break;
 
-  case VertexBuffer::Type::QuadInstanced:
-  case VertexBuffer::Type::TexturedQuadInstanced:
-  case VertexBuffer::Type::Quad3DInstanced:
-  case VertexBuffer::Type::TexturedQuad3DInstanced:
+  case Model::Type::QuadInstanced:
+  case Model::Type::TexturedQuadInstanced:
+  case Model::Type::Quad3DInstanced:
+  case Model::Type::TexturedQuad3DInstanced:
     glBindBuffer( GL_ARRAY_BUFFER, _instancedVBO );
     glBufferData( GL_ARRAY_BUFFER, _instancedMatrices.size() * sizeof( glm::mat4 ), &_instancedMatrices.data()[0], GL_STATIC_DRAW );
     glDrawElementsInstanced( _mode, static_cast< GLsizei >( _indices.size() ), GL_UNSIGNED_INT, nullptr, static_cast< GLsizei >( instanceCount ) );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
     break;
 
-  case VertexBuffer::Type::CubeInstanced:
-  case VertexBuffer::Type::TexturedCubeInstanced:
+  case Model::Type::CubeInstanced:
+  case Model::Type::TexturedCubeInstanced:
     glBindBuffer( GL_ARRAY_BUFFER, _instancedVBO );
     glBufferData( GL_ARRAY_BUFFER, _instancedMatrices.size() * sizeof( glm::mat4 ), &_instancedMatrices.data()[0], GL_STATIC_DRAW );
     glDrawArraysInstanced( _mode, 0, 36, static_cast<GLsizei>( instanceCount ) );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
     break;
 
-  case VertexBuffer::Type::Quad3D:
-  case VertexBuffer::Type::TexturedQuad3D:
+  case Model::Type::Quad3D:
+  case Model::Type::TexturedQuad3D:
     glDrawArrays( _mode, 0, 6 );
     break;
 
-  case VertexBuffer::Type::Cube:
-  case VertexBuffer::Type::TexturedCube:
-  case VertexBuffer::Type::Cubemap:
+  case Model::Type::Cube:
+  case Model::Type::TexturedCube:
+  case Model::Type::Cubemap:
     glDrawArrays( _mode, 0, 36 );
     break;
   }
@@ -533,9 +533,9 @@ void GLVertexBuffer::draw( const size_t instanceCount )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLVertexBuffer::draw( const Lore::VertexBuffer::Vertices& verts )
+void GLModel::draw( const Lore::Model::Vertices& verts )
 {
-  assert( VertexBuffer::Type::Text == _type );
+  assert( Model::Type::Text == _type );
 
   glBindBuffer( GL_ARRAY_BUFFER, _vbo );
   glBufferSubData( GL_ARRAY_BUFFER, 0, verts.size() * sizeof(real), verts.data() );

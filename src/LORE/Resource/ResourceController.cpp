@@ -65,7 +65,7 @@ ResourceGroup::ResourceGroup( const string& name )
   _addResourceType<Texture>();
   _addResourceType<SpriteAnimationSet>();
   _addResourceType<UI>();
-  _addResourceType<VertexBuffer>();
+  _addResourceType<Model>();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -187,7 +187,7 @@ void ResourceController::unloadGroup( const string& groupName )
   destroyAllInGroup<Texture>( groupName );
   destroyAllInGroup<Textbox>( groupName );
   destroyAllInGroup<UI>( groupName );
-  destroyAllInGroup<VertexBuffer>( groupName );
+  destroyAllInGroup<Model>( groupName );
 
   // Set all indexed resources not loaded.
   for ( auto& it : group->_index ) {
@@ -333,7 +333,7 @@ BoxPtr Resource::CreateBox( const string& name, const string& groupName )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-EntityPtr Resource::CreateEntity( const string& name, const VertexBuffer::Type& vbType, const string& groupName )
+EntityPtr Resource::CreateEntity( const string& name, const Model::Type& modelType, const string& groupName )
 {
   auto rc = ActiveContext->getResourceController();
   if ( rc->resourceExists<Entity>( name, groupName ) ) {
@@ -342,51 +342,51 @@ EntityPtr Resource::CreateEntity( const string& name, const VertexBuffer::Type& 
   }
   auto entity = ActiveContext->getResourceController()->create<Entity>( name, groupName );
 
-  // Lookup stock vertex buffer and assign it.
-  entity->setVertexBuffer( StockResource::GetVertexBuffer( vbType ) );
+  // Lookup stock model and assign it.
+  entity->setModel( StockResource::GetModel( modelType ) );
 
   // Set default material.
-  switch ( vbType ) {
+  switch ( modelType ) {
 
   default:
     break;
 
-  case VertexBuffer::Type::Quad:
+  case Model::Type::Quad:
   {
     auto material = StockResource::GetMaterial( "Standard2D" );
     entity->setMaterial( material->clone( "Standard2D_" + name ) );
   }
   break;
 
-  case VertexBuffer::Type::TexturedQuad:
+  case Model::Type::TexturedQuad:
   {
     auto material = StockResource::GetMaterial( "StandardTextured2D" );
     entity->setMaterial( material->clone( "StandardTextured2D_" + name ) );
   }
   break;
 
-  case VertexBuffer::Type::Cube:
+  case Model::Type::Cube:
   {
     auto material = StockResource::GetMaterial( "Standard3D" );
     entity->setMaterial( material->clone( "Standard3D_" + name ) );
   }
   break;
 
-  case VertexBuffer::Type::TexturedCube:
+  case Model::Type::TexturedCube:
   {
     auto material = StockResource::GetMaterial( "StandardTextured3D" );
     entity->setMaterial( material->clone( "StandardTextured3D_" + name ) );
   }
   break;
 
-  case VertexBuffer::Type::Quad3D:
+  case Model::Type::Quad3D:
   {
     auto material = StockResource::GetMaterial( "Standard3D" );
     entity->setMaterial( material->clone( "Standard3D_" + name ) );
   }
   break;
 
-  case VertexBuffer::Type::TexturedQuad3D:
+  case Model::Type::TexturedQuad3D:
   {
     auto material = StockResource::GetMaterial( "StandardTextured3D" );
     entity->setMaterial( material->clone( "StandardTextured3D_" + name ) );
@@ -476,11 +476,11 @@ UIPtr Resource::CreateUI( const string& name, const string& groupName )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-VertexBufferPtr Resource::CreateVertexBuffer( const string& name, const VertexBuffer::Type& type, const string& groupName )
+ModelPtr Resource::CreateModel( const string& name, const Model::Type& type, const string& groupName )
 {
-  auto vb = ActiveContext->getResourceController()->create<VertexBuffer>( name, groupName );
-  vb->init( type );
-  return vb;
+  auto model = ActiveContext->getResourceController()->create<Model>( name, groupName );
+  model->init( type );
+  return model;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -569,9 +569,9 @@ UIPtr Resource::GetUI( const string& name, const string& groupName )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-VertexBufferPtr Resource::GetVertexBuffer( const string& name, const string& groupName )
+ModelPtr Resource::GetModel( const string& name, const string& groupName )
 {
-  return ActiveContext->getResourceController()->get<VertexBuffer>( name, groupName );
+  return ActiveContext->getResourceController()->get<Model>( name, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -659,9 +659,9 @@ void Resource::DestroyUI( UIPtr ui )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Resource::DestroyVertexBuffer( VertexBufferPtr vb )
+void Resource::DestroyModel( ModelPtr model )
 {
-  ActiveContext->getResourceController()->destroy<VertexBuffer>( vb );
+  ActiveContext->getResourceController()->destroy<Model>( model );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

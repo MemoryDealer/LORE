@@ -31,7 +31,7 @@
 #include <LORE/Resource/IResource.h>
 #include <LORE/Scene/Scene.h>
 #include <LORE/Shader/Shader.h>
-#include <LORE/Shader/VertexBuffer.h>
+#include <LORE/Shader/Model.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 

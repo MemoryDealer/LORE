@@ -36,7 +36,7 @@
 #include <LORE/Scene/Camera.h>
 #include <LORE/Shader/GPUProgram.h>
 #include <LORE/Shader/Shader.h>
-#include <LORE/Shader/VertexBuffer.h>
+#include <LORE/Shader/Model.h>
 #include <LORE/Window/RenderTarget.h>
 #include <LORE/UI/UI.h>
 #include <LORE/Util/Util.h>
@@ -261,7 +261,7 @@ namespace Lore {
     static BoxPtr CreateBox( const string& name,
                              const string& groupname = ResourceController::DefaultGroupName );
     static EntityPtr CreateEntity( const string& name,
-                                   const VertexBuffer::Type& vbType,
+                                   const Model::Type& modelType,
                                    const string& groupName = ResourceController::DefaultGroupName );
     static GPUProgramPtr CreateGPUProgram( const string& name,
                                            const string& groupName = ResourceController::DefaultGroupName );
@@ -287,8 +287,8 @@ namespace Lore {
                                      const string& groupname = ResourceController::DefaultGroupName );
     static UIPtr CreateUI( const string& name,
                            const string& groupName = ResourceController::DefaultGroupName );
-    static VertexBufferPtr CreateVertexBuffer( const string& name,
-                                               const VertexBuffer::Type& type,
+    static ModelPtr CreateModel( const string& name,
+                                               const Model::Type& type,
                                                const string& groupName = ResourceController::DefaultGroupName );
 
     //
@@ -318,7 +318,7 @@ namespace Lore {
                                   const string& groupName = ResourceController::DefaultGroupName );
     static UIPtr GetUI( const string& name,
                         const string& groupName = ResourceController::DefaultGroupName );
-    static VertexBufferPtr GetVertexBuffer( const string& name,
+    static ModelPtr GetModel( const string& name,
                                             const string& groupName = ResourceController::DefaultGroupName );
 
     //
@@ -336,7 +336,7 @@ namespace Lore {
     static void DestroyTexture( TexturePtr texture );
     static void DestroyTextbox( TextboxPtr textbox );
     static void DestroyUI( UIPtr ui );
-    static void DestroyVertexBuffer( VertexBufferPtr vb );
+    static void DestroyModel( ModelPtr model );
 
     static void DestroyEntitiesInGroup( const string& groupName );
 

@@ -46,7 +46,7 @@ namespace Lore {
     //
     // Special instancing functions.
 
-    VertexBufferPtr getInstancedVertexBuffer() const;
+    ModelPtr getInstancedModel() const;
     size_t getInstanceCount() const;
 
     ///
@@ -81,13 +81,13 @@ namespace Lore {
     // Modifiers.
 
     void setMaterial( MaterialPtr material ); 
-    void setVertexBuffer( VertexBufferPtr buffer );
+    void setModel( ModelPtr buffer );
 
     //
     // Accessors.
 
     MaterialPtr getMaterial() const;
-    VertexBufferPtr getVertexBuffer() const;
+    ModelPtr getModel() const;
     uint getRenderQueue() const;
     bool isInstanced() const;
     NodePtr getInstanceControllerNode() const;
@@ -103,10 +103,10 @@ namespace Lore {
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     MaterialPtr _material { nullptr };
-    VertexBufferPtr _vertexBuffer { nullptr };
+    ModelPtr _model { nullptr };
 
     // Only used if Entity is instanced.
-    VertexBufferPtr _instancedVertexBuffer { nullptr };
+    ModelPtr _instancedModel { nullptr };
     size_t _instanceCount { 0 };
     NodePtr _instanceControllerNode { nullptr };
 

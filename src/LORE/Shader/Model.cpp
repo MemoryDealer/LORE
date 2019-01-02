@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE
@@ -25,50 +24,37 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE/Shader/VertexBuffer.h>
+#include "Model.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore { namespace OpenGL {
+using namespace Lore;
 
-    class GLVertexBuffer : public Lore::VertexBuffer,
-                           public Alloc<GLVertexBuffer>
-    {
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    public:
+Model::Model()
+: _type()
+, _attributes()
+{
 
-        GLVertexBuffer();
+}
 
-        virtual ~GLVertexBuffer() override;
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        void init( const Lore::VertexBuffer::Type& type ) override;
-        void initInstanced( const Type& type, const size_t maxCount ) override;
+void Model::addAttribute( const AttributeType& type, const uint size )
+{
+  Attribute att;
+  att.type = type;
+  att.size = size;
 
-        void updateInstanced( const size_t idx, const glm::mat4& matrix ) override;
+  _attributes.push_back( att );
+}
 
-        void bind() override;
-        void unbind() override;
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        void draw( const size_t instanceCount ) override;
-        void draw( const Vertices& verts ) override;
-
-    private:
-
-        GLuint _vbo { 0 }; // Vertex buffer object.
-        GLuint _vao { 0 }; // Vertex array object.
-        GLuint _ebo { 0 }; // Element buffer object.
-
-        GLuint _instancedVBO { 0 };
-        std::vector<glm::mat4> _instancedMatrices {};
-
-        std::vector<GLfloat> _vertices {};
-        std::vector<GLuint> _indices {};
-
-        GLenum _mode { GL_TRIANGLE_STRIP };
-        GLenum _glType { GL_UNSIGNED_INT };
-
-    };
-
-}}
+Model::Type Model::getType() const
+{
+  return _type;
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

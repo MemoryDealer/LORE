@@ -52,7 +52,7 @@ namespace Lore { namespace OpenGL {
     IResourcePtr createRenderTarget();
     IResourcePtr createShader();
     IResourcePtr createTexture();
-    IResourcePtr createVertexBuffer();
+    IResourcePtr createModel();
 
     //
     // Destruction functions.
@@ -62,7 +62,7 @@ namespace Lore { namespace OpenGL {
     void destroyRenderTarget( IResourcePtr resource );
     void destroyShader( IResourcePtr resource );
     void destroyTexture( IResourcePtr resource );
-    void destroyVertexBuffer( IResourcePtr resource );
+    void destroyModel( IResourcePtr resource );
 
   };
 

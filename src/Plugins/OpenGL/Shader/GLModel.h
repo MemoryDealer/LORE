@@ -25,89 +25,50 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE/Memory/Alloc.h>
-#include <LORE/Resource/IResource.h>
+#include <LORE/Shader/Model.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+namespace Lore { namespace OpenGL {
 
-  class LORE_EXPORT VertexBuffer : public IResource
-  {
-
-  public:
-
-    enum class Type
+    class GLModel : public Lore::Model,
+                           public Alloc<GLModel>
     {
-      Custom,
-      Quad,
-      TexturedQuad,
-      FullscreenQuad,
-      Cube,
-      TexturedCube,
-      Cubemap,
-      Quad3D,
-      TexturedQuad3D,
-      Text,
 
-      // Instanced.
-      QuadInstanced,
-      TexturedQuadInstanced,
-      Quad3DInstanced,
-      TexturedQuad3DInstanced,
-      CubeInstanced,
-      TexturedCubeInstanced
+    public:
+
+        GLModel();
+
+        virtual ~GLModel() override;
+
+        void init( const Lore::Model::Type& type ) override;
+        void initInstanced( const Type& type, const size_t maxCount ) override;
+
+        void updateInstanced( const size_t idx, const glm::mat4& matrix ) override;
+
+        void bind() override;
+        void unbind() override;
+
+        void draw( const size_t instanceCount ) override;
+        void draw( const Vertices& verts ) override;
+
+    private:
+
+        GLuint _vbo { 0 }; // Vertex buffer object.
+        GLuint _vao { 0 }; // Vertex array object.
+        GLuint _ebo { 0 }; // Element buffer object.
+
+        GLuint _instancedVBO { 0 };
+        std::vector<glm::mat4> _instancedMatrices {};
+
+        std::vector<GLfloat> _vertices {};
+        std::vector<GLuint> _indices {};
+
+        GLenum _mode { GL_TRIANGLE_STRIP };
+        GLenum _glType { GL_UNSIGNED_INT };
+
     };
 
-    enum class AttributeType
-    {
-      Int,
-      Float
-    };
-
-    using Vertices = std::vector<real>;
-
-  public:
-
-    VertexBuffer();
-    virtual ~VertexBuffer() = default;
-
-    virtual void init( const Type& type ) = 0;
-
-    virtual void initInstanced( const Type& type, const size_t maxCount ) = 0;
-
-    virtual void updateInstanced( const size_t idx, const glm::mat4& matrix ) = 0;
-
-    void addAttribute( const AttributeType& type, const uint size );
-
-    virtual void bind() = 0;
-
-    virtual void unbind() = 0;
-
-    virtual void draw( const size_t instanceCount = 0 ) = 0;
-
-    virtual void draw( const Vertices& verts ) = 0;
-
-    //
-    // Accessors.
-
-    Type getType() const;
-
-  private:
-
-    struct Attribute
-    {
-      AttributeType type;
-      int size;
-    };
-
-  protected:
-
-    Type _type;
-    std::vector<Attribute> _attributes;
-
-  };
-
-}
+}}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
