@@ -24,7 +24,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "GLModel.h"
+#include "GLMesh.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -32,13 +32,7 @@ using namespace Lore::OpenGL;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-GLModel::GLModel()
-{
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-GLModel::~GLModel()
+GLMesh::~GLMesh()
 {
   glDeleteBuffers( 1, &_vbo );
   glDeleteBuffers( 1, &_vao );
@@ -48,64 +42,64 @@ GLModel::~GLModel()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLModel::init( const Lore::Model::Type& type )
+void GLMesh::init( const Lore::Mesh::Type type )
 {
   _type = type;
 
   // First generate vertices and indices.
   switch ( _type ) {
   default:
-    throw Lore::Exception( "Unknown model type" );
+    throw Lore::Exception( "Unknown Mesh type" );
 
-  case Model::Type::QuadInstanced:
-  case Model::Type::TexturedQuadInstanced:
-    throw Lore::Exception( "Model::initInstanced() should be called for instanced types" );
+  case Mesh::Type::QuadInstanced:
+  case Mesh::Type::TexturedQuadInstanced:
+    throw Lore::Exception( "Mesh::initInstanced() should be called for instanced types" );
     break;
 
-  case Model::Type::Custom:
+  case Mesh::Type::Custom:
     _mode = GL_TRIANGLES;
     // Attributes should be added by the caller.
     break;
 
-  //
-  // 2D.
+    //
+    // 2D.
 
-  case Model::Type::Quad:
+  case Mesh::Type::Quad:
     _mode = GL_TRIANGLE_STRIP;
     _vertices = { -0.1f, -0.1f,
-                  -0.1f, 0.1f,
-                  0.1f, -0.1f,
-                  0.1f, 0.1f };
+      -0.1f, 0.1f,
+      0.1f, -0.1f,
+      0.1f, 0.1f };
     _indices = { 0, 1, 2, 3 };
 
     addAttribute( AttributeType::Float, 2 );
     break;
 
-  case Model::Type::TexturedQuad:
+  case Mesh::Type::TexturedQuad:
     _mode = GL_TRIANGLE_STRIP;
     _vertices = { -0.1f, -0.1f,     0.f, 0.f,
-                  -0.1f, 0.1f,      0.f, 1.f,
-                  0.1f, -0.1f,      1.f, 0.f,
-                  0.1f, 0.1f,       1.f, 1.f };
+      -0.1f, 0.1f,      0.f, 1.f,
+      0.1f, -0.1f,      1.f, 0.f,
+      0.1f, 0.1f,       1.f, 1.f };
     _indices = { 0, 1, 2, 3 };
 
     addAttribute( AttributeType::Float, 2 );
     addAttribute( AttributeType::Float, 2 );
     break;
 
-  case Model::Type::FullscreenQuad:
+  case Mesh::Type::FullscreenQuad:
     _mode = GL_TRIANGLE_STRIP;
     _vertices = { -1.f, -1.f,     0.f, 0.f,
-                  -1.f, 1.f,      0.f, 1.f,
-                  1.f, -1.f,      1.f, 0.f,
-                  1.f, 1.f,       1.f, 1.f };
+      -1.f, 1.f,      0.f, 1.f,
+      1.f, -1.f,      1.f, 0.f,
+      1.f, 1.f,       1.f, 1.f };
     _indices = { 0, 1, 2, 3 };
 
     addAttribute( AttributeType::Float, 2 );
     addAttribute( AttributeType::Float, 2 );
     break;
 
-  case Model::Type::Cubemap:
+  case Mesh::Type::Cubemap:
     _mode = GL_TRIANGLES;
     _vertices = {
       -1000.0f,  1000.0f, -1000.0f,
@@ -154,7 +148,7 @@ void GLModel::init( const Lore::Model::Type& type )
     addAttribute( AttributeType::Float, 3 );
     break;
 
-  case Model::Type::Text:
+  case Mesh::Type::Text:
     _mode = GL_TRIANGLES;
     // Text VBs are a special case and require dynamic drawing.
     glGenVertexArrays( 1, &_vao );
@@ -169,14 +163,14 @@ void GLModel::init( const Lore::Model::Type& type )
     _attributes.clear();
     return; // Early return for special case.
 
-  //
-  // 3D.
+            //
+            // 3D.
 
-  case Model::Type::Quad3D:
+  case Mesh::Type::Quad3D:
     // Generate quad with normals.
     _mode = GL_TRIANGLE_STRIP;
     // TODO: Combine Quad3D and Quad - have 2D renderer use normals etc.
-    _vertices = { 
+    _vertices = {
       -0.5f, -0.5f, 0.f,  0.0f,  0.0f, -1.0f,
       0.5f, -0.5f, 0.f,  0.0f,  0.0f, -1.0f,
       0.5f,  0.5f, 0.f,  0.0f,  0.0f, -1.0f,
@@ -190,7 +184,7 @@ void GLModel::init( const Lore::Model::Type& type )
     addAttribute( AttributeType::Float, 3 );
     break;
 
-  case Model::Type::TexturedQuad3D:
+  case Mesh::Type::TexturedQuad3D:
     // Generate quad with normals and texture coordinates.
     _mode = GL_TRIANGLE_STRIP;
     _vertices = {
@@ -201,14 +195,14 @@ void GLModel::init( const Lore::Model::Type& type )
       -0.5f,  0.5f, 0.f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f,
       -0.5f, -0.5f, 0.f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f
     };
-   _indices = { 0, 1, 2, 3, 4, 5 };
+    _indices = { 0, 1, 2, 3, 4, 5 };
 
     addAttribute( AttributeType::Float, 3 );
     addAttribute( AttributeType::Float, 3 );
     addAttribute( AttributeType::Float, 2 );
     break;
 
-  case Model::Type::Cube:
+  case Mesh::Type::Cube:
     _mode = GL_TRIANGLES;
     _vertices = {
       -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
@@ -258,37 +252,37 @@ void GLModel::init( const Lore::Model::Type& type )
     addAttribute( AttributeType::Float, 3 );
     break;
 
-  case Model::Type::TexturedCube:
+  case Mesh::Type::TexturedCube:
     _mode = GL_TRIANGLES;
-//     _vertices = {
-//       -1.0, -1.0,  1.0,   0.f, 0.f,
-//       1.0, -1.0,  1.0,    1.f, 0.f,
-//       -1.0,  1.0,  1.0,   0.f, 1.f,
-//       1.0,  1.0,  1.0,    1.f, 1.f,
-//       -1.0, -1.0, -1.0,   1.f, 1.f,
-//       1.0, -1.0, -1.0,    0.f, 1.f,
-//       -1.0,  1.0, -1.0,   1.f, 0.f,
-//       1.0,  1.0, -1.0,    0.f, 0.f
-//     };
-//     _indices = { 0, 1, 2, 3, 7, 1, 5, 4, 7, 6, 2, 4, 0, 1 };
-//     _vertices = {
-//       -1.f, -1.f, -1.f,   0.f, 0.f,
-//       1.f, -1.f, -1.f,    1.f, 0.f,
-//       1.f, 1.f, -1.f,     1.f, 1.f,
-//       -1.f, 1.f, -1.f,    0.f, 1.f,
-//       -1.f, -1.f, 1.f,    0.f, 1.f,
-//       1.f, -1.f, 1.f,     1.f, 1.f,
-//       1.f, 1.f, 1.f,      1.f, 0.f,
-//       -1.f, 1.f, 1.f,     0.f, 0.f
-//     };
-//     _indices = {
-//       0, 1, 3, 3, 1, 2,
-//       1, 5, 2, 2, 5, 6,
-//       5, 4, 6, 6, 4, 7,
-//       4, 0, 7, 7, 0, 3,
-//       3, 2, 7, 7, 2, 6,
-//       4, 5, 0, 0, 5, 1
-//     };
+    //     _vertices = {
+    //       -1.0, -1.0,  1.0,   0.f, 0.f,
+    //       1.0, -1.0,  1.0,    1.f, 0.f,
+    //       -1.0,  1.0,  1.0,   0.f, 1.f,
+    //       1.0,  1.0,  1.0,    1.f, 1.f,
+    //       -1.0, -1.0, -1.0,   1.f, 1.f,
+    //       1.0, -1.0, -1.0,    0.f, 1.f,
+    //       -1.0,  1.0, -1.0,   1.f, 0.f,
+    //       1.0,  1.0, -1.0,    0.f, 0.f
+    //     };
+    //     _indices = { 0, 1, 2, 3, 7, 1, 5, 4, 7, 6, 2, 4, 0, 1 };
+    //     _vertices = {
+    //       -1.f, -1.f, -1.f,   0.f, 0.f,
+    //       1.f, -1.f, -1.f,    1.f, 0.f,
+    //       1.f, 1.f, -1.f,     1.f, 1.f,
+    //       -1.f, 1.f, -1.f,    0.f, 1.f,
+    //       -1.f, -1.f, 1.f,    0.f, 1.f,
+    //       1.f, -1.f, 1.f,     1.f, 1.f,
+    //       1.f, 1.f, 1.f,      1.f, 0.f,
+    //       -1.f, 1.f, 1.f,     0.f, 0.f
+    //     };
+    //     _indices = {
+    //       0, 1, 3, 3, 1, 2,
+    //       1, 5, 2, 2, 5, 6,
+    //       5, 4, 6, 6, 4, 7,
+    //       4, 0, 7, 7, 0, 3,
+    //       3, 2, 7, 7, 2, 6,
+    //       4, 5, 0, 0, 5, 1
+    //     };
 
     _vertices = {
       -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
@@ -400,34 +394,34 @@ void GLModel::init( const Lore::Model::Type& type )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLModel::initInstanced( const Type& type, const size_t maxCount )
+void GLMesh::initInstanced( const Type type, const size_t maxCount )
 {
   // First generate vertices and indices.
   switch ( type ) {
   default:
-    throw Lore::Exception( "Model type must be instanced" );
+    throw Lore::Exception( "Mesh type must be instanced" );
 
-  case Model::Type::QuadInstanced:
+  case Mesh::Type::QuadInstanced:
     init( Type::Quad );
     break;
 
-  case Model::Type::TexturedQuadInstanced:
+  case Mesh::Type::TexturedQuadInstanced:
     init( Type::TexturedQuad );
     break;
 
-  case Model::Type::Quad3DInstanced:
+  case Mesh::Type::Quad3DInstanced:
     init( Type::Quad3D );
     break;
 
-  case Model::Type::TexturedQuad3DInstanced:
+  case Mesh::Type::TexturedQuad3DInstanced:
     init( Type::TexturedQuad3D );
     break;
 
-  case Model::Type::CubeInstanced:
+  case Mesh::Type::CubeInstanced:
     init( Type::Cube );
     break;
 
-  case Model::Type::TexturedCubeInstanced:
+  case Mesh::Type::TexturedCubeInstanced:
     init( Type::TexturedCube );
     break;
   }
@@ -453,8 +447,8 @@ void GLModel::initInstanced( const Type& type, const size_t maxCount )
     }
     break;
 
-  case Model::Type::QuadInstanced:
-  case Model::Type::TexturedQuadInstanced:
+  case Mesh::Type::QuadInstanced:
+  case Mesh::Type::TexturedQuadInstanced:
     // Set the vertex attributes for instanced matrices.
     for ( GLuint attribIdx = 2; attribIdx < 6; ++attribIdx ) {
       glEnableVertexAttribArray( attribIdx );
@@ -472,76 +466,66 @@ void GLModel::initInstanced( const Type& type, const size_t maxCount )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLModel::updateInstanced( const size_t idx, const glm::mat4& matrix )
+void GLMesh::updateInstanced( const size_t idx, const glm::mat4& matrix )
 {
   _instancedMatrices[idx] = matrix;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLModel::bind()
+void GLMesh::draw( const size_t instanceCount )
 {
   glBindVertexArray( _vao );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void GLModel::unbind()
-{
-  glBindVertexArray( 0 );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void GLModel::draw( const size_t instanceCount )
-{
   switch ( _type ) {
   default:
     glDrawElements( _mode, static_cast< GLsizei >( _indices.size() ), GL_UNSIGNED_INT, nullptr );
     break;
 
-  case Model::Type::QuadInstanced:
-  case Model::Type::TexturedQuadInstanced:
-  case Model::Type::Quad3DInstanced:
-  case Model::Type::TexturedQuad3DInstanced:
+  case Mesh::Type::QuadInstanced:
+  case Mesh::Type::TexturedQuadInstanced:
+  case Mesh::Type::Quad3DInstanced:
+  case Mesh::Type::TexturedQuad3DInstanced:
     glBindBuffer( GL_ARRAY_BUFFER, _instancedVBO );
     glBufferData( GL_ARRAY_BUFFER, _instancedMatrices.size() * sizeof( glm::mat4 ), &_instancedMatrices.data()[0], GL_STATIC_DRAW );
     glDrawElementsInstanced( _mode, static_cast< GLsizei >( _indices.size() ), GL_UNSIGNED_INT, nullptr, static_cast< GLsizei >( instanceCount ) );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
     break;
 
-  case Model::Type::CubeInstanced:
-  case Model::Type::TexturedCubeInstanced:
+  case Mesh::Type::CubeInstanced:
+  case Mesh::Type::TexturedCubeInstanced:
     glBindBuffer( GL_ARRAY_BUFFER, _instancedVBO );
     glBufferData( GL_ARRAY_BUFFER, _instancedMatrices.size() * sizeof( glm::mat4 ), &_instancedMatrices.data()[0], GL_STATIC_DRAW );
-    glDrawArraysInstanced( _mode, 0, 36, static_cast<GLsizei>( instanceCount ) );
+    glDrawArraysInstanced( _mode, 0, 36, static_cast< GLsizei >( instanceCount ) );
     glBindBuffer( GL_ARRAY_BUFFER, 0 );
     break;
 
-  case Model::Type::Quad3D:
-  case Model::Type::TexturedQuad3D:
+  case Mesh::Type::Quad3D:
+  case Mesh::Type::TexturedQuad3D:
     glDrawArrays( _mode, 0, 6 );
     break;
 
-  case Model::Type::Cube:
-  case Model::Type::TexturedCube:
-  case Model::Type::Cubemap:
+  case Mesh::Type::Cube:
+  case Mesh::Type::TexturedCube:
+  case Mesh::Type::Cubemap:
     glDrawArrays( _mode, 0, 36 );
     break;
   }
+  glBindVertexArray( 0 );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLModel::draw( const Lore::Model::Vertices& verts )
+void GLMesh::draw( const Lore::Vertices& verts )
 {
-  assert( Model::Type::Text == _type );
+  assert( Mesh::Type::Text == _type );
 
+  glBindVertexArray( _vao );
   glBindBuffer( GL_ARRAY_BUFFER, _vbo );
-  glBufferSubData( GL_ARRAY_BUFFER, 0, verts.size() * sizeof(real), verts.data() );
+  glBufferSubData( GL_ARRAY_BUFFER, 0, verts.size() * sizeof( real ), verts.data() );
   glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
   glDrawArrays( GL_TRIANGLES, 0, 6 );
+  glBindVertexArray( 0 );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

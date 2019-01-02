@@ -49,6 +49,7 @@ namespace Lore {
   class IResource;
   class Light;
   class Material;
+  class Mesh;
   class Model;
   class Node;
   class PointLight;
@@ -88,6 +89,7 @@ namespace Lore {
   using IResourcePtr = IResource*;
   using LightPtr = Light*;
   using MaterialPtr = Material*;
+  using MeshPtr = Mesh*;
   using ModelPtr = Model*;
   using NodePtr = Node*;
   using PointLightPtr = PointLight*;

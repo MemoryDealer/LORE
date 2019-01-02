@@ -271,7 +271,6 @@ void Forward3DRenderer::_renderSkybox( const RenderView& rv,
 {
   SkyboxPtr skybox = rv.scene->getSkybox();
   ModelPtr model = StockResource::GetModel( "Skybox3D" );
-  model->bind();
 
   _api->setDepthMaskEnabled( false );
 
@@ -300,9 +299,6 @@ void Forward3DRenderer::_renderSkybox( const RenderView& rv,
   }
 
   _api->setDepthMaskEnabled( true );
-
-
-  model->unbind();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -326,25 +322,23 @@ void Forward3DRenderer::_renderSolids( const RenderView& rv,
     default:
       throw Lore::Exception( "Instanced entity must have an instanced model" );
 
-    case Model::Type::Quad3DInstanced:
-    case Model::Type::CubeInstanced:
+    case Mesh::Type::Quad3DInstanced:
+    case Mesh::Type::CubeInstanced:
       program = StockResource::GetGPUProgram( "StandardInstanced3D" );
       break;
 
-    case Model::Type::TexturedQuad3DInstanced:
-    case Model::Type::TexturedCubeInstanced:
+    case Mesh::Type::TexturedQuad3DInstanced:
+    case Mesh::Type::TexturedCubeInstanced:
       program = StockResource::GetGPUProgram( "StandardTexturedInstanced3D" );
       break;
     }
 
-    model->bind();
     program->use();
 
     program->updateUniforms( rv, material, queue.lights );
     program->updateNodeUniforms( material, node, viewProjection );
 
     model->draw( entity->getInstanceCount() );
-    model->unbind();
   }
 
   // Render non-instanced solids.
@@ -356,7 +350,6 @@ void Forward3DRenderer::_renderSolids( const RenderView& rv,
     const ModelPtr model = entity->getModel();
     const GPUProgramPtr program = material->program;
 
-    model->bind();
     program->use();
     program->updateUniforms( rv, material, queue.lights );
 
@@ -365,9 +358,6 @@ void Forward3DRenderer::_renderSolids( const RenderView& rv,
       program->updateNodeUniforms( material, node, viewProjection );
       model->draw();
     }
-
-    // Rendering this entity is complete.
-    model->unbind();
   }
 }
 
@@ -395,11 +385,11 @@ void Forward3DRenderer::_renderTransparents( const RenderView& rv,
       default:
         throw Lore::Exception( "Instanced entity must have an instanced model" );
 
-      case Model::Type::QuadInstanced:
+      case Mesh::Type::QuadInstanced:
         program = StockResource::GetGPUProgram( "StandardInstanced2D" );
         break;
 
-      case Model::Type::TexturedQuadInstanced:
+      case Mesh::Type::TexturedQuadInstanced:
         program = StockResource::GetGPUProgram( "StandardTexturedInstanced2D" );
         break;
       }
@@ -408,15 +398,12 @@ void Forward3DRenderer::_renderTransparents( const RenderView& rv,
     // Set blending mode using material settings.
     _api->setBlendingFunc( material->blendingMode.srcFactor, material->blendingMode.dstFactor );
 
-    model->bind();
-
     program->use();
     program->updateUniforms( rv, material, queue.lights );
     program->updateNodeUniforms( material, node, viewProjection );
 
     // Draw the entity.
     model->draw( entity->getInstanceCount() );
-    model->unbind();
   }
 
   _api->setBlendingEnabled( false );
@@ -434,7 +421,6 @@ void Forward3DRenderer::_renderBoxes( const RenderQueue& queue,
   ModelPtr model = StockResource::GetModel( "TexturedQuad" );
 
   program->use();
-  model->bind();
 
   for ( const RenderQueue::BoxData& data : queue.boxes ) {
     BoxPtr box = data.box;
@@ -452,7 +438,6 @@ void Forward3DRenderer::_renderBoxes( const RenderQueue& queue,
     model->draw();
   }
 
-  model->unbind();
   _api->setBlendingEnabled( false );
 }
 
@@ -468,7 +453,6 @@ void Forward3DRenderer::_renderTextboxes( const RenderQueue& queue,
   ModelPtr model = StockResource::GetModel( "StandardText" );
 
   program->use();
-  model->bind();
 
   for ( auto& data : queue.textboxes ) {
     TextboxPtr textbox = data.textbox;
@@ -499,7 +483,6 @@ void Forward3DRenderer::_renderTextboxes( const RenderQueue& queue,
 
   }
 
-  model->unbind();
   _api->setBlendingEnabled( false );
 }
 

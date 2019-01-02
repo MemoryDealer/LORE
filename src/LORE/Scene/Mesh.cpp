@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE
@@ -25,36 +24,28 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE/Resource/IResource.h>
-#include <LORE/Scene/Model.h>
+#include "Mesh.h"
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+using namespace Lore;
 
-  class LORE_EXPORT Font : public IResource
-  {
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-  public:
+void Mesh::addAttribute( const AttributeType& type, const uint size )
+{
+  Attribute att;
+  att.type = type;
+  att.size = size;
 
-    Font() = default;
-    ~Font() override = default;
+  _attributes.push_back( att );
+}
 
-    virtual void loadFromFile( const string& file, const uint32_t size ) = 0;
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    virtual Vertices generateVertices( const char c,
-                                                     const real x,
-                                                     const real y,
-                                                     const real scale ) = 0;
-
-    virtual void bindTexture( const char c ) = 0;
-
-    virtual real advanceGlyphX( const char c, const real x, const real scale ) = 0;
-
-    virtual real getWidth( const char c ) = 0;
-
-  };
-
+Mesh::Type Mesh::getType() const
+{
+  return _type;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -91,6 +91,7 @@ void Context::initConfiguration()
   _poolCluster.registerPool<Box>( 100024 );
   _poolCluster.registerPool<Entity>( 16 );
   _poolCluster.registerPool<Material>( 32 );
+  _poolCluster.registerPool<Model>( 32 );
   _poolCluster.registerPool<Node>( 10024 );
   _poolCluster.registerPool<Scene>( 4 );
   _poolCluster.registerPool<Sprite>( 32 );

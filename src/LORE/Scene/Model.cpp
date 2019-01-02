@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE
@@ -25,36 +24,77 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE/Resource/IResource.h>
-#include <LORE/Scene/Model.h>
+#include "Model.h"
+
+#include <LORE/Resource/ResourceController.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+using namespace Lore;
 
-  class LORE_EXPORT Font : public IResource
-  {
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-  public:
+Model::~Model()
+{
+  // Free meshes if any.
+  for ( auto mesh : _meshes ) {
+    Resource::DestroyMesh( mesh );
+  }
+}
 
-    Font() = default;
-    ~Font() override = default;
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    virtual void loadFromFile( const string& file, const uint32_t size ) = 0;
+void Model::updateInstanced( const size_t idx, const glm::mat4& matrix )
+{
+  for ( const auto& mesh : _meshes ) {
+    mesh->updateInstanced( idx, matrix );
+  }
+}
 
-    virtual Vertices generateVertices( const char c,
-                                                     const real x,
-                                                     const real y,
-                                                     const real scale ) = 0;
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    virtual void bindTexture( const char c ) = 0;
+void Model::draw( const size_t instanceCount )
+{
+  for ( const auto& mesh : _meshes ) {
+    mesh->draw( instanceCount );
+  }
+}
 
-    virtual real advanceGlyphX( const char c, const real x, const real scale ) = 0;
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    virtual real getWidth( const char c ) = 0;
+void Model::draw( const Vertices& verts )
+{
+  for ( const auto& mesh : _meshes ) {
+    mesh->draw( verts );
+  }
+}
 
-  };
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void Model::attachMesh( const MeshPtr mesh )
+{
+  _meshes.push_back( mesh );
+
+  // Update type based on the attached mesh.
+  switch ( mesh->getType() ) {
+  case Mesh::Type::Custom:
+    _type = Mesh::Type::Custom;
+    break;
+
+  default:
+    _type = mesh->getType();
+    if ( _meshes.size() > 1 ) {
+      throw Lore::Exception( "No more than one built-in mesh type allowed for a single model" );
+    }
+    break;
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Mesh::Type Model::getType() const
+{
+  return _type;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

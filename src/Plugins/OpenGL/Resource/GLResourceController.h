@@ -49,20 +49,20 @@ namespace Lore { namespace OpenGL {
 
     IResourcePtr createFont();
     IResourcePtr createGPUProgram();
+    IResourcePtr createMesh();
     IResourcePtr createRenderTarget();
     IResourcePtr createShader();
     IResourcePtr createTexture();
-    IResourcePtr createModel();
 
     //
     // Destruction functions.
 
     void destroyFont( IResourcePtr resource );
     void destroyGPUProgram( IResourcePtr resource );
+    void destroyMesh( IResourcePtr resource );
     void destroyRenderTarget( IResourcePtr resource );
     void destroyShader( IResourcePtr resource );
     void destroyTexture( IResourcePtr resource );
-    void destroyModel( IResourcePtr resource );
 
   };
 

@@ -28,20 +28,20 @@
 
 #include <LORE/Resource/Entity.h>
 #include <LORE/Resource/ResourceController.h>
+#include <LORE/Scene/Model.h>
 #include <LORE/Scene/Scene.h>
-#include <LORE/Shader/Model.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace LocalNS {
 
-  static Lore::Model::Type StringToModelType( const Lore::string& str )
+  static Lore::Mesh::Type StringToModelType( const Lore::string& str )
   {
-    const std::unordered_map<Lore::string, Lore::Model::Type> ConversionTable = {
-      { "Quad", Lore::Model::Type::Quad3D },
-      { "TexturedQuad", Lore::Model::Type::TexturedQuad3D },
-      { "Cube", Lore::Model::Type::Cube },
-      { "TexturedCube", Lore::Model::Type::TexturedCube }
+    const std::unordered_map<Lore::string, Lore::Mesh::Type> ConversionTable = {
+      { "Quad", Lore::Mesh::Type::Quad3D },
+      { "TexturedQuad", Lore::Mesh::Type::TexturedQuad3D },
+      { "Cube", Lore::Mesh::Type::Cube },
+      { "TexturedCube", Lore::Mesh::Type::TexturedCube }
     };
     // TODO: Check scene's renderer type to use quad or quad3D.
     auto lookup = ConversionTable.find( str );

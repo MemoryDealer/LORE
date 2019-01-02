@@ -299,7 +299,6 @@ void Forward2DRenderer::renderSkybox( const RenderView& rv,
   const Skybox::LayerMap& layers = skybox->getLayerMap();
 
   ModelPtr model = StockResource::GetModel( "Skybox2D" );
-  model->bind();
 
   const glm::vec3 camPos = rv.camera->getPosition();
 
@@ -353,8 +352,6 @@ void Forward2DRenderer::renderSkybox( const RenderView& rv,
       _api->setBlendingEnabled( false );
     }
   }
-
-  model->unbind();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -376,23 +373,21 @@ void Forward2DRenderer::renderSolids( const RenderView& rv,
     default:
       throw Lore::Exception( "Instanced entity must have an instanced model" );
 
-    case Model::Type::QuadInstanced:
+    case Mesh::Type::QuadInstanced:
       program = StockResource::GetGPUProgram( "StandardInstanced2D" );
       break;
 
-    case Model::Type::TexturedQuadInstanced:
+    case Mesh::Type::TexturedQuadInstanced:
       program = StockResource::GetGPUProgram( "StandardTexturedInstanced2D" );
       break;
     }
 
-    model->bind();
     program->use();
 
     program->updateUniforms( rv, material, queue.lights );
     program->updateNodeUniforms( material, node, viewProjection );
 
     model->draw( entity->getInstanceCount() );
-    model->unbind();
   }
 
   // Render non-instanced solids.
@@ -404,7 +399,6 @@ void Forward2DRenderer::renderSolids( const RenderView& rv,
     const ModelPtr model = entity->getModel();
     const GPUProgramPtr program = material->program;
 
-    model->bind();
     program->use();
     program->updateUniforms( rv, material, queue.lights );
 
@@ -413,9 +407,6 @@ void Forward2DRenderer::renderSolids( const RenderView& rv,
       program->updateNodeUniforms( material, node, viewProjection );
       model->draw();
     }
-
-    // Rendering this entity is complete.
-    model->unbind();
   }
 }
 
@@ -444,11 +435,11 @@ void Forward2DRenderer::renderTransparents( const RenderView& rv,
       default:
         throw Lore::Exception( "Instanced entity must have an instanced model" );
 
-      case Model::Type::QuadInstanced:
+      case Mesh::Type::QuadInstanced:
         program = StockResource::GetGPUProgram( "StandardInstanced2D" );
         break;
 
-      case Model::Type::TexturedQuadInstanced:
+      case Mesh::Type::TexturedQuadInstanced:
         program = StockResource::GetGPUProgram( "StandardTexturedInstanced2D" );
         break;
       }
@@ -457,7 +448,6 @@ void Forward2DRenderer::renderTransparents( const RenderView& rv,
     // Set blending mode using material settings.
     _api->setBlendingFunc( material->blendingMode.srcFactor, material->blendingMode.dstFactor );
 
-    model->bind();
     program->use();
 
     program->updateUniforms( rv, material, queue.lights );
@@ -465,7 +455,6 @@ void Forward2DRenderer::renderTransparents( const RenderView& rv,
 
     // Draw the entity.
     model->draw( entity->getInstanceCount() );
-    model->unbind();
   }
 
   _api->setBlendingEnabled( false );
@@ -483,7 +472,6 @@ void Forward2DRenderer::renderBoxes( const RenderQueue& queue,
   ModelPtr model = StockResource::GetModel( "TexturedQuad" );
 
   program->use();
-  model->bind();
 
   for ( const RenderQueue::BoxData& data : queue.boxes ) {
     BoxPtr box = data.box;
@@ -501,7 +489,6 @@ void Forward2DRenderer::renderBoxes( const RenderQueue& queue,
     model->draw();
   }
 
-  model->unbind();
   _api->setBlendingEnabled( false );
 }
 
@@ -517,7 +504,6 @@ void Forward2DRenderer::renderTextboxes( const RenderQueue& queue,
   ModelPtr model = StockResource::GetModel( "StandardText" );
 
   program->use();
-  model->bind();
 
   for ( auto& data : queue.textboxes ) {
     TextboxPtr textbox = data.textbox;
@@ -548,7 +534,6 @@ void Forward2DRenderer::renderTextboxes( const RenderQueue& queue,
 
   }
 
-  model->unbind();
   _api->setBlendingEnabled( false );
 }
 

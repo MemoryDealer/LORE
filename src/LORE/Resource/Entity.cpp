@@ -85,19 +85,21 @@ void Entity::enableInstancing( const size_t max )
   auto rc = Resource::GetResourceController();
   _instancedModel = rc->create<Model>( _name + "_instanced", getResourceGroupName() );
 
-  const std::map< Model::Type, Model::Type> InstancedModelMap = {
-    { Model::Type::Quad, Model::Type::QuadInstanced },
-    { Model::Type::TexturedQuad, Model::Type::TexturedQuadInstanced },
-    { Model::Type::Quad3D, Model::Type::Quad3DInstanced },
-    { Model::Type::TexturedQuad3D, Model::Type::TexturedQuad3DInstanced },
-    { Model::Type::Cube, Model::Type::CubeInstanced },
-    { Model::Type::TexturedCube, Model::Type::TexturedCubeInstanced }
+  const std::map< Mesh::Type, Mesh::Type> InstancedModelMap = {
+    { Mesh::Type::Quad, Mesh::Type::QuadInstanced },
+    { Mesh::Type::TexturedQuad, Mesh::Type::TexturedQuadInstanced },
+    { Mesh::Type::Quad3D, Mesh::Type::Quad3DInstanced },
+    { Mesh::Type::TexturedQuad3D, Mesh::Type::TexturedQuad3DInstanced },
+    { Mesh::Type::Cube, Mesh::Type::CubeInstanced },
+    { Mesh::Type::TexturedCube, Mesh::Type::TexturedCubeInstanced }
   };
 
   // Determine which type of instanced model to use.
   const auto lookup = InstancedModelMap.find( _model->getType() );
   if ( InstancedModelMap.end() != lookup ) {
-    _instancedModel->initInstanced( lookup->second, max );
+    auto mesh = rc->create<Mesh>( _name + "_instanced", getResourceGroupName() );
+    mesh->initInstanced( lookup->second, max );
+    _instancedModel->attachMesh( mesh );
   }
   else {
     throw Lore::Exception( "No valid instanced model mapping" );

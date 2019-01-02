@@ -155,7 +155,7 @@ namespace Lore {
     static MaterialPtr GetMaterial( const string& name );
     static TexturePtr GetTexture( const string& name );
     static ModelPtr GetModel( const string& name );
-    static ModelPtr GetModel( const Model::Type type );
+    static ModelPtr GetModel( const Mesh::Type type );
     static FontPtr GetFont( const string& name );
 
   private:

@@ -105,7 +105,9 @@ void StockResourceController::createStockResources()
     // Generate shaders and model for text rendering.
     createTextProgram( "StandardText" );
     auto model = _controller->create<Model>( "StandardText" );
-    model->init( Model::Type::Text );
+    auto mesh = _controller->create<Mesh>( "StandardText" );
+    mesh->init( Mesh::Type::Text );
+    model->attachMesh( mesh );
   }
 }
 
@@ -126,16 +128,22 @@ void StockResourceController::createRendererStockResources( const RendererType t
   case RendererType::Forward2D:
     suffix = "2D";
     {
-      auto model = _controller->create<Model>( "Skybox" + suffix );
-      model->init( Model::Type::FullscreenQuad );
+      const string skybox = "Skybox" + suffix;
+      auto model = _controller->create<Model>( skybox );
+      auto mesh = _controller->create<Mesh>( skybox );
+      mesh->init( Mesh::Type::FullscreenQuad );
+      model->attachMesh( mesh );
     }
     break;
 
   case RendererType::Forward3D:
     suffix = "3D";
     {
-      auto model = _controller->create<Model>( "Skybox" + suffix );
-      model->init( Model::Type::Cubemap );
+      const string skybox = "Skybox" + suffix;
+      auto model = _controller->create<Model>( skybox );
+      auto mesh = _controller->create<Mesh>( skybox );
+      mesh->init( Mesh::Type::Cubemap );
+      model->attachMesh( mesh );
     }
     break;
   }
@@ -281,29 +289,29 @@ ModelPtr StockResource::GetModel( const string& name )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-ModelPtr StockResource::GetModel( const Model::Type type )
+ModelPtr StockResource::GetModel( const Mesh::Type type )
 {
   switch ( type ) {
   default:
     log_warning( "Model type not available for stock resource retrieval" );
     return nullptr;
 
-  case Model::Type::Quad:
+  case Mesh::Type::Quad:
     return ActiveContext->getStockResourceController()->get<Model>( "Quad" );
 
-  case Model::Type::TexturedQuad:
+  case Mesh::Type::TexturedQuad:
     return ActiveContext->getStockResourceController()->get<Model>( "TexturedQuad" );
 
-  case Model::Type::Quad3D:
+  case Mesh::Type::Quad3D:
     return ActiveContext->getStockResourceController()->get<Model>( "Quad3D" );
 
-  case Model::Type::TexturedQuad3D:
+  case Mesh::Type::TexturedQuad3D:
     return ActiveContext->getStockResourceController()->get<Model>( "TexturedQuad3D" );
 
-  case Model::Type::Cube:
+  case Mesh::Type::Cube:
     return ActiveContext->getStockResourceController()->get<Model>( "Cube" );
 
-  case Model::Type::TexturedCube:
+  case Mesh::Type::TexturedCube:
     return ActiveContext->getStockResourceController()->get<Model>( "TexturedCube" );
   }
 }

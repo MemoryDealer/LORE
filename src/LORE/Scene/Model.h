@@ -25,50 +25,48 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE/Shader/Model.h>
+#include <LORE/Memory/Alloc.h>
+#include <LORE/Resource/IResource.h>
+#include <LORE/Scene/Mesh.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore { namespace OpenGL {
+namespace Lore {
 
-    class GLModel : public Lore::Model,
-                           public Alloc<GLModel>
-    {
+  using Vertices = std::vector<real>;
 
-    public:
+  class LORE_EXPORT Model : public IResource,
+                            public Alloc<Model>
+  {
 
-        GLModel();
+  public:
 
-        virtual ~GLModel() override;
+    Model() = default;
+    ~Model() override;
 
-        void init( const Lore::Model::Type& type ) override;
-        void initInstanced( const Type& type, const size_t maxCount ) override;
+    void updateInstanced( const size_t idx, const glm::mat4& matrix );
 
-        void updateInstanced( const size_t idx, const glm::mat4& matrix ) override;
+    void draw( const size_t instanceCount = 0 );
+    void draw( const Vertices& verts );
 
-        void bind() override;
-        void unbind() override;
+    void attachMesh( const MeshPtr mesh );
 
-        void draw( const size_t instanceCount ) override;
-        void draw( const Vertices& verts ) override;
+    //
+    // Accessors.
 
-    private:
+    Mesh::Type getType() const;
 
-        GLuint _vbo { 0 }; // Vertex buffer object.
-        GLuint _vao { 0 }; // Vertex array object.
-        GLuint _ebo { 0 }; // Element buffer object.
+  private:
 
-        GLuint _instancedVBO { 0 };
-        std::vector<glm::mat4> _instancedMatrices {};
+    using MeshList = std::vector<MeshPtr>;
 
-        std::vector<GLfloat> _vertices {};
-        std::vector<GLuint> _indices {};
+  private:
 
-        GLenum _mode { GL_TRIANGLE_STRIP };
-        GLenum _glType { GL_UNSIGNED_INT };
+    Mesh::Type _type { Mesh::Type::Custom };
+    MeshList _meshes {};
 
-    };
+  };
 
-}}
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

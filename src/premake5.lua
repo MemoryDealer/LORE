@@ -24,7 +24,7 @@ characterset ( "MBCS" )
 
 solution "LORE"
     configurations { "Debug", "Release" }
-    startproject "Example_ComplexScene"
+    startproject "Demo3D"
 
 --
 -- Configurations
@@ -48,8 +48,6 @@ filter "system:MacOSX"
 
 --
 -- Projects
-
-startproject "Demo3D"
 
 project "LORE"
     location "LORE"

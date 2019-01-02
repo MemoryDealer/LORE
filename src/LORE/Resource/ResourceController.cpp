@@ -58,6 +58,8 @@ ResourceGroup::ResourceGroup( const string& name )
   _addResourceType<Entity>();
   _addResourceType<Font>();
   _addResourceType<Material>();
+  _addResourceType<Mesh>();
+  _addResourceType<Model>();
   _addResourceType<GPUProgram>();
   _addResourceType<RenderTarget>();
   _addResourceType<Shader>();
@@ -65,7 +67,6 @@ ResourceGroup::ResourceGroup( const string& name )
   _addResourceType<Texture>();
   _addResourceType<SpriteAnimationSet>();
   _addResourceType<UI>();
-  _addResourceType<Model>();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -180,6 +181,8 @@ void ResourceController::unloadGroup( const string& groupName )
   destroyAllInGroup<Font>( groupName );
   destroyAllInGroup<GPUProgram>( groupName );
   destroyAllInGroup<Material>( groupName );
+  destroyAllInGroup<Mesh>( groupName );
+  destroyAllInGroup<Model>( groupName );
   destroyAllInGroup<RenderTarget>( groupName );
   destroyAllInGroup<Shader>( groupName );
   destroyAllInGroup<Sprite>( groupName );
@@ -187,7 +190,6 @@ void ResourceController::unloadGroup( const string& groupName )
   destroyAllInGroup<Texture>( groupName );
   destroyAllInGroup<Textbox>( groupName );
   destroyAllInGroup<UI>( groupName );
-  destroyAllInGroup<Model>( groupName );
 
   // Set all indexed resources not loaded.
   for ( auto& it : group->_index ) {
@@ -333,7 +335,7 @@ BoxPtr Resource::CreateBox( const string& name, const string& groupName )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-EntityPtr Resource::CreateEntity( const string& name, const Model::Type& modelType, const string& groupName )
+EntityPtr Resource::CreateEntity( const string& name, const Mesh::Type& modelType, const string& groupName )
 {
   auto rc = ActiveContext->getResourceController();
   if ( rc->resourceExists<Entity>( name, groupName ) ) {
@@ -351,42 +353,42 @@ EntityPtr Resource::CreateEntity( const string& name, const Model::Type& modelTy
   default:
     break;
 
-  case Model::Type::Quad:
+  case Mesh::Type::Quad:
   {
     auto material = StockResource::GetMaterial( "Standard2D" );
     entity->setMaterial( material->clone( "Standard2D_" + name ) );
   }
   break;
 
-  case Model::Type::TexturedQuad:
+  case Mesh::Type::TexturedQuad:
   {
     auto material = StockResource::GetMaterial( "StandardTextured2D" );
     entity->setMaterial( material->clone( "StandardTextured2D_" + name ) );
   }
   break;
 
-  case Model::Type::Cube:
+  case Mesh::Type::Cube:
   {
     auto material = StockResource::GetMaterial( "Standard3D" );
     entity->setMaterial( material->clone( "Standard3D_" + name ) );
   }
   break;
 
-  case Model::Type::TexturedCube:
+  case Mesh::Type::TexturedCube:
   {
     auto material = StockResource::GetMaterial( "StandardTextured3D" );
     entity->setMaterial( material->clone( "StandardTextured3D_" + name ) );
   }
   break;
 
-  case Model::Type::Quad3D:
+  case Mesh::Type::Quad3D:
   {
     auto material = StockResource::GetMaterial( "Standard3D" );
     entity->setMaterial( material->clone( "Standard3D_" + name ) );
   }
   break;
 
-  case Model::Type::TexturedQuad3D:
+  case Mesh::Type::TexturedQuad3D:
   {
     auto material = StockResource::GetMaterial( "StandardTextured3D" );
     entity->setMaterial( material->clone( "StandardTextured3D_" + name ) );
@@ -412,6 +414,22 @@ GPUProgramPtr Resource::CreateGPUProgram( const string& name, const string& grou
 MaterialPtr Resource::CreateMaterial( const string& name, const string& groupName )
 {
   return ActiveContext->getResourceController()->create<Material>( name, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+MeshPtr Resource::CreateMesh( const string& name, const Mesh::Type& type, const string& groupName )
+{
+  auto mesh = ActiveContext->getResourceController()->create<Mesh>( name, groupName );
+  mesh->init( type );
+  return mesh;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+ModelPtr Resource::CreateModel( const string& name, const Mesh::Type& type, const string& groupName )
+{
+  return ActiveContext->getResourceController()->create<Model>( name, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -476,15 +494,6 @@ UIPtr Resource::CreateUI( const string& name, const string& groupName )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-ModelPtr Resource::CreateModel( const string& name, const Model::Type& type, const string& groupName )
-{
-  auto model = ActiveContext->getResourceController()->create<Model>( name, groupName );
-  model->init( type );
-  return model;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 BoxPtr Resource::GetBox( const string& name, const string& groupName )
 {
   return ActiveContext->getResourceController()->get<Box>( name, groupName );
@@ -516,6 +525,20 @@ GPUProgramPtr Resource::GetGPUProgram( const string& name, const string& groupNa
 MaterialPtr Resource::GetMaterial( const string& name, const string& groupName )
 {
   return ActiveContext->getResourceController()->get<Material>( name, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+MeshPtr Resource::GetMesh( const string& name, const string& groupName )
+{
+  return ActiveContext->getResourceController()->get<Mesh>( name, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+ModelPtr Resource::GetModel( const string& name, const string& groupName )
+{
+  return ActiveContext->getResourceController()->get<Model>( name, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -569,13 +592,6 @@ UIPtr Resource::GetUI( const string& name, const string& groupName )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-ModelPtr Resource::GetModel( const string& name, const string& groupName )
-{
-  return ActiveContext->getResourceController()->get<Model>( name, groupName );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 void Resource::DestroyBox( BoxPtr box )
 {
   ActiveContext->getResourceController()->destroy<Box>( box );
@@ -606,6 +622,20 @@ void Resource::DestroyGPUProgram( GPUProgramPtr program )
 void Resource::DestroyMaterial( MaterialPtr material )
 {
   ActiveContext->getResourceController()->destroy<Material>( material );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Resource::DestroyMesh( MeshPtr mesh )
+{
+  ActiveContext->getResourceController()->destroy<Mesh>( mesh );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Resource::DestroyModel( ModelPtr model )
+{
+  ActiveContext->getResourceController()->destroy<Model>( model );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -655,13 +685,6 @@ void Resource::DestroyTextbox( TextboxPtr textbox )
 void Resource::DestroyUI( UIPtr ui )
 {
   ActiveContext->getResourceController()->destroy<UI>( ui );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Resource::DestroyModel( ModelPtr model )
-{
-  ActiveContext->getResourceController()->destroy<Model>( model );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -29,9 +29,9 @@
 #include <LORE/Memory/Alloc.h>
 #include <LORE/Renderer/Renderer.h>
 #include <LORE/Resource/IResource.h>
+#include <LORE/Scene/Model.h>
 #include <LORE/Scene/Scene.h>
 #include <LORE/Shader/Shader.h>
-#include <LORE/Shader/Model.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 

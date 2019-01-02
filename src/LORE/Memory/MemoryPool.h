@@ -112,7 +112,9 @@ namespace Lore {
     inline void destroy( T* object )
     {
       if ( !object->_inUse ) {
-        throw Exception( "Attempting to destroy object not in use" );
+        //throw Exception( "Attempting to destroy object not in use" );
+        log_warning( "Attempted to destroy object not in use" );
+        return;
       }
 
       Alloc<T>* alloc = object;

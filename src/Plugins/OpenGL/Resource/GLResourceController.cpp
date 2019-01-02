@@ -32,9 +32,9 @@
 #include <Plugins/OpenGL/Resource/GLFont.h>
 #include <Plugins/OpenGL/Resource/GLStockResource.h>
 #include <Plugins/OpenGL/Resource/GLTexture.h>
+#include <Plugins/OpenGL/Scene/GLMesh.h>
 #include <Plugins/OpenGL/Shader/GLGPUProgram.h>
 #include <Plugins/OpenGL/Shader/GLShader.h>
-#include <Plugins/OpenGL/Shader/GLModel.h>
 #include <Plugins/OpenGL/Window/GLRenderTarget.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -48,35 +48,47 @@ GLResourceController::GLResourceController()
   // Add creation/destruction functors.
   addCreationFunctor<Font>( std::bind( &GLResourceController::createFont, this ) );
   addCreationFunctor<GPUProgram>( std::bind( &GLResourceController::createGPUProgram, this ) );
+  addCreationFunctor<Mesh>( std::bind( &GLResourceController::createMesh, this ) );
   addCreationFunctor<RenderTarget>( std::bind( &GLResourceController::createRenderTarget, this ) );
   addCreationFunctor<Shader>( std::bind( &GLResourceController::createShader, this ) );
   addCreationFunctor<Texture>( std::bind( &GLResourceController::createTexture, this ) );
-  addCreationFunctor<Model>( std::bind( &GLResourceController::createModel, this ) );
   addDestructionFunctor<Font>( std::bind( &GLResourceController::destroyFont, this, std::placeholders::_1 ) );
   addDestructionFunctor<GPUProgram>( std::bind( &GLResourceController::destroyGPUProgram, this, std::placeholders::_1 ) );
+  addDestructionFunctor<Mesh>( std::bind( &GLResourceController::destroyMesh, this, std::placeholders::_1 ) );
   addDestructionFunctor<RenderTarget>( std::bind( &GLResourceController::destroyRenderTarget, this, std::placeholders::_1 ) );
   addDestructionFunctor<Shader>( std::bind( &GLResourceController::destroyShader, this, std::placeholders::_1 ) );
   addDestructionFunctor<Texture>( std::bind( &GLResourceController::destroyTexture, this, std::placeholders::_1 ) );
-  addDestructionFunctor<Model>( std::bind( &GLResourceController::destroyModel, this, std::placeholders::_1 ) );
 
   // Create default models.
   auto quad = create<Model>( "Quad" );
-  quad->init( Model::Type::Quad );
+  auto quadMesh = create<Mesh>( "Quad" );
+  quadMesh->init( Mesh::Type::Quad );
+  quad->attachMesh( quadMesh );
 
   auto texturedQuad = create<Model>( "TexturedQuad" );
-  texturedQuad->init( Model::Type::TexturedQuad );
+  auto texturedQuadMesh = create<Mesh>( "TexturedQuad" );
+  texturedQuadMesh->init( Mesh::Type::TexturedQuad );
+  texturedQuad->attachMesh( texturedQuadMesh );
 
   auto cube = create<Model>( "Cube" );
-  cube->init( Model::Type::Cube );
+  auto cubeMesh = create<Mesh>( "Cube" );
+  cubeMesh->init( Mesh::Type::Cube );
+  cube->attachMesh( cubeMesh );
 
   auto texturedCube = create<Model>( "TexturedCube" );
-  texturedCube->init( Model::Type::TexturedCube );
+  auto texturedCubeMesh = create<Mesh>( "TexturedCube" );
+  texturedCubeMesh->init( Mesh::Type::TexturedCube );
+  texturedCube->attachMesh( texturedCubeMesh );
 
   auto quad3D = create<Model>( "Quad3D" );
-  quad3D->init( Model::Type::Quad3D );
+  auto quad3DMesh = create<Mesh>( "Quad3D" );
+  quad3DMesh->init( Mesh::Type::Quad3D );
+  quad3D->attachMesh( quad3DMesh );
 
   auto texturedQuad3D = create<Model>( "TexturedQuad3D" );
-  texturedQuad3D->init( Model::Type::TexturedQuad3D );
+  auto texturedQuad3DMesh = create<Mesh>( "TexturedQuad3D" );
+  texturedQuad3DMesh->init( Mesh::Type::TexturedQuad3D );
+  texturedQuad3D->attachMesh( texturedQuad3DMesh );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -91,6 +103,13 @@ Lore::IResourcePtr GLResourceController::createFont()
 Lore::IResourcePtr GLResourceController::createGPUProgram()
 {
   return MemoryAccess::GetPrimaryPoolCluster()->create<GPUProgram, GLGPUProgram>();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Lore::IResourcePtr GLResourceController::createMesh()
+{
+  return MemoryAccess::GetPrimaryPoolCluster()->create<Mesh, GLMesh>();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -117,13 +136,6 @@ Lore::IResourcePtr GLResourceController::createTexture()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::IResourcePtr GLResourceController::createModel()
-{
-  return MemoryAccess::GetPrimaryPoolCluster()->create<Model, GLModel>();
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 void GLResourceController::destroyFont( Lore::IResourcePtr resource )
 {
   MemoryAccess::GetPrimaryPoolCluster()->destroy<Font, GLFont>( static_cast< FontPtr >( resource ) );
@@ -134,6 +146,13 @@ void GLResourceController::destroyFont( Lore::IResourcePtr resource )
 void GLResourceController::destroyGPUProgram( Lore::IResourcePtr resource )
 {
   MemoryAccess::GetPrimaryPoolCluster()->destroy<GPUProgram, GLGPUProgram>( static_cast< GPUProgramPtr >( resource ) );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLResourceController::destroyMesh( Lore::IResourcePtr resource )
+{
+  MemoryAccess::GetPrimaryPoolCluster()->destroy<Mesh, GLMesh>( ResourceCast<Mesh>( resource ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -155,13 +174,6 @@ void GLResourceController::destroyShader( Lore::IResourcePtr resource )
 void GLResourceController::destroyTexture( Lore::IResourcePtr resource )
 {
   MemoryAccess::GetPrimaryPoolCluster()->destroy<Texture, GLTexture>( static_cast< TexturePtr >( resource ) );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void GLResourceController::destroyModel( Lore::IResourcePtr resource )
-{
-  MemoryAccess::GetPrimaryPoolCluster()->destroy<Model, GLModel>( static_cast< ModelPtr >( resource ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -32,7 +32,9 @@
 
 namespace Lore {
 
-  class LORE_EXPORT Model : public IResource
+  using Vertices = std::vector<real>;
+
+  class LORE_EXPORT Mesh : public IResource
   {
 
   public:
@@ -65,31 +67,22 @@ namespace Lore {
       Float
     };
 
-    using Vertices = std::vector<real>;
-
   public:
 
-    Model();
-    virtual ~Model() = default;
+    Mesh() = default;
+    virtual ~Mesh() = default;
 
-    virtual void init( const Type& type ) = 0;
+    virtual void init( const Type type ) = 0;
 
-    virtual void initInstanced( const Type& type, const size_t maxCount ) = 0;
+    virtual void initInstanced( const Type type, const size_t maxCount ) = 0;
 
     virtual void updateInstanced( const size_t idx, const glm::mat4& matrix ) = 0;
 
     void addAttribute( const AttributeType& type, const uint size );
 
-    virtual void bind() = 0;
-
-    virtual void unbind() = 0;
-
     virtual void draw( const size_t instanceCount = 0 ) = 0;
 
     virtual void draw( const Vertices& verts ) = 0;
-
-    //
-    // Accessors.
 
     Type getType() const;
 
