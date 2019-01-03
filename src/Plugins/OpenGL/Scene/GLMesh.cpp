@@ -394,6 +394,50 @@ void GLMesh::init( const Lore::Mesh::Type type )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void GLMesh::init( const CustomMeshData& data )
+{
+  // This is a custom mesh type.
+  _type = Mesh::Type::Custom;
+  _mode = GL_TRIANGLES;
+
+  glGenVertexArrays( 1, &_vao );
+  glGenBuffers( 1, &_vbo );
+  glGenBuffers( 1, &_ebo );
+  glBindVertexArray( _vao );
+
+  glBindBuffer( GL_ARRAY_BUFFER, _vbo );
+  glBufferData( GL_ARRAY_BUFFER, sizeof( Vertex ) * data.verts.size(), data.verts.data(), GL_STATIC_DRAW );
+
+  glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, _ebo );
+  glBufferData( GL_ELEMENT_ARRAY_BUFFER, data.indices.size() * sizeof( uint32_t ), data.indices.data(), GL_STATIC_DRAW );
+
+  // Setup vertex attributes.
+  glEnableVertexAttribArray( 0 );
+  glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, sizeof( Vertex ), nullptr );
+
+  // Vertex normals.
+  glEnableVertexAttribArray( 1 );
+  glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, sizeof( Vertex ), ( void* )offsetof( Vertex, normal ) );
+
+  // Texture coordinates.
+  glEnableVertexAttribArray( 2 );
+  glVertexAttribPointer( 2, 2, GL_FLOAT, GL_FALSE, sizeof( Vertex ), ( void* )offsetof( Vertex, texCoords ) );
+
+  // Vertex tangents.
+  glEnableVertexAttribArray( 3 );
+  glVertexAttribPointer( 3, 3, GL_FLOAT, GL_FALSE, sizeof( Vertex ), ( void* )offsetof( Vertex, tangent ) );
+
+  // Vertex bitangents.
+  glEnableVertexAttribArray( 4 );
+  glVertexAttribPointer( 4, 3, GL_FLOAT, GL_FALSE, sizeof( Vertex ), ( void* )offsetof( Vertex, bitangent ) );
+
+  _indices = data.indices;
+
+  glBindVertexArray( 0 );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void GLMesh::initInstanced( const Type type, const size_t maxCount )
 {
   // First generate vertices and indices.
@@ -478,6 +522,7 @@ void GLMesh::draw( const size_t instanceCount )
   glBindVertexArray( _vao );
   switch ( _type ) {
   default:
+  case Mesh::Type::Custom:
     glDrawElements( _mode, static_cast< GLsizei >( _indices.size() ), GL_UNSIGNED_INT, nullptr );
     break;
 

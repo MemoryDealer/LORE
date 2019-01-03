@@ -60,6 +60,7 @@ project "LORE"
     files {
         "LORE/**.h", "LORE/**.cpp", "LORE/**.inl"
     }
+    links { "assimp-vc140-mt" }
     postbuildcommands { "{COPY} ../../res/ ../../bin/%{cfg.buildcfg}/Run/res/" }
 
 project "Plugin_OpenGL"

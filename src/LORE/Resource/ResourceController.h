@@ -254,6 +254,9 @@ namespace Lore {
     static TexturePtr LoadTexture( const string& name,
                                    const string& file,
                                    const string& groupName = ResourceController::DefaultGroupName );
+    static EntityPtr LoadEntity( const string& name,
+                                 const string& path,
+                                 const string& groupName = ResourceController::DefaultGroupName );
 
     //
     // Factory functions for creation of resources.

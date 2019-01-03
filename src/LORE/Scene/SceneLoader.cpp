@@ -28,6 +28,7 @@
 
 #include <LORE/Resource/Entity.h>
 #include <LORE/Resource/ResourceController.h>
+#include <LORE/Scene/IO/ModelLoader.h>
 #include <LORE/Scene/Model.h>
 #include <LORE/Scene/Scene.h>
 
@@ -35,7 +36,7 @@
 
 namespace LocalNS {
 
-  static Lore::Mesh::Type StringToModelType( const Lore::string& str )
+  static Lore::Mesh::Type StringToMeshType( const Lore::string& str )
   {
     const std::unordered_map<Lore::string, Lore::Mesh::Type> ConversionTable = {
       { "Quad", Lore::Mesh::Type::Quad3D },
@@ -150,14 +151,29 @@ void SceneLoader::_loadEntities()
       const auto entityName = entity.first;
       const SerializerValue& value = entity.second;
 
+      EntityPtr entity = nullptr;
+
       // Get the model type.
       const auto& modelType = value.getValue( "ModelType" );
       if ( modelType.isNull() ) {
-        throw Lore::SerializerException( "Entity value " + entityName + " did not specify model type" );
-      }
+        // If there is no model type, look for a model path to load.
+        const auto& modelPath = value.getValue( "Model" );
+        if ( modelPath.isNull() ) {
+          throw Lore::SerializerException( "Entity value " + entityName + " did not specify model type or a model" );
+        }
 
-      // Create the entity.
-      auto entity = Resource::CreateEntity( entityName, StringToModelType( modelType.toString() ), _resourceGroupName );
+        // Load the entity (load model from disk and assign a material).
+        try {
+          entity = Resource::LoadEntity( entityName, modelPath.toString(), _resourceGroupName );
+        }
+        catch ( Lore::Exception& e ) {
+          log_error( "Error loading entity " + entityName + e.what() );
+        }
+      }
+      else {
+        // Create the entity.
+        entity = Resource::CreateEntity( entityName, StringToMeshType( modelType.toString() ), _resourceGroupName );
+      }
 
       // Enable instancing if specified.
       const auto& instanced = value.getValue( "Instanced" );

@@ -67,12 +67,30 @@ namespace Lore {
       Float
     };
 
+    struct Vertex
+    {
+      glm::vec3 position;
+      glm::vec3 normal;
+      glm::vec2 texCoords;
+
+      glm::vec3 tangent;
+      glm::vec3 bitangent;
+    };
+
+    struct CustomMeshData
+    {
+      std::vector<Vertex> verts;
+      std::vector<uint32_t> indices;
+    };
+
   public:
 
     Mesh() = default;
     virtual ~Mesh() = default;
 
     virtual void init( const Type type ) = 0;
+
+    virtual void init( const CustomMeshData& data ) = 0;
 
     virtual void initInstanced( const Type type, const size_t maxCount ) = 0;
 

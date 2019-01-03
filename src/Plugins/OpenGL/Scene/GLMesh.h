@@ -41,6 +41,7 @@ namespace Lore { namespace OpenGL {
     ~GLMesh() override;
 
     void init( const Type type ) override;
+    void init( const CustomMeshData& data ) override;
     void initInstanced( const Type type, const size_t maxCount ) override;
 
     void updateInstanced( const size_t idx, const glm::mat4& matrix ) override;

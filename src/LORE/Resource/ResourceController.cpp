@@ -33,6 +33,7 @@
 #include <LORE/Resource/Sprite.h>
 #include <LORE/Resource/StockResource.h>
 #include <LORE/Resource/Textbox.h>
+#include <LORE/Scene/IO/ModelLoader.h>
 #include <LORE/Scene/SpriteController.h> // TODO: This should be in resources?
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -328,6 +329,29 @@ TexturePtr Resource::LoadTexture( const string& name, const string& file, const 
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+EntityPtr Resource::LoadEntity( const string& name, const string& path, const string& groupName )
+{
+  auto rc = ActiveContext->getResourceController();
+  if ( rc->resourceExists<Entity>( name, groupName ) ) {
+    log_warning( "Entity " + name + " already exists, returning existing entity" );
+    return rc->get<Entity>( name, groupName );
+  }
+  auto entity = ActiveContext->getResourceController()->create<Entity>( name, groupName );
+
+  // Give the entity a material.
+  auto material = StockResource::GetMaterial( "StandardTextured3D" );
+  entity->setMaterial( material->clone( "StandardTextured3D_" + name ) );
+
+  // Load the specified model.
+  ModelLoader loader( groupName );
+  auto model = loader.load( path );
+  entity->setModel( model );
+
+  return entity;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 BoxPtr Resource::CreateBox( const string& name, const string& groupName )
 {
   return ActiveContext->getResourceController()->create<Box>( name, groupName );
@@ -339,7 +363,7 @@ EntityPtr Resource::CreateEntity( const string& name, const Mesh::Type& modelTyp
 {
   auto rc = ActiveContext->getResourceController();
   if ( rc->resourceExists<Entity>( name, groupName ) ) {
-    log_information( "Entity " + name + " already exists, returning existing entity" );
+    log_warning( "Entity " + name + " already exists, returning existing entity" );
     return rc->get<Entity>( name, groupName );
   }
   auto entity = ActiveContext->getResourceController()->create<Entity>( name, groupName );
