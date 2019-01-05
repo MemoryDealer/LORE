@@ -51,6 +51,8 @@ namespace Lore { namespace OpenGL {
 
     void bind( const uint32_t idx ) override;
 
+    void setDefaultActiveTexture() override;
+
     //
     // Getters.
 

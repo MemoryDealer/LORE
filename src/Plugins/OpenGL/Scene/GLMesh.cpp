@@ -26,6 +26,9 @@
 
 #include "GLMesh.h"
 
+#include <LORE/Resource/ResourceController.h>
+#include <LORE/Shader/GPUProgram.h>
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 using namespace Lore::OpenGL;
@@ -517,8 +520,25 @@ void GLMesh::updateInstanced( const size_t idx, const glm::mat4& matrix )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLMesh::draw( const size_t instanceCount )
+void GLMesh::draw( const Lore::GPUProgramPtr program, const size_t instanceCount )
 {
+  // Bind any textures that are assigned to this mesh.
+  const auto diffuseCount = _sprite.getTextureCount( Texture::Type::Diffuse );
+  const auto specularCount = _sprite.getTextureCount( Texture::Type::Specular );
+  int textureUnit = 0;
+  for ( int i = 0; i < diffuseCount; ++i ) {
+    auto texture = _sprite.getTexture( Texture::Type::Diffuse, i );
+    texture->bind( textureUnit );
+    program->setUniformVar( "material.diffuseTexture" + std::to_string( i ), textureUnit );
+    ++textureUnit;
+  }
+  for ( int i = 0; i < specularCount; ++i ) {
+    auto texture = _sprite.getTexture( Texture::Type::Specular, i );
+    texture->bind( textureUnit );
+    program->setUniformVar( "material.specularTexture" + std::to_string( i ), textureUnit );
+    ++textureUnit;
+  }
+
   glBindVertexArray( _vao );
   switch ( _type ) {
   default:

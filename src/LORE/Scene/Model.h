@@ -46,7 +46,7 @@ namespace Lore {
 
     void updateInstanced( const size_t idx, const glm::mat4& matrix );
 
-    void draw( const size_t instanceCount = 0 );
+    void draw( const GPUProgramPtr program, const size_t instanceCount = 0 );
     void draw( const Vertices& verts );
 
     void attachMesh( const MeshPtr mesh );

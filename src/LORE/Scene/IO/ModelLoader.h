@@ -40,13 +40,6 @@ namespace Lore {
 
   public:
 
-    struct Data
-    {
-
-    };
-
-  public:
-
     ModelLoader(const string& resourceGroupName);
     ~ModelLoader() = default;
 
@@ -56,6 +49,7 @@ namespace Lore {
 
     void _processNode( aiNode* node, const aiScene* scene );
     void _processMesh( aiMesh* mesh, const aiScene* scene );
+    void _processTexture( aiMaterial* material, const aiTextureType type, MeshPtr mesh );
 
   private:
 

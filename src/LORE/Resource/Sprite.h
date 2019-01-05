@@ -26,6 +26,7 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 #include <LORE/Resource/IResource.h>
+#include <LORE/Resource/Texture.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -49,27 +50,40 @@ namespace Lore {
     //
     // Modifiers.
 
-    void addTexture( const TexturePtr texture )
+    void addTexture( const Texture::Type type, const TexturePtr texture )
     {
-      _textures.push_back( texture );
+      _textures[type].push_back( texture );
+    }
+
+    void clearTextures()
+    {
+      _textures.clear();
     }
 
     //
     // Getters.
 
-    TexturePtr getTexture( const size_t idx ) const
+    TexturePtr getTexture( const Texture::Type type, const size_t idx ) const
     {
-      return _textures.at( idx );
+      auto it = _textures.find( type );
+      if ( _textures.end() != it ) {
+        return it->second.at( idx );
+      }
+      return nullptr;
     }
 
-    size_t getTextureCount() const
+    size_t getTextureCount( const Texture::Type type ) const
     {
-      return _textures.size();
+      auto it = _textures.find( type );
+      if ( _textures.end() != it ) {
+        return it->second.size();
+      }
+      return 0;
     }
 
   private:
 
-    TextureList _textures {};
+    std::map<Texture::Type, TextureList> _textures;
 
   };
 

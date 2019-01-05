@@ -279,7 +279,7 @@ void Forward3DRenderer::_renderSkybox( const RenderView& rv,
     const Skybox::Layer& layer = pair.second;
     MaterialPtr material = layer.getMaterial();
 
-    if ( material->sprite && material->sprite->getTextureCount() ) {
+    if ( material->sprite && material->sprite->getTextureCount( Texture::Type::Cubemap ) ) {
       RenderQueue::LightData emptyLightData; // Not needed for skybox.
 
       // Enable blending if set.
@@ -294,7 +294,7 @@ void Forward3DRenderer::_renderSkybox( const RenderView& rv,
       program->updateUniforms( rv, material, emptyLightData );
       // TODO: Pass in camera node when camera is updated to use a scene node.
       program->updateNodeUniforms( material, nullptr, viewProjection );
-      model->draw();
+      model->draw( program );
     }
   }
 
@@ -338,7 +338,7 @@ void Forward3DRenderer::_renderSolids( const RenderView& rv,
     program->updateUniforms( rv, material, queue.lights );
     program->updateNodeUniforms( material, node, viewProjection );
 
-    model->draw( entity->getInstanceCount() );
+    model->draw( program, entity->getInstanceCount() );
   }
 
   // Render non-instanced solids.
@@ -356,7 +356,7 @@ void Forward3DRenderer::_renderSolids( const RenderView& rv,
     // Render each node associated with this entity.
     for ( const auto& node : nodes ) {
       program->updateNodeUniforms( material, node, viewProjection );
-      model->draw();
+      model->draw( program );
     }
   }
 }
@@ -403,7 +403,7 @@ void Forward3DRenderer::_renderTransparents( const RenderView& rv,
     program->updateNodeUniforms( material, node, viewProjection );
 
     // Draw the entity.
-    model->draw( entity->getInstanceCount() );
+    model->draw( program, entity->getInstanceCount() );
   }
 
   _api->setBlendingEnabled( false );
@@ -435,7 +435,7 @@ void Forward3DRenderer::_renderBoxes( const RenderQueue& queue,
     modelMatrix[1][1] *= box->getHeight();
     program->setTransformVar( viewProjection * modelMatrix );
 
-    model->draw();
+    model->draw( program );
   }
 
   _api->setBlendingEnabled( false );

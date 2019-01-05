@@ -88,7 +88,7 @@ void StockResourceController::createStockResources()
     auto texture = _controller->create<Texture>( "White" );
     texture->create( 128, 128, StockColor::White );
     auto sprite = _controller->create<Sprite>( "White" );
-    sprite->addTexture( texture );
+    sprite->addTexture( Texture::Type::Diffuse, texture );
   }
 
   //
@@ -157,7 +157,7 @@ void StockResourceController::createRendererStockResources( const RendererType t
 
     srf->createUberProgram( "StandardTextured" + suffix, params );
 
-    params.numTextures = 0;
+    params.textured = false;
     srf->createUberProgram( "Standard" + suffix, params );
   }
 
@@ -168,7 +168,7 @@ void StockResourceController::createRendererStockResources( const RendererType t
 
     srf->createUberProgram( "UnlitTextured" + suffix, params );
 
-    params.numTextures = 0;
+    params.textured = false;
     srf->createUberProgram( "UnlitStandard" + suffix, params );
   }
 
@@ -179,7 +179,7 @@ void StockResourceController::createRendererStockResources( const RendererType t
 
     srf->createUberProgram( "StandardTexturedInstanced" + suffix, params );
 
-    params.numTextures = 0;
+    params.textured = false;
     srf->createUberProgram( "StandardInstanced" + suffix, params );
   }
 

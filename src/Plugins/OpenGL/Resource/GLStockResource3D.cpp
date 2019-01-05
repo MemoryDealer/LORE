@@ -47,7 +47,7 @@ GLStockResource3DFactory::GLStockResource3DFactory( Lore::ResourceControllerPtr 
 
 Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& name, const Lore::UberProgramParameters& params )
 {
-  const bool textured = ( params.numTextures > 0 );
+  const bool textured = params.textured;
   const bool lit = !!( params.maxDirectionalLights || params.maxPointLights );
   const bool instanced = params.instanced;
   const string header = "#version " +
@@ -154,8 +154,14 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
   // Material.
   src += "struct Material {";
-  src += "sampler2D diffuseTexture;";
-  src += "sampler2D specularTexture;";
+  if ( textured ) {
+    for ( uint32_t i = 0; i < params.maxDiffuseTextures; ++i ) {
+      src += "sampler2D diffuseTexture" + std::to_string( i ) + ";";
+    }
+    for ( uint32_t i = 0; i < params.maxSpecularTextures; ++i ) {
+      src += "sampler2D specularTexture" + std::to_string( i ) + ";";
+    }
+  }
   src += "vec4 ambient;";
   src += "vec4 diffuse;";
   src += "vec4 specular;";
@@ -205,6 +211,44 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     //
     // Light functions.
 
+    // Texture functions.
+
+    if ( textured ) {
+      src += "vec3 SampleDiffuseTextures() {";
+      {
+        src += "const float mixAmount = 0.5;";
+        for ( uint32_t i = 0; i < params.maxDiffuseTextures; ++i ) {
+          if ( 0 == i ) {
+            src += "vec3 diffuse0 = vec3(texture(material.diffuseTexture0, TexCoord + texSampleOffset));";
+          }
+          else {
+            src += "vec3 diffuse" + std::to_string(i) + " = mix(vec3(texture(material.diffuseTexture" + 
+              std::to_string(i) + ", TexCoord + texSampleOffset)), diffuse" + std::to_string(i - 1) + ", mixAmount);";
+          }
+        }
+
+        src += "return diffuse" + std::to_string( params.maxDiffuseTextures - 1 ) + ";";
+      }
+      src += "}";
+
+      src += "vec3 SampleSpecularTextures() {";
+      {
+        src += "const float mixAmount = 0.5;";
+        for ( uint32_t i = 0; i < 1; ++i ) {
+          if ( 0 == i ) {
+            src += "vec3 specular0 = vec3(texture(material.specularTexture0, TexCoord + texSampleOffset));";
+          }
+          else {
+            src += "vec3 specular" + std::to_string( i ) + " = mix(vec3(texture(material.specularTexture" +
+              std::to_string( i ) + ", TexCoord + texSampleOffset)), specular" + std::to_string( i - 1 ) + ", mixAmount);";
+          }
+        }
+
+        src += "return specular" + std::to_string( 0 ) + ";";
+      }
+      src += "}";
+    }
+
     //
     // Directional light.
 
@@ -221,9 +265,9 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
       // Combine results.
       if ( textured ) {
-        src += "vec3 ambient = light.ambient * vec3(texture(material.diffuseTexture, TexCoord + texSampleOffset));";
-        src += "vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuseTexture, TexCoord + texSampleOffset));";
-        src += "vec3 specular = light.specular * spec * vec3(texture(material.specularTexture, TexCoord + texSampleOffset));";
+        src += "vec3 ambient = light.ambient * SampleDiffuseTextures();";
+        src += "vec3 diffuse = light.diffuse * diff * SampleDiffuseTextures();";
+        src += "vec3 specular = light.specular * spec * SampleSpecularTextures();";
       }
       else {
         src += "vec3 ambient = light.ambient * vec3(material.ambient);";
@@ -254,9 +298,9 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
       // Combine results.
       if ( textured ) {
-        src += "vec3 ambient = light.ambient * vec3(texture(material.diffuseTexture, TexCoord + texSampleOffset));";
-        src += "vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuseTexture, TexCoord + texSampleOffset));";
-        src += "vec3 specular = light.specular * spec * vec3(texture(material.specularTexture, TexCoord + texSampleOffset));";
+        src += "vec3 ambient = light.ambient * SampleDiffuseTextures();";
+        src += "vec3 diffuse = light.diffuse * diff * SampleDiffuseTextures();";
+        src += "vec3 specular = light.specular * spec * SampleSpecularTextures();";
       }
       else {
         src += "vec3 ambient = light.ambient * vec3(material.ambient);";
@@ -303,7 +347,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     // Apply scene ambient lighting.
     if ( lit ) {
       if ( textured ) {
-        src += "result += sceneAmbient.xyz *  vec3(texture(material.diffuseTexture, TexCoord + texSampleOffset));";
+        src += "result += sceneAmbient.xyz *  SampleDiffuseTextures();";
       }
       else {
         src += "result += sceneAmbient.xyz * material.ambient.xyz;";
@@ -330,6 +374,9 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
   program->init();
   program->attachShader( vsptr );
   program->attachShader( fsptr );
+
+  program->setDiffuseSamplerCount( params.maxDiffuseTextures );
+  program->setSpecularSamplerCount( params.maxSpecularTextures );
 
   if ( !program->link() ) {
     throw Lore::Exception( "Failed to link GPUProgram " + name );
@@ -374,6 +421,13 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
   }
 
   if ( textured ) {
+    for ( uint32_t i = 0; i < params.maxDiffuseTextures; ++i ) {
+      program->addUniformVar( "material.diffuseTexture" + std::to_string( i ) );
+    }
+    for ( uint32_t i = 0; i < params.maxSpecularTextures; ++i ) {
+      program->addUniformVar( "material.specularTexture" + std::to_string( i ) );
+    }
+
     program->addUniformVar( "texSampleOffset" );
     program->addUniformVar( "texSampleRegion.x" );
     program->addUniformVar( "texSampleRegion.y" );
@@ -434,16 +488,27 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
                                  const NodePtr node,
                                  const glm::mat4& viewProjection ) {
     // Update texture data.
-    if ( material->sprite && material->sprite->getTextureCount() ) {
+    if ( material->sprite ) {
       size_t spriteFrame = 0;
       const auto spc = node->getSpriteController();
       if ( spc ) {
         spriteFrame = spc->getActiveFrame();
       }
 
-      const TexturePtr texture = material->sprite->getTexture( spriteFrame );
-      texture->bind( 0 ); // TODO: Multi-texturing.
-      texture->bind( 1 );
+      auto sprite = material->sprite;
+      int textureUnit = 0;
+      for ( int i = 0; i < sprite->getTextureCount( Texture::Type::Diffuse ); ++i ) {
+        auto texture = sprite->getTexture( Texture::Type::Diffuse, i );
+        texture->bind( textureUnit );
+        program->setUniformVar( "material.diffuseTexture" + std::to_string( i ), textureUnit );
+        ++textureUnit;
+      }
+      for ( int i = 0; i < sprite->getTextureCount( Texture::Type::Specular ); ++i ) {
+        auto texture = sprite->getTexture( Texture::Type::Specular, i );
+        texture->bind( textureUnit );
+        program->setUniformVar( "material.specularTexture" + std::to_string( i ), textureUnit );
+        ++textureUnit;
+      }
       program->setUniformVar( "texSampleOffset", material->getTexCoordOffset() );
 
       const Rect sampleRegion = material->getTexSampleRegion();
@@ -469,16 +534,27 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
                                 const NodePtr node,
                                 const glm::mat4& viewProjection ) {
     // Update texture data.
-    if ( material->sprite && material->sprite->getTextureCount() ) {
+    if ( material->sprite ) {
       size_t spriteFrame = 0;
       const auto spc = node->getSpriteController();
       if ( spc ) {
         spriteFrame = spc->getActiveFrame();
       }
 
-      const TexturePtr texture = material->sprite->getTexture( spriteFrame );
-      texture->bind( 0 ); // TODO: Multi-texturing.
-      texture->bind( 1 );
+      auto sprite = material->sprite;
+      int textureUnit = 0;
+      for ( int i = 0; i < sprite->getTextureCount( Texture::Type::Diffuse ); ++i ) {
+        auto texture = sprite->getTexture( Texture::Type::Diffuse, i );
+        texture->bind( textureUnit );
+        program->setUniformVar( "material.diffuseTexture" + std::to_string( i ), textureUnit );
+        ++textureUnit;
+      }
+      for ( int i = 0; i < sprite->getTextureCount( Texture::Type::Specular ); ++i ) {
+        auto texture = sprite->getTexture( Texture::Type::Specular, i );
+        texture->bind( textureUnit );
+        program->setUniformVar( "material.specularTexture" + std::to_string( i ), textureUnit );
+        ++textureUnit;
+      }
       program->setUniformVar( "texSampleOffset", material->getTexCoordOffset() );
 
       const Rect sampleRegion = material->getTexSampleRegion();
@@ -615,7 +691,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createSkyboxProgram( const string&
                                 const NodePtr node,
                                 const glm::mat4& viewProjection ) {
     program->setUniformVar( "viewProjection", viewProjection );
-    auto texture = material->sprite->getTexture( 0 );
+    auto texture = material->sprite->getTexture( Texture::Type::Cubemap, 0 );
     texture->bind();
   };
 
@@ -754,7 +830,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createEnvironmentMappingProgram( c
     auto model = node->getFullTransform();
     program->setUniformVar( "model", model );
     program->setUniformVar( "viewProjection", viewProjection );
-    auto texture = material->sprite->getTexture( 0 );
+    auto texture = material->sprite->getTexture( Texture::Type::Cubemap, 0 );
     texture->bind();
   };
 

@@ -26,6 +26,8 @@
 
 #include "ModelLoader.h"
 
+#include <LORE/Resource/Material.h>
+#include <LORE/Resource/Sprite.h>
 #include <LORE/Resource/ResourceController.h>
 #include <LORE/Util/FileUtils.h>
 
@@ -36,7 +38,7 @@ using namespace Lore;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 ModelLoader::ModelLoader( const string& resourceGroupName )
-  : _resourceGroupName(resourceGroupName)
+: _resourceGroupName( resourceGroupName )
 {
 }
 
@@ -98,7 +100,8 @@ void ModelLoader::_processMesh( aiMesh* mesh, const aiScene* scene )
 
     // Texture coordinates.
     if ( mesh->mTextureCoords[0] ) {
-      vertex.texCoords = glm::vec2( mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y );
+      // Flip Y coordinate value to account for STBI flipping during load.
+      vertex.texCoords = glm::vec2( mesh->mTextureCoords[0][i].x, -mesh->mTextureCoords[0][i].y );
     }
 
     // Tangents and bitangents.
@@ -117,17 +120,57 @@ void ModelLoader::_processMesh( aiMesh* mesh, const aiScene* scene )
     }
   }
 
-  // Process material and load the associated textures.
-  if ( _loadTextures ) {
-    if ( mesh->mMaterialIndex >= 0 ) {
-      // ...
-    }
-  }
-
   // Create a LORE mesh and attach it to the model.
   auto loreMesh = Resource::CreateMesh( _name + "." + mesh->mName.C_Str(), Mesh::Type::Custom, _resourceGroupName );
   loreMesh->init( data );
   _model->attachMesh( loreMesh );
+
+  // Process material and load the associated textures.
+  if ( _loadTextures ) {
+    if ( mesh->mMaterialIndex >= 0 ) {
+      aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+      _processTexture( material, aiTextureType_DIFFUSE, loreMesh );
+      _processTexture( material, aiTextureType_SPECULAR, loreMesh );
+    }
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void ModelLoader::_processTexture( aiMaterial* material, const aiTextureType type, MeshPtr mesh )
+{
+  auto ConvertTextureType = [] ( const aiTextureType type ) {
+    switch ( type ) {
+    default:
+    case aiTextureType_DIFFUSE:
+      return Texture::Type::Diffuse;
+
+    case aiTextureType_SPECULAR:
+      return Texture::Type::Specular;
+    }
+  };
+
+  for ( uint32_t i = 0; i < material->GetTextureCount( type ); ++i ) {
+    aiString str;
+    material->GetTexture( type, i, &str );
+
+    // Load the texture into the resource group.
+    const string texturePath = str.C_Str();
+    const string textureName = Util::GetFileName( texturePath );
+
+    auto rc = Resource::GetResourceController();
+    if ( !rc->resourceExists<Texture>( textureName, _resourceGroupName ) ) {
+      // Create the LORE texture and add it to the provided material's sprite.
+      auto texture = rc->create<Texture>( textureName, _resourceGroupName );
+      texture->loadFromFile( _directory + "/" + texturePath );
+      mesh->getSprite()->addTexture( ConvertTextureType(type), texture );
+
+      log_information( "Texture " + textureName + " loaded for model " + _name );
+    }
+    else {
+      log_warning( "Tried loading texture " + textureName + " which already exists" );
+    }
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

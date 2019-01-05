@@ -306,7 +306,7 @@ void Forward2DRenderer::renderSkybox( const RenderView& rv,
     const Skybox::Layer& layer = pair.second;
     MaterialPtr mat = layer.getMaterial();
 
-    if ( mat->sprite && mat->sprite->getTextureCount() ) {
+    if ( mat->sprite && mat->sprite->getTextureCount( Texture::Type::Diffuse ) ) {
       GPUProgramPtr program = mat->program;
 
       // Enable blending if set.
@@ -321,7 +321,7 @@ void Forward2DRenderer::renderSkybox( const RenderView& rv,
         spriteFrame = layer.getSpriteController()->getActiveFrame();
       }
 
-      TexturePtr texture = mat->sprite->getTexture( spriteFrame );
+      TexturePtr texture = mat->sprite->getTexture( Texture::Type::Diffuse, spriteFrame );
       program->use();
       texture->bind();
 
@@ -345,7 +345,7 @@ void Forward2DRenderer::renderSkybox( const RenderView& rv,
       transform[3][2] = layer.getDepth();
       program->setTransformVar( proj * transform );
 
-      model->draw();
+      model->draw( program );
     }
 
     if ( mat->blendingMode.enabled ) {
@@ -387,7 +387,7 @@ void Forward2DRenderer::renderSolids( const RenderView& rv,
     program->updateUniforms( rv, material, queue.lights );
     program->updateNodeUniforms( material, node, viewProjection );
 
-    model->draw( entity->getInstanceCount() );
+    model->draw( program, entity->getInstanceCount() );
   }
 
   // Render non-instanced solids.
@@ -405,7 +405,7 @@ void Forward2DRenderer::renderSolids( const RenderView& rv,
     // Render each node associated with this entity.
     for ( const auto& node : nodes ) {
       program->updateNodeUniforms( material, node, viewProjection );
-      model->draw();
+      model->draw( program );
     }
   }
 }
@@ -454,7 +454,7 @@ void Forward2DRenderer::renderTransparents( const RenderView& rv,
     program->updateNodeUniforms( material, node, viewProjection );
 
     // Draw the entity.
-    model->draw( entity->getInstanceCount() );
+    model->draw( program, entity->getInstanceCount() );
   }
 
   _api->setBlendingEnabled( false );
@@ -486,7 +486,7 @@ void Forward2DRenderer::renderBoxes( const RenderQueue& queue,
     modelMatrix[1][1] *= box->getHeight();
     program->setTransformVar( viewProjection * modelMatrix );
 
-    model->draw();
+    model->draw( program );
   }
 
   _api->setBlendingEnabled( false );

@@ -38,7 +38,9 @@ namespace Lore {
   {
     uint32_t maxDirectionalLights { 2 };
     uint32_t maxPointLights { 8 };
-    uint32_t numTextures { 1 };
+    uint32_t maxDiffuseTextures { 8 };
+    uint32_t maxSpecularTextures { 8 };
+    bool textured { true };
     bool instanced { false };
   };
 

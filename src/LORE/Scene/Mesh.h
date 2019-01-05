@@ -27,6 +27,7 @@
 
 #include <LORE/Memory/Alloc.h>
 #include <LORE/Resource/IResource.h>
+#include <LORE/Resource/Sprite.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -89,18 +90,20 @@ namespace Lore {
     virtual ~Mesh() = default;
 
     virtual void init( const Type type ) = 0;
-
     virtual void init( const CustomMeshData& data ) = 0;
-
     virtual void initInstanced( const Type type, const size_t maxCount ) = 0;
 
     virtual void updateInstanced( const size_t idx, const glm::mat4& matrix ) = 0;
 
     void addAttribute( const AttributeType& type, const uint size );
 
-    virtual void draw( const size_t instanceCount = 0 ) = 0;
-
+    virtual void draw( const GPUProgramPtr program, const size_t instanceCount = 0 ) = 0;
     virtual void draw( const Vertices& verts ) = 0;
+
+    //
+    // Accessors.
+
+    SpritePtr getSprite();
 
     Type getType() const;
 
@@ -114,8 +117,17 @@ namespace Lore {
 
   protected:
 
-    Type _type;
-    std::vector<Attribute> _attributes;
+    using TextureList = std::vector<TexturePtr>;
+
+  protected:
+
+    Type _type { Type::Custom };
+    std::vector<Attribute> _attributes {};
+
+    // A mesh can have its own sprite that overrides the material's sprite.
+    // Note it is not allocated via the ResourceController but is explicitly
+    // owned by the Mesh.
+    Sprite _sprite {};
 
   };
 

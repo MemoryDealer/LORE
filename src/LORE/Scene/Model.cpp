@@ -53,10 +53,10 @@ void Model::updateInstanced( const size_t idx, const glm::mat4& matrix )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Model::draw( const size_t instanceCount )
+void Model::draw( const GPUProgramPtr program, const size_t instanceCount )
 {
   for ( const auto& mesh : _meshes ) {
-    mesh->draw( instanceCount );
+    mesh->draw( program, instanceCount );
   }
 }
 

@@ -102,6 +102,9 @@ void Game::loadScene()
   loader.process( "res/demo3d/demo3d.scene", _scene );
 
   // Add some cubes to test instanced rendering.
+  auto material = Lore::Resource::GetEntity( "CheckeredCube", "Demo3D" )->getMaterial();
+  material->sprite->addTexture( Lore::Texture::Type::Specular, Lore::Resource::GetTexture( "criminal-impact_dn" ) );
+  material->sprite->addTexture( Lore::Texture::Type::Diffuse, Lore::Resource::GetTexture( "criminal-impact_dn" ) );
   for ( int i = 1; i < 450; ++i ) {
     std::string cubeName = "cube" + std::to_string(i);
     Lore::NodePtr node = _scene->createNode( cubeName );

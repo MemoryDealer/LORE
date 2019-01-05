@@ -88,6 +88,20 @@ void GPUProgram::updateNodeUniforms( const MaterialPtr material,
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+uint32_t GPUProgram::getDiffuseSamplerCount() const
+{
+  return _diffuseSamplerCount;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+uint32_t GPUProgram::getSpecularSamplerCount() const
+{
+  return _specularSamplerCount;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void GPUProgram::setUniformUpdater( const UniformUpdater updater )
 {
   _uniformUpdater = updater;
@@ -98,6 +112,20 @@ void GPUProgram::setUniformUpdater( const UniformUpdater updater )
 void GPUProgram::setUniformNodeUpdater( const UniformNodeUpdater updater )
 {
   _uniformNodeUpdater = updater;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GPUProgram::setDiffuseSamplerCount( const uint32_t count )
+{
+  _diffuseSamplerCount = count;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GPUProgram::setSpecularSamplerCount( const uint32_t count )
+{
+  _specularSamplerCount = count;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

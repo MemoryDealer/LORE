@@ -47,7 +47,7 @@ GLStockResource2DFactory::GLStockResource2DFactory( Lore::ResourceControllerPtr 
 
 Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& name, const Lore::UberProgramParameters& params )
 {
-  const bool textured = ( params.numTextures > 0 );
+  const bool textured = params.textured;
   const bool lit = !!( params.maxDirectionalLights || params.maxPointLights );
   const bool instanced = params.instanced;
   const string header = "#version " +
@@ -327,14 +327,14 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
                                 const glm::mat4& viewProjection ) {
 
     // Update texture data.
-    if ( material->sprite && material->sprite->getTextureCount() ) {
+    if ( material->sprite && material->sprite->getTextureCount( Texture::Type::Diffuse ) ) {
       size_t spriteFrame = 0;
       const auto spc = node->getSpriteController();
       if ( spc ) {
         spriteFrame = spc->getActiveFrame();
       }
 
-      const TexturePtr texture = material->sprite->getTexture( spriteFrame );
+      const TexturePtr texture = material->sprite->getTexture( Texture::Type::Diffuse, spriteFrame );
       texture->bind( 0 ); // TODO: Multi-texturing.
       texture->bind( 1 );
       program->setUniformVar( "texSampleOffset", material->getTexCoordOffset() );
@@ -363,14 +363,14 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
                                          const NodePtr node,
                                          const glm::mat4& viewProjection ) {
     // Update texture data.
-    if ( material->sprite && material->sprite->getTextureCount() ) {
+    if ( material->sprite && material->sprite->getTextureCount( Texture::Type::Diffuse ) ) {
       size_t spriteFrame = 0;
       const auto spc = node->getSpriteController();
       if ( spc ) {
         spriteFrame = spc->getActiveFrame();
       }
 
-      const TexturePtr texture = material->sprite->getTexture( spriteFrame );
+      const TexturePtr texture = material->sprite->getTexture( Texture::Type::Diffuse, spriteFrame );
       texture->bind( 0 ); // TODO: Multi-texturing.
       texture->bind( 1 );
       program->setUniformVar( "texSampleOffset", material->getTexCoordOffset() );

@@ -340,7 +340,8 @@ EntityPtr Resource::LoadEntity( const string& name, const string& path, const st
 
   // Give the entity a material.
   auto material = StockResource::GetMaterial( "StandardTextured3D" );
-  entity->setMaterial( material->clone( "StandardTextured3D_" + name ) );
+  auto entityMaterial = material->clone( "StandardTextured3D_" + name );
+  entity->setMaterial( entityMaterial );
 
   // Load the specified model.
   ModelLoader loader( groupName );
