@@ -276,8 +276,8 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       src += "float diff = max(dot(normal, lightDir), 0.0);";
 
       // Specular shading.
-      src += "vec3 reflectDir = reflect(-lightDir, normal);";
-      src += "float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);";
+      src += "vec3 halfwayVec = normalize(lightDir + viewDir);";
+      src += "float spec = pow(max(dot(normal, halfwayVec), 0.0), material.shininess);";
 
       // Attenuation.
       src += "float distance = length(light.pos - FragPos);";

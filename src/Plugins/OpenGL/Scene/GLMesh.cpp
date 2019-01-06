@@ -515,7 +515,12 @@ void GLMesh::initInstanced( const Type type, const size_t maxCount )
 
 void GLMesh::updateInstanced( const size_t idx, const glm::mat4& matrix )
 {
-  _instancedMatrices[idx] = matrix;
+  if ( idx < _instancedMatrices.size() ) {
+    _instancedMatrices[idx] = matrix;
+  }
+  else {
+    throw Lore::Exception( "Instancing index " + std::to_string( idx ) + " too large for mesh " + getName() );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
