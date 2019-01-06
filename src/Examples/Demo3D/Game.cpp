@@ -101,16 +101,18 @@ void Game::loadScene()
   Lore::SceneLoader loader;
   loader.process( "res/demo3d/demo3d.scene", _scene );
 
-  // Add some cubes to test instanced rendering.
-  auto material = Lore::Resource::GetEntity( "CheckeredCube", "Demo3D" )->getMaterial();
-  material->sprite->addTexture( Lore::Texture::Type::Specular, Lore::Resource::GetTexture( "criminal-impact_dn" ) );
-  material->sprite->addTexture( Lore::Texture::Type::Diffuse, Lore::Resource::GetTexture( "criminal-impact_dn" ) );
-  material->sprite->addTexture( Lore::Texture::Type::Diffuse, Lore::Resource::GetTexture( "criminal-impact_up" ) );
-  for ( int i = 1; i < 450; ++i ) {
-    std::string cubeName = "cube" + std::to_string(i);
-    Lore::NodePtr node = _scene->createNode( cubeName );
-    node->attachObject( Lore::Resource::GetEntity( "CheckeredCube", "Demo3D" ) );
-    node->setPosition( i * 5.f, 0.f, 0.f );
+  // Create wood flooring.
+  auto woodEntity = Lore::Resource::GetEntity( "WoodQuad", "Demo3D" );
+  constexpr Lore::real WoodFloorScale = 5.f;
+  constexpr int WoodFloorGridSize = 8;
+  for ( int i = -( WoodFloorGridSize / 2 ); i < ( WoodFloorGridSize / 2 ); ++i ) {
+    for ( int j = -( WoodFloorGridSize / 2 ); j < ( WoodFloorGridSize / 2 ); ++j ) {
+      auto node = _scene->createNode( "wood-floor" + std::to_string( i ) + std::to_string( j ) );
+      node->attachObject( woodEntity );
+      node->setPosition( static_cast<Lore::real>( i ) * WoodFloorScale, 0.f, static_cast<Lore::real>( j ) * WoodFloorScale );
+      node->rotate( Lore::Vec3PosX, glm::radians( -90.f ) );
+      node->scale( WoodFloorScale );
+    }
   }
 }
 
@@ -119,7 +121,7 @@ void Game::loadScene()
 void Game::processInput()
 {
   // Player movement.
-  constexpr const Lore::real PlayerSpeed = 0.05f;
+  const Lore::real PlayerSpeed = ( Lore::Input::GetKeyState( Lore::Keycode::LeftShift ) ) ? 0.5f : 0.05f;
   glm::vec3 playerOffset( 0.f );
   if ( Lore::Input::GetKeyState( Lore::Keycode::W ) ) {
     playerOffset += PlayerSpeed * _camera->getTarget();
@@ -155,8 +157,8 @@ void Game::processInput()
 
 void Game::update()
 {
-  auto node = _scene->getNode( "Cube0" );
-  node->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( 0.001f ) );
+  //auto node = _scene->getNode( "Cube0" );
+  //node->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( 0.001f ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

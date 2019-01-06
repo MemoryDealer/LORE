@@ -332,6 +332,12 @@ void SceneLoader::_processMaterialSettings( const SerializerValue& value, Entity
     material->specular = glm::vec4( specular.toVec3(), 1.f );
   }
 
+  // Other properties.
+  const auto& shininess = value.getValue( "Shininess" );
+  if ( !shininess.isNull() ) {
+    material->shininess = shininess.toReal();
+  }
+
   // Scrolling.
   const auto& scrollSpeed = value.getValue( "ScrollSpeed" );
   if ( !scrollSpeed.isNull() ) {

@@ -40,6 +40,16 @@ namespace Lore {
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+  static const auto Vec3Zero = glm::vec3( 0.f, 0.f, 0.f );
+  static const auto Vec3PosX = glm::vec3( 1.f, 0.f, 0.f );
+  static const auto Vec3PosY = glm::vec3( 0.f, 1.f, 0.f );
+  static const auto Vec3PosZ = glm::vec3( 0.f, 0.f, 1.f );
+  static const auto Vec3NegX = glm::vec3( -1.f, 0.f, 0.f );
+  static const auto Vec3NegY = glm::vec3( 0.f, -1.f, 0.f );
+  static const auto Vec3NegZ = glm::vec3( 0.f, 0.f, -1.f );
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
   namespace Math {
 
     inline static glm::mat4 CreateTransformationMatrix( const glm::vec3& pos,
