@@ -28,16 +28,15 @@
 #include <LORE/Memory/Alloc.h>
 #include <LORE/Resource/Font.h>
 #include <LORE/Resource/Material.h>
-#include <LORE/Resource/Mesh.h>
 #include <LORE/Resource/IO/ResourceIndexer.h>
 #include <LORE/Resource/IO/SerializableResource.h>
 #include <LORE/Resource/IResource.h>
 #include <LORE/Resource/Registry.h>
 #include <LORE/Resource/Texture.h>
 #include <LORE/Scene/Camera.h>
+#include <LORE/Scene/Model.h>
 #include <LORE/Shader/GPUProgram.h>
 #include <LORE/Shader/Shader.h>
-#include <LORE/Shader/VertexBuffer.h>
 #include <LORE/Window/RenderTarget.h>
 #include <LORE/UI/UI.h>
 #include <LORE/Util/Util.h>
@@ -255,6 +254,9 @@ namespace Lore {
     static TexturePtr LoadTexture( const string& name,
                                    const string& file,
                                    const string& groupName = ResourceController::DefaultGroupName );
+    static EntityPtr LoadEntity( const string& name,
+                                 const string& path,
+                                 const string& groupName = ResourceController::DefaultGroupName );
 
     //
     // Factory functions for creation of resources.
@@ -262,15 +264,18 @@ namespace Lore {
     static BoxPtr CreateBox( const string& name,
                              const string& groupname = ResourceController::DefaultGroupName );
     static EntityPtr CreateEntity( const string& name,
-                                   const VertexBuffer::Type& vbType,
+                                   const Mesh::Type& modelType,
                                    const string& groupName = ResourceController::DefaultGroupName );
     static GPUProgramPtr CreateGPUProgram( const string& name,
                                            const string& groupName = ResourceController::DefaultGroupName );
     static MaterialPtr CreateMaterial( const string& name,
                                        const string& groupName = ResourceController::DefaultGroupName );
     static MeshPtr CreateMesh( const string& name,
-                               const VertexBuffer::Type& vbType,
+                               const Mesh::Type& type,
                                const string& groupName = ResourceController::DefaultGroupName );
+    static ModelPtr CreateModel( const string& name,
+                                 const Mesh::Type& type,
+                                 const string& groupName = ResourceController::DefaultGroupName );
     static RenderTargetPtr CreateRenderTarget( const string& name,
                                                const uint32_t width,
                                                const uint32_t height,
@@ -291,9 +296,6 @@ namespace Lore {
                                      const string& groupname = ResourceController::DefaultGroupName );
     static UIPtr CreateUI( const string& name,
                            const string& groupName = ResourceController::DefaultGroupName );
-    static VertexBufferPtr CreateVertexBuffer( const string& name,
-                                               const VertexBuffer::Type& type,
-                                               const string& groupName = ResourceController::DefaultGroupName );
 
     //
     // Getters.
@@ -310,6 +312,8 @@ namespace Lore {
                                     const string& groupName = ResourceController::DefaultGroupName );
     static MeshPtr GetMesh( const string& name,
                             const string& groupName = ResourceController::DefaultGroupName );
+    static ModelPtr GetModel( const string& name,
+                              const string& groupName = ResourceController::DefaultGroupName );
     static RenderTargetPtr GetRenderTarget( const string& name,
                                             const string& groupName = ResourceController::DefaultGroupName );
     static ShaderPtr GetShader( const string& name,
@@ -324,8 +328,6 @@ namespace Lore {
                                   const string& groupName = ResourceController::DefaultGroupName );
     static UIPtr GetUI( const string& name,
                         const string& groupName = ResourceController::DefaultGroupName );
-    static VertexBufferPtr GetVertexBuffer( const string& name,
-                                            const string& groupName = ResourceController::DefaultGroupName );
 
     //
     // Destruction methods.
@@ -336,6 +338,7 @@ namespace Lore {
     static void DestroyGPUProgram( GPUProgramPtr program );
     static void DestroyMaterial( MaterialPtr material );
     static void DestroyMesh( MeshPtr mesh );
+    static void DestroyModel( ModelPtr model );
     static void DestroyRenderTarget( RenderTargetPtr rt );
     static void DestroyShader( ShaderPtr shader );
     static void DestroySprite( SpritePtr sprite );
@@ -343,7 +346,6 @@ namespace Lore {
     static void DestroyTexture( TexturePtr texture );
     static void DestroyTextbox( TextboxPtr textbox );
     static void DestroyUI( UIPtr ui );
-    static void DestroyVertexBuffer( VertexBufferPtr vb );
 
     static void DestroyEntitiesInGroup( const string& groupName );
 

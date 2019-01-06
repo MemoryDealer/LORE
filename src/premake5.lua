@@ -9,9 +9,10 @@ debugdir "../bin/%{cfg.buildcfg}/Run"
 includedirs { ".",
               "%{prj.location}",
               "%{sln.location}/External",
+              "%{sln.location}/External/assimp/include",
               "%{sln.location}/External/freetype2",
-              "%{sln.location}/External/rapidjson/include",
               "%{sln.location}/External/glm",
+              "%{sln.location}/External/rapidjson/include",
               "%{sln.location}/Plugins/ThirdParty"
             }
 libdirs { "../lib/x64/%{cfg.buildcfg}" }
@@ -23,7 +24,7 @@ characterset ( "MBCS" )
 
 solution "LORE"
     configurations { "Debug", "Release" }
-    startproject "Example_ComplexScene"
+    startproject "Demo3D"
 
 --
 -- Configurations
@@ -59,6 +60,7 @@ project "LORE"
     files {
         "LORE/**.h", "LORE/**.cpp", "LORE/**.inl"
     }
+    links { "assimp-vc140-mt" }
     postbuildcommands { "{COPY} ../../res/ ../../bin/%{cfg.buildcfg}/Run/res/" }
 
 project "Plugin_OpenGL"

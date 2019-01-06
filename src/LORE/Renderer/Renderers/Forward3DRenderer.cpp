@@ -33,7 +33,6 @@
 #include <LORE/Resource/Entity.h>
 #include <LORE/Renderer/IRenderAPI.h>
 #include <LORE/Resource/Font.h>
-#include <LORE/Resource/Mesh.h>
 #include <LORE/Resource/Sprite.h>
 #include <LORE/Resource/StockResource.h>
 #include <LORE/Resource/Textbox.h>
@@ -271,8 +270,7 @@ void Forward3DRenderer::_renderSkybox( const RenderView& rv,
                                        const glm::mat4& viewProjection ) const
 {
   SkyboxPtr skybox = rv.scene->getSkybox();
-  VertexBufferPtr vb = StockResource::GetVertexBuffer( "Skybox3D" );
-  vb->bind();
+  ModelPtr model = StockResource::GetModel( "Skybox3D" );
 
   _api->setDepthMaskEnabled( false );
 
@@ -281,29 +279,24 @@ void Forward3DRenderer::_renderSkybox( const RenderView& rv,
     const Skybox::Layer& layer = pair.second;
     MaterialPtr material = layer.getMaterial();
 
-    if ( material->sprite && material->sprite->getTextureCount() ) {
-      RenderQueue::LightData emptyLightData; // Not needed for skybox.
+    RenderQueue::LightData emptyLightData; // Not needed for skybox.
 
-      // Enable blending if set.
-      if ( material->blendingMode.enabled ) {
-        _api->setBlendingEnabled( true );
-        _api->setBlendingFunc( material->blendingMode.srcFactor, material->blendingMode.dstFactor );
-      }
-
-      // Setup GPUProgram.
-      GPUProgramPtr program = material->program;
-      program->use();
-      program->updateUniforms( rv, material, emptyLightData );
-      // TODO: Pass in camera node when camera is updated to use a scene node.
-      program->updateNodeUniforms( material, nullptr, viewProjection );
-      vb->draw();
+    // Enable blending if set.
+    if ( material->blendingMode.enabled ) {
+      _api->setBlendingEnabled( true );
+      _api->setBlendingFunc( material->blendingMode.srcFactor, material->blendingMode.dstFactor );
     }
+
+    // Setup GPUProgram.
+    GPUProgramPtr program = material->program;
+    program->use();
+    program->updateUniforms( rv, material, emptyLightData );
+    // TODO: Pass in camera node when camera is updated to use a scene node.
+    program->updateNodeUniforms( material, nullptr, viewProjection );
+    model->draw( program );
   }
 
   _api->setDepthMaskEnabled( true );
-
-
-  vb->unbind();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -317,35 +310,33 @@ void Forward3DRenderer::_renderSolids( const RenderView& rv,
   // Render instanced solids.
   for ( const auto& entity : queue.instancedSolids ) {
     MaterialPtr material = entity->getMaterial();
-    VertexBufferPtr vertexBuffer = entity->getInstancedVertexBuffer();
+    ModelPtr model = entity->getInstancedModel();
     GPUProgramPtr program = nullptr;
 
     const NodePtr node = entity->getInstanceControllerNode();
 
-    // Acquire the correct GPUProgram for this instanced vertex buffer type.
-    switch ( vertexBuffer->getType() ) {
+    // Acquire the correct GPUProgram for this instanced model type.
+    switch ( model->getType() ) {
     default:
-      throw Lore::Exception( "Instanced entity must have an instanced vertex buffer" );
+      throw Lore::Exception( "Instanced entity must have an instanced model" );
 
-    case VertexBuffer::Type::Quad3DInstanced:
-    case VertexBuffer::Type::CubeInstanced:
+    case Mesh::Type::Quad3DInstanced:
+    case Mesh::Type::CubeInstanced:
       program = StockResource::GetGPUProgram( "StandardInstanced3D" );
       break;
 
-    case VertexBuffer::Type::TexturedQuad3DInstanced:
-    case VertexBuffer::Type::TexturedCubeInstanced:
+    case Mesh::Type::TexturedQuad3DInstanced:
+    case Mesh::Type::TexturedCubeInstanced:
       program = StockResource::GetGPUProgram( "StandardTexturedInstanced3D" );
       break;
     }
 
-    vertexBuffer->bind();
     program->use();
 
     program->updateUniforms( rv, material, queue.lights );
     program->updateNodeUniforms( material, node, viewProjection );
 
-    vertexBuffer->draw( entity->getInstanceCount() );
-    vertexBuffer->unbind();
+    model->draw( program, entity->getInstanceCount() );
   }
 
   // Render non-instanced solids.
@@ -354,21 +345,17 @@ void Forward3DRenderer::_renderSolids( const RenderView& rv,
     const RenderQueue::NodeList& nodes = pair.second;
 
     const MaterialPtr material = entity->getMaterial();
-    const VertexBufferPtr vertexBuffer = entity->getMesh()->getVertexBuffer();
+    const ModelPtr model = entity->getModel();
     const GPUProgramPtr program = material->program;
 
-    vertexBuffer->bind();
     program->use();
     program->updateUniforms( rv, material, queue.lights );
 
     // Render each node associated with this entity.
     for ( const auto& node : nodes ) {
       program->updateNodeUniforms( material, node, viewProjection );
-      vertexBuffer->draw();
+      model->draw( program );
     }
-
-    // Rendering this entity is complete.
-    vertexBuffer->unbind();
   }
 }
 
@@ -387,20 +374,20 @@ void Forward3DRenderer::_renderTransparents( const RenderView& rv,
 
     const MaterialPtr material = entity->getMaterial();
     GPUProgramPtr program = material->program;
-    VertexBufferPtr vertexBuffer = entity->getMesh()->getVertexBuffer();
+    ModelPtr model = entity->getModel();
 
     if ( entity->isInstanced() ) {
       node = entity->getInstanceControllerNode();
-      vertexBuffer = entity->getInstancedVertexBuffer();
-      switch ( vertexBuffer->getType() ) {
+      model = entity->getInstancedModel();
+      switch ( model->getType() ) {
       default:
-        throw Lore::Exception( "Instanced entity must have an instanced vertex buffer" );
+        throw Lore::Exception( "Instanced entity must have an instanced model" );
 
-      case VertexBuffer::Type::QuadInstanced:
+      case Mesh::Type::QuadInstanced:
         program = StockResource::GetGPUProgram( "StandardInstanced2D" );
         break;
 
-      case VertexBuffer::Type::TexturedQuadInstanced:
+      case Mesh::Type::TexturedQuadInstanced:
         program = StockResource::GetGPUProgram( "StandardTexturedInstanced2D" );
         break;
       }
@@ -409,15 +396,12 @@ void Forward3DRenderer::_renderTransparents( const RenderView& rv,
     // Set blending mode using material settings.
     _api->setBlendingFunc( material->blendingMode.srcFactor, material->blendingMode.dstFactor );
 
-    vertexBuffer->bind();
-
     program->use();
     program->updateUniforms( rv, material, queue.lights );
     program->updateNodeUniforms( material, node, viewProjection );
 
     // Draw the entity.
-    vertexBuffer->draw( entity->getInstanceCount() );
-    vertexBuffer->unbind();
+    model->draw( program, entity->getInstanceCount() );
   }
 
   _api->setBlendingEnabled( false );
@@ -432,10 +416,9 @@ void Forward3DRenderer::_renderBoxes( const RenderQueue& queue,
   _api->setBlendingFunc( Material::BlendFactor::SrcAlpha, Material::BlendFactor::OneMinusSrcAlpha );
 
   GPUProgramPtr program = StockResource::GetGPUProgram( "StandardBox2D" );
-  VertexBufferPtr vb = StockResource::GetVertexBuffer( "TexturedQuad" );
+  ModelPtr model = StockResource::GetModel( "TexturedQuad" );
 
   program->use();
-  vb->bind();
 
   for ( const RenderQueue::BoxData& data : queue.boxes ) {
     BoxPtr box = data.box;
@@ -445,15 +428,14 @@ void Forward3DRenderer::_renderBoxes( const RenderQueue& queue,
     program->setUniformVar( "scale", glm::vec2( data.model[0][0], data.model[1][1] ) * box->getSize() );
 
     // Apply box scaling to final transform.
-    glm::mat4 model = data.model;
-    model[0][0] *= box->getWidth();
-    model[1][1] *= box->getHeight();
-    program->setTransformVar( viewProjection * model );
+    glm::mat4 modelMatrix = data.model;
+    modelMatrix[0][0] *= box->getWidth();
+    modelMatrix[1][1] *= box->getHeight();
+    program->setTransformVar( viewProjection * modelMatrix );
 
-    vb->draw();
+    model->draw( program );
   }
 
-  vb->unbind();
   _api->setBlendingEnabled( false );
 }
 
@@ -466,10 +448,9 @@ void Forward3DRenderer::_renderTextboxes( const RenderQueue& queue,
   _api->setBlendingFunc( Material::BlendFactor::SrcAlpha, Material::BlendFactor::OneMinusSrcAlpha );
 
   GPUProgramPtr program = StockResource::GetGPUProgram( "StandardText" );
-  VertexBufferPtr vb = StockResource::GetVertexBuffer( "StandardText" );
+  ModelPtr model = StockResource::GetModel( "StandardText" );
 
   program->use();
-  vb->bind();
 
   for ( auto& data : queue.textboxes ) {
     TextboxPtr textbox = data.textbox;
@@ -493,14 +474,13 @@ void Forward3DRenderer::_renderTextboxes( const RenderQueue& queue,
                                               scale );
       font->bindTexture( c );
 
-      vb->draw( vertices );
+      model->draw( vertices );
 
       x = font->advanceGlyphX( c, x, scale );
     }
 
   }
 
-  vb->unbind();
   _api->setBlendingEnabled( false );
 }
 

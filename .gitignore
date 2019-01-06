@@ -54,3 +54,5 @@ src/ipch
 # OSX
 *.DS_Store
 *Makefile*
+
+src/\.vs/LORE/v15/

@@ -160,20 +160,15 @@ void GLTexture::create( const int width, const int height, const Lore::Color& co
 
 void GLTexture::bind( const uint32_t idx )
 {
-  GLenum activeTexture;
-  switch ( idx ) {
-  default:
-  case 0:
-    activeTexture = GL_TEXTURE0;
-    break;
-
-  case 1:
-    activeTexture = GL_TEXTURE1;
-    break;
-  }
-
-  glActiveTexture(activeTexture);
+  glActiveTexture( GL_TEXTURE0 + idx );
   glBindTexture( _target, _id );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLTexture::setDefaultActiveTexture()
+{
+  glActiveTexture( GL_TEXTURE0 );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

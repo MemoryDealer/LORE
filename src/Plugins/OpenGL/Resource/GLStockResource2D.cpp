@@ -47,7 +47,7 @@ GLStockResource2DFactory::GLStockResource2DFactory( Lore::ResourceControllerPtr 
 
 Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& name, const Lore::UberProgramParameters& params )
 {
-  const bool textured = ( params.numTextures > 0 );
+  const bool textured = params.textured;
   const bool lit = !!( params.maxDirectionalLights || params.maxPointLights );
   const bool instanced = params.instanced;
   const string header = "#version " +
@@ -141,12 +141,15 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
   // Uniforms and ins.
 
   if ( textured ) {
-    src += "uniform sampler2D tex;";
-  }
-
-  if ( textured ) {
     src += "in vec2 TexCoord;";
     src += "uniform vec2 texSampleOffset = vec2(1.0, 1.0);";
+
+    for ( uint32_t i = 0; i < params.maxDiffuseTextures; ++i ) {
+      src += "uniform sampler2D diffuseTexture" + std::to_string( i ) + ";";
+    }
+    src += "uniform sampler2D specularTexture0;";
+
+    src += "uniform float diffuseMixValues[" + std::to_string( params.maxDiffuseTextures ) + "];";
   }
 
   // Material.
@@ -197,6 +200,33 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
     src += "}";
   }
 
+  // Texture functions.
+
+  if ( textured ) {
+    src += "vec4 SampleDiffuseTextures() {";
+    {
+      for ( uint32_t i = 0; i < params.maxDiffuseTextures; ++i ) {
+        if ( 0 == i ) {
+          src += "vec4 diffuse0 = texture(diffuseTexture0, TexCoord + texSampleOffset);";
+        }
+        else {
+          src += "vec4 diffuse" + std::to_string( i ) + " = mix(texture(diffuseTexture" +
+            std::to_string( i ) + ", TexCoord + texSampleOffset), diffuse" + std::to_string( i - 1 ) +
+            ", diffuseMixValues[" + std::to_string( i ) + "]);";
+        }
+      }
+
+      src += "return diffuse" + std::to_string( params.maxDiffuseTextures - 1 ) + ";";
+    }
+    src += "}";
+
+    src += "vec4 SampleSpecularTextures() {";
+    {
+      src += "return texture(specularTexture0, TexCoord + texSampleOffset);";
+    }
+    src += "}";
+  }
+
   //
   // main function.
 
@@ -206,7 +236,7 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
   src += "vec4 texSample = vec4(1.0, 1.0, 1.0, 1.0);";
 
   if ( textured ) {
-    src += "texSample = texture(tex, TexCoord + texSampleOffset);";
+    src += "texSample = SampleDiffuseTextures();";
     src += "if ( texSample.a < 0.1 ) {";
     src += "  discard;";
     src += "}";
@@ -245,6 +275,9 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
   program->attachShader( vsptr );
   program->attachShader( fsptr );
 
+  program->setDiffuseSamplerCount( params.maxDiffuseTextures );
+  program->setSpecularSamplerCount( params.maxSpecularTextures );
+
   if ( !program->link() ) {
     throw Lore::Exception( "Failed to link GPUProgram " + name );
   }
@@ -278,6 +311,12 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
   }
 
   if ( textured ) {
+    for ( uint32_t i = 0; i < params.maxDiffuseTextures; ++i ) {
+      program->addUniformVar( "diffuseTexture" + std::to_string( i ) );
+      program->addUniformVar( "diffuseMixValues[" + std::to_string( i ) + "]" );
+    }
+    program->addUniformVar( "specularTexture0" );
+
     program->addUniformVar( "texSampleOffset" );
     program->addUniformVar( "texSampleRegion.x" );
     program->addUniformVar( "texSampleRegion.y" );
@@ -327,16 +366,34 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
                                 const glm::mat4& viewProjection ) {
 
     // Update texture data.
-    if ( material->sprite && material->sprite->getTextureCount() ) {
+    if ( material->sprite ) {
       size_t spriteFrame = 0;
       const auto spc = node->getSpriteController();
       if ( spc ) {
         spriteFrame = spc->getActiveFrame();
       }
 
-      const TexturePtr texture = material->sprite->getTexture( spriteFrame );
-      texture->bind( 0 ); // TODO: Multi-texturing.
-      texture->bind( 1 );
+      auto sprite = material->sprite;
+      int textureUnit = 0;
+      const auto diffuseCount = sprite->getTextureCount( spriteFrame, Texture::Type::Diffuse );
+      for ( int i = 0; i < diffuseCount; ++i ) {
+        auto texture = sprite->getTexture( spriteFrame, Texture::Type::Diffuse, i );
+        texture->bind( textureUnit );
+        program->setUniformVar( "diffuseTexture" + std::to_string( i ), textureUnit );
+        ++textureUnit;
+      }
+      for ( int i = 0; i < sprite->getTextureCount( spriteFrame, Texture::Type::Specular ); ++i ) {
+        auto texture = sprite->getTexture( spriteFrame, Texture::Type::Specular, i );
+        texture->bind( textureUnit );
+        program->setUniformVar( "specularTexture" + std::to_string( i ), textureUnit );
+        ++textureUnit;
+      }
+      // Set mix values.
+      for ( int i = 0; i < static_cast< int >( program->getDiffuseSamplerCount() ); ++i ) {
+        program->setUniformVar( "diffuseMixValues[" + std::to_string( i ) + "]",
+                                sprite->getMixValue( spriteFrame, Texture::Type::Diffuse, i ) );
+      }
+
       program->setUniformVar( "texSampleOffset", material->getTexCoordOffset() );
 
       const Rect sampleRegion = material->getTexSampleRegion();
@@ -363,16 +420,34 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
                                          const NodePtr node,
                                          const glm::mat4& viewProjection ) {
     // Update texture data.
-    if ( material->sprite && material->sprite->getTextureCount() ) {
+    if ( material->sprite ) {
       size_t spriteFrame = 0;
       const auto spc = node->getSpriteController();
       if ( spc ) {
         spriteFrame = spc->getActiveFrame();
       }
 
-      const TexturePtr texture = material->sprite->getTexture( spriteFrame );
-      texture->bind( 0 ); // TODO: Multi-texturing.
-      texture->bind( 1 );
+      auto sprite = material->sprite;
+      int textureUnit = 0;
+      const auto diffuseCount = sprite->getTextureCount( spriteFrame, Texture::Type::Diffuse );
+      for ( int i = 0; i < diffuseCount; ++i ) {
+        auto texture = sprite->getTexture( spriteFrame, Texture::Type::Diffuse, i );
+        texture->bind( textureUnit );
+        program->setUniformVar( "diffuseTexture" + std::to_string( i ), textureUnit );
+        ++textureUnit;
+      }
+      for ( int i = 0; i < sprite->getTextureCount( spriteFrame, Texture::Type::Specular ); ++i ) {
+        auto texture = sprite->getTexture( spriteFrame, Texture::Type::Specular, i );
+        texture->bind( textureUnit );
+        program->setUniformVar( "specularTexture" + std::to_string( i ), textureUnit );
+        ++textureUnit;
+      }
+      // Set mix values.
+      for ( int i = 0; i < static_cast< int >( program->getDiffuseSamplerCount() ); ++i ) {
+        program->setUniformVar( "diffuseMixValues[" + std::to_string( i ) + "]",
+                                sprite->getMixValue( spriteFrame, Texture::Type::Diffuse, i ) );
+      }
+
       program->setUniformVar( "texSampleOffset", material->getTexCoordOffset() );
 
       const Rect sampleRegion = material->getTexSampleRegion();

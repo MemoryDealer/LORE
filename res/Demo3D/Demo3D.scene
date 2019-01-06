@@ -8,7 +8,7 @@
   },
   "Entity": {
     "CheckeredFloor": {
-      "VertexBufferType":"TexturedQuad",
+      "ModelType":"TexturedQuad",
       "Instanced": 50,
       "Sprite":"checkerboard",
       "MaterialSettings": {
@@ -16,7 +16,7 @@
       }
     },
     "CheckeredCube": {
-      "VertexBufferType":"TexturedCube",
+      "ModelType":"TexturedCube",
       "Instanced": 500,
       "Sprite":"checkerboard",
       "MaterialSettings": {
@@ -24,7 +24,13 @@
       }
     },
     "Light": {
-      "VertexBufferType": "Cube",
+      "ModelType": "Cube",
+      "MaterialSettings": {
+        "Ambient": [1.0, 1.0, 1.0]
+      }
+    },
+    "Nanosuit": {
+      "Model": "res/Demo3D/Models/nanosuit/nanosuit.obj",
       "MaterialSettings": {
         "Ambient": [1.0, 1.0, 1.0]
       }
@@ -40,8 +46,8 @@
     "PointLight0": {
       "Type": "Point",
       "Ambient": [0.05, 0.05, 0.05],
-      "Diffuse": [0.0, 1.0, 0.0],
-      "Specular": [0.0, 1.0, 0.0],
+      "Diffuse": [1.0, 1.0, 1.0],
+      "Specular": [1.0, 1.0, 1.0],
       "Attenuation": [10.5, 0.5, 0.25, 0.01]
     }
   },
@@ -69,6 +75,11 @@
         "Light": "PointLight0",
         "Position": [0.0, 7.5, 0.0],
         "Scale": 0.25
+      },
+      "Nanosuit": {
+        "Entity": "Nanosuit",
+        "Position": [0.0, 2.0, -8.0],
+        "Scale": 1.0
       }
     }
   }

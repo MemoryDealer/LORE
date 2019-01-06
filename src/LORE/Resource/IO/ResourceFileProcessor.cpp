@@ -153,7 +153,7 @@ void ResourceFileProcessor::load( const string& groupName, ResourceControllerPtr
 
     // Automatically create a sprite of the same name as well.
     auto sprite = resourceController->create<Sprite>( name );
-    sprite->addTexture( cubemap );
+    sprite->addTexture( Texture::Type::Cubemap, cubemap );
   } break;
 
   case SerializableResource::SpriteAnimation: {
@@ -264,14 +264,15 @@ void ResourceFileProcessor::processSpriteList( const string& groupName, Resource
       }
 
       // Retrieve all textures.
+      size_t frame = 0;
       for ( const auto& textureName : textureNames ) {
-        sprite->addTexture( resourceController->get<Texture>( textureName.toString(), groupName ) );
+        sprite->addTexture( Texture::Type::Diffuse, resourceController->get<Texture>( textureName.toString(), groupName ), frame++ );
       }
     }
     else if ( SerializerValue::Type::String == spriteValue.second.getType() ) {
       // Just a single texture.
       const auto& textureName = spriteValue.second.toString();
-      sprite->addTexture( resourceController->get<Texture>( textureName, groupName ) );
+      sprite->addTexture( Texture::Type::Diffuse, resourceController->get<Texture>( textureName, groupName ) );
     }
   }
 }

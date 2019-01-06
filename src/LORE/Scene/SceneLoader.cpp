@@ -28,27 +28,28 @@
 
 #include <LORE/Resource/Entity.h>
 #include <LORE/Resource/ResourceController.h>
+#include <LORE/Scene/IO/ModelLoader.h>
+#include <LORE/Scene/Model.h>
 #include <LORE/Scene/Scene.h>
-#include <LORE/Shader/VertexBuffer.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace LocalNS {
 
-  static Lore::VertexBuffer::Type StringToVertexBufferType( const Lore::string& str )
+  static Lore::Mesh::Type StringToMeshType( const Lore::string& str )
   {
-    const std::unordered_map<Lore::string, Lore::VertexBuffer::Type> ConversionTable = {
-      { "Quad", Lore::VertexBuffer::Type::Quad3D },
-      { "TexturedQuad", Lore::VertexBuffer::Type::TexturedQuad3D },
-      { "Cube", Lore::VertexBuffer::Type::Cube },
-      { "TexturedCube", Lore::VertexBuffer::Type::TexturedCube }
+    const std::unordered_map<Lore::string, Lore::Mesh::Type> ConversionTable = {
+      { "Quad", Lore::Mesh::Type::Quad3D },
+      { "TexturedQuad", Lore::Mesh::Type::TexturedQuad3D },
+      { "Cube", Lore::Mesh::Type::Cube },
+      { "TexturedCube", Lore::Mesh::Type::TexturedCube }
     };
     // TODO: Check scene's renderer type to use quad or quad3D.
     auto lookup = ConversionTable.find( str );
     if ( ConversionTable.end() != lookup ) {
       return lookup->second;
     }
-    throw Lore::Exception( "Invalid vertex buffer type specification" );
+    throw Lore::Exception( "Invalid model type specification" );
   }
 
 }
@@ -150,14 +151,29 @@ void SceneLoader::_loadEntities()
       const auto entityName = entity.first;
       const SerializerValue& value = entity.second;
 
-      // Get the vertex buffer type.
-      const auto& vbType = value.getValue( "VertexBufferType" );
-      if ( vbType.isNull() ) {
-        throw Lore::SerializerException( "Entity value " + entityName + " did not specify vertex buffer type" );
-      }
+      EntityPtr entity = nullptr;
 
-      // Create the entity.
-      auto entity = Resource::CreateEntity( entityName, StringToVertexBufferType( vbType.toString() ), _resourceGroupName );
+      // Get the model type.
+      const auto& modelType = value.getValue( "ModelType" );
+      if ( modelType.isNull() ) {
+        // If there is no model type, look for a model path to load.
+        const auto& modelPath = value.getValue( "Model" );
+        if ( modelPath.isNull() ) {
+          throw Lore::SerializerException( "Entity value " + entityName + " did not specify model type or a model" );
+        }
+
+        // Load the entity (load model from disk and assign a material).
+        try {
+          entity = Resource::LoadEntity( entityName, modelPath.toString(), _resourceGroupName );
+        }
+        catch ( Lore::Exception& e ) {
+          log_error( "Error loading entity " + entityName + e.what() );
+        }
+      }
+      else {
+        // Create the entity.
+        entity = Resource::CreateEntity( entityName, StringToMeshType( modelType.toString() ), _resourceGroupName );
+      }
 
       // Enable instancing if specified.
       const auto& instanced = value.getValue( "Instanced" );

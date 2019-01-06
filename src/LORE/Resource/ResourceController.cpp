@@ -33,6 +33,7 @@
 #include <LORE/Resource/Sprite.h>
 #include <LORE/Resource/StockResource.h>
 #include <LORE/Resource/Textbox.h>
+#include <LORE/Scene/IO/ModelLoader.h>
 #include <LORE/Scene/SpriteController.h> // TODO: This should be in resources?
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -59,6 +60,7 @@ ResourceGroup::ResourceGroup( const string& name )
   _addResourceType<Font>();
   _addResourceType<Material>();
   _addResourceType<Mesh>();
+  _addResourceType<Model>();
   _addResourceType<GPUProgram>();
   _addResourceType<RenderTarget>();
   _addResourceType<Shader>();
@@ -66,7 +68,6 @@ ResourceGroup::ResourceGroup( const string& name )
   _addResourceType<Texture>();
   _addResourceType<SpriteAnimationSet>();
   _addResourceType<UI>();
-  _addResourceType<VertexBuffer>();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -172,6 +173,7 @@ void ResourceController::unloadGroup( const string& groupName )
   // Unload everything from the index and any other resources not indexed.
   auto group = _getGroup( groupName );
   if ( !group ) {
+    log_warning( "Group " + groupName + " not found, not unloading" );
     return;
   }
 
@@ -181,6 +183,7 @@ void ResourceController::unloadGroup( const string& groupName )
   destroyAllInGroup<GPUProgram>( groupName );
   destroyAllInGroup<Material>( groupName );
   destroyAllInGroup<Mesh>( groupName );
+  destroyAllInGroup<Model>( groupName );
   destroyAllInGroup<RenderTarget>( groupName );
   destroyAllInGroup<Shader>( groupName );
   destroyAllInGroup<Sprite>( groupName );
@@ -188,7 +191,6 @@ void ResourceController::unloadGroup( const string& groupName )
   destroyAllInGroup<Texture>( groupName );
   destroyAllInGroup<Textbox>( groupName );
   destroyAllInGroup<UI>( groupName );
-  destroyAllInGroup<VertexBuffer>( groupName );
 
   // Set all indexed resources not loaded.
   for ( auto& it : group->_index ) {
@@ -327,6 +329,30 @@ TexturePtr Resource::LoadTexture( const string& name, const string& file, const 
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+EntityPtr Resource::LoadEntity( const string& name, const string& path, const string& groupName )
+{
+  auto rc = ActiveContext->getResourceController();
+  if ( rc->resourceExists<Entity>( name, groupName ) ) {
+    log_warning( "Entity " + name + " already exists, returning existing entity" );
+    return rc->get<Entity>( name, groupName );
+  }
+  auto entity = ActiveContext->getResourceController()->create<Entity>( name, groupName );
+
+  // Give the entity a material.
+  auto material = StockResource::GetMaterial( "StandardTextured3D" );
+  auto entityMaterial = material->clone( "StandardTextured3D_" + name );
+  entity->setMaterial( entityMaterial );
+
+  // Load the specified model.
+  ModelLoader loader( groupName );
+  auto model = loader.load( path );
+  entity->setModel( model );
+
+  return entity;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 BoxPtr Resource::CreateBox( const string& name, const string& groupName )
 {
   return ActiveContext->getResourceController()->create<Box>( name, groupName );
@@ -334,60 +360,60 @@ BoxPtr Resource::CreateBox( const string& name, const string& groupName )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-EntityPtr Resource::CreateEntity( const string& name, const VertexBuffer::Type& vbType, const string& groupName )
+EntityPtr Resource::CreateEntity( const string& name, const Mesh::Type& modelType, const string& groupName )
 {
   auto rc = ActiveContext->getResourceController();
   if ( rc->resourceExists<Entity>( name, groupName ) ) {
-    log_information( "Entity " + name + " already exists, returning existing entity" );
+    log_warning( "Entity " + name + " already exists, returning existing entity" );
     return rc->get<Entity>( name, groupName );
   }
   auto entity = ActiveContext->getResourceController()->create<Entity>( name, groupName );
 
-  // Lookup stock mesh and assign it.
-  entity->setMesh( StockResource::GetMesh( vbType ) );
+  // Lookup stock model and assign it.
+  entity->setModel( StockResource::GetModel( modelType ) );
 
   // Set default material.
-  switch ( vbType ) {
+  switch ( modelType ) {
 
   default:
     break;
 
-  case VertexBuffer::Type::Quad:
+  case Mesh::Type::Quad:
   {
     auto material = StockResource::GetMaterial( "Standard2D" );
     entity->setMaterial( material->clone( "Standard2D_" + name ) );
   }
   break;
 
-  case VertexBuffer::Type::TexturedQuad:
+  case Mesh::Type::TexturedQuad:
   {
     auto material = StockResource::GetMaterial( "StandardTextured2D" );
     entity->setMaterial( material->clone( "StandardTextured2D_" + name ) );
   }
   break;
 
-  case VertexBuffer::Type::Cube:
+  case Mesh::Type::Cube:
   {
     auto material = StockResource::GetMaterial( "Standard3D" );
     entity->setMaterial( material->clone( "Standard3D_" + name ) );
   }
   break;
 
-  case VertexBuffer::Type::TexturedCube:
+  case Mesh::Type::TexturedCube:
   {
     auto material = StockResource::GetMaterial( "StandardTextured3D" );
     entity->setMaterial( material->clone( "StandardTextured3D_" + name ) );
   }
   break;
 
-  case VertexBuffer::Type::Quad3D:
+  case Mesh::Type::Quad3D:
   {
     auto material = StockResource::GetMaterial( "Standard3D" );
     entity->setMaterial( material->clone( "Standard3D_" + name ) );
   }
   break;
 
-  case VertexBuffer::Type::TexturedQuad3D:
+  case Mesh::Type::TexturedQuad3D:
   {
     auto material = StockResource::GetMaterial( "StandardTextured3D" );
     entity->setMaterial( material->clone( "StandardTextured3D_" + name ) );
@@ -417,31 +443,18 @@ MaterialPtr Resource::CreateMaterial( const string& name, const string& groupNam
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-MeshPtr Resource::CreateMesh( const string& name, const VertexBuffer::Type& vbType, const string& groupName )
+MeshPtr Resource::CreateMesh( const string& name, const Mesh::Type& type, const string& groupName )
 {
-  auto rc = ActiveContext->getResourceController();
-  auto mesh = rc->create<Mesh>( name, groupName );
-
-  // If this mesh type is a stock type, assign the corresponding vertex buffer.
-  switch ( vbType ) {
-  default:
-  case VertexBuffer::Type::Custom:
-    break;
-
-  case VertexBuffer::Type::Quad:
-    mesh->setVertexBuffer( rc->get<VertexBuffer>( "Quad" ) );
-    break;
-
-  case VertexBuffer::Type::Text:
-    mesh->setVertexBuffer( rc->get<VertexBuffer>( "Text" ) );
-    break;
-
-  case VertexBuffer::Type::TexturedQuad:
-    mesh->setVertexBuffer( rc->get<VertexBuffer>( "TexturedQuad" ) );
-    break;
-  }
-
+  auto mesh = ActiveContext->getResourceController()->create<Mesh>( name, groupName );
+  mesh->init( type );
   return mesh;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+ModelPtr Resource::CreateModel( const string& name, const Mesh::Type& type, const string& groupName )
+{
+  return ActiveContext->getResourceController()->create<Model>( name, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -506,15 +519,6 @@ UIPtr Resource::CreateUI( const string& name, const string& groupName )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-VertexBufferPtr Resource::CreateVertexBuffer( const string& name, const VertexBuffer::Type& type, const string& groupName )
-{
-  auto vb = ActiveContext->getResourceController()->create<VertexBuffer>( name, groupName );
-  vb->init( type );
-  return vb;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 BoxPtr Resource::GetBox( const string& name, const string& groupName )
 {
   return ActiveContext->getResourceController()->get<Box>( name, groupName );
@@ -553,6 +557,13 @@ MaterialPtr Resource::GetMaterial( const string& name, const string& groupName )
 MeshPtr Resource::GetMesh( const string& name, const string& groupName )
 {
   return ActiveContext->getResourceController()->get<Mesh>( name, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+ModelPtr Resource::GetModel( const string& name, const string& groupName )
+{
+  return ActiveContext->getResourceController()->get<Model>( name, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -606,13 +617,6 @@ UIPtr Resource::GetUI( const string& name, const string& groupName )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-VertexBufferPtr Resource::GetVertexBuffer( const string& name, const string& groupName )
-{
-  return ActiveContext->getResourceController()->get<VertexBuffer>( name, groupName );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 void Resource::DestroyBox( BoxPtr box )
 {
   ActiveContext->getResourceController()->destroy<Box>( box );
@@ -650,6 +654,13 @@ void Resource::DestroyMaterial( MaterialPtr material )
 void Resource::DestroyMesh( MeshPtr mesh )
 {
   ActiveContext->getResourceController()->destroy<Mesh>( mesh );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Resource::DestroyModel( ModelPtr model )
+{
+  ActiveContext->getResourceController()->destroy<Model>( model );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -699,13 +710,6 @@ void Resource::DestroyTextbox( TextboxPtr textbox )
 void Resource::DestroyUI( UIPtr ui )
 {
   ActiveContext->getResourceController()->destroy<UI>( ui );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Resource::DestroyVertexBuffer( VertexBufferPtr vb )
-{
-  ActiveContext->getResourceController()->destroy<VertexBuffer>( vb );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

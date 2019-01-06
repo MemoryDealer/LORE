@@ -26,6 +26,7 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 #include <LORE/Resource/IResource.h>
+#include <LORE/Resource/Texture.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -34,12 +35,9 @@ namespace Lore {
   ///
   /// \class Sprite
   /// \brief A container of Textures which a Material can use.
-  class LORE_EXPORT Sprite final : public Alloc<Sprite>, public IResource
+  class LORE_EXPORT Sprite final : public Alloc<Sprite>,
+                                   public IResource
   {
-
-  public:
-
-    using TextureList = std::vector<TexturePtr>;
 
   public:
 
@@ -49,27 +47,33 @@ namespace Lore {
     //
     // Modifiers.
 
-    void addTexture( const TexturePtr texture )
-    {
-      _textures.push_back( texture );
-    }
+    void addTexture( const Texture::Type type, const TexturePtr texture, const size_t frameIdx = 0, const real mixValue = 0.5f );
+    void clearTextures();
+    void setMixValue( const size_t frameIdx, const Texture::Type type, const size_t idx, const real value );
 
     //
     // Getters.
 
-    TexturePtr getTexture( const size_t idx ) const
-    {
-      return _textures.at( idx );
-    }
-
-    size_t getTextureCount() const
-    {
-      return _textures.size();
-    }
+    TexturePtr getTexture( const size_t frameIdx, const Texture::Type type, const size_t idx = 0 ) const;
+    size_t getTextureCount( const size_t frameIdx, const Texture::Type type ) const;
+    real getMixValue( const size_t frameIdx, const Texture::Type type, const size_t idx ) const;
 
   private:
 
-    TextureList _textures {};
+    using TextureList = std::vector<TexturePtr>;
+    using MixValues = std::vector<real>;
+
+    struct Frame
+    {
+      TextureList textures;
+      MixValues mixValues;
+    };
+
+    using FrameData = std::map<Texture::Type, Frame>;
+
+  private:
+
+    std::vector<FrameData> _frames {};
 
   };
 

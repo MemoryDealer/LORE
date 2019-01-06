@@ -88,46 +88,7 @@ void StockResourceController::createStockResources()
     auto texture = _controller->create<Texture>( "White" );
     texture->create( 128, 128, StockColor::White );
     auto sprite = _controller->create<Sprite>( "White" );
-    sprite->addTexture( texture );
-  }
-
-  //
-  // Create stock meshes (uses previously created vertex buffers from ResourceController's constructor).
-
-  {
-    auto mesh = _controller->create<Mesh>( "Quad" );
-    mesh->setVertexBuffer( _controller->get<VertexBuffer>( "Quad" ) );
-    _meshTable.insert( { VertexBuffer::Type::Quad, mesh } );
-  }
-
-  {
-    auto mesh = _controller->create<Mesh>( "TexturedQuad" );
-    mesh->setVertexBuffer( _controller->get<VertexBuffer>( "TexturedQuad" ) );
-    _meshTable.insert( { VertexBuffer::Type::TexturedQuad, mesh } );
-  }
-
-  {
-    auto mesh = _controller->create<Mesh>( "Cube" );
-    mesh->setVertexBuffer( _controller->get<VertexBuffer>( "Cube" ) );
-    _meshTable.insert( { VertexBuffer::Type::Cube, mesh } );
-  }
-
-  {
-    auto mesh = _controller->create<Mesh>( "TexturedCube" );
-    mesh->setVertexBuffer( _controller->get<VertexBuffer>( "TexturedCube" ) );
-    _meshTable.insert( { VertexBuffer::Type::TexturedCube, mesh } );
-  }
-
-  {
-    auto mesh = _controller->create<Mesh>( "Quad3D" );
-    mesh->setVertexBuffer( _controller->get<VertexBuffer>( "Quad3D" ) );
-    _meshTable.insert( { VertexBuffer::Type::Quad3D, mesh } );
-  }
-
-  {
-    auto mesh = _controller->create<Mesh>( "TexturedQuad3D" );
-    mesh->setVertexBuffer( _controller->get<VertexBuffer>( "TexturedQuad3D" ) );
-    _meshTable.insert( { VertexBuffer::Type::TexturedQuad3D, mesh } );
+    sprite->addTexture( Texture::Type::Diffuse, texture );
   }
 
   //
@@ -141,10 +102,12 @@ void StockResourceController::createStockResources()
   }
 
   {
-    // Generate shaders and vertex buffer for text rendering.
+    // Generate shaders and model for text rendering.
     createTextProgram( "StandardText" );
-    auto vb = _controller->create<VertexBuffer>( "StandardText" );
-    vb->init( VertexBuffer::Type::Text );
+    auto model = _controller->create<Model>( "StandardText" );
+    auto mesh = _controller->create<Mesh>( "StandardText" );
+    mesh->init( Mesh::Type::Text );
+    model->attachMesh( mesh );
   }
 }
 
@@ -165,16 +128,22 @@ void StockResourceController::createRendererStockResources( const RendererType t
   case RendererType::Forward2D:
     suffix = "2D";
     {
-      auto vb = _controller->create<VertexBuffer>( "Skybox" + suffix );
-      vb->init( VertexBuffer::Type::FullscreenQuad );
+      const string skybox = "Skybox" + suffix;
+      auto model = _controller->create<Model>( skybox );
+      auto mesh = _controller->create<Mesh>( skybox );
+      mesh->init( Mesh::Type::FullscreenQuad );
+      model->attachMesh( mesh );
     }
     break;
 
   case RendererType::Forward3D:
     suffix = "3D";
     {
-      auto vb = _controller->create<VertexBuffer>( "Skybox" + suffix );
-      vb->init( VertexBuffer::Type::Cubemap );
+      const string skybox = "Skybox" + suffix;
+      auto model = _controller->create<Model>( skybox );
+      auto mesh = _controller->create<Mesh>( skybox );
+      mesh->init( Mesh::Type::Cubemap );
+      model->attachMesh( mesh );
     }
     break;
   }
@@ -188,7 +157,7 @@ void StockResourceController::createRendererStockResources( const RendererType t
 
     srf->createUberProgram( "StandardTextured" + suffix, params );
 
-    params.numTextures = 0;
+    params.textured = false;
     srf->createUberProgram( "Standard" + suffix, params );
   }
 
@@ -199,7 +168,7 @@ void StockResourceController::createRendererStockResources( const RendererType t
 
     srf->createUberProgram( "UnlitTextured" + suffix, params );
 
-    params.numTextures = 0;
+    params.textured = false;
     srf->createUberProgram( "UnlitStandard" + suffix, params );
   }
 
@@ -210,7 +179,7 @@ void StockResourceController::createRendererStockResources( const RendererType t
 
     srf->createUberProgram( "StandardTexturedInstanced" + suffix, params );
 
-    params.numTextures = 0;
+    params.textured = false;
     srf->createUberProgram( "StandardInstanced" + suffix, params );
   }
 
@@ -289,17 +258,6 @@ void StockResourceController::createRendererStockResources( const RendererType t
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-MeshPtr StockResourceController::getMesh( const VertexBuffer::Type& type )
-{
-  auto it = _meshTable.find( type );
-  if ( _meshTable.end() != it ) {
-    return it->second;
-  }
-  return nullptr;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -317,13 +275,6 @@ MaterialPtr StockResource::GetMaterial( const string& name )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-MeshPtr StockResource::GetMesh( const VertexBuffer::Type& type )
-{
-  return ActiveContext->getStockResourceController()->getMesh( type );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 TexturePtr StockResource::GetTexture( const string& name )
 {
   return ActiveContext->getStockResourceController()->get<Texture>( name );
@@ -331,9 +282,38 @@ TexturePtr StockResource::GetTexture( const string& name )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-VertexBufferPtr StockResource::GetVertexBuffer( const string& name )
+ModelPtr StockResource::GetModel( const string& name )
 {
-  return ActiveContext->getStockResourceController()->get<VertexBuffer>( name );
+  return ActiveContext->getStockResourceController()->get<Model>( name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+ModelPtr StockResource::GetModel( const Mesh::Type type )
+{
+  switch ( type ) {
+  default:
+    log_warning( "Model type not available for stock resource retrieval" );
+    return nullptr;
+
+  case Mesh::Type::Quad:
+    return ActiveContext->getStockResourceController()->get<Model>( "Quad" );
+
+  case Mesh::Type::TexturedQuad:
+    return ActiveContext->getStockResourceController()->get<Model>( "TexturedQuad" );
+
+  case Mesh::Type::Quad3D:
+    return ActiveContext->getStockResourceController()->get<Model>( "Quad3D" );
+
+  case Mesh::Type::TexturedQuad3D:
+    return ActiveContext->getStockResourceController()->get<Model>( "TexturedQuad3D" );
+
+  case Mesh::Type::Cube:
+    return ActiveContext->getStockResourceController()->get<Model>( "Cube" );
+
+  case Mesh::Type::TexturedCube:
+    return ActiveContext->getStockResourceController()->get<Model>( "TexturedCube" );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

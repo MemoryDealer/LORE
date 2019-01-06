@@ -33,9 +33,9 @@
 #include <Plugins/OpenGL/Resource/GLFont.h>
 #include <Plugins/OpenGL/Resource/GLStockResource.h>
 #include <Plugins/OpenGL/Resource/GLTexture.h>
+#include <Plugins/OpenGL/Scene/GLMesh.h>
 #include <Plugins/OpenGL/Shader/GLGPUProgram.h>
 #include <Plugins/OpenGL/Shader/GLShader.h>
-#include <Plugins/OpenGL/Shader/GLVertexBuffer.h>
 #include <Plugins/OpenGL/Window/GLRenderTarget.h>
 #include <Plugins/OpenGL/Window/GLWindow.h>
 
@@ -120,10 +120,10 @@ void Context::initConfiguration()
   // Setup default memory pool settings.
   _poolCluster.registerPool<Font, GLFont>( 4 );
   _poolCluster.registerPool<GPUProgram, GLGPUProgram>( 64 );
+  _poolCluster.registerPool<Mesh, GLMesh>( 32 );
   _poolCluster.registerPool<RenderTarget, GLRenderTarget>( 4 );
   _poolCluster.registerPool<Shader, GLShader>( 64 );
   _poolCluster.registerPool<Texture, GLTexture>( 64 );
-  _poolCluster.registerPool<VertexBuffer, GLVertexBuffer>( 32 );
   _poolCluster.registerPool<Window, GLWindow>( 1 );
 }
 

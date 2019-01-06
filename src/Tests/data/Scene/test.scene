@@ -8,7 +8,7 @@
   },
   "Entity": {
     "CheckeredFloor": {
-      "VertexBufferType":"TexturedQuad",
+      "ModelType":"TexturedQuad",
       "Instanced": 50,
       "Sprite":"checkerboard",
       "MaterialSettings": {
@@ -16,7 +16,7 @@
       }
     },
     "CheckeredCube": {
-      "VertexBufferType":"TexturedCube",
+      "ModelType":"TexturedCube",
       "Instanced": 500,
       "Sprite":"checkerboard",
       "MaterialSettings": {
@@ -24,7 +24,7 @@
       }
     },
     "Light": {
-      "VertexBufferType": "Cube",
+      "ModelType": "Cube",
       "MaterialSettings": {
         "Ambient": [1.0, 1.0, 1.0]
       }

@@ -7,3 +7,6 @@
 [submodule "src/External/glm"]
 	path = src/External/glm
 	url = https://github.com/g-truc/glm.git
+[submodule "src/External/assimp"]
+	path = src/External/assimp
+	url = https://github.com/assimp/assimp.git

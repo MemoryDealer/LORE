@@ -29,9 +29,9 @@
 #include <LORE/Memory/Alloc.h>
 #include <LORE/Renderer/Renderer.h>
 #include <LORE/Resource/IResource.h>
+#include <LORE/Scene/Model.h>
 #include <LORE/Scene/Scene.h>
 #include <LORE/Shader/Shader.h>
-#include <LORE/Shader/VertexBuffer.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -42,7 +42,7 @@ namespace Lore {
 
   public:
 
-    using UniformUpdater = void(*)( const RenderView&, const GPUProgramPtr, const MaterialPtr, const RenderQueue::LightData& );
+    using UniformUpdater = void( *)( const RenderView&, const GPUProgramPtr, const MaterialPtr, const RenderQueue::LightData& );
     using UniformNodeUpdater = void( *)( const GPUProgramPtr, const MaterialPtr, const NodePtr, const glm::mat4& );
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -76,11 +76,17 @@ namespace Lore {
     //
     // Getters.
 
+    uint32_t getDiffuseSamplerCount() const;
+    uint32_t getSpecularSamplerCount() const;
+
     //
     // Setters.
 
     void setUniformUpdater( const UniformUpdater updater );
     void setUniformNodeUpdater( const UniformNodeUpdater updater );
+
+    void setDiffuseSamplerCount( const uint32_t count );
+    void setSpecularSamplerCount( const uint32_t count );
 
     //
     // Uniform value updating.
@@ -115,6 +121,9 @@ namespace Lore {
 
     UniformUpdater _uniformUpdater { nullptr };
     UniformNodeUpdater _uniformNodeUpdater { nullptr };
+
+    uint32_t _diffuseSamplerCount { 0 };
+    uint32_t _specularSamplerCount { 0 };
 
   };
 

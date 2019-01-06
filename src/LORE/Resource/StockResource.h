@@ -26,7 +26,6 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 #include <LORE/Resource/Material.h>
-#include <LORE/Resource/Mesh.h>
 #include <LORE/Resource/Registry.h>
 #include <LORE/Shader/GPUProgram.h>
 #include <LORE/Util/Util.h>
@@ -39,7 +38,9 @@ namespace Lore {
   {
     uint32_t maxDirectionalLights { 2 };
     uint32_t maxPointLights { 8 };
-    uint32_t numTextures { 1 };
+    uint32_t maxDiffuseTextures { 8 };
+    uint32_t maxSpecularTextures { 8 };
+    bool textured { true };
     bool instanced { false };
   };
 
@@ -131,19 +132,13 @@ namespace Lore {
       return _controller->get<ResourceType>( name );
     }
 
-    MeshPtr getMesh( const VertexBuffer::Type& type );
-
   protected:
 
-    using MeshTable = Util::MultiHashTable<VertexBuffer::Type, MeshPtr>;
     using StockResourceFactoryMap = std::map<RendererType, std::unique_ptr<StockResourceFactory>>;
 
   protected:
 
     std::unique_ptr<ResourceController> _controller { nullptr };
-
-    MeshTable _meshTable {};
-
     StockResourceFactoryMap _factories {};
 
   };
@@ -160,9 +155,9 @@ namespace Lore {
 
     static GPUProgramPtr GetGPUProgram( const string& name );
     static MaterialPtr GetMaterial( const string& name );
-    static MeshPtr GetMesh( const VertexBuffer::Type& type );
     static TexturePtr GetTexture( const string& name );
-    static VertexBufferPtr GetVertexBuffer( const string& name );
+    static ModelPtr GetModel( const string& name );
+    static ModelPtr GetModel( const Mesh::Type type );
     static FontPtr GetFont( const string& name );
 
   private:

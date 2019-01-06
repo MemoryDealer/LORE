@@ -106,6 +106,7 @@ namespace LocalNS {
         try {
           auto light = CLI::GetActiveScene()->getLight( Lore::Light::Type::Point, lightName );
           light->setDiffuse( lightColor );
+          light->setSpecular( lightColor );
         }
         catch ( const Lore::Exception& e ) {
           return e.getDescription();
