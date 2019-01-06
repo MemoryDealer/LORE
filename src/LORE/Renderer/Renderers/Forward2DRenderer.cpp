@@ -306,7 +306,7 @@ void Forward2DRenderer::renderSkybox( const RenderView& rv,
     const Skybox::Layer& layer = pair.second;
     MaterialPtr mat = layer.getMaterial();
 
-    if ( mat->sprite && mat->sprite->getTextureCount( Texture::Type::Diffuse ) ) {
+    if ( mat->sprite && mat->sprite->getTextureCount( 0, Texture::Type::Diffuse ) ) {
       GPUProgramPtr program = mat->program;
 
       // Enable blending if set.
@@ -321,7 +321,7 @@ void Forward2DRenderer::renderSkybox( const RenderView& rv,
         spriteFrame = layer.getSpriteController()->getActiveFrame();
       }
 
-      TexturePtr texture = mat->sprite->getTexture( Texture::Type::Diffuse, spriteFrame );
+      TexturePtr texture = mat->sprite->getTexture( spriteFrame, Texture::Type::Diffuse );
       program->use();
       texture->bind();
 

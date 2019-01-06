@@ -35,12 +35,9 @@ namespace Lore {
   ///
   /// \class Sprite
   /// \brief A container of Textures which a Material can use.
-  class LORE_EXPORT Sprite final : public Alloc<Sprite>, public IResource
+  class LORE_EXPORT Sprite final : public Alloc<Sprite>,
+                                   public IResource
   {
-
-  public:
-
-    using TextureList = std::vector<TexturePtr>;
 
   public:
 
@@ -50,40 +47,33 @@ namespace Lore {
     //
     // Modifiers.
 
-    void addTexture( const Texture::Type type, const TexturePtr texture )
-    {
-      _textures[type].push_back( texture );
-    }
-
-    void clearTextures()
-    {
-      _textures.clear();
-    }
+    void addTexture( const Texture::Type type, const TexturePtr texture, const size_t frameIdx = 0, const real mixValue = 0.5f );
+    void clearTextures();
+    void setMixValue( const size_t frameIdx, const Texture::Type type, const size_t idx, const real value );
 
     //
     // Getters.
 
-    TexturePtr getTexture( const Texture::Type type, const size_t idx ) const
-    {
-      auto it = _textures.find( type );
-      if ( _textures.end() != it ) {
-        return it->second.at( idx );
-      }
-      return nullptr;
-    }
-
-    size_t getTextureCount( const Texture::Type type ) const
-    {
-      auto it = _textures.find( type );
-      if ( _textures.end() != it ) {
-        return it->second.size();
-      }
-      return 0;
-    }
+    TexturePtr getTexture( const size_t frameIdx, const Texture::Type type, const size_t idx = 0 ) const;
+    size_t getTextureCount( const size_t frameIdx, const Texture::Type type ) const;
+    real getMixValue( const size_t frameIdx, const Texture::Type type, const size_t idx ) const;
 
   private:
 
-    std::map<Texture::Type, TextureList> _textures;
+    using TextureList = std::vector<TexturePtr>;
+    using MixValues = std::vector<real>;
+
+    struct Frame
+    {
+      TextureList textures;
+      MixValues mixValues;
+    };
+
+    using FrameData = std::map<Texture::Type, Frame>;
+
+  private:
+
+    std::vector<FrameData> _frames {};
 
   };
 

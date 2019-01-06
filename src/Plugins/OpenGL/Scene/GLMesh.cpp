@@ -523,20 +523,28 @@ void GLMesh::updateInstanced( const size_t idx, const glm::mat4& matrix )
 void GLMesh::draw( const Lore::GPUProgramPtr program, const size_t instanceCount )
 {
   // Bind any textures that are assigned to this mesh.
-  const auto diffuseCount = _sprite.getTextureCount( Texture::Type::Diffuse );
-  const auto specularCount = _sprite.getTextureCount( Texture::Type::Specular );
+  // TODO: Sprite animations (e.g., replace 0 with spriteFrame).
+  const auto diffuseCount = _sprite.getTextureCount( 0, Texture::Type::Diffuse );
+  const auto specularCount = _sprite.getTextureCount( 0, Texture::Type::Specular );
   int textureUnit = 0;
   for ( int i = 0; i < diffuseCount; ++i ) {
-    auto texture = _sprite.getTexture( Texture::Type::Diffuse, i );
+    auto texture = _sprite.getTexture( 0, Texture::Type::Diffuse, i );
     texture->bind( textureUnit );
-    program->setUniformVar( "material.diffuseTexture" + std::to_string( i ), textureUnit );
+    program->setUniformVar( "diffuseTexture" + std::to_string( i ), textureUnit );
     ++textureUnit;
   }
   for ( int i = 0; i < specularCount; ++i ) {
-    auto texture = _sprite.getTexture( Texture::Type::Specular, i );
+    auto texture = _sprite.getTexture( 0, Texture::Type::Specular, i );
     texture->bind( textureUnit );
-    program->setUniformVar( "material.specularTexture" + std::to_string( i ), textureUnit );
+    program->setUniformVar( "specularTexture" + std::to_string( i ), textureUnit );
     ++textureUnit;
+  }
+  // Set mix values.
+  if ( diffuseCount ) {
+    for ( int i = 0; i < static_cast<int>( program->getDiffuseSamplerCount() ); ++i ) {
+      program->setUniformVar( "diffuseMixValues[" + std::to_string( i ) + "]",
+                              _sprite.getMixValue( 0, Texture::Type::Diffuse, i ) );
+    }
   }
 
   glBindVertexArray( _vao );

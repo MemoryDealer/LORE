@@ -279,7 +279,7 @@ void Forward3DRenderer::_renderSkybox( const RenderView& rv,
     const Skybox::Layer& layer = pair.second;
     MaterialPtr material = layer.getMaterial();
 
-    if ( material->sprite && material->sprite->getTextureCount( Texture::Type::Cubemap ) ) {
+    if ( material->sprite && material->sprite->getTextureCount( 0, Texture::Type::Cubemap ) ) {
       RenderQueue::LightData emptyLightData; // Not needed for skybox.
 
       // Enable blending if set.
