@@ -279,23 +279,21 @@ void Forward3DRenderer::_renderSkybox( const RenderView& rv,
     const Skybox::Layer& layer = pair.second;
     MaterialPtr material = layer.getMaterial();
 
-    if ( material->sprite && material->sprite->getTextureCount( 0, Texture::Type::Cubemap ) ) {
-      RenderQueue::LightData emptyLightData; // Not needed for skybox.
+    RenderQueue::LightData emptyLightData; // Not needed for skybox.
 
-      // Enable blending if set.
-      if ( material->blendingMode.enabled ) {
-        _api->setBlendingEnabled( true );
-        _api->setBlendingFunc( material->blendingMode.srcFactor, material->blendingMode.dstFactor );
-      }
-
-      // Setup GPUProgram.
-      GPUProgramPtr program = material->program;
-      program->use();
-      program->updateUniforms( rv, material, emptyLightData );
-      // TODO: Pass in camera node when camera is updated to use a scene node.
-      program->updateNodeUniforms( material, nullptr, viewProjection );
-      model->draw( program );
+    // Enable blending if set.
+    if ( material->blendingMode.enabled ) {
+      _api->setBlendingEnabled( true );
+      _api->setBlendingFunc( material->blendingMode.srcFactor, material->blendingMode.dstFactor );
     }
+
+    // Setup GPUProgram.
+    GPUProgramPtr program = material->program;
+    program->use();
+    program->updateUniforms( rv, material, emptyLightData );
+    // TODO: Pass in camera node when camera is updated to use a scene node.
+    program->updateNodeUniforms( material, nullptr, viewProjection );
+    model->draw( program );
   }
 
   _api->setDepthMaskEnabled( true );

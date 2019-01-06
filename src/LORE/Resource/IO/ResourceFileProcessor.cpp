@@ -264,7 +264,7 @@ void ResourceFileProcessor::processSpriteList( const string& groupName, Resource
       }
 
       // Retrieve all textures.
-      uint32_t frame = 0;
+      size_t frame = 0;
       for ( const auto& textureName : textureNames ) {
         sprite->addTexture( Texture::Type::Diffuse, resourceController->get<Texture>( textureName.toString(), groupName ), frame++ );
       }

@@ -306,6 +306,7 @@ void Forward2DRenderer::renderSkybox( const RenderView& rv,
     const Skybox::Layer& layer = pair.second;
     MaterialPtr mat = layer.getMaterial();
 
+    // TODO: Move this to uniform updaters in Skybox2D program.
     if ( mat->sprite && mat->sprite->getTextureCount( 0, Texture::Type::Diffuse ) ) {
       GPUProgramPtr program = mat->program;
 
