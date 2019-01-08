@@ -589,6 +589,12 @@ void GLMesh::draw( const Lore::GPUProgramPtr program, const size_t instanceCount
     break;
   }
   glBindVertexArray( 0 );
+
+  // Unbind textures to avoid any textures leaking into the next mesh of a model.
+  for ( int i = 0; i < ( diffuseCount + specularCount ); ++i ) {
+    glActiveTexture( GL_TEXTURE0 + i );
+    glBindTexture( GL_TEXTURE_2D, 0 );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
