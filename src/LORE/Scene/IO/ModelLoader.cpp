@@ -165,10 +165,10 @@ void ModelLoader::_processTexture( aiMaterial* material, const aiTextureType typ
       texture->loadFromFile( _directory + "/" + texturePath );
       mesh->getSprite()->addTexture( ConvertTextureType(type), texture );
 
-      log_information( "Texture " + textureName + " loaded for model " + _name );
+      LogWrite( Info, "Texture %s loaded for model %s", textureName.c_str(), _name.c_str() );
     }
     else {
-      log_warning( "Tried loading texture " + textureName + " which already exists" );
+      LogWrite( Warning, "Tried loading texture %s which already exists", textureName.c_str() );
     }
   }
 }

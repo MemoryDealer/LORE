@@ -167,7 +167,7 @@ void SceneLoader::_loadEntities()
           entity = Resource::LoadEntity( entityName, modelPath.toString(), _resourceGroupName );
         }
         catch ( Lore::Exception& e ) {
-          log_error( "Error loading entity " + entityName + e.what() );
+          LogWrite( Error, "Error loading entity %s: %s", entityName.c_str(), e.what() );
         }
       }
       else {
@@ -214,7 +214,7 @@ void SceneLoader::_loadLighting()
       Light::Type type;
       const auto& lightTypeValue = lightData.getValue( "Type" );
       if ( SerializerValue::Type::String != lightTypeValue.getType() ) {
-        log_warning( "Invalid light type for light " + lightName );
+        LogWrite( Warning, "Invalid light type for light %s", lightName.c_str() );
         continue;
       }
       const auto& lightType = lightTypeValue.toString();
@@ -228,7 +228,7 @@ void SceneLoader::_loadLighting()
         type = Light::Type::Spot;
       }
       else {
-        log_warning( "Invalid light type for " + lightName + " - should be Directional, point, or spot" );
+        LogWrite( Warning, "Invalid light type for %s - should be Directional, point, or spot", lightName.c_str() );
       }
 
       // Create the light in the scene.
@@ -389,7 +389,7 @@ void SceneLoader::_processNode( const string& nodeName, const SerializerValue& n
         }
       }
       catch( ItemIdentityException& ){
-        log_error( "No light found with name " + lightName.toString() );
+        LogWrite( Error, "No light found with name %s", lightName.toString().c_str() );
       }
     }
   }

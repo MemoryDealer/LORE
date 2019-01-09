@@ -259,7 +259,7 @@ void ResourceFileProcessor::processSpriteList( const string& groupName, Resource
       const auto& textureNames = spriteValue.second.toArray();
 
       if ( textureNames.empty() ) {
-        log_warning( "Sprite " + name + " has no textures associated with it, ignoring..." );
+        LogWrite( Warning, "Sprite %s has no textures associated with it, ignoring...", name.c_str() );
         return;
       }
 

@@ -26,7 +26,8 @@
 
 #include "Log.h"
 
-#include <LORE/Core/Timestamp.h>
+#include <LORE/Core/Logging/Timestamp.h>
+#include <LORE/Util/FileUtils.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -34,24 +35,24 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Local {
+namespace LocalNS {
 
-  std::unique_ptr<Logger> __log;
+  std::unique_ptr<Logger> __logger;
 
 }
-using namespace Local;
+using namespace LocalNS;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Logger::__logger()
 {
-  std::unordered_map<LogLevel, string> logLevelStrings;
-  logLevelStrings[LogLevel::Critical]=" Critical";
-  logLevelStrings[LogLevel::Error]=" Error";
-  logLevelStrings[LogLevel::Warning]=" Warning";
-  logLevelStrings[LogLevel::Information]="";
-  logLevelStrings[LogLevel::Debug]=" Debug";
-  logLevelStrings[LogLevel::Trace]=" Trace";
+  const std::unordered_map<Level, string> logLevelStrings = {
+    { Level::Critical, "Critical" },
+    { Level::Error, "Error" },
+    { Level::Warning, "Warning" },
+    { Level::Info, "Info" },
+    { Level::Trace, "Trace" },
+  };
 
   while ( _active ) {
 
@@ -59,14 +60,16 @@ void Logger::__logger()
     std::unique_lock<std::mutex> lock( _mutex );
     _cv.wait( lock );
 
-    auto timestamp=GenerateTimestamp();
+    auto timestamp = GenerateTimestamp();
 
     while ( !_messageQueue.empty() ) {
       Message msg=_messageQueue.front();
 
       // Build the log string.
-      string out="[" + timestamp + "]";
-      out.append( logLevelStrings[msg.lvl] + ": " );
+      string out;
+      out.append( "[" + timestamp + "] " );
+      out.append( msg.file + ":" + msg.line + " (" + msg.function + ")" );
+      out.append( "[" + logLevelStrings.at( msg.lvl ) + "] " );
       out.append( msg.text );
 
       // Output the string to both the console and log file.
@@ -84,7 +87,7 @@ void Logger::__logger()
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Logger::Logger( const string& filename )
-  : _level( LogLevel::Information )
+  : _level( Level::Info )
   , _stream()
   , _messageQueue()
   , _thread()
@@ -100,7 +103,9 @@ Logger::Logger( const string& filename )
 
   _stream << "..::| LORE Log Started |::.." << std::endl;
 
-  _thread=std::thread( &Logger::__logger, this );
+  _thread = std::thread( &Logger::__logger, this );
+
+  CreateTimestamper();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -115,19 +120,8 @@ Logger::~Logger()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Logger::write( const string& text )
+void Logger::log( const Message& msg )
 {
-  write( LogLevel::Information, text );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Logger::write( const LogLevel& lvl, const string& text )
-{
-  Message msg;
-  msg.lvl=lvl;
-  msg.text=text;
-
   // Enqueue message and wake up logger thread.
   std::unique_lock<std::mutex> lock( _mutex );
   _messageQueue.push( msg );
@@ -138,6 +132,7 @@ void Logger::write( const LogLevel& lvl, const string& text )
 
 void Logger::flush()
 {
+  _active = false;
   if ( _thread.joinable() ) {
     _cv.notify_one();
     _thread.join();
@@ -146,41 +141,87 @@ void Logger::flush()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Log::Write( const string& msg )
+bool Logger::levelEnabled( const Level lvl )
 {
-  if ( LogLevel::Information <= __log->getLevel() ) {
-    __log->write( msg );
-  }
+  return ( lvl <= _level );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Log::Write( const LogLevel& lvl, const string& msg )
+void Logger::setLevel( const Level lvl )
 {
-  if ( lvl <= __log->getLevel() ) {
-    __log->write( lvl, msg );
+  _level = lvl;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Log::WriteLog( const bool internal,
+                    const Logger::Level lvl,
+                    const char* file,
+                    const int line,
+                    const char* function,
+                    const char* format,
+                    ... )
+{
+  if ( !format ) {
+    return;
   }
+
+  Logger::Message msg;
+  msg.lvl = lvl;
+
+  // Parse the message parameters.
+  if ( 0 == strncmp( "%s", format, sizeof( format ) ) ) {
+    va_list args;
+    va_start( args, format );
+    msg.text = va_arg( args, const char* );
+    va_end( args );
+  }
+  else {
+    constexpr auto BufferSize = 512;
+    char buf[BufferSize];
+    va_list args;
+    va_start( args, format );
+    const auto sz = vsnprintf( buf, BufferSize, format, args );
+    va_end( args );
+
+    if ( sz >= 0 && sz < BufferSize ) {
+      msg.text = buf;
+    }
+    else {
+      // Not a valid buffer.
+      return;
+    }
+  }
+
+  msg.file = Util::GetFileName( file, true );
+  msg.line = std::to_string( line );
+  msg.function = function;
+
+  __logger->log( msg );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Log::AllocateLogger()
+bool Log::LevelEnabled( const Logger::Level lvl )
 {
-  if ( !__log.get() ) {
-    __log=std::make_unique<Logger>( "Lore.log" );
-  }
-  CreateTimestamper();
+  return __logger->levelEnabled( lvl );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Log::DeleteLogger()
+void Log::Alloc()
 {
-  if ( __log.get() ) {
-    __log->setActive( false );
-    __log->flush();
-    __log.reset();
-  }
+  __logger = std::make_unique<Logger>( "LORE.log" );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Log::Delete()
+{
+  __logger->flush();
+  __logger.reset();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

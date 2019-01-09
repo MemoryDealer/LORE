@@ -64,7 +64,7 @@ void GLGPUProgram::init()
 void GLGPUProgram::attachShader( Lore::ShaderPtr shader )
 {
   if ( !shader->isLoaded() ) {
-    log_error( "Shader not loaded, not attaching to GPUProgram" + _name );
+    LogWrite( Error, "Shader not loaded, not attaching to GPUProgram %s", _name.c_str() );
     return;
   }
 
@@ -85,7 +85,7 @@ bool GLGPUProgram::link()
   glGetProgramiv( _program, GL_LINK_STATUS, &success );
   if ( !success ) {
     glGetProgramInfoLog( _program, sizeof( buf ), nullptr, buf );
-    log_error( "Failed to link program + " + _name + "(" + std::to_string( glGetError() ) + ")" + ": " + string( buf ) );
+    LogWrite( Error, "Failed to link program %s (%s): %s", _name.c_str(), glGetError(), buf );
     return false;
   }
 
@@ -204,7 +204,7 @@ GLuint GLGPUProgram::_getUniform( const string& id )
 {
   auto lookup = _uniforms.find( id );
   if ( _uniforms.end() == lookup ) {
-    log_warning( "Tried to get uniform " + id + " in " + _name + " which does not exist" );
+    LogWrite( Warning, "Tried to get uniform %s in %s which does not exist", id.c_str(), _name.c_str() );
     return -1;
   }
 

@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#pragma warning( disable: 4251 )
 #pragma warning( disable: 4311 )
 #pragma warning( disable: 4312 )
 #pragma warning( disable: 4661 )

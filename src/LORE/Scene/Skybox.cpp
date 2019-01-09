@@ -48,7 +48,7 @@ Skybox::Layer& Skybox::addLayer( const string& name )
   Layer layer( name );
   layer.setMaterial( ResourceCast<Material>( _materialTemplate->clone( "bg_layer_" + name ) ) );
 
-  log_information( "Added layer " + name + " to skybox " + _name );
+  LogWrite( Info, "Added layer %s to skybox %s", name.c_str(), _name.c_str() );
 
   auto pair = _layers.insert( { name, layer } );
   return pair.first->second;
@@ -77,7 +77,7 @@ void Skybox::removeLayer( const string& name )
 
   _layers.erase( lookup );
 
-  log_information( "Remove layer " + name + " from skybox " + _name );
+  LogWrite( Info, "Remove layer %s from skybox %s", name.c_str(), _name.c_str() );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

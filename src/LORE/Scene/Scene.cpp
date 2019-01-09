@@ -214,7 +214,7 @@ void Scene::updateSceneGraph()
 bool Scene::reload()
 {
   if ( _sceneFile.empty() ) {
-    log_warning( "No scene file found for scene, not reloading" );
+    LogWrite( Warning, "No scene file found for scene, not reloading" );
     return false;
   }
 

@@ -52,7 +52,7 @@ void GLShader::init( const Shader::Type& type )
   GLenum shaderType = 0;
   switch ( type ) {
   default:
-    log_error( "Unknown shader type requested for Shader " + _name );
+    LogWrite( Error, "Unknown shader type requested for Shader %s", _name.c_str() );
     return;
 
   case Shader::Type::Vertex:
@@ -89,7 +89,7 @@ bool GLShader::loadFromSource( const string& source )
   glGetShaderiv( _shader, GL_COMPILE_STATUS, &success );
   if ( !success ) {
     glGetShaderInfoLog( _shader, sizeof( buf ), nullptr, buf );
-    log_error( "Failed to load and compile shader " + _name + ": " + buf );
+    LogWrite( Error, "Failed to load and compile shader %s: %s", _name.c_str(), buf );
     return false;
   }
 

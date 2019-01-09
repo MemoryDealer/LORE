@@ -173,7 +173,7 @@ void ResourceController::unloadGroup( const string& groupName )
   // Unload everything from the index and any other resources not indexed.
   auto group = _getGroup( groupName );
   if ( !group ) {
-    log_warning( "Group " + groupName + " not found, not unloading" );
+    LogWrite( Warning, "Group %s not found, not unloading", groupName.c_str() );
     return;
   }
 
@@ -230,7 +230,7 @@ void ResourceController::indexResourceFile( const string& file, const string& gr
   // Validate file type.
   const auto resourceType = ResourceFileProcessor::GetResourceFileType( file );
   if ( SerializableResource::Count == resourceType ) {
-    log_warning( "Not indexing file " + file + ", not a valid file type" );
+    LogWrite( Warning, "Not indexing file %s, not a valid file type", file.c_str() );
     return;
   }
 
@@ -259,7 +259,7 @@ ResourceGroupPtr ResourceController::_getGroup( const string& groupName )
     return lookup->second.get();
   }
 
-  log_information( "Resource group " + groupName + " not found, creating resource group" );
+  LogWrite( Info, "Resource group %s not found, creating resource group", groupName.c_str() );
   auto rg = std::make_shared<ResourceGroup>( groupName );
   _groups.insert( { groupName, rg } );
   return rg.get();
@@ -333,7 +333,7 @@ EntityPtr Resource::LoadEntity( const string& name, const string& path, const st
 {
   auto rc = ActiveContext->getResourceController();
   if ( rc->resourceExists<Entity>( name, groupName ) ) {
-    log_warning( "Entity " + name + " already exists, returning existing entity" );
+    LogWrite( Warning, "Entity %s already exists, returning existing entity", name.c_str() );
     return rc->get<Entity>( name, groupName );
   }
   auto entity = ActiveContext->getResourceController()->create<Entity>( name, groupName );
@@ -364,7 +364,7 @@ EntityPtr Resource::CreateEntity( const string& name, const Mesh::Type& modelTyp
 {
   auto rc = ActiveContext->getResourceController();
   if ( rc->resourceExists<Entity>( name, groupName ) ) {
-    log_warning( "Entity " + name + " already exists, returning existing entity" );
+    LogWrite( Warning, "Entity %s already exists, returning existing entity", name.c_str() );
     return rc->get<Entity>( name, groupName );
   }
   auto entity = ActiveContext->getResourceController()->create<Entity>( name, groupName );

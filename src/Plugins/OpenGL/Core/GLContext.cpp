@@ -57,10 +57,10 @@ using namespace GLContextNS;
 
 Context::Context() noexcept
 {
-  lore_log( "Initializing OpenGL render plugin context..." );
+  LogWrite( Info, "Initializing OpenGL render plugin context..." );
   glfwInit();
   glfwSetErrorCallback( ErrorCallback );
-  lore_log( "OpenGL render plugin context initialized!" );
+  LogWrite( Info, "OpenGL render plugin context initialized!" );
 
   glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
   glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 3 );
@@ -91,7 +91,7 @@ Context::Context() noexcept
       glDebugMessageControl( GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE );
     }
     else {
-      log_warning( "No debug bit set in context flags\n" );
+      LogWrite( Warning, "No debug bit set in context flags\n" );
     }
   }
 
@@ -105,10 +105,10 @@ Context::~Context()
 {
   glfwDestroyWindow( _offscreenContextWindow );
 
-  lore_log( "Terminating OpenGL render plugin context..." );
+  LogWrite( Info, "Terminating OpenGL render plugin context..." );
   glfwSetErrorCallback( nullptr );
   glfwTerminate();
-  lore_log( "OpenGL render plugin context terminated!" );
+  LogWrite( Info, "OpenGL render plugin context terminated!" );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -149,7 +149,7 @@ Lore::WindowPtr Context::createWindow( const string& title,
   window->setMode( mode );
   _windowRegistry.insert( title, window );
 
-  lore_log( "Window " + title + " created successfully" );
+  LogWrite( Info, "Window %s created successfully", title.c_str() );
 
   // At least one window means the context is active.
   _active = true;
@@ -176,7 +176,7 @@ void Context::destroyWindow( Lore::WindowPtr window )
   _poolCluster.destroy<Window, GLWindow>( window ); // TODO: Modify memory pool to store base & derived type?
   _windowRegistry.remove( title );
 
-  lore_log( "Window " + title + " destroyed successfully" );
+  LogWrite( Info, "Window %s destroyed successfully", title.c_str() );
 
   // Context is no longer considered active if all windows have been destroyed.
   _active = !_windowRegistry.empty();

@@ -43,7 +43,7 @@ namespace Lore {
         explicit Exception( const string& what )
         : _what( what )
         {
-          log_error( "[EXCEPTION] " + what );
+          LogWrite( Error, " !EXCEPTION! %s", what.c_str() );
         }
 
         virtual string getDescription() const

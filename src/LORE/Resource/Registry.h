@@ -69,7 +69,7 @@ namespace Lore {
       const auto transformedID = Util::ToLower( id );
       auto lookup = _container.find( transformedID );
       if ( _container.end() == lookup ) {
-        log_warning( "Tried to remove resource with id " + transformedID + " which does not exist" );
+        LogWrite( Warning, "Tried to remove resource with id %s which does not exist", transformedID.c_str() );
         return;
       }
 
