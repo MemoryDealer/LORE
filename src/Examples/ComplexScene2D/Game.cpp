@@ -176,7 +176,7 @@ void Game::loadScene()
 
     auto torchLight = _scene->createPointLight( "torch" + std::to_string( i ) );
     //torchLight->setDiffuse( Lore::Color( 1.f, .69f, .4f, 1.f ) );
-    torchLight->setAttenuation( 1.f, 1.f, 0.7f, 1.8f );
+    torchLight->setAttenuation( 2.0f, 1.0f, 0.4f, 0.8f );
     torchNode->attachObject( torchLight );
   }
 

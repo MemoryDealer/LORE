@@ -140,6 +140,8 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
   //
   // Uniforms and ins.
 
+  src += "uniform float gamma;";
+
   if ( textured ) {
     src += "in vec2 TexCoord;";
     src += "uniform vec2 texSampleOffset = vec2(1.0, 1.0);";
@@ -256,7 +258,7 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
   }
 
   // Final pixel.
-  src += "pixel = texSample;";
+  src += "pixel = pow(texSample, vec4(1.0 / gamma));";
 
   src += "}";
   auto fsptr = _controller->create<Shader>( name + "_FS" );
@@ -286,6 +288,8 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
   // Add uniforms.
 
   program->addTransformVar( "transform" );
+
+  program->addUniformVar( "gamma" );
 
   if ( lit ) {
     program->addUniformVar( "model" );
@@ -330,6 +334,8 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
                             const GPUProgramPtr program,
                             const MaterialPtr material,
                             const RenderQueue::LightData& lights ) {
+    program->setUniformVar( "gamma", rv.gamma );
+
     if ( material->lighting ) {
       // Update material uniforms.
       program->setUniformVar( "material.ambient", material->ambient );
@@ -541,6 +547,8 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createSkyboxProgram( const string&
   src.clear();
   src = header;
 
+  src += "uniform float gamma;";
+
   src += "uniform sampler2D tex;";
   src += "in vec2 TexCoord;";
   src += "out vec4 pixel;";
@@ -568,6 +576,9 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createSkyboxProgram( const string&
   // Apply alpha blending from material.
   src += "pixel.a *= material.diffuse.a;";
 
+  // Gamma correction.
+  src += "pixel.rgb = pow(pixel.rgb, vec3(1.0 / gamma));";
+
   src += "}";
 
   auto fsptr = _controller->create<Shader>( name + "_FS" );
@@ -591,6 +602,8 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createSkyboxProgram( const string&
   }
 
   program->addTransformVar( "transform" );
+
+  program->addUniformVar( "gamma" );
 
   program->addUniformVar( "texSampleRegion.x" );
   program->addUniformVar( "texSampleRegion.y" );

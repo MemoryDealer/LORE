@@ -326,6 +326,8 @@ void Forward2DRenderer::renderSkybox( const RenderView& rv,
       program->use();
       texture->bind();
 
+      program->setUniformVar( "gamma", rv.gamma );
+
       Rect sampleRegion = mat->getTexSampleRegion();
       program->setUniformVar( "texSampleRegion.x", sampleRegion.x );
       program->setUniformVar( "texSampleRegion.y", sampleRegion.y );

@@ -162,8 +162,11 @@ void ModelLoader::_processTexture( aiMaterial* material, const aiTextureType typ
     if ( !rc->resourceExists<Texture>( textureName, _resourceGroupName ) ) {
       // Create the LORE texture and add it to the provided material's sprite.
       auto texture = rc->create<Texture>( textureName, _resourceGroupName );
-      texture->loadFromFile( _directory + "/" + texturePath );
-      mesh->getSprite()->addTexture( ConvertTextureType(type), texture );
+      const auto loreTextureType = ConvertTextureType( type );
+
+      // Load texture and specify SRGB only for diffuse maps.
+      texture->loadFromFile( _directory + "/" + texturePath, ( Texture::Type::Diffuse == loreTextureType ) ? true : false );
+      mesh->getSprite()->addTexture( loreTextureType, texture );
 
       LogWrite( Info, "Texture %s loaded for model %s", textureName.c_str(), _name.c_str() );
     }

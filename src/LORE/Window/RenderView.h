@@ -48,6 +48,8 @@ namespace Lore {
     RenderTargetPtr renderTarget { nullptr };
     UIPtr ui { nullptr };
 
+    real gamma { 2.2f }; // The gamma value used for rendering.
+
     Rect viewport {};
 
     // Viewports are stored in a union, so each render plugin can do the 

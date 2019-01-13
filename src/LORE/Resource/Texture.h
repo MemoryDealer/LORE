@@ -53,7 +53,7 @@ namespace Lore {
     Texture() = default;
     virtual ~Texture() = default;
 
-    virtual void loadFromFile( const string& file ) = 0;
+    virtual void loadFromFile( const string& file, const bool srgb = true ) = 0;
 
     virtual void loadCubemap( const std::vector<string>& files ) = 0;
 

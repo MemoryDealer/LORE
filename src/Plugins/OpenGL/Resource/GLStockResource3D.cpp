@@ -147,6 +147,8 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
   src += "uniform vec3 viewPos;";
 
+  src += "uniform float gamma;";
+
   if ( textured ) {
     src += "in vec2 TexCoord;";
     src += "uniform vec2 texSampleOffset = vec2(1.0, 1.0);";
@@ -343,6 +345,9 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
     // Final pixel.
     src += "pixel = vec4(result, material.diffuse.a);";
+
+    // Gamma correction.
+    src += "pixel.rgb = pow(pixel.rgb, vec3(1.0 / gamma));";
   }
   src += "}";
 
@@ -373,6 +378,8 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
   // Add uniforms.
 
   program->addTransformVar( "transform" );
+
+  program->addUniformVar( "gamma" );
 
   if ( lit ) {
     program->addUniformVar( "model" );
@@ -429,6 +436,8 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
                             const RenderQueue::LightData& lights ) {
     if ( material->lighting ) {
       program->setUniformVar( "viewPos", rv.camera->getPosition() );
+
+      program->setUniformVar( "gamma", rv.gamma );
 
       // Update material uniforms.
       program->setUniformVar( "material.ambient", material->ambient );

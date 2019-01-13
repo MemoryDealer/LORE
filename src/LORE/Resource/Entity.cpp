@@ -37,6 +37,7 @@ using namespace Lore;
 
 Entity::~Entity()
 {
+  // HACK?
   if ( _material ) {
     Resource::DestroyMaterial( _material );
   }
