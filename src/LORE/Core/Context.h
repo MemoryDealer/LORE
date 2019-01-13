@@ -76,8 +76,9 @@ namespace Lore {
     ///
     /// \brief Creates a window and returns a handle to it.
     virtual WindowPtr createWindow( const string& title,
-                                    const uint width,
-                                    const uint height,
+                                    const uint32_t width,
+                                    const uint32_t height,
+                                    const int sampleCount,
                                     const RendererType rendererTypeMask,
                                     const Window::Mode& mode = Window::Mode::Windowed ) = 0;
 

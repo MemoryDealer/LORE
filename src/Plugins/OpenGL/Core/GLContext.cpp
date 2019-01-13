@@ -62,6 +62,7 @@ Context::Context() noexcept
   glfwSetErrorCallback( ErrorCallback );
   LogWrite( Info, "OpenGL render plugin context initialized!" );
 
+  // TODO: Don't hardcode these values.
   glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
   glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 3 );
   glfwWindowHint( GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE );
@@ -139,11 +140,16 @@ void Context::renderFrame( const float lagMultiplier )
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Lore::WindowPtr Context::createWindow( const string& title,
-                                       const uint width,
-                                       const uint height,
+                                       const uint32_t width,
+                                       const uint32_t height,
+                                       const int sampleCount,
                                        const Lore::RendererType rendererTypeMask,
                                        const Lore::Window::Mode& mode )
 {
+  // Setup multisampling for this window.
+  glfwWindowHint( GLFW_SAMPLES, sampleCount );
+  glEnable( GL_MULTISAMPLE );
+
   auto window = _poolCluster.create<Window, GLWindow>();
   window->init( title, width, height, rendererTypeMask );
   window->setMode( mode );

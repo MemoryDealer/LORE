@@ -44,7 +44,7 @@ Game::Game()
   _context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
 
   // Create a window and set it to the active window.
-  _window = _context->createWindow( "Complex Scene 3D", 1280, 720, Lore::RendererType::Forward3D );
+  _window = _context->createWindow( "Complex Scene 3D", 1280, 720, 4, Lore::RendererType::Forward3D );
   _window->setActive();
 
   // Allow the DebugUI.
