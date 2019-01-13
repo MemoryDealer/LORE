@@ -112,8 +112,8 @@ namespace Lore {
                 TPool->destroy( static_cast<TDerived*>( object ) );
             }
             else {
-                log_information( "PoolCluster::create<T>: Pool of type " +
-                                       string( typeid( TDerived ).name() ) + " does not exist" );
+              LogWrite( Info, "PoolCluster::create<T>: Pool of type %s does not exist",
+                        typeid( TDerived ).name() );
             }
         }
 

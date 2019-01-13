@@ -37,6 +37,7 @@ using namespace Lore;
 
 Entity::~Entity()
 {
+  // HACK?
   if ( _material ) {
     Resource::DestroyMaterial( _material );
   }
@@ -77,7 +78,7 @@ size_t Entity::getInstanceCount() const
 void Entity::enableInstancing( const size_t max )
 {
   if ( isInstanced() ) {
-   log_information( "Instancing is already enabled" );
+   LogWrite( Info, "Instancing is already enabled" );
    return;
   }
 

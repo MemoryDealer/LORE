@@ -62,7 +62,7 @@ ConfigValue Config::GetValue( const string& key )
     return it->second;
   }
 
-  log_error( "Config value " + key + " does not exist" );
+  LogWrite( Error, "Config value %s does not exist", key.c_str() );
   return ConfigValue();
 }
 

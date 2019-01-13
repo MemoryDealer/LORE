@@ -41,7 +41,7 @@ namespace Lore { namespace OpenGL {
 
     ~GLTexture() override;
 
-    void loadFromFile( const string& file ) override;
+    void loadFromFile( const string& file, const bool srgb ) override;
 
     void loadCubemap( const std::vector<string>& files ) override;
 
@@ -63,7 +63,7 @@ namespace Lore { namespace OpenGL {
 
   private:
 
-    void _createGLTexture( const unsigned char* pixels, const int width, const int height, const bool genMipMaps = true );
+    void _createGLTexture( const unsigned char* pixels, const int width, const int height, const bool srgb = true, const bool genMipMaps = true );
 
   private:
 

@@ -42,7 +42,7 @@ GLTexture::~GLTexture()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLTexture::loadFromFile( const string& file )
+void GLTexture::loadFromFile( const string& file, const bool srgb )
 {
   _target = GL_TEXTURE_2D;
   stbi_set_flip_vertically_on_load( 1 );
@@ -51,7 +51,7 @@ void GLTexture::loadFromFile( const string& file )
   unsigned char* pixels = stbi_load( file.c_str(), &width, &height, &n, STBI_rgb_alpha );
   if ( pixels ) {
 
-    _createGLTexture( pixels, width, height );
+    _createGLTexture( pixels, width, height, srgb );
 
     stbi_image_free( pixels );
     glBindTexture( _target, 0 );
@@ -174,7 +174,7 @@ void GLTexture::setDefaultActiveTexture()
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLTexture::_createGLTexture( const unsigned char* pixels, const int width, const int height, const bool genMipMaps )
+void GLTexture::_createGLTexture( const unsigned char* pixels, const int width, const int height, const bool srgb, const bool genMipMaps )
 {
   glGenTextures( 1, &_id );
   glBindTexture( _target, _id );
@@ -186,7 +186,7 @@ void GLTexture::_createGLTexture( const unsigned char* pixels, const int width, 
   glTexParameteri( _target, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
   // Create the OpenGL texture.
-  glTexImage2D( _target, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
+  glTexImage2D( _target, 0, (srgb) ? GL_SRGB_ALPHA : GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
 
   if ( genMipMaps ) {
     glGenerateMipmap( _target );

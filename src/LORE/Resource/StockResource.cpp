@@ -293,7 +293,7 @@ ModelPtr StockResource::GetModel( const Mesh::Type type )
 {
   switch ( type ) {
   default:
-    log_warning( "Model type not available for stock resource retrieval" );
+    LogWrite( Warning, "Model type not available for stock resource retrieval" );
     return nullptr;
 
   case Mesh::Type::Quad:

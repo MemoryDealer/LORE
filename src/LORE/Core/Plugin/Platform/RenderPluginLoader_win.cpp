@@ -57,11 +57,11 @@ bool RenderPluginLoader::load( const string& file )
 
     _hModule = LoadLibrary( file.c_str() );
     if ( nullptr == _hModule ) {
-        log_critical( "Unable to load render plugin " + file );
+        LogWrite( Critical, "Unable to load render plugin %s", file.c_str() );
         return false;
     }
 
-    log_debug( "Render plugin " + file + " successfully loaded" );
+    LogWrite( Info, "Render plugin %s successfully loaded", file.c_str() );
 
     return true;
 }
@@ -77,7 +77,7 @@ std::unique_ptr<Context> RenderPluginLoader::createContext()
     CreateContextPtr ccp = reinterpret_cast< CreateContextPtr >(
         GetProcAddress( _hModule, "CreateContext" ) );
     if ( nullptr == ccp ) {
-        log_critical( "Unable to get CreateContext function pointer from render plugin" );
+        LogWrite( Critical, "Unable to get CreateContext function pointer from render plugin" );
         return nullptr;
     }
 

@@ -29,7 +29,6 @@
 #include <LORE/Config/Config.h>
 #include <LORE/Core/APIVersion.h>
 #include <LORE/Core/NotificationCenter.h>
-#include <LORE/Core/Timestamp.h>
 #include <LORE/Core/CLI/CLI.h>
 #include <LORE/Core/DebugUI/DebugUI.h>
 #include <LORE/Input/Input.h>
@@ -154,8 +153,7 @@ ScenePtr Context::createScene( const string& name, const RendererType& rt )
   auto skyboxMaterial = StockResource::GetMaterial( skyboxMaterialName );
   skybox->setMaterialTemplate( skyboxMaterial );
 
-  lore_log( "Scene " + name + " created successfully" );
-
+  LogWrite( Info, "Scene %s successfully created", name.c_str() );
   return scene;
 }
 
@@ -167,7 +165,7 @@ void Context::destroyScene( const string& name )
   _poolCluster.destroy<Scene>( scene );
   _sceneRegistry.remove( name );
 
-  lore_log( "Scene " + name + " destroyed successfully" );
+  LogWrite( Info, "Scene %s destroyed successfully", name.c_str() );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -201,7 +199,7 @@ CameraPtr Context::createCamera( const string& name, const Camera::Type type )
     throw Exception( "Failed to emplace camera in map" );
   }
 
-  log_information( "Camera " + name + " successfully created" );
+  LogWrite( Info, "Camera %s successfully created", name.c_str() );
 
   return it.first->second.get();
 }
@@ -211,7 +209,7 @@ CameraPtr Context::createCamera( const string& name, const Camera::Type type )
 void Context::destroyCamera( CameraPtr camera )
 {
   auto name = camera->getName();
-  log_information( "Destroying camera " + name );
+  LogWrite( Info, "Destroying camera %s", name.c_str() );
   _cameras.erase( name );
 }
 
@@ -283,14 +281,14 @@ std::unique_ptr<Context> Context::Create( const RenderPlugin& renderer )
   string file;
 
   // Setup required Lore objects.
-  Log::AllocateLogger();
+  Log::Alloc();
   NotificationCenter::Initialize();
 
   __rpl.free();
 
   switch ( renderer ) {
   default:
-    log_critical( "Unknown render plugin specified" );
+    LogWrite( Critical, "Unknown render plugin specified" );
     return nullptr;
 
   case RenderPlugin::OpenGL:
@@ -329,7 +327,7 @@ void Context::Destroy( std::unique_ptr<Context> context )
   Resource::AssignContext( nullptr );
   StockResource::AssignContext( nullptr );
   MemoryAccess::_SetPrimaryPoolCluster( nullptr );
-  Log::DeleteLogger();
+  Log::Delete();
   NotificationCenter::Destroy();
   _activeContextPtr = nullptr;
 }
@@ -445,7 +443,7 @@ void Context::setAPIVersion( const int major, const int minor )
 
 void Context::ErrorCallback( int error, const char* desc )
 {
-  log_error( desc );
+  LogWrite( Error, desc );
 
   // Call all error listeners.
   for ( const auto& listener : __errorListeners ) {

@@ -39,12 +39,16 @@ namespace Lore { namespace Util {
 
   ///
   /// \brief Returns file name from a full file path.
-  static string GetFileName( const string& file )
+  static string GetFileName( const string& file, const bool keepExtension = false )
   {
-    const auto lastSlash = file.rfind( '/' ) + 1;
-    const auto dot = file.rfind( '.' );
+    auto lastSlash = file.rfind( '/' ) + 1;
+    if ( 0 == lastSlash ) {
+      // TODO: Generalize platform slashes.
+      lastSlash = file.rfind( '\\' ) + 1;
+    }
+    const auto cutoff = ( keepExtension ) ? file.length() : file.rfind( '.' );
 
-    return file.substr( lastSlash, dot - lastSlash );
+    return file.substr( lastSlash, cutoff - lastSlash );
   }
 
   ///

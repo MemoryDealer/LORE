@@ -58,7 +58,7 @@ bool RenderPluginLoader::load( const string& file )
     // Load plugin module.
     // ...
 
-    log_debug( "Render plugin " + file + " successfully loaded" );
+    LogWrite( info, "Render plugin %s successfully loaded", file.c_str() );
 
     return true;
 }

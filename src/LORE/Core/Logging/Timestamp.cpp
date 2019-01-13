@@ -71,11 +71,11 @@ string Timestamper::generate() const
     string timestamp;
 
     // Trash "algorithm" to generate a timestamp string.
-    auto month = std::to_string( st.wMonth );
-    if ( st.wMonth < 10 ) month.insert( 0, "0" );
-    auto day = std::to_string( st.wDay );
-    if ( st.wDay < 10 ) day.insert( 0, "0" );
-    auto year = std::to_string( st.wYear );
+//     auto month = std::to_string( st.wMonth );
+//     if ( st.wMonth < 10 ) month.insert( 0, "0" );
+//     auto day = std::to_string( st.wDay );
+//     if ( st.wDay < 10 ) day.insert( 0, "0" );
+//     auto year = std::to_string( st.wYear );
     auto hour = std::to_string( st.wHour );
     if ( st.wHour < 10 ) hour.insert( 0, "0" );
     auto minute = std::to_string( st.wMinute );
@@ -83,7 +83,7 @@ string Timestamper::generate() const
     auto second = std::to_string( st.wSecond );
     if ( st.wSecond < 10 ) second.insert( 0, "0" );
 
-    timestamp.append( month + "/" + day + "/" + year + " " );
+    //timestamp.append( month + "/" + day + "/" + year + " " );
     timestamp.append( hour + ":" + minute + ":" + second );
     return timestamp;
 }

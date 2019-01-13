@@ -68,7 +68,7 @@ void GLFont::loadFromFile( const string& file, const uint32_t size )
 
     // Load a glyph.
     if ( FT_Load_Char( face, c, FT_LOAD_RENDER ) ) {
-      log_error( "Failed to load character " + std::to_string( c ) );
+      LogWrite( Error, "Failed to load character %c", c );
       continue;
     }
 
@@ -102,7 +102,7 @@ void GLFont::loadFromFile( const string& file, const uint32_t size )
 
   glBindTexture( GL_TEXTURE_2D, 0 );
 
-  log_information( "Successfully loaded font " + file );
+  LogWrite( Info, "Successfully loaded font %s", file.c_str() );
 
   // Clean up FT resources.
   FT_Done_Face( face );

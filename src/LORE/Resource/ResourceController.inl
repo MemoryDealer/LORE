@@ -145,7 +145,7 @@ template<typename ResourceType>
 inline void ResourceController::destroyAllInGroup( const string& groupName )
 {
   const std::type_info& ti = typeid( ResourceType );
-  log_information( "Destroying all resources of type " + string( ti.name() ) + " in group " + groupName );
+  LogWrite( Info, "Destroying all resources of type %s in group %s", ti.name(), groupName.c_str() );
   const auto t = std::type_index( typeid( ResourceType ) );
   auto group = _getGroup( groupName );
   auto registry = group->_resources[t];

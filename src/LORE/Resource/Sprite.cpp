@@ -50,7 +50,7 @@ void Sprite::addTexture( const Texture::Type type, const TexturePtr texture, con
     _frames.push_back( data );
   }
   else {
-    log_error( "Frame index " + std::to_string( frameIdx ) + " too large" );
+    LogWrite( Error, "Frame index %llu too large", TO_LLU( frameIdx ) );
   }
 }
 
@@ -71,11 +71,11 @@ void Sprite::setMixValue( const size_t frameIdx, const Texture::Type type, const
       frame.mixValues[idx] = value;
     }
     else {
-      log_error( "Mix value index " + std::to_string( value ) + " too large, not setting mix value" );
+      LogWrite( Error, "Mix value index %.2f too large, not setting mix value", value );
     }
   }
   else {
-    log_error( "Frame index " + std::to_string( frameIdx ) + " too large, not setting mix value" );
+    LogWrite( Error, "Frame index %llu too large, not setting mix value", TO_LLU( frameIdx ) );
   }
 }
 
@@ -93,7 +93,7 @@ TexturePtr Sprite::getTexture( const size_t frameIdx, const Texture::Type type, 
       }
     }
   }
-  log_error( "Failed to get texture at frame " + std::to_string( frameIdx ) + ", index " + std::to_string(idx) );
+  LogWrite( Error, "Failed to get texture at frame %llu, index %llu", TO_LLU( frameIdx ), TO_LLU( idx ) );
   return nullptr;
 }
 

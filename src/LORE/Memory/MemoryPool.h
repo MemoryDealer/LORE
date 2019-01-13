@@ -113,7 +113,7 @@ namespace Lore {
     {
       if ( !object->_inUse ) {
         //throw Exception( "Attempting to destroy object not in use" );
-        log_warning( "Attempted to destroy object not in use" );
+        LogWrite( Warning, "Attempted to destroy object not in use" );
         return;
       }
 

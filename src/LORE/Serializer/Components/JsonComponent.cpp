@@ -200,7 +200,7 @@ bool JsonSerializerComponent::deserialize( const string& file )
 
     switch ( value.GetType() ) {
     default:
-      log_error( string( "Unknown type for value " ) + key.GetString() );
+      LogWrite( Error, "Unknown type for value %s", key.GetString() );
       break;
 
     case rapidjson::Type::kNullType:
