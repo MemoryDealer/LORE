@@ -258,7 +258,8 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createUberProgram( const string& n
   }
 
   // Final pixel.
-  src += "pixel = pow(texSample, vec4(1.0 / gamma));";
+  src += "pixel = texSample;";
+  src += "pixel.rgb = pow(texSample.rgb, vec3(1.0 / gamma));";
 
   src += "}";
   auto fsptr = _controller->create<Shader>( name + "_FS" );

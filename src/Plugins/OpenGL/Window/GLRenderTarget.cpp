@@ -54,8 +54,8 @@ void GLRenderTarget::init( const uint32_t width, const uint32_t height )
   glBindFramebuffer( GL_FRAMEBUFFER, _fbo );
 
   // Generate empty texture to bind to framebuffer.
-  _texture = Lore::Resource::CreateTexture( _name + "_render_target", _width, _height, Lore::StockColor::White );
-  auto glTexturePtr = static_cast< GLTexture* >( _texture );
+  _texture = Lore::Resource::CreateTexture( _name + "_render_target", _width, _height );
+  auto glTexturePtr = ResourceCast<GLTexture>( _texture );
   auto textureID = glTexturePtr->getID();
 
   glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureID, 0 );

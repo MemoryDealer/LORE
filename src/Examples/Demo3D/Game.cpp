@@ -93,9 +93,35 @@ void Game::loadScene()
   // entire window.
   Lore::RenderView rv( "core", _scene, Lore::Rect( 0.f, 0.f, 1.f, 1.f ) );
   rv.camera = _camera;
-
+  rv.renderTarget = Lore::Resource::CreateRenderTarget( "rt1", 1920, 1080 );
+  rv.gamma = 1.f;
   // Add the RenderView to the window so it will render our scene.
   _window->addRenderView( rv );
+
+
+
+  Lore::ScenePtr postScene = _context->createScene( "pp", Lore::RendererType::Forward2D );
+  Lore::RenderView postProcessor( "pp", postScene, Lore::Rect( 0.f, 0.f, 1.f, 1.f ) );
+  postProcessor.camera = _context->createCamera( "postCam", Lore::Camera::Type::Type2D );
+  _window->addRenderView( postProcessor );
+
+  auto ppe = Lore::Resource::CreateEntity( "ppe", Lore::Mesh::Type::TexturedQuad );
+  ppe->getMaterial()->program = Lore::StockResource::GetGPUProgram( "UnlitTexturedRTT" );
+
+  auto rttSprite = Lore::Resource::CreateSprite( "rtt" );
+  rttSprite->addTexture( Lore::Texture::Type::Diffuse, rv.renderTarget->getTexture() );
+  ppe->getMaterial()->sprite = rttSprite;
+  auto ppeNode = postScene->createNode( "ppe" );
+  ppeNode->attachObject( ppe );
+  ppeNode->scale( glm::vec2( 10.6664f, 8.f ) );
+
+//   Lore::SkyboxPtr skybox = postScene->getSkybox();
+// 
+//   // The first layer will be some scrolling clouds.
+//   auto& layer0 = skybox->addLayer( "rtt" );
+//   layer0.setSprite( ppe->getMaterial()->sprite );
+
+
 
   // Load the scene from disk.
   Lore::SceneLoader loader;

@@ -150,7 +150,7 @@ void GLTexture::create( const int width, const int height, const Lore::Color& co
     }
   }
 
-  _createGLTexture( pixels, width, height );
+  _createGLTexture( pixels, width, height, false );
 
   delete[] pixels;
   glBindTexture( GL_TEXTURE_2D, 0 );

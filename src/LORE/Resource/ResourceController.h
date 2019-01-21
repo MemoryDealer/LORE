@@ -290,6 +290,10 @@ namespace Lore {
     static TexturePtr CreateTexture( const string& name,
                                      const uint32_t width,
                                      const uint32_t height,
+                                     const string& groupName = ResourceController::DefaultGroupName );
+    static TexturePtr CreateTexture( const string& name,
+                                     const uint32_t width,
+                                     const uint32_t height,
                                      const Color& color,
                                      const string& groupName = ResourceController::DefaultGroupName );
     static TextboxPtr CreateTextbox( const string& name,

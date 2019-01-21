@@ -494,6 +494,15 @@ SpriteAnimationSetPtr Resource::CreateSpriteAnimationSet( const string& name,
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+TexturePtr Resource::CreateTexture( const string& name, const uint32_t width, const uint32_t height, const string& groupName )
+{
+  auto texture = ActiveContext->getResourceController()->create<Texture>( name, groupName );
+  texture->create( width, height );
+  return texture;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 TexturePtr Resource::CreateTexture( const string& name, const uint32_t width, const uint32_t height, const Color& color, const string& groupName )
 {
   auto texture = ActiveContext->getResourceController()->create<Texture>( name, groupName );

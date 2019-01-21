@@ -236,6 +236,10 @@ void Forward3DRenderer::present( const RenderView& rv,
     _renderUI( DebugUI::GetConsoleUI(), rv, aspectRatio, projection );
   }
 
+  if ( rv.renderTarget ) {
+    _api->bindDefaultFramebuffer();
+  }
+
   _clearRenderQueues();
 }
 
