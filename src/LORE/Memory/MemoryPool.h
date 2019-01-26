@@ -87,6 +87,7 @@ namespace Lore {
     {
       for ( int i = 0; i < _size; ++i ) {
         delete _objects[i];
+        _objects[i] = nullptr;
       }
 
       delete[] _objects;

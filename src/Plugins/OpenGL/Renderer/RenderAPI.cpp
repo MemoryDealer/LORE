@@ -144,6 +144,20 @@ void RenderAPI::clear()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void RenderAPI::clearColorBufferBit()
+{
+  glClear( GL_COLOR_BUFFER_BIT );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void RenderAPI::clearDepthBufferBit()
+{
+  glClear( GL_DEPTH_BUFFER_BIT );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void RenderAPI::setViewport( const uint32_t x,
                              const uint32_t y,
                              const uint32_t width,

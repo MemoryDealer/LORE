@@ -94,6 +94,8 @@ namespace Lore {
                              const real a ) = 0;
 
     virtual void clear() = 0;
+    virtual void clearColorBufferBit() = 0;
+    virtual void clearDepthBufferBit() = 0;
 
     virtual void setViewport( const uint32_t x,
                               const uint32_t y,

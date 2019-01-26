@@ -279,6 +279,7 @@ namespace Lore {
     static RenderTargetPtr CreateRenderTarget( const string& name,
                                                const uint32_t width,
                                                const uint32_t height,
+                                               const uint32_t sampleCount,
                                                const string& groupName = ResourceController::DefaultGroupName );
     static ShaderPtr CreateShader( const string& name,
                                    const Shader::Type type,
@@ -290,6 +291,7 @@ namespace Lore {
     static TexturePtr CreateTexture( const string& name,
                                      const uint32_t width,
                                      const uint32_t height,
+                                     const uint32_t sampleCount,
                                      const string& groupName = ResourceController::DefaultGroupName );
     static TexturePtr CreateTexture( const string& name,
                                      const uint32_t width,

@@ -103,18 +103,29 @@ void GLTexture::loadCubemap( const std::vector<string>& files )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLTexture::create( const uint32_t width, const uint32_t height )
+void GLTexture::create( const uint32_t width, const uint32_t height, const uint32_t sampleCount )
 {
   glGenTextures( 1, &_id );
-  glBindTexture( GL_TEXTURE_2D, _id );
 
-  // Create empty texture.
-  glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr );
+  if ( sampleCount ) {
+    _target = GL_TEXTURE_2D_MULTISAMPLE;
+    glBindTexture( _target, _id );
 
-  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    // Create texture.
+    glTexImage2DMultisample( _target, sampleCount, GL_RGB, width, height, GL_TRUE );
+  }
+  else {
+    _target = GL_TEXTURE_2D;
+    glBindTexture( _target, _id );
 
-  glBindTexture( GL_TEXTURE_2D, 0 );
+    // Create texture.
+    glTexImage2D( _target, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr );
+
+    glTexParameteri( _target, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri( _target, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+  }
+
+  glBindTexture( _target, 0 );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
