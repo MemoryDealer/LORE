@@ -93,7 +93,7 @@ void Game::loadScene()
   // entire window.
   Lore::RenderView rv( "core", _scene, Lore::Rect( 0.f, 0.f, 1.f, 1.f ) );
   rv.camera = _camera;
-  rv.renderTarget = Lore::Resource::CreateRenderTarget( "rt1", 1920, 1080 );
+  rv.renderTarget = Lore::Resource::CreateRenderTarget( "rt1", 1920, 1080, 8 );
   rv.gamma = 1.f;
   // Add the RenderView to the window so it will render our scene.
   _window->addRenderView( rv );
@@ -110,6 +110,7 @@ void Game::loadScene()
 
   auto rttSprite = Lore::Resource::CreateSprite( "rtt" );
   rttSprite->addTexture( Lore::Texture::Type::Diffuse, rv.renderTarget->getTexture() );
+  ppe->getMaterial()->lighting = false;
   ppe->getMaterial()->sprite = rttSprite;
   auto ppeNode = postScene->createNode( "ppe" );
   ppeNode->attachObject( ppe );
