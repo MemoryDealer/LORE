@@ -255,7 +255,39 @@ void ResourceFileProcessor::processSpriteList( const string& groupName, Resource
     // Create a sprite for this entry.
     auto sprite = resourceController->create<Sprite>( name, groupName );
 
-    if ( SerializerValue::Type::Array == spriteValue.second.getType() ) {
+    const auto type = spriteValue.second.getType();
+    switch ( type ) {
+    default:
+    case SerializerValue::Type::String:
+    {
+      // Just a single texture.
+      const auto& textureName = spriteValue.second.toString();
+      sprite->addTexture( Texture::Type::Diffuse, resourceController->get<Texture>( textureName, groupName ) );
+    }
+    break;
+
+    case SerializerValue::Type::Container:
+    {
+      // Containers should explicitly define each component of the sprite.
+      const auto& container = spriteValue.second;
+      const auto& diffuse = container.getValue( "diffuse" );
+      const auto& specular = container.getValue( "specular" );
+      const auto& normal = container.getValue( "normal" );
+
+      if ( !diffuse.isNull() ) {
+        sprite->addTexture( Texture::Type::Diffuse, resourceController->get<Texture>( diffuse.toString(), groupName ) );
+      }
+      if ( !specular.isNull() ) {
+        sprite->addTexture( Texture::Type::Specular, resourceController->get<Texture>( specular.toString(), groupName ) );
+      }
+      if ( !normal.isNull() ) {
+        sprite->addTexture( Texture::Type::Normal, resourceController->get<Texture>( normal.toString(), groupName ) );
+      }
+    }
+    break;
+
+    case SerializerValue::Type::Array:
+    {
       const auto& textureNames = spriteValue.second.toArray();
 
       if ( textureNames.empty() ) {
@@ -269,12 +301,9 @@ void ResourceFileProcessor::processSpriteList( const string& groupName, Resource
         sprite->addTexture( Texture::Type::Diffuse, resourceController->get<Texture>( textureName.toString(), groupName ), frame++ );
       }
     }
-    else if ( SerializerValue::Type::String == spriteValue.second.getType() ) {
-      // Just a single texture.
-      const auto& textureName = spriteValue.second.toString();
-      sprite->addTexture( Texture::Type::Diffuse, resourceController->get<Texture>( textureName, groupName ) );
-    }
-  }
+    break;
+    } // switch
+  } // for
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
