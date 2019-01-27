@@ -183,7 +183,7 @@ void Forward2DRenderer::present( const RenderView& rv, const WindowPtr window )
 
   Color bg = rv.scene->getSkyboxColor();
   _api->clear();
-  _api->clearColor( bg.r, bg.g, bg.b, 0.f );
+  _api->clearColor( bg.r, bg.g, bg.b, 1.f );
   _api->setPolygonMode( IRenderAPI::PolygonMode::Fill );
 
   // Setup view-projection matrix.
@@ -258,6 +258,7 @@ void Forward2DRenderer::present( const RenderView& rv, const WindowPtr window )
   }
 
   if ( rv.renderTarget ) {
+    rv.renderTarget->flush();
     // Re-bind default frame buffer if custom render target was specified.
     _api->bindDefaultFramebuffer();
   }

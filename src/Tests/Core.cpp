@@ -68,7 +68,7 @@ TEST_CASE( "Context creation/destruction multiple times in a single run", "[cont
     {
         context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
 
-        Lore::WindowPtr window = context->createWindow( "UnitTest", 50, 50, Lore::RendererType::Forward2D );
+        Lore::WindowPtr window = context->createWindow( "UnitTest", 50, 50, 0, Lore::RendererType::Forward2D );
         REQUIRE( nullptr != window );
 
         DestroyLoreContext( context );
@@ -78,7 +78,7 @@ TEST_CASE( "Context creation/destruction multiple times in a single run", "[cont
         context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
         REQUIRE( nullptr != context );
 
-        window = context->createWindow( "UnitTest2", 50, 50, Lore::RendererType::Forward2D );
+        window = context->createWindow( "UnitTest2", 50, 50, 0, Lore::RendererType::Forward2D );
         REQUIRE( nullptr != window );
 
         DestroyLoreContext( context );

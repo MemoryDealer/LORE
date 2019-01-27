@@ -32,7 +32,7 @@ LoreTestHelper::LoreTestHelper()
 {
   _context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
 
-  _window = _context->createWindow( "Test", 16, 16, Lore::RendererType::Forward3D );
+  _window = _context->createWindow( "Test", 16, 16, 0, Lore::RendererType::Forward3D );
   _window->setActive();
 }
 

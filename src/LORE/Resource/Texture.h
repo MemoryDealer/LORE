@@ -57,7 +57,7 @@ namespace Lore {
 
     virtual void loadCubemap( const std::vector<string>& files ) = 0;
 
-    virtual void create( const uint32_t width, const uint32_t height ) = 0;
+    virtual void create( const uint32_t width, const uint32_t height, const uint32_t sampleCount ) = 0;
 
     virtual void create( const int width, const int height, const Color& color ) = 0;
 

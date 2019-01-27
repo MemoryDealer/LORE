@@ -54,6 +54,8 @@ namespace Lore { namespace OpenGL {
                              const real a ) override;
 
     void clear() override;
+    void clearColorBufferBit() override;
+    void clearDepthBufferBit() override;
 
     void setViewport( const uint32_t x,
                               const uint32_t y,

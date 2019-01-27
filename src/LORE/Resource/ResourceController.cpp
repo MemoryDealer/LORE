@@ -459,10 +459,10 @@ ModelPtr Resource::CreateModel( const string& name, const Mesh::Type& type, cons
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-RenderTargetPtr Resource::CreateRenderTarget( const string& name, const uint32_t width, const uint32_t height, const string& groupName )
+RenderTargetPtr Resource::CreateRenderTarget( const string& name, const uint32_t width, const uint32_t height, const uint32_t sampleCount, const string& groupName )
 {
   auto rt = ActiveContext->getResourceController()->create<RenderTarget>( name, groupName );
-  rt->init( width, height );
+  rt->init( width, height, sampleCount );
   return rt;
 }
 
@@ -490,6 +490,15 @@ SpriteAnimationSetPtr Resource::CreateSpriteAnimationSet( const string& name,
                                                           const string& groupName )
 {
   return ActiveContext->getResourceController()->create<SpriteAnimationSet>( name, groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+TexturePtr Resource::CreateTexture( const string& name, const uint32_t width, const uint32_t height, const uint32_t sampleCount, const string& groupName )
+{
+  auto texture = ActiveContext->getResourceController()->create<Texture>( name, groupName );
+  texture->create( width, height, sampleCount );
+  return texture;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

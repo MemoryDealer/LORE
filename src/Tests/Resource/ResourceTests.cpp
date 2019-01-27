@@ -41,7 +41,7 @@ TEST_CASE( "Load and unload resources in code", "[resource]" )
     REQUIRE( Lore::Resource::CreateEntity( names[i], Lore::Mesh::Type::TexturedQuad ) );
     REQUIRE( Lore::Resource::CreateGPUProgram( names[i] ) );
     REQUIRE( Lore::Resource::CreateMaterial( names[i] ) );
-    REQUIRE( Lore::Resource::CreateRenderTarget( names[i], 640, 480 ) );
+    REQUIRE( Lore::Resource::CreateRenderTarget( names[i], 640, 480, 0 ) );
     REQUIRE( Lore::Resource::CreateShader( names[i] + "_FS", Lore::Shader::Type::Fragment ) );
     REQUIRE( Lore::Resource::CreateShader( names[i] + "_VS", Lore::Shader::Type::Vertex ) );
     REQUIRE( Lore::Resource::CreateSprite( names[i] ) );
@@ -103,7 +103,7 @@ TEST_CASE( "Load and unload resources in code, different group", "[resource]" )
     REQUIRE( Lore::Resource::CreateEntity( names[i], Lore::Mesh::Type::TexturedQuad, groupName ) );
     REQUIRE( Lore::Resource::CreateGPUProgram( names[i], groupName ) );
     REQUIRE( Lore::Resource::CreateMaterial( names[i], groupName ) );
-    REQUIRE( Lore::Resource::CreateRenderTarget( names[i], 640, 480, groupName ) );
+    REQUIRE( Lore::Resource::CreateRenderTarget( names[i], 640, 480, 0, groupName ) );
     REQUIRE( Lore::Resource::CreateShader( names[i] + "_FS", Lore::Shader::Type::Fragment, groupName ) );
     REQUIRE( Lore::Resource::CreateShader( names[i] + "_VS", Lore::Shader::Type::Vertex, groupName ) );
     REQUIRE( Lore::Resource::CreateSprite( names[i], groupName ) );

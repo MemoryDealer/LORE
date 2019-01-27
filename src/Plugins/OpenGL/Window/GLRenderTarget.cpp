@@ -39,31 +39,52 @@ GLRenderTarget::~GLRenderTarget()
 {
   glDeleteRenderbuffers( 1, &_rbo );
   glDeleteFramebuffers( 1, &_fbo );
+  if ( _texture ) {
+    //Resource::DestroyTexture( _texture );
+  }
+
+  if ( _multiSampling ) {
+    glDeleteFramebuffers( 1, &_intermediateFBO );
+    //Resource::DestroyTexture( _intermediateTexture );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLRenderTarget::init( const uint32_t width, const uint32_t height )
+Lore::TexturePtr GLRenderTarget::getTexture() const
+{
+  return ( _multiSampling ) ? _intermediateTexture : _texture;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLRenderTarget::init( const uint32_t width, const uint32_t height, const uint32_t sampleCount )
 {
   _width = width;
   _height = height;
   _aspectRatio = static_cast< real >( _width ) / _height;
+  _multiSampling = !!( sampleCount );
 
   // Create a framebuffer.
   glGenFramebuffers( 1, &_fbo );
   glBindFramebuffer( GL_FRAMEBUFFER, _fbo );
 
   // Generate empty texture to bind to framebuffer.
-  _texture = Lore::Resource::CreateTexture( _name + "_render_target", _width, _height, Lore::StockColor::White );
-  auto glTexturePtr = static_cast< GLTexture* >( _texture );
+  _texture = Resource::CreateTexture( _name + "_render_target", _width, _height, sampleCount, getResourceGroupName() );
+  auto glTexturePtr = ResourceCast<GLTexture>( _texture );
   auto textureID = glTexturePtr->getID();
 
-  glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureID, 0 );
+  glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, ( _multiSampling ) ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D, textureID, 0 );
 
   // Generate render buffer object for depth/stencil buffers.
   glGenRenderbuffers( 1, &_rbo );
   glBindRenderbuffer( GL_RENDERBUFFER, _rbo );
-  glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, _width, _height );
+  if ( _multiSampling ) {
+    glRenderbufferStorageMultisample( GL_RENDERBUFFER, sampleCount, GL_DEPTH24_STENCIL8, width, height );
+  }
+  else {
+    glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, _width, _height );
+  }
   glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, _rbo );
 
   if ( GL_FRAMEBUFFER_COMPLETE != glCheckFramebufferStatus( GL_FRAMEBUFFER ) ) {
@@ -72,13 +93,37 @@ void GLRenderTarget::init( const uint32_t width, const uint32_t height )
 
   glBindRenderbuffer( GL_RENDERBUFFER, 0 );
   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+
+  if ( _multiSampling ) {
+    // Configure second post-processing framebuffer.
+    glGenFramebuffers( 1, &_intermediateFBO );
+    glBindFramebuffer( GL_FRAMEBUFFER, _intermediateFBO );
+
+    _intermediateTexture = Resource::CreateTexture( _name + "_int_render_target", _width, _height, 0, getResourceGroupName() );
+    auto intGLTexturePtr = ResourceCast<GLTexture>( _intermediateTexture );
+    auto intTextureID = intGLTexturePtr->getID();
+    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, intTextureID, 0 );
+  }
+
+  glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLRenderTarget::bind()
+void GLRenderTarget::bind() const
 {
   glBindFramebuffer( GL_FRAMEBUFFER, _fbo );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLRenderTarget::flush() const
+{
+  if ( _multiSampling ) {
+    glBindFramebuffer( GL_READ_FRAMEBUFFER, _fbo );
+    glBindFramebuffer( GL_DRAW_FRAMEBUFFER, _intermediateFBO );
+    glBlitFramebuffer( 0, 0, _width, _height, 0, 0, _width, _height, GL_COLOR_BUFFER_BIT, GL_NEAREST );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

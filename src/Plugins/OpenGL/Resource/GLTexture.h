@@ -45,7 +45,7 @@ namespace Lore { namespace OpenGL {
 
     void loadCubemap( const std::vector<string>& files ) override;
 
-    void create( const uint32_t width, const uint32_t height ) override;
+    void create( const uint32_t width, const uint32_t height, const uint32_t sampleCount ) override;
 
     void create( const int width, const int height, const Color& color ) override;
 

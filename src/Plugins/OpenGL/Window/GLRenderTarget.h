@@ -41,13 +41,20 @@ namespace Lore { namespace OpenGL {
     GLRenderTarget() = default;
     ~GLRenderTarget() override;
 
-    void bind() override;
-    void init( const uint32_t width, const uint32_t height ) override;
+    TexturePtr getTexture() const override;
+    void init( const uint32_t width, const uint32_t height, const uint32_t sampleCount ) override;
+    void bind() const override;
+    void flush() const override;
 
   private:
 
     GLuint _fbo { 0 };
+    GLuint _intermediateFBO { 0 };
     GLuint _rbo { 0 };
+
+    TexturePtr _intermediateTexture { nullptr };
+
+    bool _multiSampling { false };
 
   };
 

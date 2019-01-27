@@ -174,8 +174,6 @@ void Forward3DRenderer::present( const RenderView& rv,
     addLight( dirLight, nullptr );
   }
 
-  const real aspectRatio = ( rv.renderTarget ) ? rv.renderTarget->getAspectRatio() : window->getAspectRatio();
-
   if ( rv.renderTarget ) {
     rv.renderTarget->bind();
     _api->setViewport( 0,
@@ -191,15 +189,15 @@ void Forward3DRenderer::present( const RenderView& rv,
                        rv.gl_viewport.height );
   }
 
-  _api->setDepthTestEnabled( true );
-
   Color bg = rv.scene->getSkyboxColor();
   _api->clear();
-  _api->clearColor( bg.r, bg.g, bg.b, 0.f );
+  _api->clearColor( bg.r, bg.g, bg.b, 1.f );
   _api->setPolygonMode( IRenderAPI::PolygonMode::Fill );
+  _api->setDepthTestEnabled( true );
 
   // Setup view-projection matrix.
   // TODO: Take viewport dimensions into account. Cache more things inside window.
+  const real aspectRatio = ( rv.renderTarget ) ? rv.renderTarget->getAspectRatio() : window->getAspectRatio();
   const glm::mat4 projection = glm::perspective( glm::radians( 45.f ),
                                                  aspectRatio,
                                                  0.1f, 20000.f );
@@ -234,6 +232,11 @@ void Forward3DRenderer::present( const RenderView& rv,
   }
   if ( DebugUI::IsConsoleEnabled() ) {
     _renderUI( DebugUI::GetConsoleUI(), rv, aspectRatio, projection );
+  }
+
+  if ( rv.renderTarget ) {
+    rv.renderTarget->flush();
+    _api->bindDefaultFramebuffer();
   }
 
   _clearRenderQueues();
