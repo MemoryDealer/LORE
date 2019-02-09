@@ -85,7 +85,7 @@ bool GLGPUProgram::link()
   glGetProgramiv( _program, GL_LINK_STATUS, &success );
   if ( !success ) {
     glGetProgramInfoLog( _program, sizeof( buf ), nullptr, buf );
-    LogWrite( Error, "Failed to link program %s (%s): %s", _name.c_str(), glGetError(), buf );
+    LogWrite( Error, "Failed to link program %s (%d): %s", _name.c_str(), glGetError(), buf );
     return false;
   }
 

@@ -131,6 +131,7 @@ void ModelLoader::_processMesh( aiMesh* mesh, const aiScene* scene )
       aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
       _processTexture( material, aiTextureType_DIFFUSE, loreMesh );
       _processTexture( material, aiTextureType_SPECULAR, loreMesh );
+      _processTexture( material, aiTextureType_NORMALS, loreMesh );
     }
   }
 }
@@ -147,6 +148,9 @@ void ModelLoader::_processTexture( aiMaterial* material, const aiTextureType typ
 
     case aiTextureType_SPECULAR:
       return Texture::Type::Specular;
+
+    case aiTextureType_NORMALS:
+      return Texture::Type::Normal;
     }
   };
 

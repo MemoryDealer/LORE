@@ -49,6 +49,8 @@ void GLMesh::init( const Lore::Mesh::Type type )
 {
   _type = type;
 
+  std::vector<GLfloat> vertices { };
+
   // First generate vertices and indices.
   switch ( _type ) {
   default:
@@ -69,7 +71,7 @@ void GLMesh::init( const Lore::Mesh::Type type )
 
   case Mesh::Type::Quad:
     _mode = GL_TRIANGLE_STRIP;
-    _vertices = { -0.1f, -0.1f,
+    vertices = { -0.1f, -0.1f,
       -0.1f, 0.1f,
       0.1f, -0.1f,
       0.1f, 0.1f };
@@ -80,7 +82,7 @@ void GLMesh::init( const Lore::Mesh::Type type )
 
   case Mesh::Type::TexturedQuad:
     _mode = GL_TRIANGLE_STRIP;
-    _vertices = { -0.1f, -0.1f,     0.f, 0.f,
+    vertices = { -0.1f, -0.1f,     0.f, 0.f,
       -0.1f, 0.1f,      0.f, 1.f,
       0.1f, -0.1f,      1.f, 0.f,
       0.1f, 0.1f,       1.f, 1.f };
@@ -92,7 +94,7 @@ void GLMesh::init( const Lore::Mesh::Type type )
 
   case Mesh::Type::FullscreenQuad:
     _mode = GL_TRIANGLE_STRIP;
-    _vertices = { -1.f, -1.f,     0.f, 0.f,
+    vertices = { -1.f, -1.f,     0.f, 0.f,
       -1.f, 1.f,      0.f, 1.f,
       1.f, -1.f,      1.f, 0.f,
       1.f, 1.f,       1.f, 1.f };
@@ -104,7 +106,7 @@ void GLMesh::init( const Lore::Mesh::Type type )
 
   case Mesh::Type::Cubemap:
     _mode = GL_TRIANGLES;
-    _vertices = {
+    vertices = {
       -1000.0f,  1000.0f, -1000.0f,
       -1000.0f, -1000.0f, -1000.0f,
       1000.0f, -1000.0f, -1000.0f,
@@ -173,7 +175,7 @@ void GLMesh::init( const Lore::Mesh::Type type )
     // Generate quad with normals.
     _mode = GL_TRIANGLE_STRIP;
     // TODO: Combine Quad3D and Quad - have 2D renderer use normals etc.
-    _vertices = {
+    vertices = {
       -0.5f, -0.5f, 0.f,  0.0f,  0.0f, -1.0f,
       0.5f, -0.5f, 0.f,  0.0f,  0.0f, -1.0f,
       0.5f,  0.5f, 0.f,  0.0f,  0.0f, -1.0f,
@@ -190,24 +192,45 @@ void GLMesh::init( const Lore::Mesh::Type type )
   case Mesh::Type::TexturedQuad3D:
     // Generate quad with normals and texture coordinates.
     _mode = GL_TRIANGLE_STRIP;
-    _vertices = {
-      -0.5f, -0.5f, 0.f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
-      0.5f, -0.5f, 0.f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
-      0.5f,  0.5f, 0.f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
-      0.5f,  0.5f, 0.f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
-      -0.5f,  0.5f, 0.f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f,
-      -0.5f, -0.5f, 0.f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f
-    };
+    {
+      std::vector<glm::vec3> pos;
+//       pos.emplace_back( -0.5f, -0.5f, 0.f );
+//       pos.emplace_back( 0.5f, -0.5f, 0.f  );
+//       pos.emplace_back( 0.5f, 0.5f, 0.f );
+//       pos.emplace_back( 0.5f, 0.5f, 0.f );
+//       pos.emplace_back( -0.5f, 0.5f, 0.f );
+//       pos.emplace_back( -0.5f, -0.5f, 0.f );
+      pos.emplace_back( -0.5f, 0.5f, 0.f );
+      pos.emplace_back( -0.5f, -0.5f, 0.f );
+      pos.emplace_back( 0.5f, -0.5f, 0.f );
+      pos.emplace_back( 0.5f, 0.5f, 0.f );
+
+      std::vector<glm::vec2> uvs;
+//       uvs.emplace_back( 0.f, 0.f );
+//       uvs.emplace_back( 1.f, 0.f );
+//       uvs.emplace_back( 1.f, 1.f );
+//       uvs.emplace_back( 1.f, 1.f );
+//       uvs.emplace_back( 0.f, 1.f );
+//       uvs.emplace_back( 0.f, 0.f );
+      uvs.emplace_back( 0.f, 1.f );
+      uvs.emplace_back( 0.f, 0.f );
+      uvs.emplace_back( 1.f, 0.f );
+      uvs.emplace_back( 1.f, 1.f );
+
+      generateTangentsBitangents( pos, uvs, vertices );
+    }
     _indices = { 0, 1, 2, 3, 4, 5 };
 
     addAttribute( AttributeType::Float, 3 );
     addAttribute( AttributeType::Float, 3 );
     addAttribute( AttributeType::Float, 2 );
+    addAttribute( AttributeType::Float, 3 );
+    addAttribute( AttributeType::Float, 3 );
     break;
 
   case Mesh::Type::Cube:
     _mode = GL_TRIANGLES;
-    _vertices = {
+    vertices = {
       -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
       0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
       0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
@@ -257,7 +280,7 @@ void GLMesh::init( const Lore::Mesh::Type type )
 
   case Mesh::Type::TexturedCube:
     _mode = GL_TRIANGLES;
-    //     _vertices = {
+    //     vertices = {
     //       -1.0, -1.0,  1.0,   0.f, 0.f,
     //       1.0, -1.0,  1.0,    1.f, 0.f,
     //       -1.0,  1.0,  1.0,   0.f, 1.f,
@@ -268,7 +291,7 @@ void GLMesh::init( const Lore::Mesh::Type type )
     //       1.0,  1.0, -1.0,    0.f, 0.f
     //     };
     //     _indices = { 0, 1, 2, 3, 7, 1, 5, 4, 7, 6, 2, 4, 0, 1 };
-    //     _vertices = {
+    //     vertices = {
     //       -1.f, -1.f, -1.f,   0.f, 0.f,
     //       1.f, -1.f, -1.f,    1.f, 0.f,
     //       1.f, 1.f, -1.f,     1.f, 1.f,
@@ -287,7 +310,7 @@ void GLMesh::init( const Lore::Mesh::Type type )
     //       4, 5, 0, 0, 5, 1
     //     };
 
-    _vertices = {
+    vertices = {
       -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
       0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
       0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
@@ -337,13 +360,17 @@ void GLMesh::init( const Lore::Mesh::Type type )
     break;
   }
 
+  if ( vertices.empty() ) {
+    throw Lore::Exception( "Vertices empty when trying to create mesh " + _name );
+  }
+
   glGenVertexArrays( 1, &_vao );
   glGenBuffers( 1, &_vbo );
 
   glBindVertexArray( _vao );
 
   glBindBuffer( GL_ARRAY_BUFFER, _vbo );
-  glBufferData( GL_ARRAY_BUFFER, sizeof( GLfloat ) * _vertices.size(), _vertices.data(), GL_STATIC_DRAW );
+  glBufferData( GL_ARRAY_BUFFER, sizeof( GLfloat ) * vertices.size(), vertices.data(), GL_STATIC_DRAW );
 
   if ( !_indices.empty() ) {
     glGenBuffers( 1, &_ebo );
@@ -529,8 +556,10 @@ void GLMesh::draw( const Lore::GPUProgramPtr program, const size_t instanceCount
 {
   // Bind any textures that are assigned to this mesh.
   // TODO: Sprite animations (e.g., replace 0 with spriteFrame).
+  // TODO: Move these to a new material assigned to the mesh.
   const auto diffuseCount = _sprite.getTextureCount( 0, Texture::Type::Diffuse );
   const auto specularCount = _sprite.getTextureCount( 0, Texture::Type::Specular );
+  const auto normalMapCount = _sprite.getTextureCount( 0, Texture::Type::Normal );
   int textureUnit = 0;
   for ( int i = 0; i < diffuseCount; ++i ) {
     auto texture = _sprite.getTexture( 0, Texture::Type::Diffuse, i );
@@ -538,11 +567,22 @@ void GLMesh::draw( const Lore::GPUProgramPtr program, const size_t instanceCount
     program->setUniformVar( "diffuseTexture" + std::to_string( i ), textureUnit );
     ++textureUnit;
   }
+  
   for ( int i = 0; i < specularCount; ++i ) {
     auto texture = _sprite.getTexture( 0, Texture::Type::Specular, i );
     texture->bind( textureUnit );
     program->setUniformVar( "specularTexture" + std::to_string( i ), textureUnit );
     ++textureUnit;
+  }
+  //program->setUniformVar( "texSampleOffset", ( _sprite.getTextureCount( 0, Texture::Type::Normal ) ) ? glm::vec2( 1.f ) : glm::vec2( 0.f ) );
+  for ( int i = 0; i < normalMapCount; ++i ) {
+    auto texture = _sprite.getTexture( 0, Texture::Type::Normal, i );
+    texture->bind( textureUnit );
+    program->setUniformVar( "normalTexture" + std::to_string( i ), textureUnit );
+    ++textureUnit;
+  }
+  if ( normalMapCount > 0 ) {
+    program->setUniformVar( "useNormalTextures", !!( normalMapCount ) ? 1.f : 0.f );
   }
   // Set mix values.
   if ( diffuseCount ) {
@@ -591,7 +631,7 @@ void GLMesh::draw( const Lore::GPUProgramPtr program, const size_t instanceCount
   glBindVertexArray( 0 );
 
   // Unbind textures to avoid any textures leaking into the next mesh of a model.
-  for ( int i = 0; i < ( diffuseCount + specularCount ); ++i ) {
+  for ( int i = 0; i < 8; ++i ) {
     glActiveTexture( GL_TEXTURE0 + i );
     glBindTexture( GL_TEXTURE_2D, 0 );
   }
@@ -610,6 +650,72 @@ void GLMesh::draw( const Lore::Vertices& verts )
 
   glDrawArrays( GL_TRIANGLES, 0, 6 );
   glBindVertexArray( 0 );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLMesh::generateTangentsBitangents( const std::vector<glm::vec3>& positions,
+                                         const std::vector<glm::vec2>& uvs,
+                                         std::vector<GLfloat>& outVertices )
+{
+  // Quad.
+  if ( 4 == positions.size() && 4 == uvs.size() ) {
+    const glm::vec3 nm = Lore::Vec3PosZ;
+    glm::vec3 t1, bt1;
+    glm::vec3 t2, bt2;
+
+    const auto& pos1 = positions[0];
+    const auto& pos2 = positions[1];
+    const auto& pos3 = positions[2];
+    const auto& pos4 = positions[3];
+    const auto& uv1 = uvs[0];
+    const auto& uv2 = uvs[1];
+    const auto& uv3 = uvs[2];
+    const auto& uv4 = uvs[3];
+
+    // Triangle 1.
+    glm::vec3 edge1 = pos2 - pos1;
+    glm::vec3 edge2 = pos3 - pos1;
+    glm::vec2 dUV1 = uv2 - uv1;
+    glm::vec2 dUV2 = uv3 - uv1;
+    GLfloat F = 1.f / ( dUV1.x * dUV2.y - dUV2.x * dUV1.y );
+
+    t1.x = F * ( dUV2.y * edge1.x - dUV1.y * edge2.x );
+    t1.y = F * ( dUV2.y * edge1.y - dUV1.y * edge2.y );
+    t1.z = F * ( dUV2.y * edge1.z - dUV1.y * edge2.z );
+    t1 = glm::normalize( t1 );
+
+    bt1.x = F * ( -dUV2.x * edge1.x + dUV1.x * edge2.x );
+    bt1.y = F * ( -dUV2.x * edge1.y + dUV1.x * edge2.y );
+    bt1.z = F * ( -dUV2.x * edge1.z + dUV1.x * edge2.z );
+    bt1 = glm::normalize( bt1 );
+
+    // Triangle 2.
+    edge1 = pos3 - pos1;
+    edge2 = pos4 - pos1;
+    dUV1 = uv3 - uv1;
+    dUV2 = uv4 - uv1;
+    F = 1.f / ( dUV1.x * dUV2.y - dUV2.x * dUV1.y );
+
+    t2.x = F * ( dUV2.y * edge1.x - dUV1.y * edge2.x );
+    t2.y = F * ( dUV2.y * edge1.y - dUV1.y * edge2.y );
+    t2.z = F * ( dUV2.y * edge1.z - dUV1.y * edge2.z );
+
+    bt2.x = F * ( -dUV2.x * edge1.x + dUV1.x * edge2.x );
+    bt2.y = F * ( -dUV2.x * edge1.y + dUV1.x * edge2.y );
+    bt2.z = F * ( -dUV2.x * edge1.z + dUV1.x * edge2.z );
+
+    // Generate new vertices.
+    outVertices = {
+      pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, t1.x, t1.y, t1.z, bt1.x, bt1.y, bt1.z,
+      pos2.x, pos2.y, pos2.z, nm.x, nm.y, nm.z, uv2.x, uv2.y, t1.x, t1.y, t1.z, bt1.x, bt1.y, bt1.z,
+      pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, t1.x, t1.y, t1.z, bt1.x, bt1.y, bt1.z,
+
+      pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, t2.x, t2.y, t2.z, bt2.x, bt2.y, bt2.z,
+      pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, t2.x, t2.y, t2.z, bt2.x, bt2.y, bt2.z,
+      pos4.x, pos4.y, pos4.z, nm.x, nm.y, nm.z, uv4.x, uv4.y, t2.x, t2.y, t2.z, bt2.x, bt2.y, bt2.z
+    };
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

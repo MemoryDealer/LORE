@@ -67,6 +67,8 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
   src += "layout (location = " + std::to_string( layoutLocation++ ) + ") in vec3 normal;";
   if ( textured ) {
     src += "layout (location = " + std::to_string( layoutLocation++ ) + ") in vec2 texCoord;";
+    src += "layout (location = " + std::to_string( layoutLocation++ ) + ") in vec3 tangent;";
+    src += "layout (location = " + std::to_string( layoutLocation++ ) + ") in vec3 bitangent;";
   }
   if ( instanced ) {
     src += "layout (location = " + std::to_string( layoutLocation++ ) + ") in mat4 instanceMatrix;";
@@ -90,6 +92,15 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
   if ( textured ) {
     src += "out vec2 TexCoord;";
+    src += "out mat3 TBN;";
+//     src += "out vec3 TangentLightPos;";
+//     src += "out vec3 TangentViewPos;";
+//     src += "out vec3 TangentFragPos;";
+
+    if ( lit ) {
+      src += "uniform vec3 lightPos;";
+      src += "uniform vec3 viewPos;";
+    }
   }
 
   if ( lit ) {
@@ -106,16 +117,35 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     if ( lit ) {
       if ( instanced ) {
         src += "FragPos = vec3(instanceMatrix * vec4(vertex, 1.0));";
-        src += "Normal = mat3(instanceMatrix) * normal;";
+        src += "mat3 normalMatrix = mat3(instanceMatrix);";
+        src += "Normal = normalMatrix * normal;";
       }
       else {
         src += "FragPos = vec3(model * vec4(vertex, 1.0));";
-        src += "Normal = mat3(transpose(inverse(model))) * normal;";
+        src += "mat3 normalMatrix = mat3(transpose(inverse(model)));";
+        src += "Normal = normalMatrix * normal;";
       }
     }
 
     if ( textured ) {
       src += "TexCoord = vec2(texCoord.x * texSampleRegion.w + texSampleRegion.x, texCoord.y * texSampleRegion.h + texSampleRegion.y);";
+
+      if ( lit ) {
+        src += "vec3 T = normalize(vec3(model * vec4(tangent, 0.0)));";
+        src += "vec3 B = normalize(vec3(model * vec4(bitangent, 0.0)));";
+        src += "vec3 N = normalize(vec3(model * vec4(normal, 0.0)));";
+        src += "TBN = mat3(T, B, N);";
+
+        //src += "vec3 T = normalize(normalMatrix * tangent);";
+        //src += "vec3 N = normalize(normalMatrix * normal);";
+        //       src += "T = normalize(T - dot(T, N) * N);";
+       // src += "vec3 B = cross(N, T);";
+        // 
+        //       src += "mat3 TBN = transpose(mat3(T, B, N));";
+        //       src += "TangentLightPos = TBN * lightPos;";
+        //       src += "TangentViewPos = TBN * viewPos;";
+        //       src += "TangentFragPos = TBN * FragPos;";
+      }
     }
 
     if ( instanced ) {
@@ -159,8 +189,12 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       src += "uniform sampler2D diffuseTexture" + std::to_string( i ) + ";";
     }
     src += "uniform sampler2D specularTexture0;";
+    src += "uniform sampler2D normalTexture0;";
 
     src += "uniform float diffuseMixValues[" + std::to_string( params.maxDiffuseTextures ) + "];";
+
+    src += "uniform float useNormalTextures = 1.0;";
+    src += "uniform float useSpecularTextures = 1.0;";
   }
 
   // Material.
@@ -214,6 +248,8 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     // Texture functions.
 
     if ( textured ) {
+      src += "in mat3 TBN;";
+
       src += "vec3 SampleDiffuseTextures() {";
       {
         for ( uint32_t i = 0; i < params.maxDiffuseTextures; ++i ) {
@@ -233,7 +269,13 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
       src += "vec3 SampleSpecularTextures() {";
       {
-        src += "return vec3(texture(specularTexture0, TexCoord + texSampleOffset));";
+        src += "return useSpecularTextures * vec3(texture(specularTexture0, TexCoord + texSampleOffset)) * material.specular.rgb;";
+      }
+      src += "}";
+
+      src += "vec3 SampleNormalTextures() {";
+      {
+        src += "return vec3(texture(normalTexture0, TexCoord + texSampleOffset));";
       }
       src += "}";
     }
@@ -272,7 +314,12 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
     src += "vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir) {";
     {
-      src += "vec3 lightDir = normalize(light.pos - FragPos);";
+      if ( textured ) {
+        src += "vec3 lightDir = normalize(light.pos - FragPos);";
+      }
+      else {
+        src += "vec3 lightDir = normalize(light.pos - FragPos);";
+      }
 
       // Diffuse shading.
       src += "float diff = max(dot(normal, lightDir), 0.0);";
@@ -280,16 +327,23 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       // Specular shading.
       src += "vec3 halfwayVec = normalize(lightDir + viewDir);";
       src += "float spec = pow(max(dot(normal, halfwayVec), 0.0), material.shininess);";
+//       src += "vec3 reflectDir = reflect(-lightDir, normal);";
+//       src += "float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);";
 
       // Attenuation.
-      src += "float distance = length(light.pos - FragPos);";
+      if ( textured ) {
+        src += "float distance = length(light.pos - FragPos);";
+      }
+      else {
+        src += "float distance = length(light.pos - FragPos);";
+      }
       src += "float attenuation = light.range * light.intensity / (light.constant + light.linear * distance + light.quadratic * (distance * distance));";
 
       // Combine results.
       if ( textured ) {
-        src += "vec3 ambient = light.ambient * SampleDiffuseTextures();";
-        src += "vec3 diffuse = light.diffuse * diff * SampleDiffuseTextures();";
-        src += "vec3 specular = light.specular * spec * SampleSpecularTextures();";
+        src += "vec3 ambient = light.ambient * material.ambient.rgb * SampleDiffuseTextures();";
+        src += "vec3 diffuse = light.diffuse * diff * material.diffuse.rgb * SampleDiffuseTextures();";
+        src += "vec3 specular = light.specular * spec * material.specular.rgb * SampleSpecularTextures();";
       }
       else {
         src += "vec3 ambient = light.ambient * vec3(material.ambient);";
@@ -312,7 +366,19 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     src += "vec3 result = vec3(0.0, 0.0, 0.0);";
 
     if ( lit ) {
-      src += "vec3 norm = normalize(Normal);";
+      if ( textured ) {
+        //src += "vec3 norm = normalize(SampleNormalTextures() * 2.0 - 1.0) * useNormalTextures;";
+        //src += "norm += (normalize(Normal) * (1.0 - useNormalTextures));";
+
+        src += "vec3 norm = normalize(SampleNormalTextures()) * useNormalTextures;";
+        src += "norm = normalize(TBN * norm) * useNormalTextures;";
+        src += "norm += (normalize(Normal) * (1.0 - useNormalTextures));";
+
+        //src += "vec3 norm = normalize(Normal);"; // This restores normals to working state.
+      }
+      else {
+        src += "vec3 norm = normalize(Normal);";
+      }
       src += "vec3 viewDir = normalize(viewPos - FragPos);";
 
       // Directional lights.
@@ -420,6 +486,9 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       program->addUniformVar( "diffuseMixValues[" + std::to_string( i ) + "]" );
     }
     program->addUniformVar( "specularTexture0");
+    program->addUniformVar( "normalTexture0" );
+    program->addUniformVar( "useSpecularTextures" );
+    program->addUniformVar( "useNormalTextures" );
 
     program->addUniformVar( "texSampleOffset" );
     program->addUniformVar( "texSampleRegion.x" );
@@ -490,6 +559,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
         spriteFrame = spc->getActiveFrame();
       }
 
+      // Apply texturing with sprite data.
       auto sprite = material->sprite;
       int textureUnit = 0;
       const auto diffuseCount = sprite->getTextureCount( spriteFrame, Texture::Type::Diffuse );
@@ -499,10 +569,18 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
         program->setUniformVar( "diffuseTexture" + std::to_string( i ), textureUnit );
         ++textureUnit;
       }
+      
       for ( int i = 0; i < sprite->getTextureCount( spriteFrame, Texture::Type::Specular ); ++i ) {
         auto texture = sprite->getTexture( spriteFrame, Texture::Type::Specular, i );
         texture->bind( textureUnit );
         program->setUniformVar( "specularTexture" + std::to_string( i ), textureUnit );
+        ++textureUnit;
+      }
+      program->setUniformVar( "useNormalTextures", ( sprite->getTextureCount( spriteFrame, Texture::Type::Normal ) ) ? 1.f : 0.f );
+      for ( int i = 0; i < sprite->getTextureCount( spriteFrame, Texture::Type::Normal ); ++i ) {
+        auto texture = sprite->getTexture( spriteFrame, Texture::Type::Normal, i );
+        texture->bind( textureUnit );
+        program->setUniformVar( "normalTexture" + std::to_string( i ), textureUnit );
         ++textureUnit;
       }
       // Set mix values.
@@ -552,10 +630,18 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
         program->setUniformVar( "diffuseTexture" + std::to_string( i ), textureUnit );
         ++textureUnit;
       }
+      
       for ( int i = 0; i < sprite->getTextureCount( spriteFrame, Texture::Type::Specular ); ++i ) {
         auto texture = sprite->getTexture( spriteFrame, Texture::Type::Specular, i );
         texture->bind( textureUnit );
         program->setUniformVar( "specularTexture" + std::to_string( i ), textureUnit );
+        ++textureUnit;
+      }
+      program->setUniformVar( "useNormalTextures", ( sprite->getTextureCount( spriteFrame, Texture::Type::Normal ) ) ? 1.f : 0.f );
+      for ( int i = 0; i < sprite->getTextureCount( spriteFrame, Texture::Type::Normal ); ++i ) {
+        auto texture = sprite->getTexture( spriteFrame, Texture::Type::Normal, i );
+        texture->bind( textureUnit );
+        program->setUniformVar( "normalTexture" + std::to_string( i ), textureUnit );
         ++textureUnit;
       }
       // Set mix values.

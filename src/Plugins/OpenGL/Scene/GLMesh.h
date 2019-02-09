@@ -51,6 +51,12 @@ namespace Lore { namespace OpenGL {
 
   private:
 
+    void generateTangentsBitangents( const std::vector<glm::vec3>& positions,
+                                     const std::vector<glm::vec2>& uvs,
+                                     std::vector<GLfloat>& outVertices );
+
+  private:
+
     GLuint _vbo { 0 }; // Vertex buffer object.
     GLuint _vao { 0 }; // Vertex array object.
     GLuint _ebo { 0 }; // Element buffer object.
@@ -58,7 +64,6 @@ namespace Lore { namespace OpenGL {
     GLuint _instancedVBO { 0 };
     std::vector<glm::mat4> _instancedMatrices { };
 
-    std::vector<GLfloat> _vertices { };
     std::vector<GLuint> _indices { };
 
     GLenum _mode { GL_TRIANGLE_STRIP };
