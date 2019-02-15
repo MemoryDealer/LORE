@@ -12,6 +12,7 @@ includedirs { ".",
               "%{sln.location}/External/assimp/include",
               "%{sln.location}/External/freetype2",
               "%{sln.location}/External/glm",
+              "%{sln.location}/External/imgui",
               "%{sln.location}/External/rapidjson/include",
               "%{sln.location}/Plugins/ThirdParty"
             }
@@ -58,7 +59,8 @@ project "LORE"
     pchsource "LORE/_pch.cpp"
     forceincludes { "_pch.h" }
     files {
-        "LORE/**.h", "LORE/**.cpp", "LORE/**.inl"
+        "LORE/**.h", "LORE/**.cpp", "LORE/**.inl",
+        "External/imgui/*.h", "External/imgui/*.cpp"
     }
     links { "assimp-vc140-mt" }
     postbuildcommands { "{COPY} ../../res/ ../../bin/%{cfg.buildcfg}/Run/res/" }
