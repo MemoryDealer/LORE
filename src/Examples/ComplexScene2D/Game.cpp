@@ -37,9 +37,6 @@ Game::Game()
   // Create a window and set it to the active window.
   _window = _context->createWindow( "Complex Scene 2D", 640, 480, 4, Lore::RendererType::Forward2D );
   _window->setActive();
-
-  // Allow the DebugUI.
-  Lore::DebugUI::Enable();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

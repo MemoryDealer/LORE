@@ -46,7 +46,8 @@ namespace Lore {
     ScenePtr scene { nullptr };
     CameraPtr camera { nullptr };
     RenderTargetPtr renderTarget { nullptr };
-    UIPtr ui { nullptr };
+    //UIPtr ui { nullptr };
+    // TODO: Provide callback pointer for rendering with ImGUI?
 
     real gamma { 2.2f }; // The gamma value used for rendering.
 

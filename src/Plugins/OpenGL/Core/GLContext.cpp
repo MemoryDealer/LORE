@@ -168,8 +168,6 @@ Lore::WindowPtr Context::createWindow( const string& title,
   // Register input callbacks for this window.
   _inputController->createCallbacks( window );
 
-  DebugUI::Init();
-
   // Return a handle.
   return window;
 }

@@ -84,14 +84,6 @@ namespace Lore {
     void _renderBoxes( const RenderQueue& queue,
                        const glm::mat4& viewProjection ) const;
 
-    void _renderTextboxes( const RenderQueue& queue,
-                           const glm::mat4& viewProjection ) const;
-
-    void _renderUI( const UIPtr ui,
-                    const RenderView& rv,
-                    const real aspectRatio,
-                    const glm::mat4& proj ) const;
-
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     using RenderQueueList = std::vector<RenderQueue>;

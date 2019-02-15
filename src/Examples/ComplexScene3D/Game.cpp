@@ -47,9 +47,6 @@ Game::Game()
   _window = _context->createWindow( "Complex Scene 3D", 1280, 720, 4, Lore::RendererType::Forward3D );
   _window->setActive();
 
-  // Allow the DebugUI.
-  Lore::DebugUI::Enable();
-
   Lore::Input::SetMouseMovedCallback( Game::onMouseMove );
   Lore::Input::SetCursorEnabled( false );
 

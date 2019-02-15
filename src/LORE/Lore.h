@@ -38,7 +38,6 @@
 #include <LORE/Core/Context.h>
 #include <LORE/Core/Timer.h>
 #include <LORE/Core/CLI/CLI.h>
-#include <LORE/Core/DebugUI/DebugUI.h>
 
 // Input.
 #include <LORE/Input/Input.h>
@@ -54,8 +53,6 @@
 #include <LORE/Resource/StockResource.h>
 #include <LORE/Resource/Textbox.h>
 #include <LORE/Resource/Texture.h>
-#include <LORE/UI/UI.h>
-#include <LORE/UI/UIElement.h>
 
 // Scene.
 #include <LORE/Scene/AABB.h>

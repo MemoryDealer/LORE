@@ -30,7 +30,6 @@
 #include <LORE/Core/APIVersion.h>
 #include <LORE/Core/NotificationCenter.h>
 #include <LORE/Core/CLI/CLI.h>
-#include <LORE/Core/DebugUI/DebugUI.h>
 #include <LORE/Input/Input.h>
 #include <LORE/Renderer/RendererFactory.h>
 #include <LORE/Renderer/SceneGraphVisitor.h>
@@ -40,7 +39,6 @@
 #include <LORE/Resource/Sprite.h>
 #include <LORE/Resource/Textbox.h>
 #include <LORE/Scene/SpriteController.h>
-#include <LORE/UI/UI.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -96,9 +94,6 @@ void Context::initConfiguration()
   _poolCluster.registerPool<Sprite>( 32 );
   _poolCluster.registerPool<SpriteAnimationSet>( 8 );
   _poolCluster.registerPool<Textbox>( 8 );
-  _poolCluster.registerPool<UI>( 8 );
-  _poolCluster.registerPool<UIPanel>( 8 );
-  _poolCluster.registerPool<UIElement>( 16 );
 
   // TODO: Parse pool/config settings from cfg file (Lua).
   Config::SetValue( "RenderAABBs", false );
@@ -385,33 +380,33 @@ WindowPtr Context::GetActiveWindow()
 
 void Context::onKeyDown( const Keycode code )
 {
-  // Process default DebugUI keys.
-  if ( DebugUI::IsEnabled() ) {
-    switch ( code ) {
-    default:
-      break;
-
-    case Keycode::GraveAccent:
-      DebugUI::DisplayConsole();
-      break;
-
-    case Keycode::B: {
-      const string value( "RenderAABBs" );
-      auto renderAABBs = Config::GetValue( value );
-      Config::SetValue( value, !GET_VARIANT<bool>( renderAABBs ) );
-    } break;
-
-    case Keycode::F: {
-      if ( DebugUI::IsStatsUIEnabled() ) {
-        DebugUI::HideStats();
-      }
-      else {
-        DebugUI::DisplayStats();
-      }
-    } break;
-
-    }
-  }
+//   // Process default DebugUI keys.
+//   if ( DebugUI::IsEnabled() ) {
+//     switch ( code ) {
+//     default:
+//       break;
+// 
+//     case Keycode::GraveAccent:
+//       DebugUI::DisplayConsole();
+//       break;
+// 
+//     case Keycode::B: {
+//       const string value( "RenderAABBs" );
+//       auto renderAABBs = Config::GetValue( value );
+//       Config::SetValue( value, !GET_VARIANT<bool>( renderAABBs ) );
+//     } break;
+// 
+//     case Keycode::F: {
+//       if ( DebugUI::IsStatsUIEnabled() ) {
+//         DebugUI::HideStats();
+//       }
+//       else {
+//         DebugUI::DisplayStats();
+//       }
+//     } break;
+// 
+//     }
+//   }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

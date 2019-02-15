@@ -48,7 +48,6 @@ TEST_CASE( "Load and unload resources in code", "[resource]" )
     REQUIRE( Lore::Resource::CreateSpriteAnimationSet( names[i] ) );
     REQUIRE( Lore::Resource::CreateTextbox( names[i] ) );
     REQUIRE( Lore::Resource::CreateTexture( names[i], 32, 32, Lore::StockColor::White ) );
-    REQUIRE( Lore::Resource::CreateUI( names[i] ) );
     REQUIRE( Lore::Resource::CreateModel( names[i], Lore::Mesh::Type::Quad ) );
   }
 
@@ -64,7 +63,6 @@ TEST_CASE( "Load and unload resources in code", "[resource]" )
     REQUIRE( Lore::Resource::GetSpriteAnimationSet( names[i] ) );
     REQUIRE( Lore::Resource::GetTexture( names[i] ) );
     REQUIRE( Lore::Resource::GetTextbox( names[i] ) );
-    REQUIRE( Lore::Resource::GetUI( names[i] ) );
     REQUIRE( Lore::Resource::GetModel( names[i] ) );
   }
 
@@ -83,7 +81,6 @@ TEST_CASE( "Load and unload resources in code", "[resource]" )
     CHECK_THROWS( Lore::Resource::GetSpriteAnimationSet( names[i] ) );
     CHECK_THROWS( Lore::Resource::GetTexture( names[i] ) );
     CHECK_THROWS( Lore::Resource::GetTextbox( names[i] ) );
-    CHECK_THROWS( Lore::Resource::GetUI( names[i] ) );
     CHECK_THROWS( Lore::Resource::GetModel( names[i] ) );
   }
 }
@@ -110,7 +107,6 @@ TEST_CASE( "Load and unload resources in code, different group", "[resource]" )
     REQUIRE( Lore::Resource::CreateSpriteAnimationSet( names[i], groupName ) );
     REQUIRE( Lore::Resource::CreateTextbox( names[i], groupName ) );
     REQUIRE( Lore::Resource::CreateTexture( names[i], 32, 32, Lore::StockColor::White, groupName ) );
-    REQUIRE( Lore::Resource::CreateUI( names[i], groupName ) );
     REQUIRE( Lore::Resource::CreateModel( names[i], Lore::Mesh::Type::Quad, groupName ) );
   }
 
@@ -126,7 +122,6 @@ TEST_CASE( "Load and unload resources in code, different group", "[resource]" )
     REQUIRE( Lore::Resource::GetSpriteAnimationSet( names[i], groupName ) );
     REQUIRE( Lore::Resource::GetTexture( names[i], groupName ) );
     REQUIRE( Lore::Resource::GetTextbox( names[i], groupName ) );
-    REQUIRE( Lore::Resource::GetUI( names[i], groupName ) );
     REQUIRE( Lore::Resource::GetModel( names[i], groupName ) );
   }
 
@@ -145,7 +140,6 @@ TEST_CASE( "Load and unload resources in code, different group", "[resource]" )
     CHECK_THROWS( Lore::Resource::GetSpriteAnimationSet( names[i], groupName ) );
     CHECK_THROWS( Lore::Resource::GetTexture( names[i], groupName ) );
     CHECK_THROWS( Lore::Resource::GetTextbox( names[i], groupName ) );
-    CHECK_THROWS( Lore::Resource::GetUI( names[i], groupName ) );
     CHECK_THROWS( Lore::Resource::GetModel( names[i], groupName ) );
   }
 }

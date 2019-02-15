@@ -68,9 +68,6 @@ namespace Lore {
   class StockResourceFactory;
   class Textbox;
   class Texture;
-  class UI;
-  class UIPanel;
-  class UIElement;
   class Window;
 
   //
@@ -108,9 +105,6 @@ namespace Lore {
   using StockResourceFactoryPtr = StockResourceFactory*;
   using TextboxPtr = Textbox*;
   using TexturePtr = Texture*;
-  using UIPtr = UI*;
-  using UIPanelPtr = UIPanel*;
-  using UIElementPtr = UIElement*;
   using WindowPtr = Window*;
 
   //

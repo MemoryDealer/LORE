@@ -38,7 +38,6 @@
 #include <LORE/Shader/GPUProgram.h>
 #include <LORE/Shader/Shader.h>
 #include <LORE/Window/RenderTarget.h>
-#include <LORE/UI/UI.h>
 #include <LORE/Util/Util.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -300,8 +299,6 @@ namespace Lore {
                                      const string& groupName = ResourceController::DefaultGroupName );
     static TextboxPtr CreateTextbox( const string& name,
                                      const string& groupname = ResourceController::DefaultGroupName );
-    static UIPtr CreateUI( const string& name,
-                           const string& groupName = ResourceController::DefaultGroupName );
 
     //
     // Getters.
@@ -332,8 +329,6 @@ namespace Lore {
                                   const string& groupName = ResourceController::DefaultGroupName );
     static TextboxPtr GetTextbox( const string& name,
                                   const string& groupName = ResourceController::DefaultGroupName );
-    static UIPtr GetUI( const string& name,
-                        const string& groupName = ResourceController::DefaultGroupName );
 
     //
     // Destruction methods.
@@ -351,7 +346,6 @@ namespace Lore {
     static void DestroySpriteAnimationSet( SpriteAnimationSetPtr sas );
     static void DestroyTexture( TexturePtr texture );
     static void DestroyTextbox( TextboxPtr textbox );
-    static void DestroyUI( UIPtr ui );
 
     static void DestroyEntitiesInGroup( const string& groupName );
 
