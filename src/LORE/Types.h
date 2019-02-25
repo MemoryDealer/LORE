@@ -27,6 +27,7 @@
 
 #include <LORE/LorePlatform.h>
 
+#include <memory>
 #include <string> // TODO: Figure out nicer way for clients to include dependencies.
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -68,6 +69,7 @@ namespace Lore {
   class StockResourceFactory;
   class Textbox;
   class Texture;
+  class UI;
   class Window;
 
   //
@@ -105,6 +107,7 @@ namespace Lore {
   using StockResourceFactoryPtr = StockResourceFactory*;
   using TextboxPtr = Textbox*;
   using TexturePtr = Texture*;
+  using UIPtr = std::shared_ptr<UI>;
   using WindowPtr = Window*;
 
   //

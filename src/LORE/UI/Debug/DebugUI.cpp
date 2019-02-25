@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE
@@ -25,73 +24,81 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE/Math/Rectangle.h>
-#include <LORE/Scene/Camera.h>
-#include <LORE/Scene/Scene.h>
+#include "DebugUI.h"
+
+#include <External/imgui/imgui.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+using namespace Lore;
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+namespace LocalNS {
+
+  static DebugUI* DebugUIInstance { nullptr };
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-  ///
-  /// \class RenderView
-  /// \brief Contains the information needed to render a scene to a window.
-  /// \details ...
-  struct RenderView final
+  static void OnKeyChanged( const Keycode key, const bool pressed )
   {
+    static bool initialized { false };
 
-    string name {};
-    ScenePtr scene { nullptr };
-    CameraPtr camera { nullptr };
-    RenderTargetPtr renderTarget { nullptr };
-    UIPtr ui { nullptr };
+    if ( pressed ) {
+      switch ( key ) {
+      default:
+        break;
 
-    real gamma { 2.2f }; // The gamma value used for rendering.
-
-    Rect viewport {};
-
-    // Viewports are stored in a union, so each render plugin can do the 
-    // conversion once, when the RenderView is added to a window.
-    union
-    {
-
-      struct
-      {
-        int x, y;
-        uint width, height;
-        real aspectRatio;
-      }  gl_viewport;
-
-    };
-
-    RenderView( const string& name_ )
-      : name( name_ )
-    {
+      case Keycode::GraveAccent:
+        if ( initialized ) {
+          //DebugUIInstance->setEnabled( false );
+          //Input::SetCursorEnabled( false );
+        }
+        break;
+      }
     }
+    else {
+      switch ( key ) {
+      default:
+        break;
 
-    RenderView( const string& name_, ScenePtr scene_ )
-      : name( name_ )
-      , scene( scene_ )
-    {
+      case Keycode::GraveAccent:
+        initialized = !initialized;
+        if ( !initialized ) {
+          //Input::ResetHooks();
+        }
+        break;
+      }
     }
+  }
 
-    RenderView( const string& name_, ScenePtr scene_, const Rect& viewport_ )
-      : name( name_ )
-      , scene( scene_ )
-      , viewport( viewport_ )
-    {
-    }
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    bool operator == ( const RenderView& rhs ) const
-    {
-      // RenderView names are unique.
-      return ( name == rhs.name );
-    }
+  static void OnMouseMoved( const int32_t x, const int32_t y )
+  {
+    // Nothing to do here yet.
+  }
 
-  };
+}
+using namespace LocalNS;
 
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+DebugUI::DebugUI()
+{
+  DebugUIInstance = this;
+
+  _inputHooks.keyCallback = OnKeyChanged;
+  _inputHooks.mousePosCallback = OnMouseMoved;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void DebugUI::render( ImGuiContext* context )
+{
+  ImGui::SetCurrentContext( context );
+
+  _perfStats.render();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

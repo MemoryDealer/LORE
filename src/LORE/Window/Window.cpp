@@ -28,6 +28,7 @@
 
 #include <LORE/Resource/ResourceController.h>
 #include <LORE/Resource/StockResource.h>
+#include <LORE/UI/Debug/DebugUI.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -36,16 +37,11 @@ using namespace Lore;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Window::Window()
-: _title()
-, _width( 0 )
-, _height( 0 )
-, _frameBufferWidth( 0 )
-, _frameBufferHeight( 0 )
-, _aspectRatio( 0.f )
-, _mode( Mode::Windowed )
-, _controller( nullptr )
-, _stockController( nullptr )
 {
+  // Allocate built-in UIs.
+  _debugUI = std::make_shared<DebugUI>();
+
+  Input::AddKeyListener( this );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -158,6 +154,24 @@ ResourceControllerPtr Window::getResourceController() const
 StockResourceControllerPtr Window::getStockResourceController() const
 {
   return _stockController.get();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Window::onKeyDown( const Keycode code )
+{
+  switch ( code ) {
+  default:
+    break;
+
+  case Keycode::GraveAccent:
+    {
+      _debugUI->setEnabled( !_debugUI->getEnabled() );
+      //Input::OverrideHooks( _debugUI->getInputHooks() );
+      //Input::SetCursorEnabled( true );
+    }
+    break;
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

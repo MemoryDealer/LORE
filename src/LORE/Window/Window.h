@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE/Input/Input.h>
 #include <LORE/Memory/Alloc.h>
 #include <LORE/Window/RenderView.h>
 
@@ -32,7 +33,7 @@
 
 namespace Lore {
 
-  class LORE_EXPORT Window
+  class LORE_EXPORT Window : public KeyListener
   {
 
   public:
@@ -124,22 +125,27 @@ namespace Lore {
 
     StockResourceControllerPtr getStockResourceController() const;
 
+    void onKeyDown( const Keycode code ) override;
+
   protected:
 
     using RenderViewList = std::vector<RenderView>;
 
   protected:
 
-    string _title;
-    int _width, _height;
-    int _frameBufferWidth, _frameBufferHeight;
-    real _aspectRatio;
-    Mode _mode;
+    string _title {};
+    int _width { 0 }, _height { 0 };
+    int _frameBufferWidth { 0 }, _frameBufferHeight { 0 };
+    real _aspectRatio { 0.f };
+    Mode _mode { Mode::Windowed };
 
     RenderViewList _renderViews;
 
-    std::unique_ptr<ResourceController> _controller;
-    std::unique_ptr<StockResourceController> _stockController;
+    std::unique_ptr<ResourceController> _controller {};
+    std::unique_ptr<StockResourceController> _stockController {};
+
+    // Build-in UIs.
+    UIPtr _debugUI {};
 
   };
 

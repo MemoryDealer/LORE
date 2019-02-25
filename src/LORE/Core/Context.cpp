@@ -380,33 +380,14 @@ WindowPtr Context::GetActiveWindow()
 
 void Context::onKeyDown( const Keycode code )
 {
-//   // Process default DebugUI keys.
-//   if ( DebugUI::IsEnabled() ) {
-//     switch ( code ) {
-//     default:
-//       break;
-// 
-//     case Keycode::GraveAccent:
-//       DebugUI::DisplayConsole();
-//       break;
-// 
-//     case Keycode::B: {
-//       const string value( "RenderAABBs" );
-//       auto renderAABBs = Config::GetValue( value );
-//       Config::SetValue( value, !GET_VARIANT<bool>( renderAABBs ) );
-//     } break;
-// 
-//     case Keycode::F: {
-//       if ( DebugUI::IsStatsUIEnabled() ) {
-//         DebugUI::HideStats();
-//       }
-//       else {
-//         DebugUI::DisplayStats();
-//       }
-//     } break;
-// 
-//     }
-//   }
+  switch ( code ) {
+    case Keycode::B:
+    {
+      const string value( "RenderAABBs" );
+      auto renderAABBs = Config::GetValue( value );
+      Config::SetValue( value, !GET_VARIANT<bool>( renderAABBs ) );
+    } break;
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

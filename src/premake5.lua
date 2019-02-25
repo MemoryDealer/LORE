@@ -75,7 +75,8 @@ project "Plugin_OpenGL"
     pchsource "Plugins/OpenGL/_pch.cpp"
     forceincludes { "_pch.h" }
     files {
-        "Plugins/OpenGL/**.h", "Plugins/OpenGL/**.cpp"
+        "Plugins/OpenGL/**.h", "Plugins/OpenGL/**.cpp",
+        "External/imgui/*.h", "External/imgui/*.cpp"
     }
     links { "LORE", "glad", "freetype" }
 

@@ -84,15 +84,21 @@ namespace LocalNS {
 
   static void GLFWMousePosCallback( GLFWwindow* window, double x, double y )
   {
+    static double lastX = 0;
+    static double lastY = 0;
+
     Lore::MousePosCallback callback = InputControllerInstance->getMousePosCallback();
     if ( callback ) {
-      callback( static_cast<const int32_t>( x ), static_cast<const int32_t>( y ) );
+      callback( static_cast<const int32_t>( x - lastX ), static_cast<const int32_t>( y - lastY ) );
     }
 
     const auto& listeners = InputControllerInstance->getMouseListeners();
     for ( auto listener : listeners ) {
-      listener->onMouseMoved( static_cast< const int32_t >( x ), static_cast< const int32_t >( y ) );
+      listener->onMouseMoved( static_cast< const int32_t >( x - lastX ), static_cast< const int32_t >( y - lastY ) );
     }
+
+    lastX = x;
+    lastY = y;
   }
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -188,7 +194,10 @@ bool GLInputController::getKeyState( Lore::WindowPtr window, const Lore::Keycode
   }
 
   GLFWwindow* glfwWindow = static_cast<GLWindow*>( window )->getInternalWindow();
-  return glfwGetKey( glfwWindow, static_cast< int >( key ) );
+  if ( glfwWindow ) {
+    return glfwGetKey( glfwWindow, static_cast< int >( key ) );
+  }
+  return false;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

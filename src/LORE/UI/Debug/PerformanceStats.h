@@ -25,70 +25,31 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE/Math/Rectangle.h>
-#include <LORE/Scene/Camera.h>
-#include <LORE/Scene/Scene.h>
+#include <LORE/Core/Timer.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-  ///
-  /// \class RenderView
-  /// \brief Contains the information needed to render a scene to a window.
-  /// \details ...
-  struct RenderView final
+  class DebugUI_PerformanceStats final
   {
 
-    string name {};
-    ScenePtr scene { nullptr };
-    CameraPtr camera { nullptr };
-    RenderTargetPtr renderTarget { nullptr };
-    UIPtr ui { nullptr };
+  public:
 
-    real gamma { 2.2f }; // The gamma value used for rendering.
+    DebugUI_PerformanceStats();
+    ~DebugUI_PerformanceStats() = default;
 
-    Rect viewport {};
+    void render();
 
-    // Viewports are stored in a union, so each render plugin can do the 
-    // conversion once, when the RenderView is added to a window.
-    union
-    {
+  private:
 
-      struct
-      {
-        int x, y;
-        uint width, height;
-        real aspectRatio;
-      }  gl_viewport;
+    Timer _timer {};
 
-    };
-
-    RenderView( const string& name_ )
-      : name( name_ )
-    {
-    }
-
-    RenderView( const string& name_, ScenePtr scene_ )
-      : name( name_ )
-      , scene( scene_ )
-    {
-    }
-
-    RenderView( const string& name_, ScenePtr scene_, const Rect& viewport_ )
-      : name( name_ )
-      , scene( scene_ )
-      , viewport( viewport_ )
-    {
-    }
-
-    bool operator == ( const RenderView& rhs ) const
-    {
-      // RenderView names are unique.
-      return ( name == rhs.name );
-    }
+    // FPS.
+    int32_t _frameCount { 0 };
+    real _elapsed { 0 };
+    int32_t _FPS { 0 };
+    int32_t _MSPF { 0 };
 
   };
 

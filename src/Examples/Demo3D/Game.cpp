@@ -196,18 +196,10 @@ void Game::render()
 
 void Game::onMouseMove( const int32_t x, const int32_t y )
 {
-  static int32_t lastX = 400;
-  static int32_t lastY = 300;
-
-  const auto xOffset = x - lastX;
-  const auto yOffset = y - lastY;
-  lastX = x;
-  lastY = y;
-
   const Lore::real sensitivity = 0.1f;
   auto camera = GameInstance->getCamera();
-  camera->yaw( xOffset * sensitivity );
-  camera->pitch( yOffset * sensitivity );
+  camera->yaw( x * sensitivity );
+  camera->pitch( y * sensitivity );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

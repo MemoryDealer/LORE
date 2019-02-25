@@ -25,70 +25,41 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE/Math/Rectangle.h>
-#include <LORE/Scene/Camera.h>
-#include <LORE/Scene/Scene.h>
+#include <LORE/Input/Input.h>
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+struct ImGuiContext;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-  ///
-  /// \class RenderView
-  /// \brief Contains the information needed to render a scene to a window.
-  /// \details ...
-  struct RenderView final
+  class LORE_EXPORT UI
   {
 
-    string name {};
-    ScenePtr scene { nullptr };
-    CameraPtr camera { nullptr };
-    RenderTargetPtr renderTarget { nullptr };
-    UIPtr ui { nullptr };
+  public:
 
-    real gamma { 2.2f }; // The gamma value used for rendering.
+    UI() = default;
+    virtual ~UI() = default;
 
-    Rect viewport {};
+    virtual void render( ImGuiContext* context ) = 0;
 
-    // Viewports are stored in a union, so each render plugin can do the 
-    // conversion once, when the RenderView is added to a window.
-    union
-    {
+    //
+    // Accessors.
 
-      struct
-      {
-        int x, y;
-        uint width, height;
-        real aspectRatio;
-      }  gl_viewport;
+    bool getEnabled() const { return _enabled; }
+    InputHooksPtr getInputHooks() { return &_inputHooks; }
 
-    };
+    //
+    // Modifiers.
 
-    RenderView( const string& name_ )
-      : name( name_ )
-    {
-    }
+    void setEnabled( const bool enabled ) { _enabled = enabled; }
 
-    RenderView( const string& name_, ScenePtr scene_ )
-      : name( name_ )
-      , scene( scene_ )
-    {
-    }
+  protected:
 
-    RenderView( const string& name_, ScenePtr scene_, const Rect& viewport_ )
-      : name( name_ )
-      , scene( scene_ )
-      , viewport( viewport_ )
-    {
-    }
-
-    bool operator == ( const RenderView& rhs ) const
-    {
-      // RenderView names are unique.
-      return ( name == rhs.name );
-    }
+    InputHooks _inputHooks {};
+    bool _enabled { false };
 
   };
 

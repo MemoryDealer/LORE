@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE
@@ -25,73 +24,47 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE/Math/Rectangle.h>
-#include <LORE/Scene/Camera.h>
-#include <LORE/Scene/Scene.h>
+#include "PerformanceStats.h"
+
+#include <External/imgui/imgui.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+using namespace Lore;
 
-  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-  ///
-  /// \class RenderView
-  /// \brief Contains the information needed to render a scene to a window.
-  /// \details ...
-  struct RenderView final
-  {
+DebugUI_PerformanceStats::DebugUI_PerformanceStats()
+{
+  _timer.reset();
+}
 
-    string name {};
-    ScenePtr scene { nullptr };
-    CameraPtr camera { nullptr };
-    RenderTargetPtr renderTarget { nullptr };
-    UIPtr ui { nullptr };
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    real gamma { 2.2f }; // The gamma value used for rendering.
+void DebugUI_PerformanceStats::render()
+{
+  // Create the stats window.
+  ImGui::Begin( "Stats", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoBackground );
 
-    Rect viewport {};
+  _timer.tick();
 
-    // Viewports are stored in a union, so each render plugin can do the 
-    // conversion once, when the RenderView is added to a window.
-    union
-    {
+  // Calculate FPS and MSPF.
+  ++_frameCount;
 
-      struct
-      {
-        int x, y;
-        uint width, height;
-        real aspectRatio;
-      }  gl_viewport;
+  // Get average over one second period.
+  if ( ( _timer.getTotalElapsedTime() - _elapsed ) >= 1.f ) {
+    _FPS = _frameCount;
+    _MSPF = static_cast< int32_t >( 1000.f / static_cast< real >( _FPS ) );
 
-    };
+    // Configure data for next run.
+    _frameCount = 0;
+    _elapsed += 1.f;
+  }
 
-    RenderView( const string& name_ )
-      : name( name_ )
-    {
-    }
+  ImGui::Text( "FPS: %d", _FPS );
+  ImGui::Text( "MSPF: %d", _MSPF );
 
-    RenderView( const string& name_, ScenePtr scene_ )
-      : name( name_ )
-      , scene( scene_ )
-    {
-    }
-
-    RenderView( const string& name_, ScenePtr scene_, const Rect& viewport_ )
-      : name( name_ )
-      , scene( scene_ )
-      , viewport( viewport_ )
-    {
-    }
-
-    bool operator == ( const RenderView& rhs ) const
-    {
-      // RenderView names are unique.
-      return ( name == rhs.name );
-    }
-
-  };
-
+  ImGui::End();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
