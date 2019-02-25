@@ -38,8 +38,10 @@ using namespace Lore;
 
 Window::Window()
 {
+#ifdef LORE_DEBUG_UI
   // Allocate built-in UIs.
   _debugUI = std::make_shared<DebugUI>();
+#endif
 
   Input::AddKeyListener( this );
 }
@@ -160,6 +162,7 @@ StockResourceControllerPtr Window::getStockResourceController() const
 
 void Window::onKeyDown( const Keycode code )
 {
+#ifdef LORE_DEBUG_UI
   switch ( code ) {
   default:
     break;
@@ -172,6 +175,7 @@ void Window::onKeyDown( const Keycode code )
     }
     break;
   }
+#endif
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

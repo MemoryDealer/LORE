@@ -128,6 +128,10 @@ void GLWindow::renderFrame()
     renderer->present( rv, this );
   }
 
+  // TODO: Custom UIs.
+
+#ifdef LORE_DEBUG_UI
+
   // Start the Dear ImGui frame
   if ( _debugUI->getEnabled() ) {
     ImGui_ImplOpenGL3_NewFrame();
@@ -142,6 +146,7 @@ void GLWindow::renderFrame()
 
     ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
   }
+#endif
 
   glfwMakeContextCurrent( _window );
   glfwSwapBuffers( _window );

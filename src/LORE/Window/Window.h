@@ -144,8 +144,12 @@ namespace Lore {
     std::unique_ptr<ResourceController> _controller {};
     std::unique_ptr<StockResourceController> _stockController {};
 
+#ifdef LORE_DEBUG_UI
+
     // Build-in UIs.
     UIPtr _debugUI {};
+
+#endif
 
   };
 

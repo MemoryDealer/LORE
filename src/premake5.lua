@@ -54,7 +54,7 @@ project "LORE"
     location "LORE"
     kind "SharedLib"
     language "C++"
-    defines { "__Lore_Exports__", "_HAS_CXX17" }
+    defines { "__Lore_Exports__", "_HAS_CXX17", "LORE_DEBUG_UI" }
     pchheader "_pch.h"
     pchsource "LORE/_pch.cpp"
     forceincludes { "_pch.h" }
@@ -70,7 +70,7 @@ project "Plugin_OpenGL"
     kind "SharedLib"
     language "C++"
     libdirs { "../bin/%{cfg.buildcfg}/Run" } -- Location of LORE.lib after build.
-    defines { "__LoreOpenGL_Exports__", "_HAS_CXX17" }
+    defines { "__LoreOpenGL_Exports__", "_HAS_CXX17", "LORE_DEBUG_UI" }
     pchheader "_pch.h"
     pchsource "Plugins/OpenGL/_pch.cpp"
     forceincludes { "_pch.h" }
