@@ -30,6 +30,7 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 #include <LORE/UI/UI.h>
+#include <LORE/UI/Debug/Console.h>
 #include <LORE/UI/Debug/PerformanceStats.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -41,13 +42,32 @@ namespace Lore {
 
   public:
 
+    enum class Panel
+    {
+      PerformanceStats,
+      Console,
+      Memory
+    };
+
+  public:
+
     DebugUI();
     ~DebugUI() override = default;
 
     void render( ImGuiContext* context ) override;
+    void setPanel( const Panel panel ) { _panel = panel; }
+
+    //
+    // Overrides.
+
+    void setEnabled( const bool enabled ) override;
+    void setWindowDimensions( const Dimensions& dimensions ) override;
 
   private:
 
+    Panel _panel { Panel::Console };
+
+    DebugUI_Console _console {};
     DebugUI_PerformanceStats _perfStats {};
 
   };

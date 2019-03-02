@@ -123,8 +123,12 @@ void Window::setTitle( const string& title )
 
 void Window::setDimensions( const int width, const int height )
 {
-  _width = width;
-  _height = height;
+  _dimensions.width = width;
+  _dimensions.height = height;
+
+#ifdef LORE_DEBUG_UI
+  _debugUI->setWindowDimensions( _dimensions );
+#endif
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -169,9 +173,15 @@ void Window::onKeyDown( const Keycode code )
 
   case Keycode::GraveAccent:
     {
-      _debugUI->setEnabled( !_debugUI->getEnabled() );
-      //Input::OverrideHooks( _debugUI->getInputHooks() );
-      //Input::SetCursorEnabled( true );
+      auto debugUI = std::static_pointer_cast<DebugUI>( _debugUI );
+      debugUI->setPanel( DebugUI::Panel::PerformanceStats );
+      debugUI->setEnabled( !debugUI->getEnabled() );
+
+      if ( Input::GetKeyState( Keycode::LeftShift ) || Input::GetKeyState( Keycode::RightShift ) ) {
+        debugUI->setPanel( DebugUI::Panel::Console );
+        Input::OverrideHooks( debugUI->getInputHooks() );
+        Input::SetCursorEnabled( true );
+      }
     }
     break;
   }

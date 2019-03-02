@@ -40,8 +40,10 @@ namespace Lore {
 
   public:
 
-    UI() = default;
+    UI();
     virtual ~UI() = default;
+
+    void setImGuiContext( ImGuiContext* context );
 
     virtual void render( ImGuiContext* context ) = 0;
 
@@ -50,16 +52,24 @@ namespace Lore {
 
     bool getEnabled() const { return _enabled; }
     InputHooksPtr getInputHooks() { return &_inputHooks; }
+    Dimensions getDimensions() const { return _dimensions; }
 
     //
     // Modifiers.
 
-    void setEnabled( const bool enabled ) { _enabled = enabled; }
+    virtual void setEnabled( const bool enabled ) { _enabled = enabled; }
+
+    virtual void setWindowDimensions( const Dimensions& dimensions )
+    {
+      _dimensions = dimensions;
+    }
 
   protected:
 
     InputHooks _inputHooks {};
     bool _enabled { false };
+
+    Dimensions _dimensions {};
 
   };
 

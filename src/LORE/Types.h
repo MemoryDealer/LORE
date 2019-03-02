@@ -133,6 +133,15 @@ namespace Lore {
 
 #endif
 
+  //
+  // Structs.
+
+  struct Dimensions
+  {
+    int width {};
+    int height {};
+  };
+
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

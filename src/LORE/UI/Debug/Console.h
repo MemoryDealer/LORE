@@ -1,3 +1,4 @@
+#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE
@@ -28,50 +29,37 @@
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "PerformanceStats.h"
-
-#include <External/imgui/imgui.h>
+#include <LORE/Core/CLI/CLI.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-using namespace Lore;
+namespace Lore {
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+  class DebugUI_Console final
+  {
 
-DebugUI_PerformanceStats::DebugUI_PerformanceStats()
-{
-  _timer.reset();
-}
+  public:
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    DebugUI_Console() = default;
+    ~DebugUI_Console() = default;
 
-void DebugUI_PerformanceStats::render()
-{
-  // Create the stats window.
-  ImGui::Begin( "Stats", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoBackground );
+    void render();
 
-  _timer.tick();
+    //
+    // Modifiers.
 
-  // Calculate FPS and MSPF.
-  ++_frameCount;
+    void setWindowDimensions( const Dimensions& dimensions )
+    {
+      _windowDimensions = dimensions;
+    }
 
-  // Get average over one second period.
-  if ( ( _timer.getTotalElapsedTime() - _elapsed ) >= 1.f ) {
-    _FPS = _frameCount;
-    _MSPF = static_cast< int32_t >( 1000.f / static_cast< real >( _FPS ) );
+  private:
 
-    // Configure data for next run.
-    _frameCount = 0;
-    _elapsed += 1.f;
-  }
+    string _cliOutput {};
+    Dimensions _windowDimensions {};
 
-  ImGui::Text( "FPS: %d", _FPS );
-  ImGui::Text( "MSPF: %d", _MSPF );
+  };
 
-  // TODO: Add CPU/GPU usage stats.
-  // ...
-
-  ImGui::End();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

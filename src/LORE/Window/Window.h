@@ -109,14 +109,14 @@ namespace Lore {
     /// \brief Returns full width of window, including borders.
     inline int getFullWidth() const
     {
-      return _width;
+      return _dimensions.width;
     }
 
     ///
     /// \brief Returns full height of window, including borders.
     inline int getFullHeight() const
     {
-      return _height;
+      return _dimensions.height;
     }
 
     const RenderView& getRenderView( const int32_t idx ) const;
@@ -134,7 +134,7 @@ namespace Lore {
   protected:
 
     string _title {};
-    int _width { 0 }, _height { 0 };
+    Dimensions _dimensions {};
     int _frameBufferWidth { 0 }, _frameBufferHeight { 0 };
     real _aspectRatio { 0.f };
     Mode _mode { Mode::Windowed };

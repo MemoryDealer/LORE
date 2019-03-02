@@ -28,9 +28,10 @@
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "PerformanceStats.h"
+#include "Console.h"
 
 #include <External/imgui/imgui.h>
+#include <LORE/Core/CLI/CLI.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -38,39 +39,38 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-DebugUI_PerformanceStats::DebugUI_PerformanceStats()
+void DebugUI_Console::render()
 {
-  _timer.reset();
-}
+  const real ConsoleHeight = 10.f;
+  const real ConsoleYOffset = 32.f;
+  ImGui::SetNextWindowSize( ImVec2( static_cast<float>( _windowDimensions.width ), ConsoleHeight ) );
+  ImGui::SetNextWindowPos( ImVec2( 0.f, _windowDimensions.height - ConsoleYOffset ) );
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+  ImGui::Begin( "Console", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav );
+  ImGui::SetKeyboardFocusHere();
 
-void DebugUI_PerformanceStats::render()
-{
-  // Create the stats window.
-  ImGui::Begin( "Stats", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoBackground );
+  char buf[256] {};
+  bool executed = ImGui::InputText( "Console", buf, IM_ARRAYSIZE( buf ), ImGuiInputTextFlags_EnterReturnsTrue );
 
-  _timer.tick();
+  ImGui::End();
 
-  // Calculate FPS and MSPF.
-  ++_frameCount;
+  // Display the command output.
 
-  // Get average over one second period.
-  if ( ( _timer.getTotalElapsedTime() - _elapsed ) >= 1.f ) {
-    _FPS = _frameCount;
-    _MSPF = static_cast< int32_t >( 1000.f / static_cast< real >( _FPS ) );
+  const real OutputHeight = 60.f;
+  const real OutputYOffset = 92.f;
+  ImGui::SetNextWindowSize( ImVec2( static_cast<float>( _windowDimensions.width ), OutputHeight ) );
+  ImGui::SetNextWindowPos( ImVec2( 0.f, _windowDimensions.height - OutputYOffset ) );
+  ImGui::Begin( "Console.Output", nullptr, ImGuiWindowFlags_NoDecoration );
 
-    // Configure data for next run.
-    _frameCount = 0;
-    _elapsed += 1.f;
+  // Update CLI output if a command was executed.
+  if ( executed ) {
+    string input( buf );
+    if ( !input.empty() ) {
+      _cliOutput = CLI::Execute( buf );
+    }
   }
 
-  ImGui::Text( "FPS: %d", _FPS );
-  ImGui::Text( "MSPF: %d", _MSPF );
-
-  // TODO: Add CPU/GPU usage stats.
-  // ...
-
+  ImGui::TextWrapped( _cliOutput.c_str() );
   ImGui::End();
 }
 

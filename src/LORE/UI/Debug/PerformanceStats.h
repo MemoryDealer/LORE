@@ -45,6 +45,14 @@ namespace Lore {
 
     void render();
 
+    //
+    // Modifiers.
+
+    void setWindowDimensions( const Dimensions& dimensions )
+    {
+      _windowDimensions = dimensions;
+    }
+
   private:
 
     Timer _timer {};
@@ -54,6 +62,8 @@ namespace Lore {
     real _elapsed { 0 };
     int32_t _FPS { 0 };
     int32_t _MSPF { 0 };
+
+    Dimensions _windowDimensions {};
 
   };
 
