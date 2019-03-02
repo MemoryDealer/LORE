@@ -174,13 +174,22 @@ void Window::onKeyDown( const Keycode code )
   case Keycode::GraveAccent:
     {
       auto debugUI = std::static_pointer_cast<DebugUI>( _debugUI );
-      debugUI->setPanel( DebugUI::Panel::PerformanceStats );
-      debugUI->setEnabled( !debugUI->getEnabled() );
 
       if ( Input::GetKeyState( Keycode::LeftShift ) || Input::GetKeyState( Keycode::RightShift ) ) {
-        debugUI->setPanel( DebugUI::Panel::Console );
+        if ( debugUI->getEnabled() && DebugUI::Panel::PerformanceStats == debugUI->getActivePanel() ) {
+          // Do nothing--keep debug UI open.
+        }
+        else {
+          debugUI->setEnabled( true );
+        }
+
+        debugUI->setActivePanel( DebugUI::Panel::Console );
         Input::OverrideHooks( debugUI->getInputHooks() );
         Input::SetCursorEnabled( true );
+      }
+      else {
+        debugUI->setActivePanel( DebugUI::Panel::PerformanceStats );
+        debugUI->setEnabled( !debugUI->getEnabled() );
       }
     }
     break;
