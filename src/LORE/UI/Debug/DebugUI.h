@@ -55,7 +55,8 @@ namespace Lore {
     ~DebugUI() override = default;
 
     void render( ImGuiContext* context ) override;
-    void setPanel( const Panel panel ) { _panel = panel; }
+    Panel getActivePanel() const { return _panel; }
+    void setActivePanel( const Panel panel ) { _panel = panel; }
 
     //
     // Overrides.
