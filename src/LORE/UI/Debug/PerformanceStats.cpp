@@ -24,13 +24,13 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "DebugUIStats.h"
+#ifdef LORE_DEBUG_UI
 
-#include <LORE/Core/Context.h>
-#include <LORE/Resource/Box.h>
-#include <LORE/Resource/ResourceController.h>
-#include <LORE/Resource/Textbox.h>
-#include <LORE/Resource/StockResource.h>
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+#include "PerformanceStats.h"
+
+#include <External/imgui/imgui.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -38,70 +38,44 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-DebugUIStats::DebugUIStats()
+DebugUI_PerformanceStats::DebugUI_PerformanceStats()
 {
-  // Create the stats UI.
-  _ui = Resource::CreateUI( "DebugUI_Stats" );
-  _panel = _ui->createPanel( "core" );
-  _frameDataElement = _panel->createElement( "FrameData" );
-  _frameDataBoxElement = _panel->createElement( "FrameDataBox" );
-
-  // Create textbox for frame data.
-  _frameDataTextbox = Resource::CreateTextbox( "DebugUI_Stats.FrameData" );
-  _frameDataElement->attachTextbox( _frameDataTextbox );
-
-  // Create box to go around frame data.
-  _frameDataBox = Resource::CreateBox( "DebugUI_Stats.FrameDataBox" );
-  _frameDataBoxElement->attachBox( _frameDataBox );
-
-  // Setup positions.
-  _frameDataBoxElement->setPosition( -0.55f, .96f );
-  _frameDataBoxElement->setDimensions( 4.5f, .45f );
-  _frameDataElement->setPosition( -0.99f, 0.94f );
-
-  // Setup appearance.
-  _frameDataTextbox->setFont( StockResource::GetFont( "DebugUI" ) );
-  _frameDataTextbox->setText( "Calculating..." );
-  _frameDataTextbox->setTextColor( Color( 0.1f, 0.9f, 0.1f, 1.f ) );
-  _frameDataBox->setFillColor( Color( 0.f, 0.f, 0.6f, 0.6f ) );
-  _frameDataBox->setBorderColor( Color( 0.f, 0.f, 0.8f, 0.9f ) );
-
-  // Start the timer.
   _timer.reset();
-
-  Context::RegisterFrameListener( this );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-DebugUIStats::~DebugUIStats()
+void DebugUI_PerformanceStats::render()
 {
-}
+  // Create the stats window.
+  ImGui::Begin( "Stats", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoBackground );
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void DebugUIStats::frameStarted( const FrameEvent& e )
-{
   _timer.tick();
 
+  // Calculate FPS and MSPF.
   ++_frameCount;
 
   // Get average over one second period.
   if ( ( _timer.getTotalElapsedTime() - _elapsed ) >= 1.f ) {
-    const real fps = static_cast< real >( _frameCount );
-    const real mspf = 1000.f / fps;
-
-    std::ostringstream oss;
-    oss.precision( 3 );
-    oss << "FPS: " << fps << "    " << "Frame Time: " << mspf << " (ms)";
-
-    // Update UI.
-    _frameDataTextbox->setText( oss.str() );
+    _FPS = _frameCount;
+    _MSPF = static_cast< int32_t >( 1000.f / static_cast< real >( _FPS ) );
 
     // Configure data for next run.
     _frameCount = 0;
     _elapsed += 1.f;
   }
+
+  ImGui::Text( "FPS: %d", _FPS );
+  ImGui::Text( "MSPF: %d", _MSPF );
+
+  // TODO: Add CPU/GPU usage stats.
+  // ...
+
+  ImGui::End();
 }
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+#endif
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

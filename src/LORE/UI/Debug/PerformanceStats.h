@@ -1,3 +1,4 @@
+#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE
@@ -24,87 +25,52 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "DebugUI.h"
-
-#include <LORE/Core/DebugUI/DebugUIConsole.h>
-#include <LORE/Core/DebugUI/DebugUIStats.h>
+#ifdef LORE_DEBUG_UI
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-using namespace Lore;
+#include <LORE/Core/Timer.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-bool DebugUI::Enabled = false;
-bool DebugUI::StatsEnabled = false;
-bool DebugUI::ConsoleEnabled = false;
-std::unique_ptr<DebugUIStats> DebugUI::Stats = nullptr;
-std::unique_ptr<DebugUIConsole> DebugUI::Console = nullptr;
+namespace Lore {
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+  class DebugUI_PerformanceStats final
+  {
 
-void DebugUI::Init()
-{
-  Stats.reset( new DebugUIStats() );
-  Console.reset( new DebugUIConsole() );
+  public:
+
+    DebugUI_PerformanceStats();
+    ~DebugUI_PerformanceStats() = default;
+
+    void render();
+
+    //
+    // Modifiers.
+
+    void setWindowDimensions( const Dimensions& dimensions )
+    {
+      _windowDimensions = dimensions;
+    }
+
+  private:
+
+    Timer _timer {};
+
+    // FPS.
+    int32_t _frameCount { 0 };
+    real _elapsed { 0 };
+    int32_t _FPS { 0 };
+    int32_t _MSPF { 0 };
+
+    Dimensions _windowDimensions {};
+
+  };
+
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void DebugUI::Enable()
-{
-  Enabled = true;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void DebugUI::Disable()
-{
-  Enabled = false;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void DebugUI::DisplayStats()
-{
-  StatsEnabled = true;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void DebugUI::HideStats()
-{
-  StatsEnabled = false;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void DebugUI::DisplayConsole()
-{
-  ConsoleEnabled = true;
-  Input::OverrideHooks( Console->getInputHooks() );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void DebugUI::HideConsole()
-{
-  ConsoleEnabled = false;
-  Input::ResetHooks();
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-UIPtr DebugUI::GetStatsUI()
-{
-  return Stats->getUI();
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-UIPtr DebugUI::GetConsoleUI()
-{
-  return Console->getUI();
-}
+#endif
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

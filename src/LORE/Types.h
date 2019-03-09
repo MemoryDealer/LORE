@@ -27,6 +27,7 @@
 
 #include <LORE/LorePlatform.h>
 
+#include <memory>
 #include <string> // TODO: Figure out nicer way for clients to include dependencies.
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -69,8 +70,6 @@ namespace Lore {
   class Textbox;
   class Texture;
   class UI;
-  class UIPanel;
-  class UIElement;
   class Window;
 
   //
@@ -108,9 +107,7 @@ namespace Lore {
   using StockResourceFactoryPtr = StockResourceFactory*;
   using TextboxPtr = Textbox*;
   using TexturePtr = Texture*;
-  using UIPtr = UI*;
-  using UIPanelPtr = UIPanel*;
-  using UIElementPtr = UIElement*;
+  using UIPtr = std::shared_ptr<UI>;
   using WindowPtr = Window*;
 
   //
@@ -135,6 +132,15 @@ namespace Lore {
   #define MONOSTATE mpark::monostate
 
 #endif
+
+  //
+  // Structs.
+
+  struct Dimensions
+  {
+    int width {};
+    int height {};
+  };
 
 }
 

@@ -28,10 +28,15 @@
 
 #include "CallbackHandler.h"
 
-#include <LORE/Core/NotificationCenter.h>
+#include "imgui.h"
 
+#include <LORE/Core/APIVersion.h>
+#include <LORE/Core/NotificationCenter.h>
+#include <LORE/UI/UI.h>
 #include <Plugins/OpenGL/Resource/GLResourceController.h>
 #include <Plugins/OpenGL/Resource/GLStockResource.h>
+#include <UI/imgui_impl_glfw.h>
+#include <UI/imgui_impl_opengl3.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -59,11 +64,10 @@ void GLWindow::init( const string& title,
                      const Lore::RendererType rendererTypeMask )
 {
   _title = title;
-  _width = width;
-  _height = height;
+  Window::setDimensions( width, height );
 
-  _window = glfwCreateWindow( _width,
-                              _height,
+  _window = glfwCreateWindow( _dimensions.width,
+                              _dimensions.height,
                               _title.c_str(),
                               nullptr,
                               nullptr );
@@ -95,6 +99,17 @@ void GLWindow::init( const string& title,
   _stockController->createRendererStockResources( RendererType::Forward3D );
 
   glfwMakeContextCurrent( currentContext );
+
+  // Setup Platform/Renderer bindings
+  ImGui_ImplGlfw_InitForOpenGL( _window, false );
+  const string glsl_version = "#version " +
+    std::to_string( APIVersion::GetMajor() ) + std::to_string( APIVersion::GetMinor() ) + "0" +
+    " core\n";
+  ImGui_ImplOpenGL3_Init( glsl_version.c_str() );
+
+#ifdef LORE_DEBUG_UI
+  _debugUI->setImGuiContext( ImGui::GetCurrentContext() );
+#endif
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -110,14 +125,33 @@ void GLWindow::renderFrame()
     return;
   }
 
-  glfwMakeContextCurrent( _window );
-
   // Render each Scene with the corresponding RenderView data.
   for ( const RenderView& rv : _renderViews ) {
     RendererPtr renderer = rv.scene->getRenderer();
     renderer->present( rv, this );
   }
 
+  // TODO: Custom UIs.
+
+#ifdef LORE_DEBUG_UI
+
+  // Start the Dear ImGui frame
+  if ( _debugUI->getEnabled() ) {
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+
+    _debugUI->render( ImGui::GetCurrentContext() );
+
+    ImGui::Render();
+
+    glfwMakeContextCurrent( _window );
+
+    ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData() );
+  }
+#endif
+
+  glfwMakeContextCurrent( _window );
   glfwSwapBuffers( _window );
 }
 

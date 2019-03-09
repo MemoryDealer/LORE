@@ -24,7 +24,11 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "UI.h"
+#ifdef LORE_DEBUG_UI
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+#include "DebugUI.h"
 
 #include <External/imgui/imgui.h>
 
@@ -36,23 +40,60 @@ using namespace Lore;
 
 namespace LocalNS {
 
+  static DebugUI* DebugUIInstance { nullptr };
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
   static void OnKeyChanged( const Keycode key, const bool pressed )
   {
     ImGuiIO& io = ImGui::GetIO();
-    io.KeysDown[static_cast<int>( key )] = pressed;
+    if ( Keycode::GraveAccent != key ) {
+      io.KeysDown[static_cast< int >( key )] = pressed;
+    }
 
-    // Modifiers are not reliable across systems
-//     io.KeyCtrl = io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
-//     io.KeyShift = io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
-//     io.KeyAlt = io.KeysDown[GLFW_KEY_LEFT_ALT] || io.KeysDown[GLFW_KEY_RIGHT_ALT];
-//     io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
+    static bool initialized { false };
+    if ( pressed ) {
+      switch ( key ) {
+      default:
+        break;
+
+      case Keycode::GraveAccent:
+        if ( initialized ) {
+          DebugUIInstance->setEnabled( false );
+          Input::SetCursorEnabled( false );
+        }
+        break;
+      }
+    }
+    else {
+      switch ( key ) {
+      default:
+        break;
+
+      case Keycode::GraveAccent:
+        initialized = !initialized;
+        if ( !initialized ) {
+          Input::ResetHooks();
+        }
+        break;
+      }
+    }
   }
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
   static void OnChar( const char c )
   {
     ImGuiIO& io = ImGui::GetIO();
-    if ( c > 0 && c < 0x10000 )
-      io.AddInputCharacter( static_cast<unsigned short>( c ) );
+    if ( c > 0 && c < 0x10000 && '`' != c && '~' != c )
+      io.AddInputCharacter( static_cast< unsigned short >( c ) );
+  }
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  static void OnMouseMoved( const int32_t x, const int32_t y )
+  {
+    // Nothing to do here yet.
   }
 
 }
@@ -60,17 +101,52 @@ using namespace LocalNS;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-UI::UI()
+DebugUI::DebugUI()
 {
+  DebugUIInstance = this;
+
   _inputHooks.keyCallback = OnKeyChanged;
   _inputHooks.charCallback = OnChar;
+  _inputHooks.mousePosCallback = OnMouseMoved;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void UI::setImGuiContext( ImGuiContext* context )
+void DebugUI::render( ImGuiContext* context )
 {
   ImGui::SetCurrentContext( context );
+
+  switch ( _panel ) {
+  default:
+  case Panel::PerformanceStats:
+    _perfStats.render();
+    break;
+
+  case Panel::Console:
+    _perfStats.render();
+    _console.render();
+    break;
+  }
 }
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void DebugUI::setEnabled( const bool enabled )
+{
+  UI::setEnabled( enabled );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void DebugUI::setWindowDimensions( const Dimensions& dimensions )
+{
+  UI::setWindowDimensions( dimensions );
+  _perfStats.setWindowDimensions( dimensions );
+  _console.setWindowDimensions( dimensions );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+#endif
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

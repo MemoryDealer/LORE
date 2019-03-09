@@ -254,9 +254,9 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
       // Combine results.
       if ( textured ) {
-        src += "vec3 ambient = light.ambient * SampleDiffuseTextures();";
-        src += "vec3 diffuse = light.diffuse * diff * SampleDiffuseTextures();";
-        src += "vec3 specular = light.specular * spec * SampleSpecularTextures();";
+        src += "vec3 ambient = light.ambient * material.ambient.rgb * SampleDiffuseTextures();";
+        src += "vec3 diffuse = light.diffuse * diff * material.diffuse.rgb * SampleDiffuseTextures();";
+        src += "vec3 specular = light.specular * spec * material.specular.rgb * SampleSpecularTextures();";
       }
       else {
         src += "vec3 ambient = light.ambient * vec3(material.ambient);";
@@ -287,9 +287,9 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
       // Combine results.
       if ( textured ) {
-        src += "vec3 ambient = light.ambient * SampleDiffuseTextures();";
-        src += "vec3 diffuse = light.diffuse * diff * SampleDiffuseTextures();";
-        src += "vec3 specular = light.specular * spec * SampleSpecularTextures();";
+        src += "vec3 ambient = light.ambient * material.ambient.rgb * SampleDiffuseTextures();";
+        src += "vec3 diffuse = light.diffuse * diff * material.diffuse.rgb * SampleDiffuseTextures();";
+        src += "vec3 specular = light.specular * spec * material.specular.rgb * SampleSpecularTextures();";
       }
       else {
         src += "vec3 ambient = light.ambient * vec3(material.ambient);";

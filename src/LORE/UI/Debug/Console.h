@@ -25,34 +25,45 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE/Input/Input.h>
+#ifdef LORE_DEBUG_UI
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+#include <LORE/Core/CLI/CLI.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-  class DebugUIComponent
+  class DebugUI_Console final
   {
 
   public:
 
-    const string DebugUIResourceGroupName = "DebugUI";
+    DebugUI_Console() = default;
+    ~DebugUI_Console() = default;
 
-  public:
+    void render();
 
-    DebugUIComponent() = default;
-    virtual ~DebugUIComponent() = default;
+    //
+    // Modifiers.
 
-    InputHooksPtr getInputHooks() { return &_hooks; }
-    UIPtr getUI() const { return _ui; }
+    void setWindowDimensions( const Dimensions& dimensions )
+    {
+      _windowDimensions = dimensions;
+    }
 
-  protected:
+  private:
 
-    UIPtr _ui { nullptr };
-    InputHooks _hooks;
+    string _cliOutput {};
+    Dimensions _windowDimensions {};
 
   };
 
 }
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+#endif
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

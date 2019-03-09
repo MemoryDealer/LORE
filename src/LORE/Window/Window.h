@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#include <LORE/Input/Input.h>
 #include <LORE/Memory/Alloc.h>
 #include <LORE/Window/RenderView.h>
 
@@ -32,7 +33,7 @@
 
 namespace Lore {
 
-  class LORE_EXPORT Window
+  class LORE_EXPORT Window : public KeyListener
   {
 
   public:
@@ -108,14 +109,14 @@ namespace Lore {
     /// \brief Returns full width of window, including borders.
     inline int getFullWidth() const
     {
-      return _width;
+      return _dimensions.width;
     }
 
     ///
     /// \brief Returns full height of window, including borders.
     inline int getFullHeight() const
     {
-      return _height;
+      return _dimensions.height;
     }
 
     const RenderView& getRenderView( const int32_t idx ) const;
@@ -124,22 +125,31 @@ namespace Lore {
 
     StockResourceControllerPtr getStockResourceController() const;
 
+    void onKeyDown( const Keycode code ) override;
+
   protected:
 
     using RenderViewList = std::vector<RenderView>;
 
   protected:
 
-    string _title;
-    int _width, _height;
-    int _frameBufferWidth, _frameBufferHeight;
-    real _aspectRatio;
-    Mode _mode;
+    string _title {};
+    Dimensions _dimensions {};
+    int _frameBufferWidth { 0 }, _frameBufferHeight { 0 };
+    real _aspectRatio { 0.f };
+    Mode _mode { Mode::Windowed };
 
     RenderViewList _renderViews;
 
-    std::unique_ptr<ResourceController> _controller;
-    std::unique_ptr<StockResourceController> _stockController;
+    std::unique_ptr<ResourceController> _controller {};
+    std::unique_ptr<StockResourceController> _stockController {};
+
+#ifdef LORE_DEBUG_UI
+
+    // Build-in UIs.
+    UIPtr _debugUI {};
+
+#endif
 
   };
 

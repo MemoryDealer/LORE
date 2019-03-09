@@ -28,6 +28,7 @@
 
 #include <LORE/Resource/ResourceController.h>
 #include <LORE/Resource/StockResource.h>
+#include <LORE/UI/Debug/DebugUI.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -36,16 +37,13 @@ using namespace Lore;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Window::Window()
-: _title()
-, _width( 0 )
-, _height( 0 )
-, _frameBufferWidth( 0 )
-, _frameBufferHeight( 0 )
-, _aspectRatio( 0.f )
-, _mode( Mode::Windowed )
-, _controller( nullptr )
-, _stockController( nullptr )
 {
+#ifdef LORE_DEBUG_UI
+  // Allocate built-in UIs.
+  _debugUI = std::make_shared<DebugUI>();
+#endif
+
+  Input::AddKeyListener( this );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -125,8 +123,12 @@ void Window::setTitle( const string& title )
 
 void Window::setDimensions( const int width, const int height )
 {
-  _width = width;
-  _height = height;
+  _dimensions.width = width;
+  _dimensions.height = height;
+
+#ifdef LORE_DEBUG_UI
+  _debugUI->setWindowDimensions( _dimensions );
+#endif
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -158,6 +160,41 @@ ResourceControllerPtr Window::getResourceController() const
 StockResourceControllerPtr Window::getStockResourceController() const
 {
   return _stockController.get();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Window::onKeyDown( const Keycode code )
+{
+#ifdef LORE_DEBUG_UI
+  switch ( code ) {
+  default:
+    break;
+
+  case Keycode::GraveAccent:
+    {
+      auto debugUI = std::static_pointer_cast<DebugUI>( _debugUI );
+
+      if ( Input::GetKeyState( Keycode::LeftShift ) || Input::GetKeyState( Keycode::RightShift ) ) {
+        if ( debugUI->getEnabled() && DebugUI::Panel::PerformanceStats == debugUI->getActivePanel() ) {
+          // Do nothing--keep debug UI open.
+        }
+        else {
+          debugUI->setEnabled( true );
+        }
+
+        debugUI->setActivePanel( DebugUI::Panel::Console );
+        Input::OverrideHooks( debugUI->getInputHooks() );
+        Input::SetCursorEnabled( true );
+      }
+      else {
+        debugUI->setActivePanel( DebugUI::Panel::PerformanceStats );
+        debugUI->setEnabled( !debugUI->getEnabled() );
+      }
+    }
+    break;
+  }
+#endif
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
