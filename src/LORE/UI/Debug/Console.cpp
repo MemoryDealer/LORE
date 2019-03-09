@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE
@@ -25,63 +24,58 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "DebugUIComponent.h"
-
-#include <LORE/Core/Timer.h>
-#include <LORE/Renderer/FrameListener/FrameListener.h>
+#ifdef LORE_DEBUG_UI
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore {
+#include "Console.h"
 
-  using Clock = std::chrono::high_resolution_clock;
+#include <External/imgui/imgui.h>
+#include <LORE/Core/CLI/CLI.h>
 
-  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-  class DebugUIConsole final : public DebugUIComponent,
-                               public FrameListener
-  {
+using namespace Lore;
 
-  public:
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    DebugUIConsole();
-    virtual ~DebugUIConsole() override;
+void DebugUI_Console::render()
+{
+  const real ConsoleHeight = 10.f;
+  const real ConsoleYOffset = 32.f;
+  ImGui::SetNextWindowSize( ImVec2( static_cast<float>( _windowDimensions.width ), ConsoleHeight ) );
+  ImGui::SetNextWindowPos( ImVec2( 0.f, _windowDimensions.height - ConsoleYOffset ) );
 
-    void setCommandStr( const string& cmd );
-    void appendChar( const char c );
-    void backspace();
-    void onDelete();
-    void cursorLeft();
-    void cursorRight();
-    void cursorHome();
-    void cursorEnd();
-    void execute();
-    void clear();
+  ImGui::Begin( "Console", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav );
+  ImGui::SetKeyboardFocusHere();
 
-    virtual void frameStarted( const FrameEvent& e ) override;
+  char buf[256] {};
+  bool executed = ImGui::InputText( "Console", buf, IM_ARRAYSIZE( buf ), ImGuiInputTextFlags_EnterReturnsTrue );
 
-  private:
+  ImGui::End();
 
-    UIPanelPtr _panel { nullptr };
-    UIElementPtr _consoleElement { nullptr };
-    TextboxPtr _consoleTextbox { nullptr };
-    BoxPtr _consoleBox { nullptr };
-    UIElementPtr _consoleBoxElement { nullptr };
-    UIElementPtr _consoleHistoryElement { nullptr };
-    TextboxPtr _consoleHistoryTextbox { nullptr };
-    UIElementPtr _backgroundElement { nullptr };
-    EntityPtr _backgroundEntity { nullptr };
+  // Display the command output.
 
-    UIElementPtr _cursorElement { nullptr };
-    EntityPtr _cursorEntity { nullptr };
+  const real OutputHeight = 60.f;
+  const real OutputYOffset = 92.f;
+  ImGui::SetNextWindowSize( ImVec2( static_cast<float>( _windowDimensions.width ), OutputHeight ) );
+  ImGui::SetNextWindowPos( ImVec2( 0.f, _windowDimensions.height - OutputYOffset ) );
+  ImGui::Begin( "Console.Output", nullptr, ImGuiWindowFlags_NoDecoration );
 
-    Clock::time_point _time;
+  // Update CLI output if a command was executed.
+  if ( executed ) {
+    string input( buf );
+    if ( !input.empty() ) {
+      _cliOutput = CLI::Execute( buf );
+    }
+  }
 
-    string _command {};
-    uint32_t _cursorIdx { 0 };
-
-  };
-
+  ImGui::TextWrapped( _cliOutput.c_str() );
+  ImGui::End();
 }
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+#endif
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

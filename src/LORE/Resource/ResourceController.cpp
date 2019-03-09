@@ -67,7 +67,6 @@ ResourceGroup::ResourceGroup( const string& name )
   _addResourceType<Textbox>();
   _addResourceType<Texture>();
   _addResourceType<SpriteAnimationSet>();
-  _addResourceType<UI>();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -190,7 +189,6 @@ void ResourceController::unloadGroup( const string& groupName )
   destroyAllInGroup<SpriteAnimationSet>( groupName );
   destroyAllInGroup<Texture>( groupName );
   destroyAllInGroup<Textbox>( groupName );
-  destroyAllInGroup<UI>( groupName );
 
   // Set all indexed resources not loaded.
   for ( auto& it : group->_index ) {
@@ -521,13 +519,6 @@ TextboxPtr Resource::CreateTextbox( const string& name, const string& groupName 
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-UIPtr Resource::CreateUI( const string& name, const string& groupName )
-{
-  return ActiveContext->getResourceController()->create<UI>( name, groupName );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 BoxPtr Resource::GetBox( const string& name, const string& groupName )
 {
   return ActiveContext->getResourceController()->get<Box>( name, groupName );
@@ -619,13 +610,6 @@ TextboxPtr Resource::GetTextbox( const string& name, const string& groupName )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-UIPtr Resource::GetUI( const string& name, const string& groupName )
-{
-  return ActiveContext->getResourceController()->get<UI>( name, groupName );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 void Resource::DestroyBox( BoxPtr box )
 {
   ActiveContext->getResourceController()->destroy<Box>( box );
@@ -712,13 +696,6 @@ void Resource::DestroyTexture( TexturePtr texture )
 void Resource::DestroyTextbox( TextboxPtr textbox )
 {
   ActiveContext->getResourceController()->destroy<Textbox>( textbox );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Resource::DestroyUI( UIPtr ui )
-{
-  ActiveContext->getResourceController()->destroy<UI>( ui );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

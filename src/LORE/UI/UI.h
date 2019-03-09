@@ -25,42 +25,51 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE/Resource/IResource.h>
-#include <LORE/Resource/Registry.h>
-#include <LORE/UI/UIPanel.h>
+#include <LORE/Input/Input.h>
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+struct ImGuiContext;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-  class LORE_EXPORT UI final : public Alloc<UI>, public IResource
+  class LORE_EXPORT UI
   {
 
   public:
 
-    using PanelRegistry = Registry<std::unordered_map, UIPanel>;
+    UI();
+    virtual ~UI() = default;
 
-  public:
+    void setImGuiContext( ImGuiContext* context );
 
-    UI() = default;
-    virtual ~UI() override = default;
+    virtual void render( ImGuiContext* context ) = 0;
 
-    UIPanelPtr createPanel( const string& name );
+    //
+    // Accessors.
 
-    void destroyPanel( const string& name );
+    bool getEnabled() const { return _enabled; }
+    InputHooksPtr getInputHooks() { return &_inputHooks; }
+    Dimensions getDimensions() const { return _dimensions; }
 
-    // Getters.
+    //
+    // Modifiers.
 
-    UIPanelPtr getPanel( const string& name );
+    virtual void setEnabled( const bool enabled ) { _enabled = enabled; }
 
-    inline PanelRegistry::ConstIterator getPanelIterator() const
+    virtual void setWindowDimensions( const Dimensions& dimensions )
     {
-      return _panels.getConstIterator();
+      _dimensions = dimensions;
     }
 
-  private:
+  protected:
 
-    PanelRegistry _panels;
+    InputHooks _inputHooks {};
+    bool _enabled { false };
+
+    Dimensions _dimensions {};
 
   };
 

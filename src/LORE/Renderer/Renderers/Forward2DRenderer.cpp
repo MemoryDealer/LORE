@@ -26,7 +26,6 @@
 
 #include "Forward2DRenderer.h"
 
-#include <LORE/Core/DebugUI/DebugUI.h>
 #include <LORE/Config/Config.h>
 #include <LORE/Math/Math.h>
 #include <LORE/Resource/Box.h>
@@ -43,7 +42,6 @@
 #include <LORE/Scene/Scene.h>
 #include <LORE/Scene/SpriteController.h>
 #include <LORE/Shader/GPUProgram.h>
-#include <LORE/UI/UI.h>
 #include <LORE/Window/RenderTarget.h>
 #include <LORE/Window/Window.h>
 
@@ -209,9 +207,6 @@ void Forward2DRenderer::present( const RenderView& rv, const WindowPtr window )
 
     // Render boxes.
     renderBoxes( queue, viewProjection );
-
-    // Render text.
-    renderTextboxes( queue, viewProjection );
   }
 
   // AABBs.
@@ -242,19 +237,6 @@ void Forward2DRenderer::present( const RenderView& rv, const WindowPtr window )
       AddAABB( it.getNext() );
     }
     renderBoxes( tmpQueue, viewProjection );
-  }
-
-  // Render UI.
-  if ( rv.ui ) {
-    renderUI( rv.ui, rv, aspectRatio, projection );
-  }
-
-  // Render debug UI if enabled.
-  if ( DebugUI::IsStatsUIEnabled() ) {
-    renderUI( DebugUI::GetStatsUI(), rv, aspectRatio, projection );
-  }
-  if ( DebugUI::IsConsoleEnabled() ) {
-    renderUI( DebugUI::GetConsoleUI(), rv, aspectRatio, projection );
   }
 
   if ( rv.renderTarget ) {
@@ -492,147 +474,6 @@ void Forward2DRenderer::renderBoxes( const RenderQueue& queue,
 
     model->draw( program );
   }
-
-  _api->setBlendingEnabled( false );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Forward2DRenderer::renderTextboxes( const RenderQueue& queue,
-                                       const glm::mat4& viewProjection ) const
-{
-  _api->setBlendingEnabled( true );
-  _api->setBlendingFunc( Material::BlendFactor::SrcAlpha, Material::BlendFactor::OneMinusSrcAlpha );
-
-  GPUProgramPtr program = StockResource::GetGPUProgram( "StandardText" );
-  ModelPtr model = StockResource::GetModel( "StandardText" );
-
-  program->use();
-
-  for ( auto& data : queue.textboxes ) {
-    TextboxPtr textbox = data.textbox;
-    string text = textbox->getText();
-    FontPtr font = textbox->getFont();
-
-    // TODO: Use a better design for this relationship.
-    program->setUniformVar( "projection", viewProjection );
-    program->setUniformVar( "depth", data.model[3][2] );
-    program->setUniformVar( "color", textbox->getTextColor() );
-
-    // Render each character.
-    real x = data.model[3][0];
-    const real y = data.model[3][1];
-    const real scale = 1.f;
-    for (char & c : text) {
-      // Generate vertices to draw glyph and bind its associated texture.
-      auto vertices = font->generateVertices( c,
-                                              x,
-                                              y,
-                                              scale );
-      font->bindTexture( c );
-
-      model->draw( vertices );
-
-      x = font->advanceGlyphX( c, x, scale );
-    }
-
-  }
-
-  _api->setBlendingEnabled( false );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Forward2DRenderer::renderUI( const UIPtr ui,
-                                const RenderView& rv,
-                                const real aspectRatio,
-                                const glm::mat4& proj ) const
-{
-  auto panelIt = ui->getPanelIterator();
-
-  RenderQueue queue;
-  constexpr const real DepthOffset = -1101.f;
-
-  std::vector<Node> nodes;
-  nodes.resize( 10 );
-  int idx = 0;
-
-  // For each panel.
-  while ( panelIt.hasMore() ) {
-    auto panel = panelIt.getNext();
-    const glm::vec2 panelOrigin = panel->getOrigin();
-
-    // For each element in this panel.
-    auto elementIt = panel->getElementIterator();
-    while ( elementIt.hasMore() ) {
-      auto element = elementIt.getNext();
-      if ( !element->isVisible() ) {
-        continue;
-      }
-
-      auto elementPos = panelOrigin + element->getPosition();
-      auto elementDimensions = element->getDimensions();
-      elementPos.x *= aspectRatio;
-      elementDimensions.x *= aspectRatio;
-
-      // Build list of entity data and textboxes to render.
-      auto entity = element->getEntity();
-      if ( entity ) {
-        auto mat = entity->getMaterial();
-
-        Node& node = nodes[idx++];
-        node.setName( element->getName() );
-        node.setPosition( elementPos );
-        node.setScale( elementDimensions );
-        node.setDepth( element->getDepth() + DepthOffset ); // Offset UI element depth beyond scene node depth.
-        node.updateWorldTransform();
-
-        if ( mat->blendingMode.enabled ) {
-          RenderQueue::EntityNodePair pair { entity, &node };
-          queue.transparents.insert( { node.getDepth(), pair } );
-        }
-        else {
-          if ( entity->isInstanced() ) {
-            RenderQueue::InstancedEntitySet& set = queue.instancedSolids;
-            // Only add instanced entities that haven't been processed yet.
-            if ( set.find( entity ) == set.end() ) {
-              set.insert( entity );
-            }
-          }
-          else {
-            RenderQueue::NodeList& solidNodes = queue.solids[entity];
-            solidNodes.push_back( &node );
-          }
-        }
-      }
-
-      auto box = element->getBox();
-      if ( box ) {
-        RenderQueue::BoxData bd;
-        bd.box = box;
-        glm::quat q( 1.f, 0.f, 0.f, 0.f );
-        bd.model = Math::CreateTransformationMatrix( glm::vec3( elementPos.x, elementPos.y, 0.f ), q, glm::vec3( elementDimensions.x, elementDimensions.y, 1.f ) );
-        bd.model[3][2] = element->getDepth() + DepthOffset;
-        queue.boxes.push_back( bd );
-      }
-
-      auto textbox = element->getTextbox();
-      if ( textbox ) {
-        RenderQueue::TextboxData td;
-        td.textbox = textbox;
-        glm::quat q( 1.f, 0.f, 0.f, 0.f );
-        td.model = Math::CreateTransformationMatrix( glm::vec3( elementPos.x, elementPos.y, 0.f ), q, glm::vec3( 1.f ) );
-        td.model[3][2] = element->getDepth() + DepthOffset - 0.01f; // Give text a little room over boxes.
-        queue.textboxes.push_back( td );
-      }
-    }
-  }
-
-  // Now render the UI elements.
-  renderSolids( rv, queue, proj );
-  renderTransparents( rv, queue, proj );
-  renderBoxes( queue, proj );
-  renderTextboxes( queue, proj );
 
   _api->setBlendingEnabled( false );
 }

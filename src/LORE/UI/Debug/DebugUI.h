@@ -25,42 +25,58 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "DebugUIComponent.h"
+#ifdef LORE_DEBUG_UI
 
-#include <LORE/Core/Timer.h>
-#include <LORE/Renderer/FrameListener/FrameListener.h>
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+#include <LORE/UI/UI.h>
+#include <LORE/UI/Debug/Console.h>
+#include <LORE/UI/Debug/PerformanceStats.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace Lore {
 
-  class DebugUIStats final : public DebugUIComponent,
-                             public FrameListener
+  class DebugUI : public UI
   {
 
   public:
 
-    DebugUIStats();
-    virtual ~DebugUIStats() override;
+    enum class Panel
+    {
+      PerformanceStats,
+      Console,
+      Memory
+    };
 
-    virtual void frameStarted( const FrameEvent& e ) override;
+  public:
+
+    DebugUI();
+    ~DebugUI() override = default;
+
+    void render( ImGuiContext* context ) override;
+    Panel getActivePanel() const { return _panel; }
+    void setActivePanel( const Panel panel ) { _panel = panel; }
+
+    //
+    // Overrides.
+
+    void setEnabled( const bool enabled ) override;
+    void setWindowDimensions( const Dimensions& dimensions ) override;
 
   private:
 
-    UIPanelPtr _panel { nullptr };
+    Panel _panel { Panel::Console };
 
-    UIElementPtr _frameDataElement { nullptr };
-    TextboxPtr _frameDataTextbox { nullptr };
-
-    UIElementPtr _frameDataBoxElement { nullptr };
-    BoxPtr _frameDataBox { nullptr };
-
-    Timer _timer {};
-    int32_t _frameCount { 0 };
-    real _elapsed { 0.f };
+    DebugUI_Console _console {};
+    DebugUI_PerformanceStats _perfStats {};
 
   };
 
 }
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+#endif
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

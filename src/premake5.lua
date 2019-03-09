@@ -12,6 +12,7 @@ includedirs { ".",
               "%{sln.location}/External/assimp/include",
               "%{sln.location}/External/freetype2",
               "%{sln.location}/External/glm",
+              "%{sln.location}/External/imgui",
               "%{sln.location}/External/rapidjson/include",
               "%{sln.location}/Plugins/ThirdParty"
             }
@@ -53,12 +54,13 @@ project "LORE"
     location "LORE"
     kind "SharedLib"
     language "C++"
-    defines { "__Lore_Exports__", "_HAS_CXX17" }
+    defines { "__Lore_Exports__", "_HAS_CXX17", "LORE_DEBUG_UI" }
     pchheader "_pch.h"
     pchsource "LORE/_pch.cpp"
     forceincludes { "_pch.h" }
     files {
-        "LORE/**.h", "LORE/**.cpp", "LORE/**.inl"
+        "LORE/**.h", "LORE/**.cpp", "LORE/**.inl",
+        "External/imgui/*.h", "External/imgui/*.cpp"
     }
     links { "assimp-vc140-mt" }
     postbuildcommands { "{COPY} ../../res/ ../../bin/%{cfg.buildcfg}/Run/res/" }
@@ -68,12 +70,13 @@ project "Plugin_OpenGL"
     kind "SharedLib"
     language "C++"
     libdirs { "../bin/%{cfg.buildcfg}/Run" } -- Location of LORE.lib after build.
-    defines { "__LoreOpenGL_Exports__", "_HAS_CXX17" }
+    defines { "__LoreOpenGL_Exports__", "_HAS_CXX17", "LORE_DEBUG_UI" }
     pchheader "_pch.h"
     pchsource "Plugins/OpenGL/_pch.cpp"
     forceincludes { "_pch.h" }
     files {
-        "Plugins/OpenGL/**.h", "Plugins/OpenGL/**.cpp"
+        "Plugins/OpenGL/**.h", "Plugins/OpenGL/**.cpp",
+        "External/imgui/*.h", "External/imgui/*.cpp"
     }
     links { "LORE", "glad", "freetype" }
 
