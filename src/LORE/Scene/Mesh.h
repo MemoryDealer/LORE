@@ -49,6 +49,7 @@ namespace Lore {
       Cube,
       TexturedCube,
       Cubemap,
+      BoundingBox,
       Quad3D,
       TexturedQuad3D,
       Text,

@@ -20,6 +20,8 @@ libdirs { "../lib/x64/%{cfg.buildcfg}" }
 architecture "x86_64"
 characterset ( "MBCS" )
 
+cppdialect "C++17"
+
 --
 -- Solution
 

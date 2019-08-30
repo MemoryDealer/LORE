@@ -151,6 +151,45 @@ void GLMesh::init( const Lore::Mesh::Type type )
     addAttribute( AttributeType::Float, 3 );
     break;
 
+  case Mesh::Type::BoundingBox:
+    _mode = GL_LINES;
+    _vertices = {
+      // Back.
+      0.5f, 0.5f, -0.5f,
+      0.5f, -0.5f, -0.5f,
+      0.5f, -0.5f, -0.5f,
+      -0.5f, -0.5f, -0.5f,
+      -0.5f, -0.5f, -0.5f,
+      -0.5f, 0.5f, -0.5f,
+      -0.5f, 0.5f, -0.5f,
+      0.5f, 0.5f, -0.5f,
+
+      // Front.
+      0.5f, 0.5f, 0.5f,
+      0.5f, -0.5f, 0.5f,
+      0.5f, -0.5f, 0.5f,
+      -0.5f, -0.5f, 0.5f,
+      -0.5f, -0.5f, 0.5f,
+      -0.5f, 0.5f, 0.5f,
+      -0.5f, 0.5f, 0.5f,
+      0.5f, 0.5f, 0.5f,
+
+      // Left connections.
+      -0.5f, 0.5f, 0.5f,
+      -0.5f, 0.5f, -0.5f,
+      -0.5f, -0.5f, 0.f,
+      -0.5f, -0.5f, -0.5f,
+
+      // Right connections.
+      0.5f, 0.5f, 0.5f,
+      0.5f, 0.5f, -0.5f,
+      0.5f, -0.5f, 0.5f,
+      0.5f, -0.5f, -0.5f
+    };
+
+    addAttribute( AttributeType::Float, 3 );
+    break;
+
   case Mesh::Type::Text:
     _mode = GL_TRIANGLES;
     // Text VBs are a special case and require dynamic drawing.
@@ -586,6 +625,10 @@ void GLMesh::draw( const Lore::GPUProgramPtr program, const size_t instanceCount
   case Mesh::Type::TexturedCube:
   case Mesh::Type::Cubemap:
     glDrawArrays( _mode, 0, 36 );
+    break;
+
+  case Mesh::Type::BoundingBox:
+    glDrawArrays( _mode, 0, 24 );
     break;
   }
   glBindVertexArray( 0 );

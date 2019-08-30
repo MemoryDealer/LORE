@@ -210,34 +210,34 @@ void Forward2DRenderer::present( const RenderView& rv, const WindowPtr window )
   }
 
   // AABBs.
-  auto renderAABBs = Config::GetValue( "RenderAABBs" );
-  if ( GET_VARIANT<bool>( renderAABBs ) ) {
-    RenderQueue tmpQueue;
-
-    std::function<void( NodePtr )> AddAABB = [&] ( NodePtr node ) {
-      AABBPtr aabb = node->getAABB();
-      if ( aabb ) {
-        RenderQueue::BoxData data;
-        data.box = aabb->getBox();
-        data.model = Math::CreateTransformationMatrix( node->getDerivedPosition(), glm::quat(), aabb->getDimensions() * 5.f );
-        data.model[3][2] = Node::Depth::Min;
-
-        tmpQueue.boxes.push_back( data );
-      }
-
-      Node::ChildNodeIterator it = node->getChildNodeIterator();
-      while ( it.hasMore() ) {
-        AddAABB( it.getNext() );
-      }
-    };
-
-    auto root = rv.scene->getRootNode();
-    Node::ChildNodeIterator it = root->getChildNodeIterator();
-    while ( it.hasMore() ) {
-      AddAABB( it.getNext() );
-    }
-    renderBoxes( tmpQueue, viewProjection );
-  }
+//   auto renderAABBs = Config::GetValue( "RenderAABBs" );
+//   if ( GET_VARIANT<bool>( renderAABBs ) ) {
+//     RenderQueue tmpQueue;
+// 
+//     std::function<void( NodePtr )> AddAABB = [&] ( NodePtr node ) {
+//       AABBPtr aabb = node->getAABB();
+//       if ( aabb ) {
+//         RenderQueue::BoxData data;
+//         data.box = aabb->getBox();
+//         data.model = Math::CreateTransformationMatrix( node->getDerivedPosition(), glm::quat(), aabb->getDimensions() * 5.f );
+//         data.model[3][2] = Node::Depth::Min;
+// 
+//         tmpQueue.boxes.push_back( data );
+//       }
+// 
+//       Node::ChildNodeIterator it = node->getChildNodeIterator();
+//       while ( it.hasMore() ) {
+//         AddAABB( it.getNext() );
+//       }
+//     };
+// 
+//     auto root = rv.scene->getRootNode();
+//     Node::ChildNodeIterator it = root->getChildNodeIterator();
+//     while ( it.hasMore() ) {
+//       AddAABB( it.getNext() );
+//     }
+//     renderBoxes( tmpQueue, viewProjection );
+//   }
 
   if ( rv.renderTarget ) {
     rv.renderTarget->flush();

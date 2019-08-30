@@ -27,55 +27,45 @@
 
 namespace Lore {
 
-  class AABB final
+  ///
+  /// \brief Return the min/max points of provided points.
+  template< typename Vec >
+  std::pair< Vec, Vec > GetExtents( const Vec* pts, size_t stride, size_t count )
   {
-
-  public:
-
-    explicit AABB( NodePtr node );
-
-    ~AABB();
-
-    void update();
-
-    bool intersects( const AABB& rhs ) const;
-
-    //
-    // Getters.
-
-    glm::vec3 getMin() const
-    {
-      return _min;
+    unsigned char* base = ( unsigned char* )pts;
+    Vec pmin( *( Vec* )base );
+    Vec pmax( *( Vec* )base );
+    for ( size_t i = 0; i < count; ++i, base += stride ) {
+      const Vec& pt = *( Vec* )base;
+      pmin = glm::min( pmin, pt );
+      pmax = glm::max( pmax, pt );
     }
 
-    glm::vec3 getMax() const
-    {
-      return _max;
+    return make_pair( pmin, pmax );
+  }
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  ///
+  /// \brief Centers geometry around the origin and scales it to fit in a size^3 box.
+  template< typename Vec >
+  void CenterAndScale( Vec* pts, size_t stride, size_t count, const typename Vec::value_type& size )
+  {
+    using Scalar = typename Vec::value_type;
+
+    // get min/max extents
+    std::pair< Vec, Vec > exts = GetExtents( pts, stride, count );
+
+    // center and scale 
+    const Vec center = ( exts.first * Scalar( 0.5 ) ) + ( exts.second * Scalar( 0.5f ) );
+
+    const Scalar factor = size / glm::compMax( exts.second - exts.first );
+    unsigned char* base = ( unsigned char* )pts;
+    for ( size_t i = 0; i < count; ++i, base += stride ) {
+      Vec& pt = *( Vec* )base;
+      pt = ( ( pt - center ) * factor );
     }
-
-    real getWidth() const
-    {
-      return _dimensions.x;
-    }
-
-    real getHeight() const
-    {
-      return _dimensions.y;
-    }
-
-    glm::vec3 getDimensions() const
-    {
-      return _dimensions;
-    }
-
-  private:
-
-    glm::vec3 _min {};
-    glm::vec3 _max {};
-    glm::vec3 _center {};
-    glm::vec3 _dimensions {};
-
-  };
+  }
 
 }
 

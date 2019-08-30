@@ -89,6 +89,11 @@ GLResourceController::GLResourceController()
   auto texturedQuad3DMesh = create<Mesh>( "TexturedQuad3D" );
   texturedQuad3DMesh->init( Mesh::Type::TexturedQuad3D );
   texturedQuad3D->attachMesh( texturedQuad3DMesh );
+
+  auto boundingBox = create<Model>( "BoundingBox" );
+  auto boundingBoxMesh = create<Mesh>( "BoundingBox" );
+  boundingBoxMesh->init( Mesh::Type::BoundingBox );
+  boundingBox->attachMesh( boundingBoxMesh );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

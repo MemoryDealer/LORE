@@ -37,35 +37,32 @@ using namespace Lore;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 AABB::AABB( NodePtr node )
-: _node( node )
 {
-  _box = Lore::Resource::CreateBox( node->_scene->getName() + "." + node->getName() + "_AABB", ResourceController::DefaultGroupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 AABB::~AABB()
 {
-  Lore::Resource::DestroyBox( _box );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void AABB::update()
 {
-  const auto x = _node->getDerivedPosition().x;
-  const auto y = _node->getDerivedPosition().y;
-  const auto w = _node->getDerivedScale().x * 0.2f;
-  const auto h = _node->getDerivedScale().y * 0.2f;
-
-  auto angle = glm::eulerAngles( glm::quat_cast( _node->getFullTransform() ) ).z;
-  _dimensions.x = h * std::abs( std::sin( angle ) ) + w * std::abs( std::cos( angle ) );
-  _dimensions.y = w * std::abs( std::sin( angle ) ) + h * std::abs( std::cos( angle ) );
-
-  _min.x = x - _dimensions.x / 2.f;
-  _min.y = y - _dimensions.y / 2.f;
-  _max.x = x + _dimensions.x / 2.f;
-  _max.y = y + _dimensions.y / 2.f;
+//   const auto x = _node->getDerivedPosition().x;
+//   const auto y = _node->getDerivedPosition().y;
+//   const auto w = _node->getDerivedScale().x * 0.2f;
+//   const auto h = _node->getDerivedScale().y * 0.2f;
+// 
+//   auto angle = glm::eulerAngles( glm::quat_cast( _node->getFullTransform() ) ).z;
+//   _dimensions.x = h * std::abs( std::sin( angle ) ) + w * std::abs( std::cos( angle ) );
+//   _dimensions.y = w * std::abs( std::sin( angle ) ) + h * std::abs( std::cos( angle ) );
+// 
+//   _min.x = x - _dimensions.x / 2.f;
+//   _min.y = y - _dimensions.y / 2.f;
+//   _max.x = x + _dimensions.x / 2.f;
+//   _max.y = y + _dimensions.y / 2.f;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

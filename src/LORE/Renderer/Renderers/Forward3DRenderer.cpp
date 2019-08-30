@@ -59,8 +59,6 @@ Forward3DRenderer::Forward3DRenderer()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 void Forward3DRenderer::addRenderData( EntityPtr entity,
                                        NodePtr node )
 {
@@ -219,6 +217,9 @@ void Forward3DRenderer::present( const RenderView& rv,
     _renderTransparents( rv, queue, viewProjection );
   }
 
+  // Test - render AABBs.
+  _renderingBoundingBoxes( rv, viewProjection );
+
   if ( rv.renderTarget ) {
     rv.renderTarget->flush();
     _api->bindDefaultFramebuffer();
@@ -239,6 +240,8 @@ void Forward3DRenderer::_clearRenderQueues()
 
   // Erase all queues from the active queue list.
   _activeQueues.clear();
+
+  _aabbs.clear();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -343,6 +346,9 @@ void Forward3DRenderer::_renderSolids( const RenderView& rv,
     for ( const auto& node : nodes ) {
       program->updateNodeUniforms( material, node, viewProjection );
       model->draw( program );
+
+      //
+      _aabbs.push_back( node );
     }
   }
 }
@@ -425,6 +431,41 @@ void Forward3DRenderer::_renderBoxes( const RenderQueue& queue,
   }
 
   _api->setBlendingEnabled( false );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Forward3DRenderer::_renderingBoundingBoxes( const RenderView& rv,
+                                                 const glm::mat4& viewProjection ) const
+{
+  _api->setPolygonMode( IRenderAPI::PolygonMode::Line );
+
+  GPUProgramPtr program = StockResource::GetGPUProgram( "UnlitStandard3D" );
+  ModelPtr model = StockResource::GetModel( "BoundingBox" );
+
+  for ( const auto& node : _aabbs ) {
+    MaterialPtr material = nullptr;
+    auto entityIt = node->getEntityListConstIterator();
+    while ( entityIt.hasMore() ) {
+      auto entity = entityIt.getNext();
+      material = entity->getMaterial();
+      if ( material ) {
+        break;
+      }
+    }
+
+    if ( !material ) {
+      continue;
+    }
+
+    program->use();
+    program->updateUniforms( rv, material, {} );
+    // TODO: Create a child node of every node that is its AABB?
+    // Pass it into here and update it accordingly.
+    program->updateNodeUniforms( material, node, viewProjection );
+
+    model->draw( program );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

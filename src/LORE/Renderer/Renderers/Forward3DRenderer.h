@@ -84,6 +84,9 @@ namespace Lore {
     void _renderBoxes( const RenderQueue& queue,
                        const glm::mat4& viewProjection ) const;
 
+    void _renderingBoundingBoxes( const RenderView& rv,
+                                  const glm::mat4& viewProjection ) const;
+
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     using RenderQueueList = std::vector<RenderQueue>;
@@ -93,6 +96,7 @@ namespace Lore {
 
     RenderQueueList _queues { };
     ActiveRenderQueueList _activeQueues { };
+    mutable RenderQueue::NodeList _aabbs {};
 
     CameraPtr _camera { nullptr };
 
