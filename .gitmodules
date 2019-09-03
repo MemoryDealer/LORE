@@ -13,3 +13,6 @@
 [submodule "src/External/imgui"]
 	path = src/External/imgui
 	url = https://github.com/ocornut/imgui.git
+[submodule "src/External/freetype2"]
+	path = src/External/freetype2
+	url = https://github.com/aseprite/freetype2.git

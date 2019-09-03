@@ -151,7 +151,7 @@ void SceneLoader::_loadEntities()
       const auto entityName = entity.first;
       const SerializerValue& value = entity.second;
 
-      EntityPtr entity = nullptr;
+      EntityPtr newEntity = nullptr;
 
       // Get the model type.
       const auto& modelType = value.getValue( "ModelType" );
@@ -164,36 +164,36 @@ void SceneLoader::_loadEntities()
 
         // Load the entity (load model from disk and assign a material).
         try {
-          entity = Resource::LoadEntity( entityName, modelPath.toString(), _resourceGroupName );
+          newEntity = Resource::LoadEntity( entityName, modelPath.toString(), _resourceGroupName );
         }
         catch ( Lore::Exception& e ) {
           LogWrite( Error, "Error loading entity %s: %s", entityName.c_str(), e.what() );
-          entity = Resource::GetEntity( entityName, _resourceGroupName );
-          entity->setModel( Resource::GetModel( Util::GetFileName( modelPath.toString() ), _resourceGroupName ) );
+          newEntity = Resource::GetEntity( entityName, _resourceGroupName );
+          newEntity->setModel( Resource::GetModel( Util::GetFileName( modelPath.toString() ), _resourceGroupName ) );
         }
       }
       else {
         // Create the entity.
-        entity = Resource::CreateEntity( entityName, StringToMeshType( modelType.toString() ), _resourceGroupName );
+        newEntity = Resource::CreateEntity( entityName, StringToMeshType( modelType.toString() ), _resourceGroupName );
       }
 
       // Enable instancing if specified.
       const auto& instanced = value.getValue( "Instanced" );
       if ( !instanced.isNull() && SerializerValue::Type::Int == instanced.getType() ) {
         const auto instanceCount = instanced.toInt();
-        entity->enableInstancing( instanceCount );
+        newEntity->enableInstancing( instanceCount );
       }
 
       // Attach a sprite if specified.
       const auto& spriteName = value.getValue( "Sprite" );
       if ( !spriteName.isNull() ) {
-        entity->setSprite( Resource::GetSprite( spriteName.toString() ) );
+        newEntity->setSprite( Resource::GetSprite( spriteName.toString() ) );
       }
 
       // Process material settings for the entity.
       const auto& materialSettings = value.getValue( "MaterialSettings" );
       if ( !materialSettings.isNull() ) {
-        _processMaterialSettings( materialSettings, entity );
+        _processMaterialSettings( materialSettings, newEntity );
       }
     }
   }

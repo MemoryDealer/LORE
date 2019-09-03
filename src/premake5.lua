@@ -10,7 +10,7 @@ includedirs { ".",
               "%{prj.location}",
               "%{sln.location}/External",
               "%{sln.location}/External/assimp/include",
-              "%{sln.location}/External/freetype2",
+              "%{sln.location}/External/freetype2/include",
               "%{sln.location}/External/glm",
               "%{sln.location}/External/imgui",
               "%{sln.location}/External/rapidjson/include",
@@ -62,7 +62,10 @@ project "LORE"
         "LORE/**.h", "LORE/**.cpp", "LORE/**.inl",
         "External/imgui/*.h", "External/imgui/*.cpp"
     }
-    links { "assimp-vc140-mt" }
+    filter { "system:Windows" }
+        links { "assimp-vc140-mt" }
+    filter { "system:MacOSX" }
+        linkoptions { "../External/assimp/lib/libassimp.4.1.0.dylib" }
     postbuildcommands { "{COPY} ../../res/ ../../bin/%{cfg.buildcfg}/Run/res/" }
 
 project "Plugin_OpenGL"
@@ -78,14 +81,16 @@ project "Plugin_OpenGL"
         "Plugins/OpenGL/**.h", "Plugins/OpenGL/**.cpp",
         "External/imgui/*.h", "External/imgui/*.cpp"
     }
-    links { "LORE", "glad", "freetype" }
+    links { "LORE", "glad" }
 
     -- OS-specific options
     filter { "system:Windows" }
+        -- Are these the same for each OS???
         links { "glfw3dll" }
 
     filter { "system:MacOSX" }
-        links { "glfw3" }
+        links { "glfw3dll" }
+        linkoptions { "../../External/freetype2/build/libfreetype.6.16.0.dylib" }
         linkoptions { "-framework Cocoa -framework IOKit -framework CoreVideo -framework OpenGL" }
 
     postbuildcommands { "{COPY} ../../../lib/x64/%{cfg.buildcfg}/ ../../../bin/%{cfg.buildcfg}/Run/" }

@@ -172,7 +172,7 @@ void Log::WriteLog( const bool internal,
   msg.lvl = lvl;
 
   // Parse the message parameters.
-  if ( 0 == strncmp( "%s", format, sizeof( format ) ) ) {
+  if ( 0 == strncmp( "%s", format, strlen(format) ) ) {
     va_list args;
     va_start( args, format );
     msg.text = va_arg( args, const char* );

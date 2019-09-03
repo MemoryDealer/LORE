@@ -297,6 +297,9 @@ std::unique_ptr<Context> Context::Create( const RenderPlugin& renderer )
 
   // Load the context class from the plugin.
   auto context = __rpl.createContext();
+  if (!context) {
+    throw Lore::Exception("Failed to create context");
+  }
 
   CLI::AssignContext( context.get() );
   Input::AssignContext( context.get() );
@@ -381,6 +384,9 @@ WindowPtr Context::GetActiveWindow()
 void Context::onKeyDown( const Keycode code )
 {
   switch ( code ) {
+    default:
+      break;
+
     case Keycode::B:
     {
       const string value( "RenderAABBs" );

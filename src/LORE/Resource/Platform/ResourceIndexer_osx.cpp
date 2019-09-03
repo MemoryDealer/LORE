@@ -28,7 +28,7 @@
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE/Resource/ResourceIndexer.h>
+#include <LORE/Resource/IO/ResourceIndexer.h>
 
 #include <LORE/Resource/ResourceController.h>
 

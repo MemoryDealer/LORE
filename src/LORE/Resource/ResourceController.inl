@@ -121,7 +121,7 @@ inline typename std::enable_if<std::is_base_of<Alloc<ResourceType>, ResourceType
 ResourceController::destroy( ResourceType* resource )
 {
   auto groupName = resource->getResourceGroupName();
-  _getGroup( groupName )->removeResource<ResourceType>( resource->getName() );
+  _getGroup( groupName )->template removeResource<ResourceType>( resource->getName() );
   MemoryAccess::GetPrimaryPoolCluster()->destroy<ResourceType>( resource );
 }
 
@@ -132,7 +132,7 @@ inline typename std::enable_if<!std::is_base_of<Alloc<ResourceType>, ResourceTyp
 ResourceController::destroy( ResourceType* resource )
 {
   auto groupName = resource->getResourceGroupName();
-  _getGroup( groupName )->removeResource<ResourceType>( resource->getName() );
+  _getGroup( groupName )->template removeResource<ResourceType>( resource->getName() );
   auto functor = getDestructionFunctor<ResourceType>();
   if ( functor ) {
     functor( resource );

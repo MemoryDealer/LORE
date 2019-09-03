@@ -30,6 +30,11 @@
 #include <rapidjson/document.h>
 #include <rapidjson/prettywriter.h>
 
+// Avoid having to call GetObjectA on document in Windows.
+#ifdef _MSC_VER
+#undef GetObject
+#endif
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 using namespace Lore;
@@ -188,7 +193,7 @@ bool JsonSerializerComponent::deserialize( const string& file )
     throw Lore::Exception( "Parse error for JSON document: " + std::to_string( doc.GetParseError() ) );
   }
 
-  if ( doc.IsNull() || ( doc.IsObject() && doc.GetObjectA().MemberCount() == 0 ) ) {
+  if ( doc.IsNull() || ( doc.IsObject() && doc.GetObject().MemberCount() == 0 ) ) {
     // Nothing to deserialize.
     return false;
   }

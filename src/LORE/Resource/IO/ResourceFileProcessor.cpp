@@ -202,17 +202,17 @@ void ResourceFileProcessor::processAnimation( SpriteAnimationSetPtr animationSet
     const auto& deltaTimes = settings.getValue( "deltaTimes" ).toArray();
 
     // Create an animation to add to the animation set.
-    SpriteController::Animation animation;
+    SpriteController::Animation spriteAnimation;
 
     // Process frames and delta times.
     for ( const auto& frame : frames ) {
-      animation.frames.push_back( static_cast<size_t>( frame.toInt() ) );
+      spriteAnimation.frames.push_back( static_cast<size_t>( frame.toInt() ) );
     }
     for ( const auto& dt : deltaTimes ) {
-      animation.deltaTimes.push_back( static_cast< long >( dt.toInt() ) );
+      spriteAnimation.deltaTimes.push_back( static_cast< long >( dt.toInt() ) );
     }
 
-    animationSet->addAnimation( name, animation );
+    animationSet->addAnimation( name, spriteAnimation );
   }
 }
 
