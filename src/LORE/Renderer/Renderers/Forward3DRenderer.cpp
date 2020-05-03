@@ -80,7 +80,7 @@ void Forward3DRenderer::addRenderData( EntityPtr entity,
 
   if ( blended ) {
     RenderQueue::EntityNodePair pair { entity, node };
-    queue.transparents.insert( { glm::length( _camera->getPosition() - node->getPosition() ), pair } );
+    queue.transparents.insert( { glm::length2( _camera->getPosition() - node->getPosition() ), pair } );
   }
   else {
     if ( entity->isInstanced() ) {
