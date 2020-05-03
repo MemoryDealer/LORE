@@ -30,7 +30,7 @@ By default the `Demo3D` project is selected. There are also two other projects: 
 ### Debug Console
 Press shift and ~ to bring up the debug console (also brings up the FPS display which can be toggled alternatively with ~).
 
-#### Some Commands
+#### Some Commands (not case sensitive):
 - `SetNodePos [node name] [x] [y]`: sets the position of a node in world space
 - `MoveNode [node name] [x] [y] [z]`: translates node in world space
 - `SetLightColor [node name] [r] [g] [b]`: changes a light's color
@@ -44,7 +44,7 @@ E.g.,
     "Nodes": {
       "FloatingLight": {
         "Entity": "Light",
-        "Light": "PointLight0",
+        "Light": "PointLight0", <-- name to use for SetLightColor
         "Position": [0.0, 3.5, 0.0],
         "Scale": 0.25
       },
@@ -56,3 +56,24 @@ E.g.,
     }
   }
 ```
+
+### 2D Sample Controls 
+- Move with standard WASD
+- Z/X to zoom camera in/out
+
+### 3D Sample Controls
+- Move camera with standard WASD
+- Mouse to rotate camera
+- Q/E to move up/down in world space
+- Shift to speed up movement (`Demo3D` only)
+
+## Images
+
+2D scene with light colors changed (e.g., `setlightcolor torch0 [r] [g] [b]`):
+![2D Sample](images/2Dscene.png)
+
+A 3D scene:
+![3D Sample](images/3Dscene.png)
+
+## Known Issues
+There is currently a crash when exiting a LORE application, which seems to have appeared only recently. Currently looking into this.
