@@ -68,9 +68,11 @@ Context::~Context()
 {
   NotificationUnsubscribe( WindowEventNotification, &Context::onWindowEvent );
 
-  // Explicitly destroy Scene objects before resources, otherwise the order of destruction
+  // Explicitly destroy Entity/Model/Scene objects before resources, otherwise the order of destruction
   // in the pool cluster can lead to crashes, since resources (such as Box or Light) can be destroyed
   // before the owning object tries to delete them (AABBs for Boxes).
+  _poolCluster.unregisterPool<Entity>();
+  _poolCluster.unregisterPool<Model>();
   _poolCluster.unregisterPool<Scene>();
 }
 
@@ -95,7 +97,7 @@ void Context::initConfiguration()
   _poolCluster.registerPool<SpriteAnimationSet>( 8 );
   _poolCluster.registerPool<Textbox>( 8 );
 
-  // TODO: Parse pool/config settings from cfg file (Lua).
+  // TODO: Parse pool/config settings from cfg file.
   Config::SetValue( "RenderAABBs", false );
 
   // Setup CLI.

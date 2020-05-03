@@ -74,6 +74,3 @@ E.g.,
 
 A 3D scene:
 ![3D Sample](images/3Dscene.png)
-
-## Known Issues
-There is currently a crash when exiting a LORE application, which seems to have appeared only recently. Currently looking into this.
