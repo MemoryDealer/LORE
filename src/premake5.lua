@@ -44,9 +44,6 @@ filter "configurations:Release"
 filter "system:MacOSX"
     cppdialect "C++14"
 
--- Use latest C++ standard for all projects (using _HAS_CXX17 for now).
---buildoptions { "/std:c++latest" }
-
 --
 -- Projects
 
@@ -54,7 +51,8 @@ project "LORE"
     location "LORE"
     kind "SharedLib"
     language "C++"
-    defines { "__Lore_Exports__", "_HAS_CXX17", "LORE_DEBUG_UI" }
+    defines { "__Lore_Exports__", "_HAS_CXX17", "_HAS_CXX20", "LORE_DEBUG_UI" }
+    buildoptions { "/std:c++latest" }
     pchheader "_pch.h"
     pchsource "LORE/_pch.cpp"
     forceincludes { "_pch.h" }
@@ -64,13 +62,15 @@ project "LORE"
     }
     links { "assimp-vc140-mt" }
     postbuildcommands { "{COPY} ../../res/ ../../bin/%{cfg.buildcfg}/Run/res/" }
+    postbuildcommands { "{COPY} ../../lib/x64/%{cfg.buildcfg}/ ../../bin/%{cfg.buildcfg}/Run/" }
 
 project "Plugin_OpenGL"
     location "Plugins/OpenGL"
     kind "SharedLib"
     language "C++"
     libdirs { "../bin/%{cfg.buildcfg}/Run" } -- Location of LORE.lib after build.
-    defines { "__LoreOpenGL_Exports__", "_HAS_CXX17", "LORE_DEBUG_UI" }
+    defines { "__LoreOpenGL_Exports__", "_HAS_CXX17", "_HAS_CXX20", "LORE_DEBUG_UI" }
+    buildoptions { "/std:c++latest" }
     pchheader "_pch.h"
     pchsource "Plugins/OpenGL/_pch.cpp"
     forceincludes { "_pch.h" }
@@ -106,7 +106,8 @@ project "Demo3D"
     location "Examples/Demo3D"
     kind "ConsoleApp"
     language "C++"
-    defines { "_HAS_CXX17" }
+    defines { "_HAS_CXX17", "_HAS_CXX20" }
+    buildoptions { "/std:c++latest" }
     files {
         "Examples/Demo3D/**.h",
         "Examples/Demo3D/**.cpp"
@@ -118,7 +119,8 @@ project "Example_ComplexScene2D"
     location "Examples/ComplexScene2D"
     kind "ConsoleApp"
     language "C++"
-    defines { "_HAS_CXX17" }
+    defines { "_HAS_CXX17", "_HAS_CXX20" }
+    buildoptions { "/std:c++latest" }
     files { 
         "Examples/ComplexScene2D/**.h",
         "Examples/ComplexScene2D/**.cpp"
@@ -130,7 +132,8 @@ project "Example_ComplexScene3D"
     location "Examples/ComplexScene3D"
     kind "ConsoleApp"
     language "C++"
-    defines { "_HAS_CXX17" }
+    defines { "_HAS_CXX17", "_HAS_CXX20" }
+    buildoptions { "/std:c++latest" }
     files { 
         "Examples/ComplexScene3D/**.h",
         "Examples/ComplexScene3D/**.cpp"
@@ -145,7 +148,8 @@ project "Tests"
     location "Tests"
     kind "ConsoleApp"
     language "C++"
-    defines { "_HAS_CXX17" }
+    defines { "_HAS_CXX17", "_HAS_CXX20" }
+    buildoptions { "/std:c++latest" }
     forceincludes { "TestUtils.h" }
     files {
         "Tests/**.h", "Tests/**.hpp", "Tests/**.cpp", "Tests/**.json"

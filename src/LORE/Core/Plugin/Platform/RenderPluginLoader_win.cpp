@@ -57,7 +57,7 @@ bool RenderPluginLoader::load( const string& file )
 
     _hModule = LoadLibrary( file.c_str() );
     if ( nullptr == _hModule ) {
-        LogWrite( Critical, "Unable to load render plugin %s", file.c_str() );
+        LogWrite( Critical, "Unable to load render plugin %s - error %d", file.c_str(), GetLastError() );
         return false;
     }
 
