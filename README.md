@@ -25,6 +25,12 @@ You are done :)
 
 By default the `Demo3D` project is selected. There are also two other projects: `Example_ComplexScene2D` and `Example_ComplexScene3D`.
 
+#### Note about sample resource files
+
+The resource files under the `res` directory are copied to the executable directory (e.g., `bin/Debug/Run`) as part of the build process. Any changes under the `res` directory require either running `res/copyToBin.bat` or building one of the projects again (except for `Tests` or `glad`).
+
+Alternatively, you can change the debugging working directory to `..\..\..` to avoid needing the copy (in Visual Studio, right-click sample project -> properties and go to the Debugging section to change the Working Directory).
+
 ## Tips and Tricks
 
 ### Debug Console
@@ -74,3 +80,8 @@ E.g.,
 
 A 3D scene:
 ![3D Sample](images/3Dscene.png)
+
+## Known Issues
+- Reloading in Demo3D leaves out the wood floor
+- 3D skybox does not automatically track the camera position, so you can fly freely outside of it
+
