@@ -15,7 +15,7 @@
 Then build the project "assimp" inside the Assimp Visual Studio solution or by command line.
 
 ### Generate the LORE project files and build
-We can go up one directory and run `make.bat` to generate the Visual Studio project files using Premake.
+We can go up two directories to `src` and run `make.bat` to generate the Visual Studio project files using Premake.
 
 Open the solution (you may have to upgrade if using VS 2019), and build all.
 
