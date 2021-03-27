@@ -40,6 +40,9 @@ namespace Lore { namespace OpenGL {
                                                  const GLchar* message,
                                                  const void* userParam )
         {
+          //
+          return; // See comments in Log.ccp - Logger::__logger()
+          //
             printf( "[OpenGL] %s\n", message );
             printf( "Source: " );
 

@@ -27,6 +27,7 @@
 
 #include <LORE/Resource/Material.h>
 #include <LORE/Resource/Registry.h>
+#include <LORE/Resource/ResourceController.h>
 #include <LORE/Shader/GPUProgram.h>
 #include <LORE/Util/Util.h>
 

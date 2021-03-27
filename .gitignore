@@ -55,3 +55,5 @@ src/ipch
 *Makefile*
 
 src/\.vs/LORE/v15/
+
+*.log

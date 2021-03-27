@@ -73,7 +73,13 @@ void Logger::__logger()
       out.append( msg.text );
 
       // Output the string to both the console and log file.
-      printf( "%s\n", out.c_str() );
+
+      ///
+      /// Ever since upgrading to VS2019, something is severely wrong with printf and it hangs indefinitely at times.
+      /// They claim to have fixed it but they might be lying.
+      /// https://developercommunity.visualstudio.com/t/printf-vprintf-blocknever-return/1314072
+      /// 
+      //printf( "%s\n", out.c_str() );
       _stream << out << std::endl;
 
       _messageQueue.pop();
