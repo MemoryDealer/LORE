@@ -130,6 +130,21 @@ void GLTexture::create( const uint32_t width, const uint32_t height, const uint3
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void GLTexture::createDepth( const uint32_t width, const uint32_t height )
+{
+  glGenTextures( 1, &_id );
+  glBindTexture( GL_TEXTURE_2D, _id );
+  glTexImage2D( GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr );
+  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+
+  glBindTexture( _target, 0 );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void GLTexture::create( const int width, const int height, const Lore::Color& color )
 {
   const auto size = width * height * 4;

@@ -595,6 +595,111 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+Lore::GPUProgramPtr GLStockResource3DFactory::createShadowProgram( const string& name )
+{
+  const string header = "#version " +
+    std::to_string( APIVersion::GetMajor() ) + std::to_string( APIVersion::GetMinor() ) + "0" +
+    " core\n";
+
+  //
+  // Vertex shader.
+
+  string src = header;
+
+  //
+  // Layout.
+
+  src += "layout (location = 0) in vec3 pos;";
+
+  //
+  // Uniforms and outs.
+
+  src += "uniform mat4 viewProjection;";
+  src += "uniform mat4 model;";
+
+  //
+  // main function.
+
+  src += "void main(){";
+  {
+    src += "gl_Position = viewProjection * model * vec4(pos, 1.0);";
+  }
+  src += "}";
+
+  auto vsptr = _controller->create<Shader>( name + "_VS" );
+  vsptr->init( Shader::Type::Vertex );
+  if ( !vsptr->loadFromSource( src ) ) {
+    throw Lore::Exception( "Failed to compile shadow vertex shader for " + name );
+  }
+
+  // ::::::::::::::::::::::::::::::::: //
+
+  //
+  // Fragment shader.
+
+  src.clear();
+  src = header;
+
+  //
+  // main function.
+
+  src += "void main(){";
+  {
+    // Nothing to do here.
+  }
+  src += "}";
+
+  auto fsptr = _controller->create<Shader>( name + "_FS" );
+  fsptr->init( Shader::Type::Fragment );
+  if ( !fsptr->loadFromSource( src ) ) {
+    throw Lore::Exception( "Failed to compile shadow fragment shader for " + name );
+  }
+
+  // ::::::::::::::::::::::::::::::::: //
+
+  //
+  // GPU program.
+
+  auto program = _controller->create<Lore::GPUProgram>( name );
+  program->init();
+  program->attachShader( vsptr );
+  program->attachShader( fsptr );
+
+  if ( !program->link() ) {
+    throw Lore::Exception( "Failed to link GPUProgram " + name );
+  }
+
+  //
+  // Add uniforms.
+
+  program->addUniformVar( "viewProjection" );
+  program->addUniformVar( "model" );
+
+  // Uniform updaters.
+
+  auto UniformUpdater = []( const RenderView& rv,
+                            const GPUProgramPtr program,
+                            const MaterialPtr material,
+                            const RenderQueue::LightData& lights ) {
+                              return;
+  };
+
+  auto UniformNodeUpdater = []( const GPUProgramPtr program,
+                                const MaterialPtr material,
+                                const NodePtr node,
+                                const glm::mat4& viewProjection ) {
+                                  program->setUniformVar( "viewProjection", viewProjection );
+                                  program->setUniformVar( "model", node->getFullTransform() );
+  };
+
+  program->setUniformUpdater( UniformUpdater );
+  program->setUniformNodeUpdater( UniformNodeUpdater );
+
+  return program;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 Lore::GPUProgramPtr GLStockResource3DFactory::createSkyboxProgram( const string& name, const Lore::SkyboxProgramParameters& params )
 {
   const string header = "#version " +

@@ -183,6 +183,11 @@ void StockResourceController::createRendererStockResources( const RendererType t
     srf->createUberProgram( "StandardInstanced" + suffix, params );
   }
 
+  // Shadow programs.
+  {
+    srf->createShadowProgram( "DepthShadowMap" );
+  }
+
   //
   // Create stock materials.
 

@@ -78,6 +78,7 @@ namespace Lore {
     // Factory functions that must be implemented by the render plugin.
 
     virtual GPUProgramPtr createUberProgram( const string& name, const UberProgramParameters& params ) = 0;
+    virtual GPUProgramPtr createShadowProgram( const string& name ) = 0;
     virtual GPUProgramPtr createSkyboxProgram( const string& name, const SkyboxProgramParameters& params ) = 0;
     virtual GPUProgramPtr createEnvironmentMappingProgram( const string& name, const EnvironmentMappingProgramParameters& params ) = 0;
     virtual GPUProgramPtr createBoxProgram( const string& name ) = 0;

@@ -97,7 +97,7 @@ namespace Lore {
 
     void addAttribute( const AttributeType& type, const uint size );
 
-    virtual void draw( const GPUProgramPtr program, const size_t instanceCount = 0 ) = 0;
+    virtual void draw( const GPUProgramPtr program, const size_t instanceCount = 0, const bool bindTextures = true ) = 0;
     virtual void draw( const Vertices& verts ) = 0;
 
     //

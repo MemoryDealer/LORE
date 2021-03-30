@@ -82,7 +82,7 @@ void Logger::__logger()
       /// https://developercommunity.visualstudio.com/t/printf-vprintf-blocknever-return/1314072
       /// 
       //printf( "%s\n", out.c_str() );
-      std::cout << out << std::endl;
+      //std::cout << out << std::endl;
       _stream << out << std::endl;
 
       _messageQueue.pop();

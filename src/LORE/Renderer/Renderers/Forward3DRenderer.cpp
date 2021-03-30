@@ -172,6 +172,55 @@ void Forward3DRenderer::present( const RenderView& rv,
     addLight( dirLight, nullptr );
   }
 
+  //
+  // Render depth shadow map.
+  if ( rv.depthShadowMap ) {
+    rv.depthShadowMap->bind();
+    _api->clearDepthBufferBit();
+
+    RenderQueue& queue = _queues.at( RenderQueue::General ); // Temporarily probably not permanent code.
+    for ( const auto& dirLight : queue.lights.directionalLights ) {
+      glm::mat4 lightProj = glm::ortho( -10.f, 10.f, -10.f, 10.f, 1.f, 7.5f );
+      glm::mat4 lightView = glm::lookAt( -dirLight->getDirection(),
+                                         Vec3Zero,
+                                         Vec3PosY );
+      glm::mat4 lightViewProj = lightProj * lightView;
+
+      GPUProgramPtr shadowProgram = StockResource::GetGPUProgram( "DepthShadowMap" );
+      shadowProgram->use();
+
+      // TODO: Instanced solids...needs shader
+      //for ( const auto& entity : queue.instancedSolids ) {
+      //  ModelPtr model = entity->getInstancedModel();
+
+      //  const NodePtr node = entity->getInstanceControllerNode();
+
+      //  //shadowProgram->updateUniforms( rv, nullptr, queue.lights );
+      //  shadowProgram->updateNodeUniforms( nullptr, node, lightViewProj );
+
+      //  model->draw( shadowProgram, entity->getInstanceCount() );
+      //}
+
+      // Render non-instanced solids.
+      for ( auto& pair : queue.solids ) {
+        const EntityPtr entity = pair.first;
+        const RenderQueue::NodeList& nodes = pair.second;
+        const ModelPtr model = entity->getModel();
+
+        // Render each node associated with this entity.
+        for ( const auto& node : nodes ) {
+          shadowProgram->updateNodeUniforms( nullptr, node, lightViewProj );
+          model->draw( shadowProgram, 0, false );
+        }
+      }
+    }
+
+    rv.depthShadowMap->unbind();
+  }
+
+  //
+  // Render scene.
+
   if ( rv.renderTarget ) {
     rv.renderTarget->bind();
     _api->setViewport( 0,

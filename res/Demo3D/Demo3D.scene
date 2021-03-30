@@ -17,7 +17,6 @@
     },
     "CheckeredCube": {
       "ModelType":"TexturedCube",
-      "Instanced": 500,
       "Sprite":"checkerboard",
       "MaterialSettings": {
         "ScrollSpeed": [0.0, 0.0]

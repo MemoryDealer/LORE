@@ -466,6 +466,15 @@ RenderTargetPtr Resource::CreateRenderTarget( const string& name, const uint32_t
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+RenderTargetPtr Resource::CreateDepthShadowMap( const string& name, const uint32_t width, const uint32_t height, const uint32_t sampleCount, const string& groupName )
+{
+  auto rt = ActiveContext->getResourceController()->create<RenderTarget>( name, groupName );
+  rt->initDepthShadowMap( width, height, sampleCount );
+  return rt;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 ShaderPtr Resource::CreateShader( const string& name,
                                   const Shader::Type type,
                                   const string& groupName )
@@ -505,6 +514,18 @@ TexturePtr Resource::CreateTexture( const string& name, const uint32_t width, co
 {
   auto texture = ActiveContext->getResourceController()->create<Texture>( name, groupName );
   texture->create( width, height, color );
+  return texture;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+TexturePtr Resource::CreateDepthTexture( const string& name,
+                                         const uint32_t width,
+                                         const uint32_t height,
+                                         const string& groupName )
+{
+  auto texture = ActiveContext->getResourceController()->create<Texture>( name, groupName );
+  texture->createDepth( width, height );
   return texture;
 }
 
