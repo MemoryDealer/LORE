@@ -42,6 +42,7 @@ namespace Lore {
     uint32_t maxDiffuseTextures { 8 };
     uint32_t maxSpecularTextures { 8 };
     bool textured { true };
+    bool shadows { true };
     bool instanced { false };
   };
 

@@ -24,7 +24,6 @@
     },
     "StoneQuad": {
       "ModelType":"TexturedQuad",
-      "Instanced": 100,
       "Sprite":"stone",
       "MaterialSettings": {
         "Shininess": 32.0

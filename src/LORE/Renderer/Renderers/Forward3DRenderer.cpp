@@ -174,20 +174,23 @@ void Forward3DRenderer::present( const RenderView& rv,
 
   //
   // Render depth shadow map.
+  glm::mat4 lightViewProj;
   if ( rv.depthShadowMap ) {
     rv.depthShadowMap->bind();
     _api->clearDepthBufferBit();
 
     RenderQueue& queue = _queues.at( RenderQueue::General ); // Temporarily probably not permanent code.
     for ( const auto& dirLight : queue.lights.directionalLights ) {
-      glm::mat4 lightProj = glm::ortho( -10.f, 10.f, -10.f, 10.f, 1.f, 7.5f );
-      glm::mat4 lightView = glm::lookAt( -dirLight->getDirection(),
+      const auto orthoSize = 20.f;
+      glm::mat4 lightProj = glm::ortho( -orthoSize, orthoSize, -orthoSize, orthoSize, 1.f, 50.f );
+      glm::mat4 lightView = glm::lookAt( -dirLight->getDirection() * 10.f,
                                          Vec3Zero,
                                          Vec3PosY );
-      glm::mat4 lightViewProj = lightProj * lightView;
+      lightViewProj = lightProj * lightView;
 
       GPUProgramPtr shadowProgram = StockResource::GetGPUProgram( "DepthShadowMap" );
       shadowProgram->use();
+      shadowProgram->setUniformVar( "viewProjection", lightViewProj );
 
       // TODO: Instanced solids...needs shader
       //for ( const auto& entity : queue.instancedSolids ) {
@@ -215,7 +218,7 @@ void Forward3DRenderer::present( const RenderView& rv,
       }
     }
 
-    rv.depthShadowMap->unbind();
+    _api->bindDefaultFramebuffer();
   }
 
   //
@@ -254,7 +257,7 @@ void Forward3DRenderer::present( const RenderView& rv,
   // Render all solids first.
   for ( const auto& activeQueue : _activeQueues ) {
     RenderQueue& queue = activeQueue.second;
-    _renderSolids( rv, queue, viewProjection );
+    _renderSolids( rv, queue, viewProjection, lightViewProj );
   }
 
   // Render skybox.
@@ -340,7 +343,8 @@ void Forward3DRenderer::_renderSkybox( const RenderView& rv,
 
 void Forward3DRenderer::_renderSolids( const RenderView& rv,
                                        const RenderQueue& queue,
-                                       const glm::mat4& viewProjection ) const
+                                       const glm::mat4& viewProjection,
+                                       const glm::mat4& lightViewProj ) const
 {
   const ScenePtr scene = rv.scene;
 
@@ -386,6 +390,12 @@ void Forward3DRenderer::_renderSolids( const RenderView& rv,
     const GPUProgramPtr program = material->program;
 
     program->use();
+
+    // Shadows.
+    rv.depthShadowMap->getTexture()->bind( 10 );
+    program->setUniformVar( "depthShadowMap", 10 );
+    program->setUniformVar( "lightSpaceMatrix", lightViewProj );
+
     program->updateUniforms( rv, material, queue.lights );
 
     // Render each node associated with this entity.

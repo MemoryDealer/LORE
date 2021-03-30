@@ -50,7 +50,6 @@ namespace Lore {
     virtual void initDepthShadowMap( const uint32_t width, const uint32_t height, const uint32_t sampleCount ) = 0;
 
     virtual void bind() const = 0;
-    virtual void unbind() const = 0;
     virtual void flush() const = 0;
 
     virtual TexturePtr getTexture() const = 0;

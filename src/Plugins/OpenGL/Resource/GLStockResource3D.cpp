@@ -50,6 +50,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
   const bool textured = params.textured;
   const bool lit = !!( params.maxDirectionalLights || params.maxPointLights );
   const bool instanced = params.instanced;
+  const bool shadows = params.shadows;
   const string header = "#version " +
     std::to_string( APIVersion::GetMajor() ) + std::to_string( APIVersion::GetMinor() ) + "0" +
     " core\n";
@@ -87,6 +88,9 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
   src += "uniform mat4 transform;";
   src += "uniform Rect texSampleRegion;";
+  if ( shadows ) {
+    src += "uniform mat4 lightSpaceMatrix;";
+  }
 
   if ( textured ) {
     src += "out vec2 TexCoord;";
@@ -96,6 +100,10 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     src += "uniform mat4 model;";
     src += "out vec3 FragPos;";
     src += "out vec3 Normal;";
+
+    if ( shadows ) {
+      src += "out vec4 FragPosLightSpace;";
+    }
   }
 
   //
@@ -111,6 +119,10 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       else {
         src += "FragPos = vec3(model * vec4(vertex, 1.0));";
         src += "Normal = mat3(transpose(inverse(model))) * normal;";
+      }
+
+      if ( shadows ) {
+        src += "FragPosLightSpace = lightSpaceMatrix * vec4(FragPos, 1.0);";
       }
     }
 
@@ -210,6 +222,30 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
     src += "in vec3 FragPos;";
     src += "in vec3 Normal;";
+
+    // Shadows.
+
+    if ( shadows ) {
+      src += "in vec4 FragPosLightSpace;";
+      src += "uniform sampler2D depthShadowMap;";
+
+      src += "float CalculateShadows(vec4 fragPosLightSpace) {";
+      {
+        // We must do the perspective divide manually (only needed for projection matrices though).
+        src += "vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;";
+        // Convert NDC coordinates to [0,1] range.
+        src += "projCoords = projCoords * 0.5 + 0.5;";
+
+        // Closest depth is from shadow map, while current depth is known from the fragment.
+        src += "float closestDepth = texture(depthShadowMap, projCoords.xy).r;";
+        src += "float currentDepth = projCoords.z;";
+
+        src += "float shadow = currentDepth > closestDepth ? 1.0 : 0.0;";
+
+        src += "return shadow;";
+      }
+      src += "}";
+    }
 
     // Texture functions.
 
@@ -328,6 +364,10 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
         src += "result += CalcPointLight(pointLights[i], norm, viewDir);";
       }
       src += "}";
+
+      // Shadows.
+      src += "float shadow = CalculateShadows(FragPosLightSpace);";
+      src += "result *= (1.0 - shadow);";
     }
     else {
       src += "result = vec3(1.0, 1.0, 1.0);";
@@ -426,6 +466,11 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     program->addUniformVar( "texSampleRegion.y" );
     program->addUniformVar( "texSampleRegion.w" );
     program->addUniformVar( "texSampleRegion.h" );
+  }
+
+  if ( shadows ) {
+    program->addUniformVar( "lightSpaceMatrix" );
+    program->addUniformVar( "depthShadowMap" );
   }
 
   // Setup uniform updaters.
@@ -688,8 +733,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createShadowProgram( const string&
                                 const MaterialPtr material,
                                 const NodePtr node,
                                 const glm::mat4& viewProjection ) {
-                                  program->setUniformVar( "viewProjection", viewProjection );
-                                  program->setUniformVar( "model", node->getFullTransform() );
+    program->setUniformVar( "model", node->getFullTransform() );
   };
 
   program->setUniformUpdater( UniformUpdater );

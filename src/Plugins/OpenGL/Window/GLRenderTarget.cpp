@@ -144,13 +144,6 @@ void GLRenderTarget::bind() const
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLRenderTarget::unbind() const
-{
-  glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 void GLRenderTarget::flush() const
 {
   if ( _multiSampling ) {
