@@ -125,17 +125,17 @@ void Game::loadScene()
   Lore::SceneLoader loader;
   loader.process( "res/demo3d/demo3d.scene", _scene );
 
-  // Create wood flooring.
-  auto woodEntity = Lore::Resource::GetEntity( "WoodQuad", "Demo3D" );
-  constexpr Lore::real WoodFloorScale = 5.f;
-  constexpr int WoodFloorGridSize = 8;
-  for ( int i = -( WoodFloorGridSize / 2 ); i < ( WoodFloorGridSize / 2 ); ++i ) {
-    for ( int j = -( WoodFloorGridSize / 2 ); j < ( WoodFloorGridSize / 2 ); ++j ) {
-      auto node = _scene->createNode( "wood-floor" + std::to_string( i ) + std::to_string( j ) );
-      node->attachObject( woodEntity );
-      node->setPosition( static_cast<Lore::real>( i ) * WoodFloorScale, 0.f, static_cast<Lore::real>( j ) * WoodFloorScale );
+  // Create stone flooring.
+  auto stoneEntity = Lore::Resource::GetEntity( "StoneQuad", "Demo3D" );
+  constexpr Lore::real StoneFloorScale = 5.f;
+  constexpr int stoneFloorGridSize = 8;
+  for ( int i = -( stoneFloorGridSize / 2 ); i < ( stoneFloorGridSize / 2 ); ++i ) {
+    for ( int j = -( stoneFloorGridSize / 2 ); j < ( stoneFloorGridSize / 2 ); ++j ) {
+      auto node = _scene->createNode( "stone-floor" + std::to_string( i ) + std::to_string( j ) );
+      node->attachObject( stoneEntity );
+      node->setPosition( static_cast<Lore::real>( i ) * StoneFloorScale, 0.f, static_cast<Lore::real>( j ) * StoneFloorScale);
       node->rotate( Lore::Vec3PosX, glm::radians( -90.f ) );
-      node->scale( WoodFloorScale );
+      node->scale( StoneFloorScale );
     }
   }
 }
