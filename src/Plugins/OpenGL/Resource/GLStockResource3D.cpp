@@ -236,11 +236,33 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
         // Convert NDC coordinates to [0,1] range.
         src += "projCoords = projCoords * 0.5 + 0.5;";
 
+        // Prevent over-sampling the depth shadow map.
+        src += "if (projCoords.z > 1.0) {";
+        {
+          src += "return 0.0;";
+        }
+        src += "}";
+
         // Closest depth is from shadow map, while current depth is known from the fragment.
-        src += "float closestDepth = texture(depthShadowMap, projCoords.xy).r;";
         src += "float currentDepth = projCoords.z;";
 
-        src += "float shadow = currentDepth > closestDepth ? 1.0 : 0.0;";
+        src += "float bias = 0.005;";
+
+        // Soft shadows with PCF.
+        src += "float shadow = 0.0;";
+        src += "vec2 texelSize = 1.0 / textureSize(depthShadowMap, 0);";
+        src += "const int halfKernelWidth = 1;";
+        src += "for (int x = -halfKernelWidth; x <= halfKernelWidth; ++x) {";
+        {
+          src += "for (int y = -halfKernelWidth; y <= halfKernelWidth; ++y) {";
+          {
+            src += "float pcfDepth = texture(depthShadowMap, projCoords.xy + vec2(x, y) * texelSize).r;";
+            src += "shadow += (currentDepth - bias) > pcfDepth ? 1.0 : 0.0;";
+          }
+          src += "}";
+        }
+        src += "}";
+        src += "shadow /= ((halfKernelWidth * 2 + 1) * (halfKernelWidth * 2 + 1));";
 
         src += "return shadow;";
       }

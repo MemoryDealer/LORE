@@ -178,12 +178,13 @@ void Forward3DRenderer::present( const RenderView& rv,
   if ( rv.depthShadowMap ) {
     rv.depthShadowMap->bind();
     _api->clearDepthBufferBit();
+    //_api->setCullingMode( IRenderAPI::CullingMode::Front );
 
     RenderQueue& queue = _queues.at( RenderQueue::General ); // Temporarily probably not permanent code.
     for ( const auto& dirLight : queue.lights.directionalLights ) {
-      const auto orthoSize = 20.f;
-      glm::mat4 lightProj = glm::ortho( -orthoSize, orthoSize, -orthoSize, orthoSize, 1.f, 50.f );
-      glm::mat4 lightView = glm::lookAt( -dirLight->getDirection() * 10.f,
+      const auto orthoSize = 10.f;
+      glm::mat4 lightProj = glm::ortho( -orthoSize, orthoSize, -orthoSize, orthoSize, 1.f, 60.f );
+      glm::mat4 lightView = glm::lookAt( -dirLight->getDirection() * 20.f,
                                          Vec3Zero,
                                          Vec3PosY );
       lightViewProj = lightProj * lightView;
@@ -218,6 +219,7 @@ void Forward3DRenderer::present( const RenderView& rv,
       }
     }
 
+    _api->setCullingMode( IRenderAPI::CullingMode::None ); // TODO: Fix normals on cubes/quads and use back culling.
     _api->bindDefaultFramebuffer();
   }
 
