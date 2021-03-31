@@ -1,0 +1,11 @@
+{
+  "name":"space",
+  "textures":[
+    "right-space.png",
+    "left-space.png",
+    "top-space.png",
+    "bottom-space.png",
+    "front-space.png",
+    "back-space.png"
+  ]
+}

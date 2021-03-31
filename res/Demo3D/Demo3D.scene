@@ -3,7 +3,7 @@
     "Type": "Generic",
     "ResourceGroup": "Demo3D",
     "SkyboxColor": [0.3, 0.8, 0.75],
-    "SkyboxSprite":"alien-sky",
+    "SkyboxSprite": "space",
     "AmbientLightColor": [0.05, 0.05, 0.05]
   },
   "Entity": {
