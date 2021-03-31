@@ -176,6 +176,7 @@ void Forward3DRenderer::present( const RenderView& rv,
   // Render depth shadow map.
   glm::mat4 lightViewProj;
   if ( rv.depthShadowMap ) {
+    _api->setViewport( 0, 0, rv.depthShadowMap->getWidth(), rv.depthShadowMap->getHeight() );
     rv.depthShadowMap->bind();
     _api->clearDepthBufferBit();
     //_api->setCullingMode( IRenderAPI::CullingMode::Front );
@@ -227,11 +228,11 @@ void Forward3DRenderer::present( const RenderView& rv,
   // Render scene.
 
   if ( rv.renderTarget ) {
-    rv.renderTarget->bind();
     _api->setViewport( 0,
                        0,
                        static_cast< uint32_t >( rv.viewport.w * rv.renderTarget->getWidth() ),
                        static_cast< uint32_t >( rv.viewport.h * rv.renderTarget->getHeight() ) );
+    rv.renderTarget->bind();
   }
   else {
     // TODO: Get rid of gl_viewport.
@@ -304,6 +305,14 @@ void Forward3DRenderer::_activateQueue( const uint id,
   if ( _activeQueues.end() == lookup ) {
     _activeQueues.insert( { id, rq } );
   }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Forward3DRenderer::_renderShadowMaps( const RenderView& rv,
+                                           const RenderQueue& queue )
+{
+
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -90,7 +90,7 @@ void Game::loadScene()
   // entire window.
   Lore::RenderView rv( "core", _scene, Lore::Rect( 0.f, 0.f, 1.f, 1.f ) );
   rv.camera = _camera;
-  rv.depthShadowMap = Lore::Resource::CreateDepthShadowMap( "shadows", 1280, 720, 0 );
+  rv.depthShadowMap = Lore::Resource::CreateDepthShadowMap( "shadows", 2048, 2048, 0 );
 
   //rv.renderTarget = Lore::Resource::CreateRenderTarget( "rt1", 1920, 1080, 8 );
   //rv.gamma = 1.f;
