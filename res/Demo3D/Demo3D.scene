@@ -8,22 +8,21 @@
   },
   "Entity": {
     "CheckeredQuad": {
-      "ModelType":"TexturedQuad",
-      "Instanced": 50,
+      "Model": "res/Demo3D/Models/quad.fbx",
       "Sprite":"checkerboard",
       "MaterialSettings": {
         "ScrollSpeed": [0.01, 0.0]
       }
     },
     "CheckeredCube": {
-      "ModelType":"TexturedCube",
-      "Sprite":"checkerboard",
+      "Model": "res/Demo3D/Models/cube.fbx",
+      "Sprite": "checkerboard",
       "MaterialSettings": {
         "ScrollSpeed": [0.0, 0.0]
       }
     },
     "StoneQuad": {
-      "ModelType":"TexturedQuad",
+      "Model": "res/Demo3D/Models/quad.fbx",
       "Sprite":"stone",
       "MaterialSettings": {
         "Shininess": 32.0

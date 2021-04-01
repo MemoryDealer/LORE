@@ -246,7 +246,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
         // Closest depth is from shadow map, while current depth is known from the fragment.
         src += "float currentDepth = projCoords.z;";
 
-        src += "float bias = 0.005;";
+        src += "float bias = 0.001;";
 
         // Soft shadows with PCF.
         src += "float shadow = 0.0;";

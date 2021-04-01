@@ -66,7 +66,7 @@ Game::~Game()
 void Game::loadResources()
 {
   // Index all resource locations for complex scene as specified in the configuration file.
-  Lore::Resource::LoadResourceConfiguration( "res/demo3d/resources.json" );
+  Lore::Resource::LoadResourceConfiguration( "../../../res/demo3d/resources.json" );
   // Now load the Core resource group, which contains the resource locations we just indexed.
   Lore::Resource::LoadGroup( Lore::ResourceController::DefaultGroupName );
 }
@@ -126,18 +126,18 @@ void Game::loadScene()
 
   // Load the scene from disk.
   Lore::SceneLoader loader;
-  loader.process( "res/demo3d/demo3d.scene", _scene );
+  loader.process( "../../../res/demo3d/demo3d.scene", _scene );
 
   // Create stone flooring.
   auto stoneEntity = Lore::Resource::GetEntity( "StoneQuad", "Demo3D" );
-  constexpr Lore::real StoneFloorScale = 5.f;
+  constexpr Lore::real StoneFloorScale = 2.f;
   constexpr int stoneFloorGridSize = 8;
   for ( int i = -( stoneFloorGridSize / 2 ); i < ( stoneFloorGridSize / 2 ); ++i ) {
     for ( int j = -( stoneFloorGridSize / 2 ); j < ( stoneFloorGridSize / 2 ); ++j ) {
       auto node = _scene->createNode( "stone-floor" + std::to_string( i ) + std::to_string( j ) );
       node->attachObject( stoneEntity );
-      node->setPosition( static_cast<Lore::real>( i ) * StoneFloorScale, 0.f, static_cast<Lore::real>( j ) * StoneFloorScale);
-      node->rotate( Lore::Vec3PosX, glm::radians( -90.f ) );
+      node->setPosition( static_cast<Lore::real>( i ) * StoneFloorScale * 2.f, 0.f, static_cast<Lore::real>( j ) * StoneFloorScale * 2.f);
+      node->rotate( Lore::Vec3PosX, glm::radians( 90.f ) );
       node->scale( StoneFloorScale );
     }
   }

@@ -179,7 +179,7 @@ void Forward3DRenderer::present( const RenderView& rv,
     _api->setViewport( 0, 0, rv.depthShadowMap->getWidth(), rv.depthShadowMap->getHeight() );
     rv.depthShadowMap->bind();
     _api->clearDepthBufferBit();
-    //_api->setCullingMode( IRenderAPI::CullingMode::Front );
+    _api->setCullingMode( IRenderAPI::CullingMode::Back ); // Note: Cull front to disable self-shadow.
 
     RenderQueue& queue = _queues.at( RenderQueue::General ); // Temporarily probably not permanent code.
     for ( const auto& dirLight : queue.lights.directionalLights ) {
@@ -220,7 +220,7 @@ void Forward3DRenderer::present( const RenderView& rv,
       }
     }
 
-    _api->setCullingMode( IRenderAPI::CullingMode::None ); // TODO: Fix normals on cubes/quads and use back culling.
+    _api->setCullingMode( IRenderAPI::CullingMode::Back );
     _api->bindDefaultFramebuffer();
   }
 
