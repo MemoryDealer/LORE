@@ -39,6 +39,12 @@ namespace Lore { namespace Util {
     return lower;
   }
 
+  static bool EndsWith( const string& str, const char c )
+  {
+    const char& last = str.back();
+    return ( c == last );
+  }
+
 }}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

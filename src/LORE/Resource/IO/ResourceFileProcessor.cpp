@@ -51,7 +51,7 @@ void ResourceFileProcessor::LoadConfiguration( const string& file, ResourceContr
     const auto& directories = value.second.toArray();
     for ( const auto& directoryValue : directories ) {
       const string& directory = directoryValue.toString();
-      resourceController->indexResourceLocation( directory, resourceGroup );
+      resourceController->indexResourceLocation( Resource::GetWorkingDirectory() + directory, resourceGroup );
     }
   }
 }

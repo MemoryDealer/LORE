@@ -137,6 +137,8 @@ namespace Lore {
 
     static const string DefaultGroupName;
 
+    string _workingDirectory {};
+
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     ResourceController();
@@ -242,6 +244,9 @@ namespace Lore {
     static void IndexResourceLocation( const string& directory,
                                        const string& groupName = ResourceController::DefaultGroupName,
                                        const bool recursive = true );
+
+    static string GetWorkingDirectory();
+    static void SetWorkingDirectory( const std::string& dir );
 
     //
     // Functions for loading resources from the storage.

@@ -1,10 +1,10 @@
 {
   "Core": [
-    "../../../res/demo3d/animations",
-    "../../../res/demo3d/cubemaps",
-    "../../../res/demo3d/fonts",
-    "../../../res/demo3d/materials",
-    "../../../res/demo3d/sprites",
-    "../../../res/demo3d/textures"
+    "res/demo3d/animations",
+    "res/demo3d/cubemaps",
+    "res/demo3d/fonts",
+    "res/demo3d/materials",
+    "res/demo3d/sprites",
+    "res/demo3d/textures"
   ]
 }

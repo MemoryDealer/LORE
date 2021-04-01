@@ -29,7 +29,7 @@
       }
     },
     "Light": {
-      "ModelType": "Cube",
+      "Model": "res/Demo3D/Models/cube.fbx",
       "MaterialSettings": {
         "Ambient": [1.0, 1.0, 1.0]
       }

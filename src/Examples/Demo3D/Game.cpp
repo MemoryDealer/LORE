@@ -65,8 +65,10 @@ Game::~Game()
 
 void Game::loadResources()
 {
+  Lore::Resource::SetWorkingDirectory( "../../../" );
+
   // Index all resource locations for complex scene as specified in the configuration file.
-  Lore::Resource::LoadResourceConfiguration( "../../../res/demo3d/resources.json" );
+  Lore::Resource::LoadResourceConfiguration( "res/demo3d/resources.json" );
   // Now load the Core resource group, which contains the resource locations we just indexed.
   Lore::Resource::LoadGroup( Lore::ResourceController::DefaultGroupName );
 }
@@ -126,7 +128,7 @@ void Game::loadScene()
 
   // Load the scene from disk.
   Lore::SceneLoader loader;
-  loader.process( "../../../res/demo3d/demo3d.scene", _scene );
+  loader.process( "res/demo3d/demo3d.scene", _scene );
 
   // Create stone flooring.
   auto stoneEntity = Lore::Resource::GetEntity( "StoneQuad", "Demo3D" );

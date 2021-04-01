@@ -99,6 +99,8 @@ ResourceController::ResourceController()
   // Store and set to active group.
   _groups.insert( { DefaultGroupName, rg } );
   _defaultGroup = rg.get();
+
+  _workingDirectory = "./";
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -305,6 +307,27 @@ void Resource::IndexResourceLocation( const string& directory, const string& gro
 void Resource::ReloadGroup( const string& groupName )
 {
   return ActiveContext->getResourceController()->unloadGroup( groupName );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+string Resource::GetWorkingDirectory()
+{
+  return ActiveContext->getResourceController()->_workingDirectory;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Resource::SetWorkingDirectory( const std::string& dir )
+{
+  ActiveContext->getResourceController()->_workingDirectory = dir;
+
+  std::replace( ActiveContext->getResourceController()->_workingDirectory.begin(),
+                ActiveContext->getResourceController()->_workingDirectory.end(),
+                '\\', '/' );
+  if ( !Util::EndsWith( ActiveContext->getResourceController()->_workingDirectory, '/' ) ) {
+    ActiveContext->getResourceController()->_workingDirectory.append( "/" );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
