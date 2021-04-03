@@ -24,18 +24,9 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Config.h"
+#include "FileUtils.h"
 
-#include <LORE/Util/StringUtils.h>
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-namespace LocalNS {
-
-  static std::unordered_map<std::string, Lore::ConfigValue> ConfigValues;
-
-}
-using namespace LocalNS;
+#include <LORE/Resource/ResourceController.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -43,29 +34,8 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Config::SetValue( const string& key, const string& value )
+string FileUtil::ApplyWorkingDirectory( const string& dir )
 {
-  ConfigValues[StringUtil::ToLower( key )] = value;
+  return Resource::GetWorkingDirectory() + dir;
 }
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Config::SetValue( const string& key, const bool value )
-{
-  ConfigValues[StringUtil::ToLower( key )] = value;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-ConfigValue Config::GetValue( const string& key )
-{
-  auto it = ConfigValues.find( StringUtil::ToLower( key ) );
-  if ( ConfigValues.end() != it ) {
-    return it->second;
-  }
-
-  LogWrite( Error, "Config value %s does not exist", StringUtil::ToLower( key ).c_str() );
-  return ConfigValue();
-}
-
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

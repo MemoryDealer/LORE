@@ -173,56 +173,9 @@ void Forward3DRenderer::present( const RenderView& rv,
   }
 
   //
-  // Render depth shadow map.
-  glm::mat4 lightViewProj;
-  if ( rv.depthShadowMap ) {
-    _api->setViewport( 0, 0, rv.depthShadowMap->getWidth(), rv.depthShadowMap->getHeight() );
-    rv.depthShadowMap->bind();
-    _api->clearDepthBufferBit();
-    _api->setCullingMode( IRenderAPI::CullingMode::Back ); // Note: Cull front to disable self-shadow.
-
-    RenderQueue& queue = _queues.at( RenderQueue::General ); // Temporarily probably not permanent code.
-    for ( const auto& dirLight : queue.lights.directionalLights ) {
-      const auto orthoSize = 10.f;
-      glm::mat4 lightProj = glm::ortho( -orthoSize, orthoSize, -orthoSize, orthoSize, 1.f, 60.f );
-      glm::mat4 lightView = glm::lookAt( -dirLight->getDirection() * 20.f,
-                                         Vec3Zero,
-                                         Vec3PosY );
-      lightViewProj = lightProj * lightView;
-
-      GPUProgramPtr shadowProgram = StockResource::GetGPUProgram( "DepthShadowMap" );
-      shadowProgram->use();
-      shadowProgram->setUniformVar( "viewProjection", lightViewProj );
-
-      // TODO: Instanced solids...needs shader
-      //for ( const auto& entity : queue.instancedSolids ) {
-      //  ModelPtr model = entity->getInstancedModel();
-
-      //  const NodePtr node = entity->getInstanceControllerNode();
-
-      //  //shadowProgram->updateUniforms( rv, nullptr, queue.lights );
-      //  shadowProgram->updateNodeUniforms( nullptr, node, lightViewProj );
-
-      //  model->draw( shadowProgram, entity->getInstanceCount() );
-      //}
-
-      // Render non-instanced solids.
-      for ( auto& pair : queue.solids ) {
-        const EntityPtr entity = pair.first;
-        const RenderQueue::NodeList& nodes = pair.second;
-        const ModelPtr model = entity->getModel();
-
-        // Render each node associated with this entity.
-        for ( const auto& node : nodes ) {
-          shadowProgram->updateNodeUniforms( nullptr, node, lightViewProj );
-          model->draw( shadowProgram, 0, false );
-        }
-      }
-    }
-
-    _api->setCullingMode( IRenderAPI::CullingMode::Back );
-    _api->bindDefaultFramebuffer();
-  }
+  // Render shadow maps first.
+  
+  _renderShadowMaps( rv, _queues.at( RenderQueue::General ) );
 
   //
   // Render scene.
@@ -240,12 +193,15 @@ void Forward3DRenderer::present( const RenderView& rv,
                        rv.gl_viewport.y,
                        rv.gl_viewport.width,
                        rv.gl_viewport.height );
+
+    _api->bindDefaultFramebuffer();
   }
 
   Color bg = rv.scene->getSkyboxColor();
   _api->clear();
   _api->clearColor( bg.r, bg.g, bg.b, 1.f );
   _api->setPolygonMode( IRenderAPI::PolygonMode::Fill );
+  _api->setCullingMode( IRenderAPI::CullingMode::Back );
   _api->setDepthTestEnabled( true );
 
   // Setup view-projection matrix.
@@ -260,7 +216,7 @@ void Forward3DRenderer::present( const RenderView& rv,
   // Render all solids first.
   for ( const auto& activeQueue : _activeQueues ) {
     RenderQueue& queue = activeQueue.second;
-    _renderSolids( rv, queue, viewProjection, lightViewProj );
+    _renderSolids( rv, queue, viewProjection );
   }
 
   // Render skybox.
@@ -312,7 +268,55 @@ void Forward3DRenderer::_activateQueue( const uint id,
 void Forward3DRenderer::_renderShadowMaps( const RenderView& rv,
                                            const RenderQueue& queue )
 {
+  GPUProgramPtr shadowProgram = StockResource::GetGPUProgram( "DepthShadowMap" );
+  shadowProgram->use();
 
+  _api->setCullingMode( IRenderAPI::CullingMode::Back );
+
+  for ( const auto& dirLight : queue.lights.directionalLights ) {
+    // Bind this light's shadow map.
+    if ( !dirLight->shadowMap ) {
+      continue;
+    }
+
+    _api->setViewport( 0, 0, dirLight->shadowMap->getWidth(), dirLight->shadowMap->getHeight() );
+    dirLight->shadowMap->bind();
+    _api->clearDepthBufferBit();
+
+    const auto orthoSize = 10.f;
+    glm::mat4 lightProj = glm::ortho( -orthoSize, orthoSize, -orthoSize, orthoSize, 1.f, 60.f );
+    glm::mat4 lightView = glm::lookAt( -dirLight->getDirection() * 20.f,
+                                       Vec3Zero,
+                                       Vec3PosY );
+
+    dirLight->viewProj = lightProj * lightView;
+    shadowProgram->setUniformVar( "viewProjection", dirLight->viewProj );
+
+    // TODO: Instanced solids...needs shader
+    //for ( const auto& entity : queue.instancedSolids ) {
+    //  ModelPtr model = entity->getInstancedModel();
+
+    //  const NodePtr node = entity->getInstanceControllerNode();
+
+    //  //shadowProgram->updateUniforms( rv, nullptr, queue.lights );
+    //  shadowProgram->updateNodeUniforms( nullptr, node, lightViewProj );
+
+    //  model->draw( shadowProgram, entity->getInstanceCount() );
+    //}
+
+    // Render non-instanced solids.
+    for ( auto& pair : queue.solids ) {
+      const EntityPtr entity = pair.first;
+      const RenderQueue::NodeList& nodes = pair.second;
+      const ModelPtr model = entity->getModel();
+
+      // Render each node associated with this entity.
+      for ( const auto& node : nodes ) {
+        shadowProgram->updateNodeUniforms( nullptr, node, dirLight->viewProj ); // Note: dirLight->viewProj not used.
+        model->draw( shadowProgram, 0, false );
+      }
+    }
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -354,8 +358,7 @@ void Forward3DRenderer::_renderSkybox( const RenderView& rv,
 
 void Forward3DRenderer::_renderSolids( const RenderView& rv,
                                        const RenderQueue& queue,
-                                       const glm::mat4& viewProjection,
-                                       const glm::mat4& lightViewProj ) const
+                                       const glm::mat4& viewProjection ) const
 {
   const ScenePtr scene = rv.scene;
 
@@ -401,12 +404,6 @@ void Forward3DRenderer::_renderSolids( const RenderView& rv,
     const GPUProgramPtr program = material->program;
 
     program->use();
-
-    // Shadows.
-    rv.depthShadowMap->getTexture()->bind( 10 );
-    program->setUniformVar( "depthShadowMap", 10 );
-    program->setUniformVar( "lightSpaceMatrix", lightViewProj );
-
     program->updateUniforms( rv, material, queue.lights );
 
     // Render each node associated with this entity.

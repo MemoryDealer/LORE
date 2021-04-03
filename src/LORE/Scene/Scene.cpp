@@ -130,6 +130,7 @@ DirectionalLightPtr Scene::createDirectionalLight( const string& name )
 {
   auto light = MemoryAccess::GetPrimaryPoolCluster()->create<DirectionalLight>();
   light->setName( name );
+  light->init();
   _directionalLights.insert( name, light );
 
   return light;

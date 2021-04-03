@@ -46,7 +46,6 @@ namespace Lore {
     ScenePtr scene {};
     CameraPtr camera {};
     RenderTargetPtr renderTarget {};
-    RenderTargetPtr depthShadowMap {};
     UIPtr ui {};
 
     real gamma { 2.2f }; // The gamma value used for rendering.

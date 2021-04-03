@@ -169,7 +169,7 @@ void SceneLoader::_loadEntities()
         catch ( Lore::Exception& e ) {
           LogWrite( Error, "Error loading entity %s: %s", entityName.c_str(), e.what() );
           entity = Resource::GetEntity( entityName, _resourceGroupName );
-          entity->setModel( Resource::GetModel( Util::GetFileName( modelPath.toString() ), _resourceGroupName ) );
+          entity->setModel( Resource::GetModel( FileUtil::GetFileName( modelPath.toString() ), _resourceGroupName ) );
         }
       }
       else {

@@ -78,8 +78,7 @@ namespace Lore {
 
     void _renderSolids( const RenderView& rv,
                         const RenderQueue& queue,
-                        const glm::mat4& viewProjection,
-                        const glm::mat4& lightViewProj ) const;
+                        const glm::mat4& viewProjection ) const;
 
     void _renderTransparents( const RenderView& rv,
                               const RenderQueue& queue,

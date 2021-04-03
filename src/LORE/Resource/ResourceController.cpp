@@ -325,7 +325,7 @@ void Resource::SetWorkingDirectory( const std::string& dir )
   std::replace( ActiveContext->getResourceController()->_workingDirectory.begin(),
                 ActiveContext->getResourceController()->_workingDirectory.end(),
                 '\\', '/' );
-  if ( !Util::EndsWith( ActiveContext->getResourceController()->_workingDirectory, '/' ) ) {
+  if ( !StringUtil::EndsWith( ActiveContext->getResourceController()->_workingDirectory, '/' ) ) {
     ActiveContext->getResourceController()->_workingDirectory.append( "/" );
   }
 }

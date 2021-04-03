@@ -88,9 +88,6 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
   src += "uniform mat4 transform;";
   src += "uniform Rect texSampleRegion;";
-  if ( shadows ) {
-    src += "uniform mat4 lightSpaceMatrix;";
-  }
 
   if ( textured ) {
     src += "out vec2 TexCoord;";
@@ -102,7 +99,9 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     src += "out vec3 Normal;";
 
     if ( shadows ) {
-      src += "out vec4 FragPosLightSpace;";
+      src += "out vec4 FragPosDirLightSpace[" + std::to_string( params.maxDirectionalLights ) + "];";
+      src += "uniform mat4 dirLightSpaceMatrix[" + std::to_string( params.maxDirectionalLights ) + "];";
+      src += "uniform int numDirLights;";
     }
   }
 
@@ -122,7 +121,11 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       }
 
       if ( shadows ) {
-        src += "FragPosLightSpace = lightSpaceMatrix * vec4(FragPos, 1.0);";
+        src += "for (int i = 0; i < numDirLights; ++i) {";
+        {
+          src += "FragPosDirLightSpace[i] = dirLightSpaceMatrix[i] * vec4(FragPos, 1.0);";
+        }
+        src += "}";
       }
     }
 
@@ -213,6 +216,10 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     src += "};";
 
     src += "uniform DirectionalLight dirLights[" + std::to_string( params.maxDirectionalLights ) + "];";
+    if ( shadows ) {
+      src += "in vec4 FragPosDirLightSpace[" + std::to_string( params.maxDirectionalLights ) + "];";
+      src += "uniform sampler2D dirLightShadowMap[" + std::to_string( params.maxDirectionalLights ) + "];";
+    }
     src += "uniform int numDirLights;";
 
     src += "uniform PointLight pointLights[" + std::to_string( params.maxPointLights ) + "];";
@@ -226,13 +233,10 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     // Shadows.
 
     if ( shadows ) {
-      src += "in vec4 FragPosLightSpace;";
-      src += "uniform sampler2D depthShadowMap;";
-
-      src += "float CalculateShadows(vec4 fragPosLightSpace) {";
+      src += "float CalcDirShadows(vec4 fragPosDirLightSpace, sampler2D shadowMap) {";
       {
         // We must do the perspective divide manually (only needed for projection matrices though).
-        src += "vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;";
+        src += "vec3 projCoords = fragPosDirLightSpace.xyz / fragPosDirLightSpace.w;";
         // Convert NDC coordinates to [0,1] range.
         src += "projCoords = projCoords * 0.5 + 0.5;";
 
@@ -250,13 +254,13 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
         // Soft shadows with PCF.
         src += "float shadow = 0.0;";
-        src += "vec2 texelSize = 1.0 / textureSize(depthShadowMap, 0);";
+        src += "vec2 texelSize = 1.0 / textureSize(shadowMap, 0);";
         src += "const int halfKernelWidth = 1;";
         src += "for (int x = -halfKernelWidth; x <= halfKernelWidth; ++x) {";
         {
           src += "for (int y = -halfKernelWidth; y <= halfKernelWidth; ++y) {";
           {
-            src += "float pcfDepth = texture(depthShadowMap, projCoords.xy + vec2(x, y) * texelSize).r;";
+            src += "float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r;";
             src += "shadow += (currentDepth - bias) > pcfDepth ? 1.0 : 0.0;";
           }
           src += "}";
@@ -299,7 +303,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     //
     // Directional light.
 
-    src += "vec3 CalcDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir) {";
+    src += "vec3 CalcDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir, int idx) {";
     {
       src += "vec3 lightDir = normalize(-light.direction);";
 
@@ -321,7 +325,12 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
         src += "vec3 diffuse = light.diffuse * diff * vec3(material.diffuse);";
         src += "vec3 specular = light.specular * spec * vec3(material.specular);";
       }
-      src += "return (ambient + diffuse + specular);";
+      src += "vec3 result = (ambient + diffuse + specular);";
+
+      // Shadows.
+      src += "float shadow = CalcDirShadows(FragPosDirLightSpace[idx], dirLightShadowMap[idx]);";
+      src += "result *= (1.0 - shadow);";
+      src += "return result;";
     }
     src += "}";
 
@@ -376,7 +385,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       // Directional lights.
       src += "for(int i = 0; i < numDirLights; ++i) {";
       {
-        src += "result += CalcDirectionalLight(dirLights[i], norm, viewDir);";
+        src += "result += CalcDirectionalLight(dirLights[i], norm, viewDir, i);";
       }
       src += "}";
 
@@ -386,10 +395,6 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
         src += "result += CalcPointLight(pointLights[i], norm, viewDir);";
       }
       src += "}";
-
-      // Shadows.
-      src += "float shadow = CalculateShadows(FragPosLightSpace);";
-      src += "result *= (1.0 - shadow);";
     }
     else {
       src += "result = vec3(1.0, 1.0, 1.0);";
@@ -460,6 +465,9 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       program->addUniformVar( idx + ".diffuse" );
       program->addUniformVar( idx + ".specular" );
       program->addUniformVar( idx + ".direction" );
+
+      program->addUniformVar( "dirLightSpaceMatrix[" + std::to_string( i ) + "]" );
+      program->addUniformVar( "dirLightShadowMap[" + std::to_string( i ) + "]" );
     }
 
     for ( uint32_t i = 0; i < params.maxPointLights; ++i ) {
@@ -517,13 +525,24 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       program->setUniformVar( "numDirLights", static_cast< int >( lights.directionalLights.size() ) );
       program->setUniformVar( "numPointLights", static_cast< int >( lights.pointLights.size() ) );
 
+      int shadowMapTexUnit = 10;
       int i = 0;
       for ( const auto& directionalLight : lights.directionalLights ) {
-        const string idx( "dirLights[" + std::to_string( i++ ) + "]" );
+        const string idx( "dirLights[" + std::to_string( i ) + "]" );
         program->setUniformVar( idx + ".ambient", glm::vec3( directionalLight->getAmbient() ) );
         program->setUniformVar( idx + ".diffuse", glm::vec3( directionalLight->getDiffuse() ) );
         program->setUniformVar( idx + ".specular", glm::vec3( directionalLight->getSpecular() ) );
         program->setUniformVar( idx + ".direction", glm::vec3( directionalLight->getDirection() ) );
+
+        if ( directionalLight->shadowMap ) {
+          directionalLight->shadowMap->getTexture()->bind( shadowMapTexUnit );
+          program->setUniformVar( "dirLightShadowMap[" + std::to_string( i ) + "]", shadowMapTexUnit );
+          program->setUniformVar( "dirLightSpaceMatrix[" + std::to_string( i ) + "]", directionalLight->viewProj );
+
+          ++shadowMapTexUnit;
+        }
+
+        ++i;
       }
 
       i = 0;

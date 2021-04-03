@@ -84,7 +84,7 @@ string CLI::Execute( const string& command )
   }
   CommandHistoryIdx = -1;
 
-  Util::ToLower( commandName );
+  StringUtil::ToLower( commandName );
   auto lookup = CommandMap.find( commandName );
   if ( CommandMap.end() != lookup ) {
     CommandPtr p = lookup->second;
@@ -110,7 +110,7 @@ bool CLI::RegisterCommand( CommandPtr command, const uint32_t count, ... )
   for ( uint32_t n = 0; n < count; ++n ) {
     auto c = va_arg( v, const char* );
     string commandName( c );
-    Util::ToLower( commandName );
+    StringUtil::ToLower( commandName );
     std::pair<string, CommandPtr> pair( commandName, command );
     CommandMap.insert( pair );
   }

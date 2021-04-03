@@ -45,8 +45,14 @@
     "DirectionalLight0": {
       "Type": "Directional",
       "Direction": [-0.5, -0.2, -0.5],
-      "Diffuse": [0.1, 0.1, 0.25],
-      "Specular": [0.1, 0.1, 0.25]
+      "Diffuse": [0.2, 0.2, 0.525],
+      "Specular": [0.2, 0.2, 0.525]
+    },
+    "DirectionalLight1": {
+      "Type": "Directional",
+      "Direction": [0.2, -0.3, -0.2],
+      "Diffuse": [0.5, 0.5, 0.5],
+      "Specular": [0.5, 0.5, 0.5]
     },
     "PointLight0": {
       "Type": "Point",

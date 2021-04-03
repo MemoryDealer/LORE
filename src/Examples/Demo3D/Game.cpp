@@ -68,7 +68,7 @@ void Game::loadResources()
   Lore::Resource::SetWorkingDirectory( "../../../" );
 
   // Index all resource locations for complex scene as specified in the configuration file.
-  Lore::Resource::LoadResourceConfiguration( "res/demo3d/resources.json" );
+  Lore::Resource::LoadResourceConfiguration( Lore::FileUtil::ApplyWorkingDirectory( "res/demo3d/resources.json" ) );
   // Now load the Core resource group, which contains the resource locations we just indexed.
   Lore::Resource::LoadGroup( Lore::ResourceController::DefaultGroupName );
 }
@@ -92,7 +92,6 @@ void Game::loadScene()
   // entire window.
   Lore::RenderView rv( "core", _scene, Lore::Rect( 0.f, 0.f, 1.f, 1.f ) );
   rv.camera = _camera;
-  rv.depthShadowMap = Lore::Resource::CreateDepthShadowMap( "shadows", 2048, 2048, 0 );
 
   //rv.renderTarget = Lore::Resource::CreateRenderTarget( "rt1", 1920, 1080, 8 );
   //rv.gamma = 1.f;
@@ -128,7 +127,7 @@ void Game::loadScene()
 
   // Load the scene from disk.
   Lore::SceneLoader loader;
-  loader.process( "res/demo3d/demo3d.scene", _scene );
+  loader.process( Lore::FileUtil::ApplyWorkingDirectory( "res/demo3d/demo3d.scene" ), _scene );
 
   // Create stone flooring.
   auto stoneEntity = Lore::Resource::GetEntity( "StoneQuad", "Demo3D" );

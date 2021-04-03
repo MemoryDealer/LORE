@@ -25,40 +25,49 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore { namespace Util {
+namespace Lore {
 
-  static string GetFileExtension( const string& file )
+  struct FileUtil
   {
-    const auto idx = file.rfind( '.' );
-    if ( string::npos == idx ) {
-      return string( "" );
+
+    static LORE_EXPORT string ApplyWorkingDirectory( const string& dir );
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    static string GetFileExtension( const string& file )
+    {
+      const auto idx = file.rfind( '.' );
+      if ( string::npos == idx ) {
+        return string( "" );
+      }
+
+      return file.substr( idx + 1, file.size() - idx );
     }
 
-    return file.substr( idx + 1, file.size() - idx );
-  }
+    ///
+    /// \brief Returns file name from a full file path.
+    static string GetFileName( const string& file, const bool keepExtension = false )
+    {
+      auto lastSlash = file.rfind( '/' ) + 1;
+      if ( 0 == lastSlash ) {
+        // TODO: Generalize platform slashes.
+        lastSlash = file.rfind( '\\' ) + 1;
+      }
+      const auto cutoff = ( keepExtension ) ? file.length() : file.rfind( '.' );
 
-  ///
-  /// \brief Returns file name from a full file path.
-  static string GetFileName( const string& file, const bool keepExtension = false )
-  {
-    auto lastSlash = file.rfind( '/' ) + 1;
-    if ( 0 == lastSlash ) {
-      // TODO: Generalize platform slashes.
-      lastSlash = file.rfind( '\\' ) + 1;
+      return file.substr( lastSlash, cutoff - lastSlash );
     }
-    const auto cutoff = ( keepExtension ) ? file.length() : file.rfind( '.' );
 
-    return file.substr( lastSlash, cutoff - lastSlash );
-  }
+    ///
+    /// \brief Returns directory of the file in the specified file path.
+    static string GetFileDir( const string& filePath )
+    {
+      const auto lastSlash = filePath.rfind( '/' );
+      return filePath.substr( 0, lastSlash );
+    }
 
-  ///
-  /// \brief Returns directory of the file in the specified file path.
-  static string GetFileDir( const string& filePath )
-  {
-    const auto lastSlash = filePath.rfind( '/' );
-    return filePath.substr( 0, lastSlash );
-  }
+  };
 
-}}
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -57,8 +57,8 @@ ModelPtr ModelLoader::load( const string& path, const bool loadTextures )
     throw Exception( "Failed to load model at " + adjustedPath + ": " + importer.GetErrorString() );
   }
 
-  _name = Util::GetFileName( adjustedPath );
-  _directory = Util::GetFileDir( adjustedPath );
+  _name = FileUtil::GetFileName( adjustedPath );
+  _directory = FileUtil::GetFileDir( adjustedPath );
 
   // Allocate a model, processed meshes will be attached to this.
   _model = Resource::CreateModel( _name, Mesh::Type::Custom, _resourceGroupName );
@@ -158,7 +158,7 @@ void ModelLoader::_processTexture( aiMaterial* material, const aiTextureType typ
 
     // Load the texture into the resource group.
     const string texturePath = str.C_Str();
-    const string textureName = Util::GetFileName( texturePath );
+    const string textureName = FileUtil::GetFileName( texturePath );
 
     auto rc = Resource::GetResourceController();
     if ( !rc->resourceExists<Texture>( textureName, _resourceGroupName ) ) {

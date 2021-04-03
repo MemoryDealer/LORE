@@ -204,7 +204,7 @@ void Log::WriteLog( const bool internal,
     }
   }
 
-  msg.file = Util::GetFileName( file, true );
+  msg.file = FileUtil::GetFileName( file, true );
   msg.line = std::to_string( line );
   msg.function = function;
 
