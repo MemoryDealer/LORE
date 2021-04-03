@@ -46,17 +46,19 @@ ModelLoader::ModelLoader( const string& resourceGroupName )
 
 ModelPtr ModelLoader::load( const string& path, const bool loadTextures )
 {
+  const string adjustedPath = Resource::GetWorkingDirectory() + path;
+
   _loadTextures = loadTextures;
 
   Assimp::Importer importer;
-  const aiScene* scene = importer.ReadFile( path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace );
+  const aiScene* scene = importer.ReadFile( adjustedPath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace );
 
   if ( !scene || ( scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE ) || !scene->mRootNode ) {
-    throw Exception( "Failed to load model at " + path + ": " + importer.GetErrorString() );
+    throw Exception( "Failed to load model at " + adjustedPath + ": " + importer.GetErrorString() );
   }
 
-  _name = Util::GetFileName( path );
-  _directory = Util::GetFileDir( path );
+  _name = FileUtil::GetFileName( adjustedPath );
+  _directory = FileUtil::GetFileDir( adjustedPath );
 
   // Allocate a model, processed meshes will be attached to this.
   _model = Resource::CreateModel( _name, Mesh::Type::Custom, _resourceGroupName );
@@ -156,7 +158,7 @@ void ModelLoader::_processTexture( aiMaterial* material, const aiTextureType typ
 
     // Load the texture into the resource group.
     const string texturePath = str.C_Str();
-    const string textureName = Util::GetFileName( texturePath );
+    const string textureName = FileUtil::GetFileName( texturePath );
 
     auto rc = Resource::GetResourceController();
     if ( !rc->resourceExists<Texture>( textureName, _resourceGroupName ) ) {

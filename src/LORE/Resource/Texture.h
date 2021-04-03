@@ -61,6 +61,8 @@ namespace Lore {
 
     virtual void create( const int width, const int height, const Color& color ) = 0;
 
+    virtual void createDepth( const uint32_t width, const uint32_t ) = 0;
+
     virtual void bind( const uint32_t idx = 0 ) = 0;
 
     virtual void setDefaultActiveTexture() = 0;

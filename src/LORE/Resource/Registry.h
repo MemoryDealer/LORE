@@ -55,7 +55,7 @@ namespace Lore {
 
     void insert( const ID& id, T* resource )
     {
-      const auto transformedID = Util::ToLower( id );
+      const auto transformedID = StringUtil::ToLower( id );
       if ( _container.find( transformedID ) != _container.end() ) {
         throw Lore::Exception( "Resource with id " + transformedID + " already exists" );
       }
@@ -66,7 +66,7 @@ namespace Lore {
 
     void remove( const ID& id )
     {
-      const auto transformedID = Util::ToLower( id );
+      const auto transformedID = StringUtil::ToLower( id );
       auto lookup = _container.find( transformedID );
       if ( _container.end() == lookup ) {
         LogWrite( Warning, "Tried to remove resource with id %s which does not exist", transformedID.c_str() );
@@ -83,7 +83,7 @@ namespace Lore {
 
     T* get( const ID& id ) const
     {
-      const auto transformedID = Util::ToLower( id );
+      const auto transformedID = StringUtil::ToLower( id );
       auto lookup = _container.find( transformedID );
       if ( _container.end() == lookup ) {
         throw Lore::ItemIdentityException( "Resource with id " + transformedID + " does not exist" );
@@ -94,7 +94,7 @@ namespace Lore {
 
     bool exists( const ID& id ) const
     {
-      return ( _container.find( Util::ToLower( id ) ) != _container.end() );
+      return ( _container.find( StringUtil::ToLower( id ) ) != _container.end() );
     }
 
     size_t size() const

@@ -110,6 +110,33 @@ void GLRenderTarget::init( const uint32_t width, const uint32_t height, const ui
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void GLRenderTarget::initDepthShadowMap( const uint32_t width, const uint32_t height, const uint32_t sampleCount )
+{
+  _width = width;
+  _height = height;
+  _aspectRatio = static_cast<real>( _width ) / _height;
+  _multiSampling = !!( sampleCount );
+
+  // Create a framebuffer.
+  glGenFramebuffers( 1, &_fbo );
+  glBindFramebuffer( GL_FRAMEBUFFER, _fbo );
+
+  // Generate empty texture to bind to framebuffer.
+  _texture = Resource::CreateDepthTexture( _name + "_render_target", _width, _height, getResourceGroupName() );
+  auto glTexturePtr = ResourceCast<GLTexture>( _texture );
+  auto textureID = glTexturePtr->getID();
+
+  glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, textureID, 0 );
+
+  // We're not using color data.
+  glDrawBuffer( GL_NONE );
+  glReadBuffer( GL_NONE );
+
+  glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void GLRenderTarget::bind() const
 {
   glBindFramebuffer( GL_FRAMEBUFFER, _fbo );

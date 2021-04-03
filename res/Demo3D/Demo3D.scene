@@ -3,30 +3,29 @@
     "Type": "Generic",
     "ResourceGroup": "Demo3D",
     "SkyboxColor": [0.3, 0.8, 0.75],
-    "SkyboxSprite":"alien-sky",
+    "SkyboxSprite": "space",
     "AmbientLightColor": [0.05, 0.05, 0.05]
   },
   "Entity": {
     "CheckeredQuad": {
-      "ModelType":"TexturedQuad",
-      "Instanced": 50,
+      "Model": "res/Demo3D/Models/quad.fbx",
       "Sprite":"checkerboard",
       "MaterialSettings": {
         "ScrollSpeed": [0.01, 0.0]
       }
     },
     "CheckeredCube": {
-      "ModelType":"TexturedCube",
-      "Instanced": 500,
-      "Sprite":"checkerboard",
+      "Model": "res/Demo3D/Models/cube.fbx",
+      "Instanced": 5,
+      "Sprite": "checkerboard",
       "MaterialSettings": {
         "ScrollSpeed": [0.0, 0.0]
       }
     },
-    "WoodQuad": {
-      "ModelType":"TexturedQuad",
+    "StoneQuad": {
+      "Model": "res/Demo3D/Models/quad.fbx",
       "Instanced": 100,
-      "Sprite":"wood",
+      "Sprite":"stone",
       "MaterialSettings": {
         "Shininess": 32.0
       }
@@ -48,8 +47,14 @@
     "DirectionalLight0": {
       "Type": "Directional",
       "Direction": [-0.5, -0.2, -0.5],
-      "Diffuse": [0.1, 0.1, 0.25],
-      "Specular": [0.1, 0.1, 0.25]
+      "Diffuse": [0.2, 0.2, 0.525],
+      "Specular": [0.2, 0.2, 0.525]
+    },
+    "DirectionalLight1": {
+      "Type": "Directional",
+      "Direction": [0.2, -0.3, -0.2],
+      "Diffuse": [0.5, 0.5, 0.5],
+      "Specular": [0.5, 0.5, 0.5]
     },
     "PointLight0": {
       "Type": "Point",
@@ -71,6 +76,21 @@
         "Entity": "Star",
         "Position": [0.0, 2.0, -8.0],
         "Scale": 0.4
+      },
+      "Cube0": {
+        "Entity": "CheckeredCube",
+        "Position": [3.0, 1.0, 0.0],
+        "Scale": 1.0
+      },
+      "Cube1": {
+        "Entity": "CheckeredCube",
+        "Position": [-3.0, 1.0, 0.0],
+        "Scale": 1.0
+      },
+      "Cube2": {
+        "Entity": "CheckeredCube",
+        "Position": [1.0, 2.0, 4.0],
+        "Scale": 2.0
       }
     }
   }

@@ -471,6 +471,10 @@ void GLMesh::initInstanced( const Type type, const size_t maxCount )
   case Mesh::Type::TexturedCubeInstanced:
     init( Type::TexturedCube );
     break;
+
+  case Mesh::Type::CustomInstanced:
+    // Nothing to do...
+    break;
   }
 
   // Bind the existing vertex array to add instanced buffer data to it.
@@ -525,30 +529,34 @@ void GLMesh::updateInstanced( const size_t idx, const glm::mat4& matrix )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLMesh::draw( const Lore::GPUProgramPtr program, const size_t instanceCount )
+void GLMesh::draw( const Lore::GPUProgramPtr program, const size_t instanceCount, const bool bindTextures )
 {
   // Bind any textures that are assigned to this mesh.
   // TODO: Sprite animations (e.g., replace 0 with spriteFrame).
-  const auto diffuseCount = _sprite.getTextureCount( 0, Texture::Type::Diffuse );
-  const auto specularCount = _sprite.getTextureCount( 0, Texture::Type::Specular );
-  int textureUnit = 0;
-  for ( int i = 0; i < diffuseCount; ++i ) {
-    auto texture = _sprite.getTexture( 0, Texture::Type::Diffuse, i );
-    texture->bind( textureUnit );
-    program->setUniformVar( "diffuseTexture" + std::to_string( i ), textureUnit );
-    ++textureUnit;
-  }
-  for ( int i = 0; i < specularCount; ++i ) {
-    auto texture = _sprite.getTexture( 0, Texture::Type::Specular, i );
-    texture->bind( textureUnit );
-    program->setUniformVar( "specularTexture" + std::to_string( i ), textureUnit );
-    ++textureUnit;
-  }
-  // Set mix values.
-  if ( diffuseCount ) {
-    for ( int i = 0; i < static_cast<int>( program->getDiffuseSamplerCount() ); ++i ) {
-      program->setUniformVar( "diffuseMixValues[" + std::to_string( i ) + "]",
-                              _sprite.getMixValue( 0, Texture::Type::Diffuse, i ) );
+  size_t diffuseCount = 0;
+  size_t specularCount = 0;
+  if ( bindTextures ) {
+    diffuseCount = _sprite.getTextureCount( 0, Texture::Type::Diffuse );
+    specularCount = _sprite.getTextureCount( 0, Texture::Type::Specular );
+    int textureUnit = 0;
+    for ( int i = 0; i < diffuseCount; ++i ) {
+      auto texture = _sprite.getTexture( 0, Texture::Type::Diffuse, i );
+      texture->bind( textureUnit );
+      program->setUniformVar( "diffuseTexture" + std::to_string( i ), textureUnit );
+      ++textureUnit;
+    }
+    for ( int i = 0; i < specularCount; ++i ) {
+      auto texture = _sprite.getTexture( 0, Texture::Type::Specular, i );
+      texture->bind( textureUnit );
+      program->setUniformVar( "specularTexture" + std::to_string( i ), textureUnit );
+      ++textureUnit;
+    }
+    // Set mix values.
+    if ( diffuseCount ) {
+      for ( int i = 0; i < static_cast<int>( program->getDiffuseSamplerCount() ); ++i ) {
+        program->setUniformVar( "diffuseMixValues[" + std::to_string( i ) + "]",
+                                _sprite.getMixValue( 0, Texture::Type::Diffuse, i ) );
+      }
     }
   }
 
@@ -563,6 +571,7 @@ void GLMesh::draw( const Lore::GPUProgramPtr program, const size_t instanceCount
   case Mesh::Type::TexturedQuadInstanced:
   case Mesh::Type::Quad3DInstanced:
   case Mesh::Type::TexturedQuad3DInstanced:
+  case Mesh::Type::CustomInstanced:
     glBindBuffer( GL_ARRAY_BUFFER, _instancedVBO );
     glBufferData( GL_ARRAY_BUFFER, _instancedMatrices.size() * sizeof( glm::mat4 ), &_instancedMatrices.data()[0], GL_STATIC_DRAW );
     glDrawElementsInstanced( _mode, static_cast< GLsizei >( _indices.size() ), GL_UNSIGNED_INT, nullptr, static_cast< GLsizei >( instanceCount ) );

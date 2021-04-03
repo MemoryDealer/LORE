@@ -26,6 +26,8 @@
 
 #include "Config.h"
 
+#include <LORE/Util/StringUtils.h>
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace LocalNS {
@@ -43,26 +45,26 @@ using namespace Lore;
 
 void Config::SetValue( const string& key, const string& value )
 {
-  ConfigValues[key] = value;
+  ConfigValues[StringUtil::ToLower( key )] = value;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Config::SetValue( const string& key, const bool value )
 {
-  ConfigValues[key] = value;
+  ConfigValues[StringUtil::ToLower( key )] = value;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 ConfigValue Config::GetValue( const string& key )
 {
-  auto it = ConfigValues.find( key );
+  auto it = ConfigValues.find( StringUtil::ToLower( key ) );
   if ( ConfigValues.end() != it ) {
     return it->second;
   }
 
-  LogWrite( Error, "Config value %s does not exist", key.c_str() );
+  LogWrite( Error, "Config value %s does not exist", StringUtil::ToLower( key ).c_str() );
   return ConfigValue();
 }
 

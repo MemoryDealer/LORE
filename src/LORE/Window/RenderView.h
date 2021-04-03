@@ -43,10 +43,10 @@ namespace Lore {
   {
 
     string name {};
-    ScenePtr scene { nullptr };
-    CameraPtr camera { nullptr };
-    RenderTargetPtr renderTarget { nullptr };
-    UIPtr ui { nullptr };
+    ScenePtr scene {};
+    CameraPtr camera {};
+    RenderTargetPtr renderTarget {};
+    UIPtr ui {};
 
     real gamma { 2.2f }; // The gamma value used for rendering.
 

@@ -46,7 +46,7 @@ namespace Lore {
 
     void updateInstanced( const size_t idx, const glm::mat4& matrix );
 
-    void draw( const GPUProgramPtr program, const size_t instanceCount = 0 );
+    void draw( const GPUProgramPtr program, const size_t instanceCount = 0, const bool bindTextures = true );
     void draw( const Vertices& verts );
 
     void attachMesh( const MeshPtr mesh );
@@ -60,7 +60,7 @@ namespace Lore {
 
     using MeshList = std::vector<MeshPtr>;
 
-  private:
+  public:
 
     Mesh::Type _type { Mesh::Type::Custom };
     MeshList _meshes {};

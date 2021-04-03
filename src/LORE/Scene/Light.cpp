@@ -26,8 +26,29 @@
 
 #include "Light.h"
 
+#include <LORE/Config/Config.h>
+#include <LORE/Resource/ResourceController.h>
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 using namespace Lore;
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Light::~Light()
+{
+  if ( shadowMap ) {
+    Resource::DestroyRenderTarget( shadowMap );
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void DirectionalLight::init()
+{
+  if ( GET_VARIANT<bool>( Config::GetValue( "shadows" ) ) ) {
+    shadowMap = Resource::CreateDepthShadowMap( _name + "_shadowmap", 2048, 2048, 0 ); // TODO: Customize res.
+  }
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

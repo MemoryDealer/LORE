@@ -40,6 +40,7 @@ namespace Lore { namespace OpenGL {
     ~GLStockResource2DFactory() override = default;
 
     GPUProgramPtr createUberProgram( const string& name, const Lore::UberProgramParameters& params ) override;
+    GPUProgramPtr createShadowProgram( const string& name, const bool instanced ) override { return nullptr; } // TODO: Implement 2D shadows.
     GPUProgramPtr createSkyboxProgram( const string& name, const SkyboxProgramParameters& params ) override;
     GPUProgramPtr createEnvironmentMappingProgram( const string& name, const EnvironmentMappingProgramParameters& params ) override;
     GPUProgramPtr createBoxProgram( const string& name ) override;
@@ -57,6 +58,7 @@ namespace Lore { namespace OpenGL {
     ~GLStockResource3DFactory() override = default;
 
     GPUProgramPtr createUberProgram( const string& name, const Lore::UberProgramParameters& params ) override;
+    GPUProgramPtr createShadowProgram( const string& name, const bool instanced ) override;
     GPUProgramPtr createSkyboxProgram( const string& name, const SkyboxProgramParameters& params ) override;
     GPUProgramPtr createEnvironmentMappingProgram( const string& name, const EnvironmentMappingProgramParameters& params ) override;
     GPUProgramPtr createBoxProgram( const string& name ) override;

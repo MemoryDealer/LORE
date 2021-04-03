@@ -99,6 +99,8 @@ ResourceController::ResourceController()
   // Store and set to active group.
   _groups.insert( { DefaultGroupName, rg } );
   _defaultGroup = rg.get();
+
+  _workingDirectory = "./";
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -309,6 +311,27 @@ void Resource::ReloadGroup( const string& groupName )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+string Resource::GetWorkingDirectory()
+{
+  return ActiveContext->getResourceController()->_workingDirectory;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Resource::SetWorkingDirectory( const std::string& dir )
+{
+  ActiveContext->getResourceController()->_workingDirectory = dir;
+
+  std::replace( ActiveContext->getResourceController()->_workingDirectory.begin(),
+                ActiveContext->getResourceController()->_workingDirectory.end(),
+                '\\', '/' );
+  if ( !StringUtil::EndsWith( ActiveContext->getResourceController()->_workingDirectory, '/' ) ) {
+    ActiveContext->getResourceController()->_workingDirectory.append( "/" );
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 FontPtr Resource::LoadFont( const string& name, const string& file, const uint32_t size, const string& groupName )
 {
   auto font = ActiveContext->getResourceController()->create<Font>( name, groupName );
@@ -466,6 +489,15 @@ RenderTargetPtr Resource::CreateRenderTarget( const string& name, const uint32_t
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+RenderTargetPtr Resource::CreateDepthShadowMap( const string& name, const uint32_t width, const uint32_t height, const uint32_t sampleCount, const string& groupName )
+{
+  auto rt = ActiveContext->getResourceController()->create<RenderTarget>( name, groupName );
+  rt->initDepthShadowMap( width, height, sampleCount );
+  return rt;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 ShaderPtr Resource::CreateShader( const string& name,
                                   const Shader::Type type,
                                   const string& groupName )
@@ -505,6 +537,18 @@ TexturePtr Resource::CreateTexture( const string& name, const uint32_t width, co
 {
   auto texture = ActiveContext->getResourceController()->create<Texture>( name, groupName );
   texture->create( width, height, color );
+  return texture;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+TexturePtr Resource::CreateDepthTexture( const string& name,
+                                         const uint32_t width,
+                                         const uint32_t height,
+                                         const string& groupName )
+{
+  auto texture = ActiveContext->getResourceController()->create<Texture>( name, groupName );
+  texture->createDepth( width, height );
   return texture;
 }
 

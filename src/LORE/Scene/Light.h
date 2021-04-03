@@ -33,12 +33,10 @@
 
 namespace Lore {
 
-  class Light
+  struct Light
   {
 
     LORE_OBJECT_BODY()
-
-  public:
 
     enum class Type
     {
@@ -47,10 +45,14 @@ namespace Lore {
       Spot
     };
 
+    RenderTargetPtr shadowMap {};
+
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     Light() = default;
-    virtual ~Light() = default;
+    virtual ~Light();
+
+    virtual void init() {}
 
     //
     // Getters.
@@ -111,13 +113,15 @@ namespace Lore {
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-  class DirectionalLight final : public Light, public Alloc<DirectionalLight>
+  struct DirectionalLight final : public Light, public Alloc<DirectionalLight>
   {
 
-  public:
+    glm::mat4 viewProj {};
 
     DirectionalLight() = default;
     ~DirectionalLight() override = default;
+
+    void init() override;
 
     inline void setDirection( const glm::vec3& direction )
     {
@@ -145,10 +149,8 @@ namespace Lore {
   ///
   /// \class MovableLight
   /// \brief A light that can be attached to a scene node.
-  class MovableLight : public Light
+  struct MovableLight : public Light
   {
-
-  public:
 
     MovableLight() = default;
     ~MovableLight() override = default;
@@ -208,10 +210,8 @@ namespace Lore {
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-  class PointLight final : public MovableLight, public Alloc<PointLight>
+  struct PointLight final : public MovableLight, public Alloc<PointLight>
   {
-
-  public:
 
     PointLight()
     {
@@ -226,10 +226,8 @@ namespace Lore {
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-  class SpotLight : public MovableLight, public Alloc<SpotLight>
+  struct SpotLight : public MovableLight, public Alloc<SpotLight>
   {
-
-  public:
 
     SpotLight()
     {

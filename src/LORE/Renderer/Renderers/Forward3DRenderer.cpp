@@ -172,12 +172,20 @@ void Forward3DRenderer::present( const RenderView& rv,
     addLight( dirLight, nullptr );
   }
 
+  //
+  // Render shadow maps first.
+  
+  _renderShadowMaps( rv, _queues.at( RenderQueue::General ) );
+
+  //
+  // Render scene.
+
   if ( rv.renderTarget ) {
-    rv.renderTarget->bind();
     _api->setViewport( 0,
                        0,
                        static_cast< uint32_t >( rv.viewport.w * rv.renderTarget->getWidth() ),
                        static_cast< uint32_t >( rv.viewport.h * rv.renderTarget->getHeight() ) );
+    rv.renderTarget->bind();
   }
   else {
     // TODO: Get rid of gl_viewport.
@@ -185,12 +193,15 @@ void Forward3DRenderer::present( const RenderView& rv,
                        rv.gl_viewport.y,
                        rv.gl_viewport.width,
                        rv.gl_viewport.height );
+
+    _api->bindDefaultFramebuffer();
   }
 
   Color bg = rv.scene->getSkyboxColor();
   _api->clear();
   _api->clearColor( bg.r, bg.g, bg.b, 1.f );
   _api->setPolygonMode( IRenderAPI::PolygonMode::Fill );
+  _api->setCullingMode( IRenderAPI::CullingMode::Back );
   _api->setDepthTestEnabled( true );
 
   // Setup view-projection matrix.
@@ -249,6 +260,67 @@ void Forward3DRenderer::_activateQueue( const uint id,
   const auto lookup = _activeQueues.find( id );
   if ( _activeQueues.end() == lookup ) {
     _activeQueues.insert( { id, rq } );
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Forward3DRenderer::_renderShadowMaps( const RenderView& rv,
+                                           const RenderQueue& queue )
+{
+  _api->setCullingMode( IRenderAPI::CullingMode::Back );
+
+  // Directional lights.
+  for ( const auto& dirLight : queue.lights.directionalLights ) {
+    // Bind this light's shadow map.
+    if ( !dirLight->shadowMap ) {
+      continue;
+    }
+
+    _api->setViewport( 0, 0, dirLight->shadowMap->getWidth(), dirLight->shadowMap->getHeight() );
+    dirLight->shadowMap->bind();
+    _api->clearDepthBufferBit();
+
+    const auto orthoSize = 10.f;
+    glm::mat4 lightProj = glm::ortho( -orthoSize, orthoSize, -orthoSize, orthoSize, 1.f, 60.f );
+    glm::mat4 lightView = glm::lookAt( -dirLight->getDirection() * 20.f,
+                                       Vec3Zero,
+                                       Vec3PosY );
+
+    GPUProgramPtr shadowProgram = StockResource::GetGPUProgram( "DepthShadowMapInstanced" );
+    shadowProgram->use();
+
+    dirLight->viewProj = lightProj * lightView;
+    shadowProgram->setUniformVar( "viewProjection", dirLight->viewProj );
+
+    // Instanced solids.
+    for ( const auto& entity : queue.instancedSolids ) {
+      ModelPtr model = entity->getInstancedModel();
+
+      const NodePtr node = entity->getInstanceControllerNode();
+
+      shadowProgram->updateUniforms( rv, nullptr, queue.lights );
+      shadowProgram->updateNodeUniforms( nullptr, node, dirLight->viewProj );
+
+      model->draw( shadowProgram, entity->getInstanceCount() );
+    }
+
+    shadowProgram = StockResource::GetGPUProgram( "DepthShadowMap" );
+    shadowProgram->use();
+    shadowProgram->setUniformVar( "viewProjection", dirLight->viewProj );
+
+    // Render non-instanced solids.
+    for ( auto& pair : queue.solids ) {
+      const EntityPtr entity = pair.first;
+      const RenderQueue::NodeList& nodes = pair.second;
+      const ModelPtr model = entity->getModel();
+
+      // Render each node associated with this entity.
+      for ( const auto& node : nodes ) {
+        shadowProgram->updateNodeUniforms( nullptr, node, dirLight->viewProj ); // Note: dirLight->viewProj not used.
+        model->draw( shadowProgram, 0, false );
+      }
+    }
   }
 }
 
@@ -315,6 +387,7 @@ void Forward3DRenderer::_renderSolids( const RenderView& rv,
 
     case Mesh::Type::TexturedQuad3DInstanced:
     case Mesh::Type::TexturedCubeInstanced:
+    case Mesh::Type::CustomInstanced:
       program = StockResource::GetGPUProgram( "StandardTexturedInstanced3D" );
       break;
     }

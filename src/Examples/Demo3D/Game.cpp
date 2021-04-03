@@ -65,8 +65,10 @@ Game::~Game()
 
 void Game::loadResources()
 {
+  Lore::Resource::SetWorkingDirectory( "../../../" );
+
   // Index all resource locations for complex scene as specified in the configuration file.
-  Lore::Resource::LoadResourceConfiguration( "res/demo3d/resources.json" );
+  Lore::Resource::LoadResourceConfiguration( Lore::FileUtil::ApplyWorkingDirectory( "res/demo3d/resources.json" ) );
   // Now load the Core resource group, which contains the resource locations we just indexed.
   Lore::Resource::LoadGroup( Lore::ResourceController::DefaultGroupName );
 }
@@ -90,8 +92,10 @@ void Game::loadScene()
   // entire window.
   Lore::RenderView rv( "core", _scene, Lore::Rect( 0.f, 0.f, 1.f, 1.f ) );
   rv.camera = _camera;
+
   //rv.renderTarget = Lore::Resource::CreateRenderTarget( "rt1", 1920, 1080, 8 );
   //rv.gamma = 1.f;
+
   // Add the RenderView to the window so it will render our scene.
   _window->addRenderView( rv );
 
@@ -123,19 +127,19 @@ void Game::loadScene()
 
   // Load the scene from disk.
   Lore::SceneLoader loader;
-  loader.process( "res/demo3d/demo3d.scene", _scene );
+  loader.process( Lore::FileUtil::ApplyWorkingDirectory( "res/demo3d/demo3d.scene" ), _scene );
 
-  // Create wood flooring.
-  auto woodEntity = Lore::Resource::GetEntity( "WoodQuad", "Demo3D" );
-  constexpr Lore::real WoodFloorScale = 5.f;
-  constexpr int WoodFloorGridSize = 8;
-  for ( int i = -( WoodFloorGridSize / 2 ); i < ( WoodFloorGridSize / 2 ); ++i ) {
-    for ( int j = -( WoodFloorGridSize / 2 ); j < ( WoodFloorGridSize / 2 ); ++j ) {
-      auto node = _scene->createNode( "wood-floor" + std::to_string( i ) + std::to_string( j ) );
-      node->attachObject( woodEntity );
-      node->setPosition( static_cast<Lore::real>( i ) * WoodFloorScale, 0.f, static_cast<Lore::real>( j ) * WoodFloorScale );
-      node->rotate( Lore::Vec3PosX, glm::radians( -90.f ) );
-      node->scale( WoodFloorScale );
+  // Create stone flooring.
+  auto stoneEntity = Lore::Resource::GetEntity( "StoneQuad", "Demo3D" );
+  constexpr Lore::real StoneFloorScale = 2.f;
+  constexpr int stoneFloorGridSize = 8;
+  for ( int i = -( stoneFloorGridSize / 2 ); i < ( stoneFloorGridSize / 2 ); ++i ) {
+    for ( int j = -( stoneFloorGridSize / 2 ); j < ( stoneFloorGridSize / 2 ); ++j ) {
+      auto node = _scene->createNode( "stone-floor" + std::to_string( i ) + std::to_string( j ) );
+      node->attachObject( stoneEntity );
+      node->setPosition( static_cast<Lore::real>( i ) * StoneFloorScale * 2.f, 0.f, static_cast<Lore::real>( j ) * StoneFloorScale * 2.f);
+      node->rotate( Lore::Vec3PosX, glm::radians( 90.f ) );
+      node->scale( StoneFloorScale );
     }
   }
 }

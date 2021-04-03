@@ -47,6 +47,5 @@ public:\
     void setResourceGroupName( const string& name ){\
         _resourceGroupName = name;\
     }\
-private:\
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -25,20 +25,31 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore { namespace Util {
+namespace Lore {
 
-  static void ToLower( string& str )
+  struct StringUtil
   {
-    std::transform( str.begin(), str.end(), str.begin(), ::tolower );
-  }
 
-  static string ToLower( const string& str )
-  {
-    string lower( str );
-    ToLower( lower );
-    return lower;
-  }
+    static void ToLower( string& str )
+    {
+      std::transform( str.begin(), str.end(), str.begin(), ::tolower );
+    }
 
-}}
+    static string ToLower( const string& str )
+    {
+      string lower( str );
+      ToLower( lower );
+      return lower;
+    }
+
+    static bool EndsWith( const string& str, const char c )
+    {
+      const char& last = str.back();
+      return ( c == last );
+    }
+
+  };
+
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -99,6 +99,7 @@ void Context::initConfiguration()
 
   // TODO: Parse pool/config settings from cfg file.
   Config::SetValue( "RenderAABBs", false );
+  Config::SetValue( "shadows", true );
 
   // Setup CLI.
   CLI::Init();

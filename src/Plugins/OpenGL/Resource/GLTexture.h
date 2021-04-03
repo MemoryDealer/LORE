@@ -49,6 +49,8 @@ namespace Lore { namespace OpenGL {
 
     void create( const int width, const int height, const Color& color ) override;
 
+    void createDepth( const uint32_t width, const uint32_t ) override;
+
     void bind( const uint32_t idx ) override;
 
     void setDefaultActiveTexture() override;

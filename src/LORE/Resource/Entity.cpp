@@ -103,7 +103,11 @@ void Entity::enableInstancing( const size_t max )
     _instancedModel->attachMesh( mesh );
   }
   else {
-    throw Lore::Exception( "No valid instanced model mapping" );
+    // Custom mesh.
+    for ( const auto& mesh : _model->_meshes ) {
+      mesh->initInstanced( Mesh::Type::CustomInstanced, max );
+      _instancedModel->attachMesh( mesh );
+    }
   }
 }
 

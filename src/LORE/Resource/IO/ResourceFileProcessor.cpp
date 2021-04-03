@@ -51,7 +51,8 @@ void ResourceFileProcessor::LoadConfiguration( const string& file, ResourceContr
     const auto& directories = value.second.toArray();
     for ( const auto& directoryValue : directories ) {
       const string& directory = directoryValue.toString();
-      resourceController->indexResourceLocation( directory, resourceGroup );
+      // Always index resource locations relative to working directory.
+      resourceController->indexResourceLocation( FileUtil::ApplyWorkingDirectory( directory ), resourceGroup );
     }
   }
 }
@@ -73,7 +74,7 @@ SerializableResource ResourceFileProcessor::GetResourceFileType( const string& f
     { "tga", SerializableResource::Texture }
   };
 
-  const string extension = Util::GetFileExtension( file );
+  const string extension = FileUtil::GetFileExtension( file );
   if ( !extension.empty() ) {
     auto lookup = ExtensionMapping.find( extension );
     if ( ExtensionMapping.end() != lookup ) {
@@ -91,7 +92,7 @@ ResourceFileProcessor::ResourceFileProcessor( const string& file, const Serializ
 , _type( type )
 {
   _hasData = process();
-  _directory = Util::GetFileDir( file );
+  _directory = FileUtil::GetFileDir( file );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -120,7 +121,7 @@ string ResourceFileProcessor::getName() const
 
   case SerializableResource::SpriteList:
   case SerializableResource::Texture:
-    return Util::GetFileName( _file );
+    return FileUtil::GetFileName( _file );
   }
 }
 
@@ -182,7 +183,7 @@ void ResourceFileProcessor::load( const string& groupName, ResourceControllerPtr
     break;
 
   case SerializableResource::Texture: {
-    auto textureName = Util::GetFileName( _file );
+    auto textureName = FileUtil::GetFileName( _file );
     auto texture = resourceController->create<Texture>( textureName, groupName );
     texture->loadFromFile( _file );
   } break;
@@ -221,7 +222,7 @@ void ResourceFileProcessor::processAnimation( SpriteAnimationSetPtr animationSet
 void ResourceFileProcessor::processMaterial( MaterialPtr material, const SerializerValue& settings, ResourceControllerPtr resourceController )
 {
   for ( const auto& value : settings.getValues() ) {
-    string setting = Util::ToLower( value.first );
+    string setting = StringUtil::ToLower( value.first );
 
     if ( "sprite" == setting ) {
       material->sprite = resourceController->get<Sprite>( value.second.toString() );

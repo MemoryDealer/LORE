@@ -137,6 +137,8 @@ namespace Lore {
 
     static const string DefaultGroupName;
 
+    string _workingDirectory {};
+
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     ResourceController();
@@ -243,6 +245,9 @@ namespace Lore {
                                        const string& groupName = ResourceController::DefaultGroupName,
                                        const bool recursive = true );
 
+    static string GetWorkingDirectory();
+    static void SetWorkingDirectory( const std::string& dir );
+
     //
     // Functions for loading resources from the storage.
 
@@ -280,6 +285,11 @@ namespace Lore {
                                                const uint32_t height,
                                                const uint32_t sampleCount,
                                                const string& groupName = ResourceController::DefaultGroupName );
+    static RenderTargetPtr CreateDepthShadowMap( const string& name,
+                                                 const uint32_t width,
+                                                 const uint32_t height,
+                                                 const uint32_t sampleCount,
+                                                 const string& groupName = ResourceController::DefaultGroupName );
     static ShaderPtr CreateShader( const string& name,
                                    const Shader::Type type,
                                    const string& groupName = ResourceController::DefaultGroupName );
@@ -297,6 +307,10 @@ namespace Lore {
                                      const uint32_t height,
                                      const Color& color,
                                      const string& groupName = ResourceController::DefaultGroupName );
+    static TexturePtr CreateDepthTexture( const string& name,
+                                          const uint32_t width,
+                                          const uint32_t height,
+                                          const string& groupName = ResourceController::DefaultGroupName );
     static TextboxPtr CreateTextbox( const string& name,
                                      const string& groupname = ResourceController::DefaultGroupName );
 

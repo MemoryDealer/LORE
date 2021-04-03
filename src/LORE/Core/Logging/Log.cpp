@@ -26,6 +26,8 @@
 
 #include "Log.h"
 
+#include <iostream>
+
 #include <LORE/Core/Logging/Timestamp.h>
 #include <LORE/Util/FileUtils.h>
 
@@ -80,6 +82,7 @@ void Logger::__logger()
       /// https://developercommunity.visualstudio.com/t/printf-vprintf-blocknever-return/1314072
       /// 
       //printf( "%s\n", out.c_str() );
+      std::cout << out << std::endl;
       _stream << out << std::endl;
 
       _messageQueue.pop();
@@ -201,7 +204,7 @@ void Log::WriteLog( const bool internal,
     }
   }
 
-  msg.file = Util::GetFileName( file, true );
+  msg.file = FileUtil::GetFileName( file, true );
   msg.line = std::to_string( line );
   msg.function = function;
 
