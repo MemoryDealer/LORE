@@ -185,7 +185,8 @@ void StockResourceController::createRendererStockResources( const RendererType t
 
   // Shadow programs.
   {
-    srf->createShadowProgram( "DepthShadowMap" );
+    srf->createShadowProgram( "DepthShadowMap", false );
+    srf->createShadowProgram( "DepthShadowMapInstanced", true );
   }
 
   //

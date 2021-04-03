@@ -268,11 +268,9 @@ void Forward3DRenderer::_activateQueue( const uint id,
 void Forward3DRenderer::_renderShadowMaps( const RenderView& rv,
                                            const RenderQueue& queue )
 {
-  GPUProgramPtr shadowProgram = StockResource::GetGPUProgram( "DepthShadowMap" );
-  shadowProgram->use();
-
   _api->setCullingMode( IRenderAPI::CullingMode::Back );
 
+  // Directional lights.
   for ( const auto& dirLight : queue.lights.directionalLights ) {
     // Bind this light's shadow map.
     if ( !dirLight->shadowMap ) {
@@ -289,20 +287,27 @@ void Forward3DRenderer::_renderShadowMaps( const RenderView& rv,
                                        Vec3Zero,
                                        Vec3PosY );
 
+    GPUProgramPtr shadowProgram = StockResource::GetGPUProgram( "DepthShadowMapInstanced" );
+    shadowProgram->use();
+
     dirLight->viewProj = lightProj * lightView;
     shadowProgram->setUniformVar( "viewProjection", dirLight->viewProj );
 
-    // TODO: Instanced solids...needs shader
-    //for ( const auto& entity : queue.instancedSolids ) {
-    //  ModelPtr model = entity->getInstancedModel();
+    // Instanced solids.
+    for ( const auto& entity : queue.instancedSolids ) {
+      ModelPtr model = entity->getInstancedModel();
 
-    //  const NodePtr node = entity->getInstanceControllerNode();
+      const NodePtr node = entity->getInstanceControllerNode();
 
-    //  //shadowProgram->updateUniforms( rv, nullptr, queue.lights );
-    //  shadowProgram->updateNodeUniforms( nullptr, node, lightViewProj );
+      shadowProgram->updateUniforms( rv, nullptr, queue.lights );
+      shadowProgram->updateNodeUniforms( nullptr, node, dirLight->viewProj );
 
-    //  model->draw( shadowProgram, entity->getInstanceCount() );
-    //}
+      model->draw( shadowProgram, entity->getInstanceCount() );
+    }
+
+    shadowProgram = StockResource::GetGPUProgram( "DepthShadowMap" );
+    shadowProgram->use();
+    shadowProgram->setUniformVar( "viewProjection", dirLight->viewProj );
 
     // Render non-instanced solids.
     for ( auto& pair : queue.solids ) {
@@ -382,6 +387,7 @@ void Forward3DRenderer::_renderSolids( const RenderView& rv,
 
     case Mesh::Type::TexturedQuad3DInstanced:
     case Mesh::Type::TexturedCubeInstanced:
+    case Mesh::Type::CustomInstanced:
       program = StockResource::GetGPUProgram( "StandardTexturedInstanced3D" );
       break;
     }

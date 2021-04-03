@@ -233,7 +233,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     // Shadows.
 
     if ( shadows ) {
-      src += "float CalcDirShadows(vec4 fragPosDirLightSpace, sampler2D shadowMap) {";
+      src += "float CalcDirShadows(vec4 fragPosDirLightSpace, sampler2D shadowMap, float dotNormalDir) {";
       {
         // We must do the perspective divide manually (only needed for projection matrices though).
         src += "vec3 projCoords = fragPosDirLightSpace.xyz / fragPosDirLightSpace.w;";
@@ -250,7 +250,8 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
         // Closest depth is from shadow map, while current depth is known from the fragment.
         src += "float currentDepth = projCoords.z;";
 
-        src += "float bias = 0.001;";
+        src += "float bias = 0.001;"; // TODO: Make shadow bias customizable per light.
+        //src += "float bias = max(0.05 * (1.0 - dotNormalDir), 0.005);";
 
         // Soft shadows with PCF.
         src += "float shadow = 0.0;";
@@ -328,7 +329,9 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       src += "vec3 result = (ambient + diffuse + specular);";
 
       // Shadows.
-      src += "float shadow = CalcDirShadows(FragPosDirLightSpace[idx], dirLightShadowMap[idx]);";
+      //src += "float dotNormalDir = dot(normal, lightDir);";
+      src += "float dotNormalDir = 1.0;";
+      src += "float shadow = CalcDirShadows(FragPosDirLightSpace[idx], dirLightShadowMap[idx], dotNormalDir);";
       src += "result *= (1.0 - shadow);";
       src += "return result;";
     }
@@ -681,7 +684,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Lore::GPUProgramPtr GLStockResource3DFactory::createShadowProgram( const string& name )
+Lore::GPUProgramPtr GLStockResource3DFactory::createShadowProgram( const string& name, const bool instanced )
 {
   const string header = "#version " +
     std::to_string( APIVersion::GetMajor() ) + std::to_string( APIVersion::GetMinor() ) + "0" +
@@ -697,6 +700,11 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createShadowProgram( const string&
 
   src += "layout (location = 0) in vec3 pos;";
 
+  if ( instanced ) {
+    // The instanced matrices are at location 3.
+    src += "layout (location = " + std::to_string( 3 ) + ") in mat4 instanceMatrix;";
+  }
+
   //
   // Uniforms and outs.
 
@@ -708,7 +716,12 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createShadowProgram( const string&
 
   src += "void main(){";
   {
-    src += "gl_Position = viewProjection * model * vec4(pos, 1.0);";
+    if ( instanced ) {
+      src += "gl_Position = viewProjection * instanceMatrix * vec4(pos, 1.0);";
+    }
+    else {
+      src += "gl_Position = viewProjection * model * vec4(pos, 1.0);";
+    }
   }
   src += "}";
 

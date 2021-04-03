@@ -471,6 +471,10 @@ void GLMesh::initInstanced( const Type type, const size_t maxCount )
   case Mesh::Type::TexturedCubeInstanced:
     init( Type::TexturedCube );
     break;
+
+  case Mesh::Type::CustomInstanced:
+    // Nothing to do...
+    break;
   }
 
   // Bind the existing vertex array to add instanced buffer data to it.
@@ -567,6 +571,7 @@ void GLMesh::draw( const Lore::GPUProgramPtr program, const size_t instanceCount
   case Mesh::Type::TexturedQuadInstanced:
   case Mesh::Type::Quad3DInstanced:
   case Mesh::Type::TexturedQuad3DInstanced:
+  case Mesh::Type::CustomInstanced:
     glBindBuffer( GL_ARRAY_BUFFER, _instancedVBO );
     glBufferData( GL_ARRAY_BUFFER, _instancedMatrices.size() * sizeof( glm::mat4 ), &_instancedMatrices.data()[0], GL_STATIC_DRAW );
     glDrawElementsInstanced( _mode, static_cast< GLsizei >( _indices.size() ), GL_UNSIGNED_INT, nullptr, static_cast< GLsizei >( instanceCount ) );

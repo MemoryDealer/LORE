@@ -60,7 +60,7 @@ namespace Lore {
 
     using MeshList = std::vector<MeshPtr>;
 
-  private:
+  public:
 
     Mesh::Type _type { Mesh::Type::Custom };
     MeshList _meshes {};

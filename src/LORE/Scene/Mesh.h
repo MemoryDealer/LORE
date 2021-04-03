@@ -43,6 +43,7 @@ namespace Lore {
     enum class Type
     {
       Custom,
+      CustomInstanced,
       Quad,
       TexturedQuad,
       FullscreenQuad,

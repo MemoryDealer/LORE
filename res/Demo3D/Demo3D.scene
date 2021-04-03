@@ -16,6 +16,7 @@
     },
     "CheckeredCube": {
       "Model": "res/Demo3D/Models/cube.fbx",
+      "Instanced": 5,
       "Sprite": "checkerboard",
       "MaterialSettings": {
         "ScrollSpeed": [0.0, 0.0]
@@ -23,13 +24,14 @@
     },
     "StoneQuad": {
       "Model": "res/Demo3D/Models/quad.fbx",
+      "Instanced": 100,
       "Sprite":"stone",
       "MaterialSettings": {
         "Shininess": 32.0
       }
     },
     "Light": {
-      "Model": "res/Demo3D/Models/cube.fbx",
+      "ModelType": "Cube",
       "MaterialSettings": {
         "Ambient": [1.0, 1.0, 1.0]
       }
@@ -84,6 +86,11 @@
         "Entity": "CheckeredCube",
         "Position": [-3.0, 1.0, 0.0],
         "Scale": 1.0
+      },
+      "Cube2": {
+        "Entity": "CheckeredCube",
+        "Position": [1.0, 2.0, 4.0],
+        "Scale": 2.0
       }
     }
   }
