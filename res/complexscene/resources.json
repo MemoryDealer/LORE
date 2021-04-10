@@ -1,7 +1,6 @@
 {
   "Core": [
     "res/complexscene/animations",
-    "res/complexscene/fonts",
     "res/complexscene/materials",
     "res/complexscene/sprites",
     "res/complexscene/textures"

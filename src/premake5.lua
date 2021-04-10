@@ -61,7 +61,6 @@ project "LORE"
         "External/imgui/*.h", "External/imgui/*.cpp"
     }
     links { "assimp-vc140-mt" }
-    postbuildcommands { "{COPY} ../../res/ ../../bin/%{cfg.buildcfg}/Run/res/" }
     postbuildcommands { "{COPY} ../../lib/x64/%{cfg.buildcfg}/ ../../bin/%{cfg.buildcfg}/Run/" }
 
 project "Plugin_OpenGL"
@@ -89,7 +88,6 @@ project "Plugin_OpenGL"
         linkoptions { "-framework Cocoa -framework IOKit -framework CoreVideo -framework OpenGL" }
 
     postbuildcommands { "{COPY} ../../../lib/x64/%{cfg.buildcfg}/ ../../../bin/%{cfg.buildcfg}/Run/" }
-    postbuildcommands { "{COPY} ../../../res/ ../../../bin/%{cfg.buildcfg}/Run/res/" }
 
 project "glad"
     location "Plugins/ThirdParty/glad"
@@ -113,7 +111,6 @@ project "Demo3D"
         "Examples/Demo3D/**.cpp"
     }
     links { "LORE" }
-    postbuildcommands { "{COPY} ../../../res/ ../../../bin/%{cfg.buildcfg}/Run/res/" }
 
 project "Example_ComplexScene2D"
     location "Examples/ComplexScene2D"
@@ -126,7 +123,6 @@ project "Example_ComplexScene2D"
         "Examples/ComplexScene2D/**.cpp"
     }
     links { "LORE" }
-    postbuildcommands { "{COPY} ../../../res/ ../../../bin/%{cfg.buildcfg}/Run/res/" }
 
 project "Example_ComplexScene3D"
     location "Examples/ComplexScene3D"
@@ -139,7 +135,6 @@ project "Example_ComplexScene3D"
         "Examples/ComplexScene3D/**.cpp"
     }
     links { "LORE" }
-    postbuildcommands { "{COPY} ../../../res/ ../../../bin/%{cfg.buildcfg}/Run/res/" }
 
 --
 -- Tests
@@ -155,4 +150,3 @@ project "Tests"
         "Tests/**.h", "Tests/**.hpp", "Tests/**.cpp", "Tests/**.json"
     }
     links { "LORE" }
-    postbuildcommands { "{COPY} data/ ../../bin/%{cfg.buildcfg}/Run/TestData/" }

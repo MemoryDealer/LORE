@@ -51,8 +51,10 @@ Game::~Game()
 
 void Game::loadResources()
 {
+  Lore::Resource::SetWorkingDirectory( "../../../" );
+
   // Index all resource locations for complex scene as specified in the configuration file.
-  Lore::Resource::LoadResourceConfiguration( "res/complexscene/resources.json" );
+  Lore::Resource::LoadResourceConfiguration( Lore::FileUtil::ApplyWorkingDirectory( "res/complexscene/resources.json" ) );
   // Now load the Core resource group, which contains the resource locations we just indexed.
   Lore::Resource::LoadGroup( Lore::ResourceController::DefaultGroupName );
 }
