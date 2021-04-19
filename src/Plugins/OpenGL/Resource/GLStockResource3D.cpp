@@ -279,6 +279,15 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       }
       src += "}";
 
+      //src += "vec3 sampleOffsetDirections[20] = vec3[]\
+      //  (\
+      //    vec3( 1, 1, 1 ), vec3( 1, -1, 1 ), vec3( -1, -1, 1 ), vec3( -1, 1, 1 ),\
+      //    vec3( 1, 1, -1 ), vec3( 1, -1, -1 ), vec3( -1, -1, -1 ), vec3( -1, 1, -1 ),\
+      //    vec3( 1, 1, 0 ), vec3( 1, -1, 0 ), vec3( -1, -1, 0 ), vec3( -1, 1, 0 ),\
+      //    vec3( 1, 0, 1 ), vec3( -1, 0, 1 ), vec3( 1, 0, -1 ), vec3( -1, 0, -1 ),\
+      //    vec3( 0, 1, 1 ), vec3( 0, -1, 1 ), vec3( 0, -1, -1 ), vec3( 0, 1, -1 )\
+      //    );";
+
       src += "float CalcPointShadows(vec3 fragPos, PointLight light, samplerCube shadowCubemap) {";
       {
         src += "vec3 fragToLight = (fragPos - light.pos);";
@@ -290,6 +299,26 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
         src += "float currentDepth = length(fragToLight);";
         src += "float bias = 0.05;";
         src += "float shadow = (currentDepth - bias) > closestDepth ? 1.0 : 0.0;";
+
+        //src += "float shadow = 0.0;";
+        //src += "int samples = 20;";
+        //src += "float bias = 0.15;";
+        //src += "float viewDist = length(viewPos - fragPos);";
+        //src += "float diskRadius = (1.0 + (viewDist / light.shadowFarPlane)) / light.shadowFarPlane;";
+        //
+        //src += "for (int i = 0; i < samples; ++i) {";
+        //{
+        //  src += "float closestDepth = texture(shadowCubemap, fragToLight + sampleOffsetDirections[i] * diskRadius).r;";
+        //  src += "closestDepth *= light.shadowFarPlane;";
+        //  src += "if (currentDepth - bias > closestDepth) {";
+        //  {
+        //    src += "shadow += 1.0;";
+        //  }
+        //  src += "}";
+        //}
+        //src += "}";
+
+        //src += "shadow /= float(samples);";
 
         src += "return shadow;";
       }
