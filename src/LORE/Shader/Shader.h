@@ -39,6 +39,7 @@ namespace Lore {
 
         enum class Type {
             Vertex,
+            Geometry,
             Fragment
         };
 

@@ -44,6 +44,7 @@ namespace Lore { namespace OpenGL {
     TexturePtr getTexture() const override;
     void init( const uint32_t width, const uint32_t height, const uint32_t sampleCount ) override;
     void initDepthShadowMap( const uint32_t width, const uint32_t height, const uint32_t sampleCount ) override;
+    void initDepthShadowCubemap( const uint32_t width, const uint32_t height ) override;
     void bind() const override;
     void flush() const override;
 

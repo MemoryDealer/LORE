@@ -48,6 +48,7 @@ namespace Lore {
 
     virtual void init( const uint32_t width, const uint32_t height, const uint32_t sampleCount ) = 0;
     virtual void initDepthShadowMap( const uint32_t width, const uint32_t height, const uint32_t sampleCount ) = 0;
+    virtual void initDepthShadowCubemap( const uint32_t width, const uint32_t height ) = 0;
 
     virtual void bind() const = 0;
     virtual void flush() const = 0;

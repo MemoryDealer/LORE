@@ -212,6 +212,9 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       src += "float linear;";
       src += "float quadratic;";
       src += "float intensity;";
+      if ( shadows ) {
+        src += "float shadowFarPlane;";
+      }
     }
     src += "};";
 
@@ -224,6 +227,9 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
     src += "uniform PointLight pointLights[" + std::to_string( params.maxPointLights ) + "];";
     src += "uniform int numPointLights;";
+    if ( shadows ) {
+      src += "uniform samplerCube shadowCubemap[" + std::to_string( params.maxPointLights ) + "];";
+    }
 
     src += "uniform vec4 sceneAmbient;";
 
@@ -268,6 +274,22 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
         }
         src += "}";
         src += "shadow /= ((halfKernelWidth * 2 + 1) * (halfKernelWidth * 2 + 1));";
+
+        src += "return shadow;";
+      }
+      src += "}";
+
+      src += "float CalcPointShadows(vec3 fragPos, PointLight light, samplerCube shadowCubemap) {";
+      {
+        src += "vec3 fragToLight = (fragPos - light.pos);";
+
+        // Sample shadow cubemap with this vector.
+        src += "float closestDepth = texture(shadowCubemap, fragToLight).r;";
+        src += "closestDepth *= light.shadowFarPlane;"; // Re-map back to original space.
+
+        src += "float currentDepth = length(fragToLight);";
+        src += "float bias = 0.05;";
+        src += "float shadow = (currentDepth - bias) > closestDepth ? 1.0 : 0.0;";
 
         src += "return shadow;";
       }
@@ -340,7 +362,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     //
     // Point light.
 
-    src += "vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir) {";
+    src += "vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir, samplerCube shadowCubemap) {";
     {
       src += "vec3 lightDir = normalize(light.pos - FragPos);";
 
@@ -369,7 +391,11 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       src += "ambient *= attenuation;";
       src += "diffuse *= attenuation;";
       src += "specular *= attenuation;";
-      src += "return (ambient + diffuse + specular);";
+
+      // Shadows and final combine.
+      src += "float shadow = CalcPointShadows(FragPos, light, shadowCubemap);";
+      src += "vec3 result = (ambient + diffuse + specular) * (1.0 - shadow);";
+      src += "return result;";
     }
     src += "}";
   }
@@ -395,7 +421,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       // Point lights.
       src += "for(int i = 0; i < numPointLights; ++i) {";
       {
-        src += "result += CalcPointLight(pointLights[i], norm, viewDir);";
+        src += "result += CalcPointLight(pointLights[i], norm, viewDir, shadowCubemap[i]);";
       }
       src += "}";
     }
@@ -469,8 +495,10 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       program->addUniformVar( idx + ".specular" );
       program->addUniformVar( idx + ".direction" );
 
-      program->addUniformVar( "dirLightSpaceMatrix[" + std::to_string( i ) + "]" );
-      program->addUniformVar( "dirLightShadowMap[" + std::to_string( i ) + "]" );
+      if ( shadows ) {
+        program->addUniformVar( "dirLightSpaceMatrix[" + std::to_string( i ) + "]" );
+        program->addUniformVar( "dirLightShadowMap[" + std::to_string( i ) + "]" );
+      }
     }
 
     for ( uint32_t i = 0; i < params.maxPointLights; ++i ) {
@@ -484,7 +512,14 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       program->addUniformVar( idx + ".linear" );
       program->addUniformVar( idx + ".quadratic" );
       program->addUniformVar( idx + ".intensity" );
+
+      if ( shadows ) {
+        program->addUniformVar( idx + ".shadowFarPlane" );
+        program->addUniformVar( "shadowCubemap[" + std::to_string( i ) + "]" );
+      }
     }
+
+    program->maxPointLights = params.maxPointLights;
   }
 
   if ( textured ) {
@@ -499,11 +534,6 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     program->addUniformVar( "texSampleRegion.y" );
     program->addUniformVar( "texSampleRegion.w" );
     program->addUniformVar( "texSampleRegion.h" );
-  }
-
-  if ( shadows ) {
-    program->addUniformVar( "lightSpaceMatrix" );
-    program->addUniformVar( "depthShadowMap" );
   }
 
   // Setup uniform updaters.
@@ -529,7 +559,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       program->setUniformVar( "numPointLights", static_cast< int >( lights.pointLights.size() ) );
 
       int shadowMapTexUnit = 10;
-      int i = 0;
+      u8 i = 0;
       for ( const auto& directionalLight : lights.directionalLights ) {
         const string idx( "dirLights[" + std::to_string( i ) + "]" );
         program->setUniformVar( idx + ".ambient", glm::vec3( directionalLight->getAmbient() ) );
@@ -548,9 +578,10 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
         ++i;
       }
 
+      shadowMapTexUnit = 12; // TODO: Config shadow map tex units?
       i = 0;
       for ( const auto& pair : lights.pointLights ) {
-        const string idx( "pointLights[" + std::to_string( i++ ) + "]" );
+        const string idx( "pointLights[" + std::to_string( i ) + "]" );
         const auto pointLight = pair.first;
         const auto pos = pair.second;
 
@@ -563,6 +594,23 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
         program->setUniformVar( idx + ".linear", pointLight->getLinear() );
         program->setUniformVar( idx + ".quadratic", pointLight->getQuadratic() );
         program->setUniformVar( idx + ".intensity", pointLight->getIntensity() );
+
+        if ( pointLight->shadowMap ) {
+          program->setUniformVar( idx + ".shadowFarPlane", pointLight->shadowFarPlane );
+
+          pointLight->shadowMap->getTexture()->bind( shadowMapTexUnit );
+          program->setUniformVar( "shadowCubemap[" + std::to_string( i ) + "]", shadowMapTexUnit );
+
+          ++shadowMapTexUnit;
+        }
+
+        ++i;
+      }
+
+      // Assign the last shadow map to any unused shadow maps so they don't get filled with the skybox cubemap.
+      --shadowMapTexUnit;
+      for ( u8 j = i; j < program->maxPointLights; ++j ) {
+        program->setUniformVar( "shadowCubemap[" + std::to_string( j ) + "]", shadowMapTexUnit );
       }
     }
   };
@@ -779,14 +827,186 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createShadowProgram( const string&
   auto UniformUpdater = []( const RenderView& rv,
                             const GPUProgramPtr program,
                             const MaterialPtr material,
-                            const RenderQueue::LightData& lights ) {
-                              return;
+                            const RenderQueue::LightData& lights )
+  {
   };
 
   auto UniformNodeUpdater = []( const GPUProgramPtr program,
                                 const MaterialPtr material,
                                 const NodePtr node,
-                                const glm::mat4& viewProjection ) {
+                                const glm::mat4& viewProjection )
+  {
+    program->setUniformVar( "model", node->getFullTransform() );
+  };
+
+  program->setUniformUpdater( UniformUpdater );
+  program->setUniformNodeUpdater( UniformNodeUpdater );
+
+  return program;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Lore::GPUProgramPtr GLStockResource3DFactory::createCubemapShadowProgram( const string& name, const bool instanced )
+{
+  const string header = "#version " +
+    std::to_string( APIVersion::GetMajor() ) + std::to_string( APIVersion::GetMinor() ) + "0" +
+    " core\n";
+
+  //
+  // Vertex shader.
+
+  string src = header;
+
+  //
+  // Layout.
+
+  src += "layout (location = 0) in vec3 pos;";
+
+  if ( instanced ) {
+    // The instanced matrices are at location 3.
+    src += "layout (location = " + std::to_string( 3 ) + ") in mat4 instanceMatrix;";
+  }
+
+  //
+  // Uniforms and outs.
+
+  src += "uniform mat4 model;";
+
+  //
+  // main function.
+
+  src += "void main() {";
+  {
+    if ( instanced ) {
+      src += "gl_Position = instanceMatrix * vec4(pos, 1.0);";
+    }
+    else {
+      src += "gl_Position = model * vec4(pos, 1.0);";
+    }
+  }
+  src += "}";
+
+  auto vsptr = _controller->create<Shader>( name + "_VS" );
+  vsptr->init( Shader::Type::Vertex );
+  if ( !vsptr->loadFromSource( src ) ) {
+    throw Lore::Exception( "Failed to compile shadow vertex shader for " + name );
+  }
+
+  // ::::::::::::::::::::::::::::::::: //
+
+  //
+  // Geometry shader.
+
+  src.clear();
+  src = header;
+
+  src += "layout (triangles) in;";
+  src += "layout (triangle_strip, max_vertices=18) out;";
+
+  src += "uniform mat4 shadowMatrices[6];";
+
+  src += "out vec4 FragPos;";
+
+  //
+  // main function.
+
+  src += "void main() {";
+  {
+    src += "for (int face = 0; face < 6; ++face) {";
+    {
+      src += "gl_Layer = face;"; // Specify the face to render.
+      src += "for (int i = 0; i < 3; ++i) {";
+      {
+        src += "FragPos = gl_in[i].gl_Position;";
+        src += "gl_Position = shadowMatrices[face] * FragPos;";
+        src += "EmitVertex();";
+      }
+      src += "}";
+
+      src += "EndPrimitive();";
+    }
+    src += "}";
+  }
+  src += "}";
+
+  auto gsptr = _controller->create<Shader>( name + "_GS" );
+  gsptr->init( Shader::Type::Geometry );
+  if ( !gsptr->loadFromSource( src ) ) {
+    throw Lore::Exception( "Failed to compile shadow geometry shader for " + name );
+  }
+
+
+  // ::::::::::::::::::::::::::::::::: //
+
+  //
+  // Fragment shader.
+
+  src.clear();
+  src = header;
+
+  src += "in vec4 FragPos;";
+
+  src += "uniform vec3 lightPos;";
+  src += "uniform float farPlane;";
+
+  //
+  // main function.
+
+  src += "void main() {";
+  {
+    src += "float lightDist = length(FragPos.xyz - lightPos);";
+    src += "lightDist /= farPlane;"; // Re-map to [0, 1].
+    src += "gl_FragDepth = lightDist;";
+  }
+  src += "}";
+
+  auto fsptr = _controller->create<Shader>( name + "_FS" );
+  fsptr->init( Shader::Type::Fragment );
+  if ( !fsptr->loadFromSource( src ) ) {
+    throw Lore::Exception( "Failed to compile shadow fragment shader for " + name );
+  }
+
+  // ::::::::::::::::::::::::::::::::: //
+
+  //
+  // GPU program.
+
+  auto program = _controller->create<Lore::GPUProgram>( name );
+  program->init();
+  program->attachShader( vsptr );
+  program->attachShader( gsptr );
+  program->attachShader( fsptr );
+
+  if ( !program->link() ) {
+    throw Lore::Exception( "Failed to link GPUProgram " + name );
+  }
+
+  //
+  // Add uniforms.
+
+  program->addUniformVar( "model" );
+  program->addUniformVar( "lightPos" );
+  program->addUniformVar( "farPlane" );
+
+  for ( int i = 0; i < 6; ++i ) {
+    program->addUniformVar( "shadowMatrices[" + std::to_string( i ) + "]" );
+  }
+
+  // Uniform updaters.
+
+  auto UniformUpdater = []( const RenderView& rv,
+                            const GPUProgramPtr program,
+                            const MaterialPtr material,
+                            const RenderQueue::LightData& lights )
+  {
+  };
+
+  auto UniformNodeUpdater = []( const GPUProgramPtr program,
+                                const MaterialPtr material,
+                                const NodePtr node,
+                                const glm::mat4& viewProjection )
+  {
     program->setUniformVar( "model", node->getFullTransform() );
   };
 
