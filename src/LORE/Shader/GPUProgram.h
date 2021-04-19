@@ -111,11 +111,9 @@ namespace Lore {
 
     virtual void setUniformVar( const string& id, const int i ) = 0;
 
-  protected:
 
     using ShaderMap = std::unordered_map<Shader::Type, ShaderPtr>;
 
-  protected:
 
     ShaderMap _shaders;
 
@@ -124,6 +122,8 @@ namespace Lore {
 
     uint32_t _diffuseSamplerCount { 0 };
     uint32_t _specularSamplerCount { 0 };
+
+    u8 maxPointLights = 0;
 
   };
 

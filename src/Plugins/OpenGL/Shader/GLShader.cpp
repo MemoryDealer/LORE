@@ -59,6 +59,10 @@ void GLShader::init( const Shader::Type& type )
     shaderType = GL_VERTEX_SHADER;
     break;
 
+  case Shader::Type::Geometry:
+    shaderType = GL_GEOMETRY_SHADER;
+    break;
+
   case Shader::Type::Fragment:
     shaderType = GL_FRAGMENT_SHADER;
     break;

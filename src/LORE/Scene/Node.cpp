@@ -467,6 +467,15 @@ void Node::_updateWorldTransform( const glm::mat4& m )
   s[2][2] = _transform.derivedScale.z;
 
   _transform.world = m * s;
+
+  // Any point light's space transforms for shadows need updating as well.
+  auto it = _lights.getIterator();
+  while ( it.hasMore() ) {
+    auto light = it.getNext();
+    if ( Light::Type::Point == light->_type ) {
+      light->updateShadowTransforms( _transform.position );
+    }
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

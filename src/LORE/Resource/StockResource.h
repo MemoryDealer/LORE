@@ -37,10 +37,10 @@ namespace Lore {
 
   struct UberProgramParameters
   {
-    uint32_t maxDirectionalLights { 2 };
-    uint32_t maxPointLights { 8 };
-    uint32_t maxDiffuseTextures { 8 };
-    uint32_t maxSpecularTextures { 8 };
+    u8 maxDirectionalLights { 2 };
+    u8 maxPointLights { 8 };
+    u8 maxDiffuseTextures { 8 };
+    u8 maxSpecularTextures { 8 };
     bool textured { true };
     bool shadows { true };
     bool instanced { false };
@@ -80,6 +80,7 @@ namespace Lore {
 
     virtual GPUProgramPtr createUberProgram( const string& name, const UberProgramParameters& params ) = 0;
     virtual GPUProgramPtr createShadowProgram( const string& name, const bool instanced ) = 0;
+    virtual GPUProgramPtr createCubemapShadowProgram( const string& name, const bool instanced ) = 0;
     virtual GPUProgramPtr createSkyboxProgram( const string& name, const SkyboxProgramParameters& params ) = 0;
     virtual GPUProgramPtr createEnvironmentMappingProgram( const string& name, const EnvironmentMappingProgramParameters& params ) = 0;
     virtual GPUProgramPtr createBoxProgram( const string& name ) = 0;

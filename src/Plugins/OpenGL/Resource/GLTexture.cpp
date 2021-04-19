@@ -72,17 +72,17 @@ void GLTexture::loadCubemap( const std::vector<string>& files )
   glBindTexture( _target, _id );
 
   // Load each cubemap texture.
-  int width, height, n;
+  int width, height, comp;
   for ( uint32_t i = 0; i < files.size(); ++i ) {
-    unsigned char* data = stbi_load( files[i].c_str(), &width, &height, &n, 0 );
+    unsigned char* data = stbi_load( files[i].c_str(), &width, &height, &comp, 0 );
     if ( data ) {
       glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
                     0,
-                    GL_RGBA,
+                    ( STBI_rgb == comp ) ? GL_RGB : GL_RGBA,
                     width,
                     height,
                     0,
-                    GL_RGBA,
+                    ( STBI_rgb == comp ) ? GL_RGB : GL_RGBA,
                     GL_UNSIGNED_BYTE,
                     data );
     }
@@ -142,6 +142,27 @@ void GLTexture::createDepth( const uint32_t width, const uint32_t height )
 
   float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
   glTexParameterfv( GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor );
+
+  glBindTexture( _target, 0 );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLTexture::createCubemap( const uint32_t width, const uint32_t height )
+{
+  _target = GL_TEXTURE_CUBE_MAP;
+  glGenTextures( 1, &_id );
+  glBindTexture( _target, _id );
+
+  for ( uint32_t i = 0; i < 6; ++i ) {
+    glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr );
+  }
+
+  glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+  glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+  glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+  glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+  glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE );
 
   glBindTexture( _target, 0 );
 }

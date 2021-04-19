@@ -95,6 +95,8 @@ namespace Lore {
       _specular = color;
     }
 
+    virtual void updateShadowTransforms( const glm::vec3& pos ) {}
+
   protected:
 
     Type _type { Type::Directional };
@@ -213,15 +215,18 @@ namespace Lore {
   struct PointLight final : public MovableLight, public Alloc<PointLight>
   {
 
-    PointLight()
-    {
-      _type = Type::Point;
-    }
+    PointLight() = default;
     ~PointLight() override = default;
 
-  private:
+    void init() override;
 
+    void updateShadowTransforms( const glm::vec3& pos ) override;
 
+    // :::::::::::::::::::::::::::::::: //
+
+    std::vector<glm::mat4> shadowTransforms;
+    glm::mat4 _shadowProj;
+    real shadowFarPlane = 25.f;
   };
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

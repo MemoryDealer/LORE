@@ -287,7 +287,7 @@ void Forward3DRenderer::_renderShadowMaps( const RenderView& rv,
                                        Vec3Zero,
                                        Vec3PosY );
 
-    GPUProgramPtr shadowProgram = StockResource::GetGPUProgram( "DepthShadowMapInstanced" );
+    GPUProgramPtr shadowProgram = StockResource::GetGPUProgram( "DirectionalShadowMapInstanced" );
     shadowProgram->use();
 
     dirLight->viewProj = lightProj * lightView;
@@ -305,7 +305,7 @@ void Forward3DRenderer::_renderShadowMaps( const RenderView& rv,
       model->draw( shadowProgram, entity->getInstanceCount() );
     }
 
-    shadowProgram = StockResource::GetGPUProgram( "DepthShadowMap" );
+    shadowProgram = StockResource::GetGPUProgram( "DirectionalShadowMap" );
     shadowProgram->use();
     shadowProgram->setUniformVar( "viewProjection", dirLight->viewProj );
 
@@ -318,6 +318,67 @@ void Forward3DRenderer::_renderShadowMaps( const RenderView& rv,
       // Render each node associated with this entity.
       for ( const auto& node : nodes ) {
         shadowProgram->updateNodeUniforms( nullptr, node, dirLight->viewProj ); // Note: dirLight->viewProj not used.
+        model->draw( shadowProgram, 0, false );
+      }
+    }
+  }
+
+  // Point lights.
+  for ( const auto& pointLightPair : queue.lights.pointLights ) {
+    const auto& light = pointLightPair.first;
+
+    if ( !light->shadowMap ) {
+      continue;
+    }
+
+    const PointLightPtr pointLight = static_cast<PointLightPtr> ( light );
+    const auto& lightPos = pointLightPair.second;
+
+    _api->setViewport( 0, 0, pointLight->shadowMap->getWidth(), pointLight->shadowMap->getHeight() );
+    pointLight->shadowMap->bind();
+    _api->clearDepthBufferBit();
+
+
+    // Instanced solids.
+    GPUProgramPtr shadowProgram = StockResource::GetGPUProgram( "OmnidirectionalShadowMapInstanced" );
+    shadowProgram->use();
+
+    for ( int i = 0; i < 6; ++i ) {
+      shadowProgram->setUniformVar( "shadowMatrices[" + std::to_string( i ) + "]", pointLight->shadowTransforms[i] );
+    }
+    shadowProgram->setUniformVar( "lightPos", lightPos );
+    shadowProgram->setUniformVar( "farPlane", pointLight->shadowFarPlane );
+
+    for ( const auto& entity : queue.instancedSolids ) {
+      ModelPtr model = entity->getInstancedModel();
+
+      const NodePtr node = entity->getInstanceControllerNode();
+
+      glm::mat4 ident; // Not used in updater.
+      shadowProgram->updateNodeUniforms( nullptr, node, ident );
+
+      model->draw( shadowProgram, entity->getInstanceCount() );
+    }
+
+    // Non-instanced solids.
+    shadowProgram = StockResource::GetGPUProgram( "OmnidirectionalShadowMap" );
+    shadowProgram->use();
+
+    for ( int i = 0; i < 6; ++i ) {
+      shadowProgram->setUniformVar( "shadowMatrices[" + std::to_string( i ) + "]", pointLight->shadowTransforms[i] );
+    }
+    shadowProgram->setUniformVar( "lightPos", lightPos );
+    shadowProgram->setUniformVar( "farPlane", pointLight->shadowFarPlane );
+
+    for ( auto& pair : queue.solids ) {
+      const EntityPtr entity = pair.first;
+      const RenderQueue::NodeList& nodes = pair.second;
+      const ModelPtr model = entity->getModel();
+
+      // Render each node associated with this entity.
+      glm::mat4 ident; // Not used in updater.
+      for ( const auto& node : nodes ) {
+        shadowProgram->updateNodeUniforms( nullptr, node, ident );
         model->draw( shadowProgram, 0, false );
       }
     }

@@ -142,6 +142,7 @@ PointLightPtr Scene::createPointLight( const string& name )
 {
   auto light = MemoryAccess::GetPrimaryPoolCluster()->create<PointLight>();
   light->setName( name );
+  light->init();
   _pointLights.insert( name, light );
 
   return light;

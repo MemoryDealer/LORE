@@ -52,3 +52,32 @@ void DirectionalLight::init()
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void PointLight::init()
+{
+  _type = Type::Point;
+
+  if ( GET_VARIANT<bool>( Config::GetValue( "shadows" ) ) ) {
+    shadowMap = Resource::CreateDepthShadowCubemap( _name + "_shadowmap", 2048, 2048 ); // TODO: Customize res.
+
+    shadowTransforms.resize( 6 );
+
+    const float aspect = static_cast<float> ( 2048 ) / 2048; // TODO: Use custom res;
+    const float zNear = 1.0f;
+    _shadowProj = glm::perspective( glm::radians( 90.0f ), aspect, zNear, shadowFarPlane );
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void PointLight::updateShadowTransforms( const glm::vec3& pos )
+{
+  shadowTransforms[0] = _shadowProj * glm::lookAt( pos, pos + Vec3PosX, Vec3NegY );
+  shadowTransforms[1] = _shadowProj * glm::lookAt( pos, pos + Vec3NegX, Vec3NegY );
+  shadowTransforms[2] = _shadowProj * glm::lookAt( pos, pos + Vec3PosY, Vec3PosZ );
+  shadowTransforms[3] = _shadowProj * glm::lookAt( pos, pos + Vec3NegY, Vec3NegZ );
+  shadowTransforms[4] = _shadowProj * glm::lookAt( pos, pos + Vec3PosZ, Vec3NegY );
+  shadowTransforms[5] = _shadowProj * glm::lookAt( pos, pos + Vec3NegZ, Vec3NegY );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

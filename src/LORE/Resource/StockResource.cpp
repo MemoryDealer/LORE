@@ -95,10 +95,10 @@ void StockResourceController::createStockResources()
   // Font stock resources.
 
   {
-    auto defaultFont = _controller->create<Font>( "Default" );
-    defaultFont->loadFromFile( "res/stock/fonts/core.ttf", 12 );
-    auto debugUIFont = _controller->create<Font>( "DebugUI" );
-    debugUIFont->loadFromFile( "res/stock/fonts/core.ttf", 7 );
+    //auto defaultFont = _controller->create<Font>( "Default" );
+    //defaultFont->loadFromFile( _controller->_workingDirectory + "/res/stock/fonts/core.ttf", 12 );
+    //auto debugUIFont = _controller->create<Font>( "DebugUI" );
+    //debugUIFont->loadFromFile( _controller->_workingDirectory + "/res/stock/fonts/core.ttf", 7 );
   }
 
   {
@@ -185,8 +185,11 @@ void StockResourceController::createRendererStockResources( const RendererType t
 
   // Shadow programs.
   {
-    srf->createShadowProgram( "DepthShadowMap", false );
-    srf->createShadowProgram( "DepthShadowMapInstanced", true );
+    srf->createShadowProgram( "DirectionalShadowMap", false );
+    srf->createShadowProgram( "DirectionalShadowMapInstanced", true );
+
+    srf->createCubemapShadowProgram( "OmnidirectionalShadowMap", false );
+    srf->createCubemapShadowProgram( "OmnidirectionalShadowMapInstanced", true );
   }
 
   //

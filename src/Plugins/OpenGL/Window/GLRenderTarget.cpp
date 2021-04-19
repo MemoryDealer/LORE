@@ -137,6 +137,31 @@ void GLRenderTarget::initDepthShadowMap( const uint32_t width, const uint32_t he
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void GLRenderTarget::initDepthShadowCubemap( const uint32_t width, const uint32_t height )
+{
+  _width = width;
+  _height = height;
+  _aspectRatio = static_cast<real>( _width ) / _height;
+
+  // Generate the cubemap first.
+  _texture = Resource::CreateCubemap( _name + "_render_target_cubemap", _width, _height, getResourceGroupName() );
+  auto glTexturePtr = ResourceCast<GLTexture>( _texture );
+  auto cubemapID = glTexturePtr->getID();
+
+  // Create a framebuffer.
+  glGenFramebuffers( 1, &_fbo );
+  glBindFramebuffer( GL_FRAMEBUFFER, _fbo );
+  glFramebufferTexture( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, cubemapID, 0 );
+
+  // We're not using color data.
+  glDrawBuffer( GL_NONE );
+  glReadBuffer( GL_NONE );
+
+  glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void GLRenderTarget::bind() const
 {
   glBindFramebuffer( GL_FRAMEBUFFER, _fbo );

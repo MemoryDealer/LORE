@@ -290,6 +290,10 @@ namespace Lore {
                                                  const uint32_t height,
                                                  const uint32_t sampleCount,
                                                  const string& groupName = ResourceController::DefaultGroupName );
+    static RenderTargetPtr CreateDepthShadowCubemap( const string& name,
+                                                     const uint32_t width,
+                                                     const uint32_t height,
+                                                     const string& groupName = ResourceController::DefaultGroupName );
     static ShaderPtr CreateShader( const string& name,
                                    const Shader::Type type,
                                    const string& groupName = ResourceController::DefaultGroupName );
@@ -311,6 +315,10 @@ namespace Lore {
                                           const uint32_t width,
                                           const uint32_t height,
                                           const string& groupName = ResourceController::DefaultGroupName );
+    static TexturePtr CreateCubemap( const string& name,
+                                     const uint32_t width,
+                                     const uint32_t height,
+                                     const string& groupName = ResourceController::DefaultGroupName );
     static TextboxPtr CreateTextbox( const string& name,
                                      const string& groupname = ResourceController::DefaultGroupName );
 
