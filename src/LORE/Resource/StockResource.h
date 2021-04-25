@@ -39,8 +39,9 @@ namespace Lore {
   {
     u8 maxDirectionalLights { 2 };
     u8 maxPointLights { 8 };
-    u8 maxDiffuseTextures { 8 };
-    u8 maxSpecularTextures { 8 };
+    u8 maxDiffuseTextures { 4 };
+    u8 maxSpecularTextures { 4 };
+    u8 maxNormalTextures { 4 };
     bool textured { true };
     bool shadows { true };
     bool instanced { false };

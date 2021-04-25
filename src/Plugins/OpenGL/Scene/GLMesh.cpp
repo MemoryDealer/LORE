@@ -533,27 +533,36 @@ void GLMesh::draw( const Lore::GPUProgramPtr program, const size_t instanceCount
 {
   // Bind any textures that are assigned to this mesh.
   // TODO: Sprite animations (e.g., replace 0 with spriteFrame).
-  size_t diffuseCount = 0;
-  size_t specularCount = 0;
+  u8 diffuseCount = 0;
+  u8 specularCount = 0;
+  u8 normalCount = 0;
   if ( bindTextures ) {
     diffuseCount = _sprite.getTextureCount( 0, Texture::Type::Diffuse );
     specularCount = _sprite.getTextureCount( 0, Texture::Type::Specular );
-    int textureUnit = 0;
-    for ( int i = 0; i < diffuseCount; ++i ) {
+    normalCount = _sprite.getTextureCount( 0, Texture::Type::Normal );
+
+    u8 textureUnit = 0;
+    for ( u8 i = 0; i < diffuseCount; ++i ) {
       auto texture = _sprite.getTexture( 0, Texture::Type::Diffuse, i );
       texture->bind( textureUnit );
       program->setUniformVar( "diffuseTexture" + std::to_string( i ), textureUnit );
       ++textureUnit;
     }
-    for ( int i = 0; i < specularCount; ++i ) {
+    for ( u8 i = 0; i < specularCount; ++i ) {
       auto texture = _sprite.getTexture( 0, Texture::Type::Specular, i );
       texture->bind( textureUnit );
       program->setUniformVar( "specularTexture" + std::to_string( i ), textureUnit );
       ++textureUnit;
     }
+    for ( u8 i = 0; i < normalCount; ++i ) {
+      auto texture = _sprite.getTexture( 0, Texture::Type::Normal, i );
+      texture->bind( textureUnit );
+      program->setUniformVar( "normalTexture" + std::to_string( i ), textureUnit );
+      ++textureUnit;
+    }
     // Set mix values.
     if ( diffuseCount ) {
-      for ( int i = 0; i < static_cast<int>( program->getDiffuseSamplerCount() ); ++i ) {
+      for ( u8 i = 0; i < static_cast<int>( program->getDiffuseSamplerCount() ); ++i ) {
         program->setUniformVar( "diffuseMixValues[" + std::to_string( i ) + "]",
                                 _sprite.getMixValue( 0, Texture::Type::Diffuse, i ) );
       }
@@ -600,7 +609,7 @@ void GLMesh::draw( const Lore::GPUProgramPtr program, const size_t instanceCount
   glBindVertexArray( 0 );
 
   // Unbind textures to avoid any textures leaking into the next mesh of a model.
-  for ( int i = 0; i < ( diffuseCount + specularCount ); ++i ) {
+  for ( u8 i = 0; i < ( diffuseCount + specularCount + normalCount ); ++i ) {
     glActiveTexture( GL_TEXTURE0 + i );
     glBindTexture( GL_TEXTURE_2D, 0 );
   }

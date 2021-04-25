@@ -48,10 +48,26 @@ void GLTexture::loadFromFile( const string& file, const bool srgb )
   stbi_set_flip_vertically_on_load( 1 );
 
   int width, height, n;
+  // Always load with four components so we can have a single code path (e.g., no changing GL_UNPACK_ALIGNMENT etc.).
   unsigned char* pixels = stbi_load( file.c_str(), &width, &height, &n, STBI_rgb_alpha );
   if ( pixels ) {
+    glGenTextures( 1, &_id );
+    glBindTexture( _target, _id );
 
-    _createGLTexture( pixels, width, height, srgb );
+    glTexImage2D( _target, 0, ( srgb ) ? GL_SRGB_ALPHA : GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
+
+    const bool genMipMaps = true;
+    if ( genMipMaps ) {
+      glGenerateMipmap( _target );
+    }
+
+    /*glTexParameteri( _target, GL_TEXTURE_WRAP_S, ( _format == GL_RGBA ) ? GL_CLAMP_TO_EDGE : GL_REPEAT );
+    glTexParameteri( _target, GL_TEXTURE_WRAP_T, ( _format == GL_RGBA ) ? GL_CLAMP_TO_EDGE : GL_REPEAT );*/
+    glTexParameteri( _target, GL_TEXTURE_WRAP_S, GL_REPEAT );
+    glTexParameteri( _target, GL_TEXTURE_WRAP_T, GL_REPEAT );
+
+    glTexParameteri( _target, GL_TEXTURE_MIN_FILTER, ( genMipMaps ) ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR );
+    glTexParameteri( _target, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
     stbi_image_free( pixels );
     glBindTexture( _target, 0 );
@@ -229,18 +245,18 @@ void GLTexture::_createGLTexture( const unsigned char* pixels, const int width, 
   glGenTextures( 1, &_id );
   glBindTexture( _target, _id );
 
-  glTexParameteri( _target, GL_TEXTURE_WRAP_S, GL_REPEAT );
-  glTexParameteri( _target, GL_TEXTURE_WRAP_T, GL_REPEAT );
-
-  glTexParameteri( _target, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-  glTexParameteri( _target, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-
   // Create the OpenGL texture.
-  glTexImage2D( _target, 0, (srgb) ? GL_SRGB_ALPHA : GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
+  glTexImage2D( _target, 0, ( srgb ) ? GL_SRGB_ALPHA : GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
 
   if ( genMipMaps ) {
     glGenerateMipmap( _target );
   }
+
+  glTexParameteri( _target, GL_TEXTURE_WRAP_S, GL_REPEAT );
+  glTexParameteri( _target, GL_TEXTURE_WRAP_T, GL_REPEAT );
+
+  glTexParameteri( _target, GL_TEXTURE_MIN_FILTER, ( genMipMaps ) ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR );
+  glTexParameteri( _target, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

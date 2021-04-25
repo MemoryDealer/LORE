@@ -48,6 +48,11 @@ namespace Lore {
       return ( c == last );
     }
 
+    static bool Contains( const string& str, const string& pattern )
+    {
+      return ( str.find( pattern ) != string::npos );
+    }
+
   };
 
 }

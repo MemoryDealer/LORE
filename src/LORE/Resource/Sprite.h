@@ -55,7 +55,7 @@ namespace Lore {
     // Getters.
 
     TexturePtr getTexture( const size_t frameIdx, const Texture::Type type, const size_t idx = 0 ) const;
-    size_t getTextureCount( const size_t frameIdx, const Texture::Type type ) const;
+    u8 getTextureCount( const size_t frameIdx, const Texture::Type type ) const;
     real getMixValue( const size_t frameIdx, const Texture::Type type, const size_t idx ) const;
 
   private:
