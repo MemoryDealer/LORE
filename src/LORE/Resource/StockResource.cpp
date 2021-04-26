@@ -155,6 +155,9 @@ void StockResourceController::createRendererStockResources( const RendererType t
   {
     UberProgramParameters params;
 
+    srf->createUberProgram( "StandardTexturedNormalMapping" + suffix, params );
+
+    params.maxNormalTextures = 0;
     srf->createUberProgram( "StandardTextured" + suffix, params );
 
     params.textured = false;
@@ -177,6 +180,9 @@ void StockResourceController::createRendererStockResources( const RendererType t
     UberProgramParameters params;
     params.instanced = true;
 
+    srf->createUberProgram( "StandardTexturedNormalMappingInstanced" + suffix, params );
+
+    params.maxNormalTextures = 0;
     srf->createUberProgram( "StandardTexturedInstanced" + suffix, params );
 
     params.textured = false;
@@ -197,8 +203,12 @@ void StockResourceController::createRendererStockResources( const RendererType t
 
   // Lit materials.
   {
-    auto material = _controller->create<Material>( "StandardTextured" + suffix );
+    auto material = _controller->create<Material>( "StandardTexturedNormalMapping" + suffix );
     material->lighting = true;
+    material->sprite = _controller->get<Sprite>( "White" );
+    material->program = _controller->get<GPUProgram>( "StandardTexturedNormalMapping" + suffix );
+
+    material = _controller->create<Material>( "StandardTextured" + suffix );
     material->sprite = _controller->get<Sprite>( "White" );
     material->program = _controller->get<GPUProgram>( "StandardTextured" + suffix );
   }

@@ -185,8 +185,8 @@ void Game::processInput()
 
 void Game::update()
 {
-  //auto node = _scene->getNode( "Cube0" );
-  //node->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( 0.001f ) );
+  auto node = _scene->getNode( "Cube2" );
+  node->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( 0.0001f ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

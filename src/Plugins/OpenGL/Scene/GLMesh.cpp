@@ -486,28 +486,30 @@ void GLMesh::initInstanced( const Type type, const size_t maxCount )
   _instancedMatrices.resize( maxCount );
   glBufferData( GL_ARRAY_BUFFER, _instancedMatrices.size() * sizeof( glm::mat4 ), &_instancedMatrices.data()[0], GL_STATIC_DRAW );
 
-  // HACK: 2D instanced matrices must be generated with different attribute indices (???).
   const auto vec4Size = sizeof( glm::vec4 );
+  GLuint attribStart = 0;
   switch ( type ) {
   default:
-    // Set the vertex attributes for instanced matrices.
-    for ( GLuint attribIdx = 3; attribIdx <= 6; ++attribIdx ) {
-      glEnableVertexAttribArray( attribIdx );
-      glVertexAttribPointer( attribIdx, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, reinterpret_cast< void* >( ( attribIdx - 3 ) * vec4Size ) );
-      glVertexAttribDivisor( attribIdx, 1 );
-    }
+    break;
+
+  case Mesh::Type::CustomInstanced:
+    // Attribute 4 is the bitangent so begin at 5.
+    attribStart = 5;
     break;
 
   case Mesh::Type::QuadInstanced:
   case Mesh::Type::TexturedQuadInstanced:
-    // Set the vertex attributes for instanced matrices.
-    for ( GLuint attribIdx = 2; attribIdx < 6; ++attribIdx ) {
-      glEnableVertexAttribArray( attribIdx );
-      glVertexAttribPointer( attribIdx, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, reinterpret_cast< void* >( ( attribIdx - 2 ) * vec4Size ) );
-      glVertexAttribDivisor( attribIdx, 1 );
-    }
+    // 2D instanced matrices must be generated with different attribute indices - they don't use normals so attribIdx starts at 2.
+    attribStart = 2;
     break;
 
+  }
+
+  // Set the vertex attributes for instanced matrices (a vec4 for each row of a mat4).
+  for ( GLuint attribIdx = attribStart; attribIdx < ( attribStart + 4 ); ++attribIdx ) {
+    glEnableVertexAttribArray( attribIdx );
+    glVertexAttribPointer( attribIdx, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, reinterpret_cast<void*>( ( attribIdx - attribStart ) * vec4Size ) );
+    glVertexAttribDivisor( attribIdx, 1 );
   }
 
   glBindVertexArray( 0 );
@@ -533,27 +535,36 @@ void GLMesh::draw( const Lore::GPUProgramPtr program, const size_t instanceCount
 {
   // Bind any textures that are assigned to this mesh.
   // TODO: Sprite animations (e.g., replace 0 with spriteFrame).
-  size_t diffuseCount = 0;
-  size_t specularCount = 0;
+  u8 diffuseCount = 0;
+  u8 specularCount = 0;
+  u8 normalCount = 0;
   if ( bindTextures ) {
     diffuseCount = _sprite.getTextureCount( 0, Texture::Type::Diffuse );
     specularCount = _sprite.getTextureCount( 0, Texture::Type::Specular );
-    int textureUnit = 0;
-    for ( int i = 0; i < diffuseCount; ++i ) {
+    normalCount = _sprite.getTextureCount( 0, Texture::Type::Normal );
+
+    u8 textureUnit = 0;
+    for ( u8 i = 0; i < diffuseCount; ++i ) {
       auto texture = _sprite.getTexture( 0, Texture::Type::Diffuse, i );
       texture->bind( textureUnit );
       program->setUniformVar( "diffuseTexture" + std::to_string( i ), textureUnit );
       ++textureUnit;
     }
-    for ( int i = 0; i < specularCount; ++i ) {
+    for ( u8 i = 0; i < specularCount; ++i ) {
       auto texture = _sprite.getTexture( 0, Texture::Type::Specular, i );
       texture->bind( textureUnit );
       program->setUniformVar( "specularTexture" + std::to_string( i ), textureUnit );
       ++textureUnit;
     }
+    for ( u8 i = 0; i < normalCount; ++i ) {
+      auto texture = _sprite.getTexture( 0, Texture::Type::Normal, i );
+      texture->bind( textureUnit );
+      program->setUniformVar( "normalTexture" + std::to_string( i ), textureUnit );
+      ++textureUnit;
+    }
     // Set mix values.
     if ( diffuseCount ) {
-      for ( int i = 0; i < static_cast<int>( program->getDiffuseSamplerCount() ); ++i ) {
+      for ( u8 i = 0; i < static_cast<int>( program->getDiffuseSamplerCount() ); ++i ) {
         program->setUniformVar( "diffuseMixValues[" + std::to_string( i ) + "]",
                                 _sprite.getMixValue( 0, Texture::Type::Diffuse, i ) );
       }
@@ -600,7 +611,7 @@ void GLMesh::draw( const Lore::GPUProgramPtr program, const size_t instanceCount
   glBindVertexArray( 0 );
 
   // Unbind textures to avoid any textures leaking into the next mesh of a model.
-  for ( int i = 0; i < ( diffuseCount + specularCount ); ++i ) {
+  for ( u8 i = 0; i < ( diffuseCount + specularCount + normalCount ); ++i ) {
     glActiveTexture( GL_TEXTURE0 + i );
     glBindTexture( GL_TEXTURE_2D, 0 );
   }

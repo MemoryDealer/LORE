@@ -449,7 +449,12 @@ void Forward3DRenderer::_renderSolids( const RenderView& rv,
     case Mesh::Type::TexturedQuad3DInstanced:
     case Mesh::Type::TexturedCubeInstanced:
     case Mesh::Type::CustomInstanced:
-      program = StockResource::GetGPUProgram( "StandardTexturedInstanced3D" );
+      if ( material->sprite->getTextureCount( 0, Texture::Type::Normal ) > 0 ) {
+        program = StockResource::GetGPUProgram( "StandardTexturedNormalMappingInstanced3D" );
+      }
+      else {
+        program = StockResource::GetGPUProgram( "StandardTexturedInstanced3D" );
+      }
       break;
     }
 

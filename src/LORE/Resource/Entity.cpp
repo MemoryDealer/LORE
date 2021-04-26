@@ -28,6 +28,7 @@
 
 #include <LORE/Resource/Material.h>
 #include <LORE/Resource/ResourceController.h>
+#include <LORE/Resource/StockResource.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -135,6 +136,12 @@ void Entity::setInstanceControllerNode( const NodePtr node )
 void Entity::setSprite( SpritePtr sprite )
 {
   _material->sprite = sprite;
+
+  // Program was assigned in Resource::LoadEntity()...if normal maps are
+  // detected auto-switch to the normal mapping program.
+  if ( _material->sprite->getTextureCount( 0, Texture::Type::Normal ) > 0 ) {
+    _material->program = StockResource::GetGPUProgram( "StandardTexturedNormalMapping3D" );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

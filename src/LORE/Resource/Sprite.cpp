@@ -99,14 +99,14 @@ TexturePtr Sprite::getTexture( const size_t frameIdx, const Texture::Type type, 
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-size_t Sprite::getTextureCount( const size_t frameIdx, const Texture::Type type ) const
+u8 Sprite::getTextureCount( const size_t frameIdx, const Texture::Type type ) const
 {
   if ( frameIdx < _frames.size() ) {
     const FrameData& data = _frames[frameIdx];
     auto lookup = data.find( type );
     if ( data.end() != lookup ) {
       const Frame& frame = lookup->second;
-      return frame.textures.size();
+      return static_cast<u8>( frame.textures.size() );
     }
   }
   return 0;

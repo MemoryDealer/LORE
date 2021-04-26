@@ -38,6 +38,10 @@ using namespace Lore::OpenGL;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+constexpr int instancedMatrixTexUnit = 5;
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 GLStockResource3DFactory::GLStockResource3DFactory( Lore::ResourceControllerPtr controller )
   : StockResourceFactory( controller )
 {
@@ -48,6 +52,7 @@ GLStockResource3DFactory::GLStockResource3DFactory( Lore::ResourceControllerPtr 
 Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& name, const Lore::UberProgramParameters& params )
 {
   const bool textured = params.textured;
+  const bool normalMapping = ( params.maxNormalTextures > 0 );
   const bool lit = !!( params.maxDirectionalLights || params.maxPointLights );
   const bool instanced = params.instanced;
   const bool shadows = params.shadows;
@@ -68,6 +73,9 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
   src += "layout (location = " + std::to_string( layoutLocation++ ) + ") in vec3 normal;";
   if ( textured ) {
     src += "layout (location = " + std::to_string( layoutLocation++ ) + ") in vec2 texCoord;";
+
+    src += "layout (location = " + std::to_string( layoutLocation++ ) + ") in vec3 tangent;";
+    src += "layout (location = " + std::to_string( layoutLocation++ ) + ") in vec3 bitangent;";
   }
   if ( instanced ) {
     src += "layout (location = " + std::to_string( layoutLocation++ ) + ") in mat4 instanceMatrix;";
@@ -91,6 +99,46 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
   if ( textured ) {
     src += "out vec2 TexCoord;";
+
+    if ( lit && normalMapping ) { // We need the light data in the vertex shader also for normal mapping.
+      src += "struct DirectionalLight {";
+      {
+        src += "vec3 direction;";
+        src += "vec3 ambient;";
+        src += "vec3 diffuse;";
+        src += "vec3 specular;";
+      }
+      src += "};";
+
+      src += "struct PointLight {";
+      {
+        src += "vec3 pos;";
+        src += "vec3 ambient;";
+        src += "vec3 diffuse;";
+        src += "vec3 specular;";
+        src += "float range;";
+        src += "float constant;";
+        src += "float linear;";
+        src += "float quadratic;";
+        src += "float intensity;";
+        if ( shadows ) {
+          src += "float shadowFarPlane;";
+        }
+      }
+      src += "};";
+
+      src += "uniform PointLight pointLights[" + std::to_string( params.maxPointLights ) + "];";
+      src += "uniform vec3 viewPos;";
+      src += "uniform int numPointLights;";
+
+      src += "uniform DirectionalLight dirLights[" + std::to_string( params.maxDirectionalLights ) + "];";
+      src += "uniform int numDirLights;";
+
+      src += "out vec3 tangentLightPos[" + std::to_string( params.maxPointLights ) + "];";
+      src += "out vec3 tangentDirLightDirection[" + std::to_string( params.maxDirectionalLights ) + "];";
+      src += "out vec3 tangentViewPos;";
+      src += "out vec3 tangentFragPos;";
+    }
   }
 
   if ( lit ) {
@@ -101,7 +149,10 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     if ( shadows ) {
       src += "out vec4 FragPosDirLightSpace[" + std::to_string( params.maxDirectionalLights ) + "];";
       src += "uniform mat4 dirLightSpaceMatrix[" + std::to_string( params.maxDirectionalLights ) + "];";
-      src += "uniform int numDirLights;";
+
+      if ( !normalMapping ) { // Already added for normal mapping.
+        src += "uniform int numDirLights;";
+      }
     }
   }
 
@@ -131,6 +182,44 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
     if ( textured ) {
       src += "TexCoord = vec2(texCoord.x * texSampleRegion.w + texSampleRegion.x, texCoord.y * texSampleRegion.h + texSampleRegion.y);";
+
+      if ( lit && normalMapping ) {
+        if ( instanced ) {
+          src += "mat3 normalMat = transpose(inverse(mat3(instanceMatrix)));";
+        }
+        else {
+          src += "mat3 normalMat = transpose(inverse(mat3(model)));";
+        }
+
+        src += "vec3 T = normalize(normalMat * tangent);";
+        src += "vec3 N = normalize(normalMat * normal);";
+        src += "T = normalize(T - dot(T, N) * N);";
+
+        src += "vec3 B = cross(N, T);";
+
+        /*src += "if (dot(cross(N, T), B) < 0.0) {";
+        {
+          src += "T = T * -1.0;";
+        }
+        src += "}";*/
+
+        src += "mat3 TBN = transpose(mat3(T, B, N));";
+
+        src += "for (int i = 0; i < numPointLights; ++i) {";
+        {
+          src += "tangentLightPos[i] = TBN * pointLights[i].pos;";
+        }
+        src += "}";
+
+        src += "for (int i = 0; i < numDirLights; ++i) {";
+        {
+          src += "tangentDirLightDirection[i] = TBN * -dirLights[i].direction;";
+        }
+        src += "}";
+
+        src += "tangentViewPos = TBN * viewPos;";
+        src += "tangentFragPos = TBN * FragPos;";
+      }
     }
 
     if ( instanced ) {
@@ -170,20 +259,35 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
   }
 
   if ( textured ) {
-    for ( uint32_t i = 0; i < params.maxDiffuseTextures; ++i ) {
+    for ( u8 i = 0; i < params.maxDiffuseTextures; ++i ) {
       src += "uniform sampler2D diffuseTexture" + std::to_string( i ) + ";";
     }
     src += "uniform sampler2D specularTexture0;";
 
     src += "uniform float diffuseMixValues[" + std::to_string( params.maxDiffuseTextures ) + "];";
+
+    if ( lit && normalMapping ) {
+      src += "uniform int numNormalTextures;";
+
+      for ( u8 i = 0; i < params.maxNormalTextures; ++i ) {
+        src += "uniform sampler2D normalTexture" + std::to_string( i ) + ";";
+      }
+
+      src += "in vec3 tangentLightPos[" + std::to_string( params.maxPointLights ) + "];";
+      src += "in vec3 tangentDirLightDirection[" + std::to_string( params.maxDirectionalLights ) + "];";
+      src += "in vec3 tangentViewPos;";
+      src += "in vec3 tangentFragPos;";
+    }
   }
 
   // Material.
   src += "struct Material {";
-  src += "vec4 ambient;";
-  src += "vec4 diffuse;";
-  src += "vec4 specular;";
-  src += "float shininess;";
+  {
+    src += "vec4 ambient;";
+    src += "vec4 diffuse;";
+    src += "vec4 specular;";
+    src += "float shininess;";
+  }
   src += "};";
   src += "uniform Material material;";
 
@@ -350,6 +454,20 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
         src += "return vec3(texture(specularTexture0, TexCoord + texSampleOffset));";
       }
       src += "}";
+
+      if ( lit && normalMapping ) {
+        src += "vec3 SampleNormalTextures() {";
+        {
+          src += "vec3 normal;";
+
+          // TODO: Multitexturing...
+          src += "normal = texture(normalTexture0, TexCoord + texSampleOffset).rgb;";
+          src += "normal = normalize(normal * 2.0 - 1.0);";
+
+          src += "return normal;";
+        }
+        src += "}";
+      }
     }
 
     //
@@ -357,7 +475,12 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
     src += "vec3 CalcDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir, int idx) {";
     {
-      src += "vec3 lightDir = normalize(-light.direction);";
+      if ( textured && normalMapping ) {
+        src += "vec3 lightDir = normalize(tangentDirLightDirection[idx]);";
+      }
+      else {
+        src += "vec3 lightDir = normalize(-light.direction);";
+      }
 
       // Diffuse shading.
       src += "float diff = max(dot(normal, lightDir), 0.0);";
@@ -391,9 +514,14 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     //
     // Point light.
 
-    src += "vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir, samplerCube shadowCubemap) {";
+    src += "vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir, samplerCube shadowCubemap, int i) {";
     {
-      src += "vec3 lightDir = normalize(light.pos - FragPos);";
+      if ( textured && normalMapping ) {
+        src += "vec3 lightDir = normalize(tangentLightPos[i] - tangentFragPos);";
+      }
+      else {
+        src += "vec3 lightDir = normalize(light.pos - FragPos);";
+      }
 
       // Diffuse shading.
       src += "float diff = max(dot(normal, lightDir), 0.0);";
@@ -437,8 +565,14 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     src += "vec3 result = vec3(0.0, 0.0, 0.0);";
 
     if ( lit ) {
-      src += "vec3 norm = normalize(Normal);";
-      src += "vec3 viewDir = normalize(viewPos - FragPos);";
+      if ( textured && normalMapping ) {
+        src += "vec3 norm = SampleNormalTextures();";
+        src += "vec3 viewDir = normalize(tangentViewPos - tangentFragPos);";
+      }
+      else {
+        src += "vec3 norm = normalize(Normal);";
+        src += "vec3 viewDir = normalize(viewPos - FragPos);";
+      }
 
       // Directional lights.
       src += "for(int i = 0; i < numDirLights; ++i) {";
@@ -450,7 +584,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       // Point lights.
       src += "for(int i = 0; i < numPointLights; ++i) {";
       {
-        src += "result += CalcPointLight(pointLights[i], norm, viewDir, shadowCubemap[i]);";
+        src += "result += CalcPointLight(pointLights[i], norm, viewDir, shadowCubemap[i], i);";
       }
       src += "}";
     }
@@ -555,6 +689,10 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     for ( uint32_t i = 0; i < params.maxDiffuseTextures; ++i ) {
       program->addUniformVar( "diffuseTexture" + std::to_string( i ) );
       program->addUniformVar( "diffuseMixValues[" + std::to_string( i ) + "]" );
+
+      if ( lit && normalMapping ) {
+        program->addUniformVar( "normalTexture" + std::to_string( i ) );
+      }
     }
     program->addUniformVar( "specularTexture0");
 
@@ -659,18 +797,25 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       auto sprite = material->sprite;
       int textureUnit = 0;
       const auto diffuseCount = sprite->getTextureCount( spriteFrame, Texture::Type::Diffuse );
-      for ( int i = 0; i < diffuseCount; ++i ) {
+      for ( u8 i = 0; i < diffuseCount; ++i ) {
         auto texture = sprite->getTexture( spriteFrame, Texture::Type::Diffuse, i );
         texture->bind( textureUnit );
         program->setUniformVar( "diffuseTexture" + std::to_string( i ), textureUnit );
         ++textureUnit;
       }
-      for ( int i = 0; i < sprite->getTextureCount( spriteFrame, Texture::Type::Specular ); ++i ) {
+      for ( u8 i = 0; i < sprite->getTextureCount( spriteFrame, Texture::Type::Specular ); ++i ) {
         auto texture = sprite->getTexture( spriteFrame, Texture::Type::Specular, i );
         texture->bind( textureUnit );
         program->setUniformVar( "specularTexture" + std::to_string( i ), textureUnit );
         ++textureUnit;
       }
+      for ( u8 i = 0; i < sprite->getTextureCount( spriteFrame, Texture::Type::Normal ); ++i ) {
+        auto texture = sprite->getTexture( spriteFrame, Texture::Type::Normal, i );
+        texture->bind( textureUnit );
+        program->setUniformVar( "normalTexture" + std::to_string( i ), textureUnit );
+        ++textureUnit;
+      }
+
       // Set mix values.
       for ( int i = 0; i < static_cast<int>( program->getDiffuseSamplerCount() ); ++i ) {
         program->setUniformVar( "diffuseMixValues[" + std::to_string( i ) + "]",
@@ -724,6 +869,13 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
         program->setUniformVar( "specularTexture" + std::to_string( i ), textureUnit );
         ++textureUnit;
       }
+      for ( u8 i = 0; i < sprite->getTextureCount( spriteFrame, Texture::Type::Normal ); ++i ) {
+        auto texture = sprite->getTexture( spriteFrame, Texture::Type::Normal, i );
+        texture->bind( textureUnit );
+        program->setUniformVar( "normalTexture" + std::to_string( i ), textureUnit );
+        ++textureUnit;
+      }
+
       // Set mix values.
       for ( int i = 0; i < static_cast<int>( program->getDiffuseSamplerCount() ); ++i ) {
         program->setUniformVar( "diffuseMixValues[" + std::to_string( i ) + "]",
@@ -778,8 +930,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createShadowProgram( const string&
   src += "layout (location = 0) in vec3 pos;";
 
   if ( instanced ) {
-    // The instanced matrices are at location 3.
-    src += "layout (location = " + std::to_string( 3 ) + ") in mat4 instanceMatrix;";
+    src += "layout (location = " + std::to_string( instancedMatrixTexUnit ) + ") in mat4 instanceMatrix;";
   }
 
   //
@@ -893,8 +1044,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createCubemapShadowProgram( const 
   src += "layout (location = 0) in vec3 pos;";
 
   if ( instanced ) {
-    // The instanced matrices are at location 3.
-    src += "layout (location = " + std::to_string( 3 ) + ") in mat4 instanceMatrix;";
+    src += "layout (location = " + std::to_string( instancedMatrixTexUnit ) + ") in mat4 instanceMatrix;";
   }
 
   //

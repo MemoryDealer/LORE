@@ -1,6 +1,9 @@
 {
   "checkerboard":"checkerboard",
-  "stone":"stone",
+  "stone": {
+    "diffuse": "stone",
+    "normal": "stone-normal"
+  },
   "brick": {
     "diffuse":"brickwall",
     "normal":"brickwall_normal"
