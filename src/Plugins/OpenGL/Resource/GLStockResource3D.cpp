@@ -100,7 +100,16 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
   if ( textured ) {
     src += "out vec2 TexCoord;";
 
-    if ( lit && normalMapping ) { // We need the point light data in the vertex shader also for normal mapping.
+    if ( lit && normalMapping ) { // We need the light data in the vertex shader also for normal mapping.
+      src += "struct DirectionalLight {";
+      {
+        src += "vec3 direction;";
+        src += "vec3 ambient;";
+        src += "vec3 diffuse;";
+        src += "vec3 specular;";
+      }
+      src += "};";
+
       src += "struct PointLight {";
       {
         src += "vec3 pos;";
@@ -122,7 +131,11 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       src += "uniform vec3 viewPos;";
       src += "uniform int numPointLights;";
 
+      src += "uniform DirectionalLight dirLights[" + std::to_string( params.maxDirectionalLights ) + "];";
+      src += "uniform int numDirLights;";
+
       src += "out vec3 tangentLightPos[" + std::to_string( params.maxPointLights ) + "];";
+      src += "out vec3 tangentDirLightDirection[" + std::to_string( params.maxDirectionalLights ) + "];";
       src += "out vec3 tangentViewPos;";
       src += "out vec3 tangentFragPos;";
     }
@@ -136,7 +149,10 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     if ( shadows ) {
       src += "out vec4 FragPosDirLightSpace[" + std::to_string( params.maxDirectionalLights ) + "];";
       src += "uniform mat4 dirLightSpaceMatrix[" + std::to_string( params.maxDirectionalLights ) + "];";
-      src += "uniform int numDirLights;";
+
+      if ( !normalMapping ) { // Already added for normal mapping.
+        src += "uniform int numDirLights;";
+      }
     }
   }
 
@@ -192,6 +208,12 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
         src += "for (int i = 0; i < numPointLights; ++i) {";
         {
           src += "tangentLightPos[i] = TBN * pointLights[i].pos;";
+        }
+        src += "}";
+
+        src += "for (int i = 0; i < numDirLights; ++i) {";
+        {
+          src += "tangentDirLightDirection[i] = TBN * -dirLights[i].direction;";
         }
         src += "}";
 
@@ -251,7 +273,8 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
         src += "uniform sampler2D normalTexture" + std::to_string( i ) + ";";
       }
 
-      src += "in vec3 tangentLightPos[8];";
+      src += "in vec3 tangentLightPos[" + std::to_string( params.maxPointLights ) + "];";
+      src += "in vec3 tangentDirLightDirection[" + std::to_string( params.maxDirectionalLights ) + "];";
       src += "in vec3 tangentViewPos;";
       src += "in vec3 tangentFragPos;";
     }
@@ -259,10 +282,12 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
   // Material.
   src += "struct Material {";
-  src += "vec4 ambient;";
-  src += "vec4 diffuse;";
-  src += "vec4 specular;";
-  src += "float shininess;";
+  {
+    src += "vec4 ambient;";
+    src += "vec4 diffuse;";
+    src += "vec4 specular;";
+    src += "float shininess;";
+  }
   src += "};";
   src += "uniform Material material;";
 
@@ -451,7 +476,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     src += "vec3 CalcDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir, int idx) {";
     {
       if ( textured && normalMapping ) {
-        src += "vec3 lightDir = normalize(-light.direction);"; // TODO: Account for lightdir in tangent space.
+        src += "vec3 lightDir = normalize(tangentDirLightDirection[idx]);";
       }
       else {
         src += "vec3 lightDir = normalize(-light.direction);";
