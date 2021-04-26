@@ -486,28 +486,30 @@ void GLMesh::initInstanced( const Type type, const size_t maxCount )
   _instancedMatrices.resize( maxCount );
   glBufferData( GL_ARRAY_BUFFER, _instancedMatrices.size() * sizeof( glm::mat4 ), &_instancedMatrices.data()[0], GL_STATIC_DRAW );
 
-  // HACK: 2D instanced matrices must be generated with different attribute indices (???).
   const auto vec4Size = sizeof( glm::vec4 );
+  GLuint attribStart = 0;
   switch ( type ) {
   default:
-    // Set the vertex attributes for instanced matrices.
-    for ( GLuint attribIdx = 3; attribIdx <= 6; ++attribIdx ) {
-      glEnableVertexAttribArray( attribIdx );
-      glVertexAttribPointer( attribIdx, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, reinterpret_cast< void* >( ( attribIdx - 3 ) * vec4Size ) );
-      glVertexAttribDivisor( attribIdx, 1 );
-    }
+    break;
+
+  case Mesh::Type::CustomInstanced:
+    // Attribute 4 is the bitangent so begin at 5.
+    attribStart = 5;
     break;
 
   case Mesh::Type::QuadInstanced:
   case Mesh::Type::TexturedQuadInstanced:
-    // Set the vertex attributes for instanced matrices.
-    for ( GLuint attribIdx = 2; attribIdx < 6; ++attribIdx ) {
-      glEnableVertexAttribArray( attribIdx );
-      glVertexAttribPointer( attribIdx, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, reinterpret_cast< void* >( ( attribIdx - 2 ) * vec4Size ) );
-      glVertexAttribDivisor( attribIdx, 1 );
-    }
+    // 2D instanced matrices must be generated with different attribute indices - they don't use normals so attribIdx starts at 2.
+    attribStart = 2;
     break;
 
+  }
+
+  // Set the vertex attributes for instanced matrices (a vec4 for each row of a mat4).
+  for ( GLuint attribIdx = attribStart; attribIdx < ( attribStart + 4 ); ++attribIdx ) {
+    glEnableVertexAttribArray( attribIdx );
+    glVertexAttribPointer( attribIdx, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, reinterpret_cast<void*>( ( attribIdx - attribStart ) * vec4Size ) );
+    glVertexAttribDivisor( attribIdx, 1 );
   }
 
   glBindVertexArray( 0 );

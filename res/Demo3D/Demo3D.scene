@@ -16,6 +16,7 @@
     },
     "CheckeredCube": {
       "Model": "res/Demo3D/Models/cube.fbx",
+      "Instanced": 5,
       "Sprite": "checkerboard",
       "MaterialSettings": {
         "ScrollSpeed": [0.0, 0.0]
@@ -23,6 +24,7 @@
     },
     "StoneQuad": {
       "Model": "res/Demo3D/Models/quad.fbx",
+      "Instanced": 100,
       "Sprite":"stone",
       "MaterialSettings": {
         "Shininess": 32.0

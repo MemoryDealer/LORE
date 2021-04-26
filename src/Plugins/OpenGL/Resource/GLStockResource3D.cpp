@@ -38,6 +38,10 @@ using namespace Lore::OpenGL;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+constexpr int instancedMatrixTexUnit = 5;
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 GLStockResource3DFactory::GLStockResource3DFactory( Lore::ResourceControllerPtr controller )
   : StockResourceFactory( controller )
 {
@@ -70,10 +74,8 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
   if ( textured ) {
     src += "layout (location = " + std::to_string( layoutLocation++ ) + ") in vec2 texCoord;";
 
-    if ( normalMapping ) {
-      src += "layout (location = " + std::to_string( layoutLocation++ ) + ") in vec3 tangent;";
-      src += "layout (location = " + std::to_string( layoutLocation++ ) + ") in vec3 bitangent;";
-    }
+    src += "layout (location = " + std::to_string( layoutLocation++ ) + ") in vec3 tangent;";
+    src += "layout (location = " + std::to_string( layoutLocation++ ) + ") in vec3 bitangent;";
   }
   if ( instanced ) {
     src += "layout (location = " + std::to_string( layoutLocation++ ) + ") in mat4 instanceMatrix;";
@@ -116,11 +118,11 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       }
       src += "};";
 
-      src += "uniform PointLight pointLights[8];";
+      src += "uniform PointLight pointLights[" + std::to_string( params.maxPointLights ) + "];";
       src += "uniform vec3 viewPos;";
       src += "uniform int numPointLights;";
 
-      src += "out vec3 tangentLightPos[8];";
+      src += "out vec3 tangentLightPos[" + std::to_string( params.maxPointLights ) + "];";
       src += "out vec3 tangentViewPos;";
       src += "out vec3 tangentFragPos;";
     }
@@ -903,8 +905,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createShadowProgram( const string&
   src += "layout (location = 0) in vec3 pos;";
 
   if ( instanced ) {
-    // The instanced matrices are at location 3.
-    src += "layout (location = " + std::to_string( 3 ) + ") in mat4 instanceMatrix;";
+    src += "layout (location = " + std::to_string( instancedMatrixTexUnit ) + ") in mat4 instanceMatrix;";
   }
 
   //
@@ -1018,8 +1019,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createCubemapShadowProgram( const 
   src += "layout (location = 0) in vec3 pos;";
 
   if ( instanced ) {
-    // The instanced matrices are at location 3.
-    src += "layout (location = " + std::to_string( 3 ) + ") in mat4 instanceMatrix;";
+    src += "layout (location = " + std::to_string( instancedMatrixTexUnit ) + ") in mat4 instanceMatrix;";
   }
 
   //

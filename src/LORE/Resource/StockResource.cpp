@@ -180,6 +180,9 @@ void StockResourceController::createRendererStockResources( const RendererType t
     UberProgramParameters params;
     params.instanced = true;
 
+    srf->createUberProgram( "StandardTexturedNormalMappingInstanced" + suffix, params );
+
+    params.maxNormalTextures = 0;
     srf->createUberProgram( "StandardTexturedInstanced" + suffix, params );
 
     params.textured = false;
