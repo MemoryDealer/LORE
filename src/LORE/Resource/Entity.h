@@ -27,6 +27,7 @@
 
 #include <LORE/Resource/IResource.h>
 
+#include <LORE/Renderer/IRenderAPI.h>
 #include <LORE/Renderer/Renderer.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -92,7 +93,7 @@ namespace Lore {
     bool isInstanced() const;
     NodePtr getInstanceControllerNode() const;
 
-  private:
+    //
 
     friend class Node;
 
@@ -111,6 +112,8 @@ namespace Lore {
     NodePtr _instanceControllerNode { nullptr };
 
     uint _renderQueue { RenderQueue::General };
+
+    IRenderAPI::CullingMode cullingMode = IRenderAPI::CullingMode::Back;
 
   };
 

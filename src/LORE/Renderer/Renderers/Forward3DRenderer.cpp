@@ -458,6 +458,8 @@ void Forward3DRenderer::_renderSolids( const RenderView& rv,
       break;
     }
 
+    _api->setCullingMode( entity->cullingMode );
+
     program->use();
 
     program->updateUniforms( rv, material, queue.lights );
@@ -474,6 +476,8 @@ void Forward3DRenderer::_renderSolids( const RenderView& rv,
     const MaterialPtr material = entity->getMaterial();
     const ModelPtr model = entity->getModel();
     const GPUProgramPtr program = material->program;
+
+    _api->setCullingMode( entity->cullingMode );
 
     program->use();
     program->updateUniforms( rv, material, queue.lights );
@@ -522,6 +526,7 @@ void Forward3DRenderer::_renderTransparents( const RenderView& rv,
 
     // Set blending mode using material settings.
     _api->setBlendingFunc( material->blendingMode.srcFactor, material->blendingMode.dstFactor );
+    _api->setCullingMode( entity->cullingMode );
 
     program->use();
     program->updateUniforms( rv, material, queue.lights );

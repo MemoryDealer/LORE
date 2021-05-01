@@ -69,10 +69,12 @@ void GLMesh::init( const Lore::Mesh::Type type )
 
   case Mesh::Type::Quad:
     _mode = GL_TRIANGLE_STRIP;
-    _vertices = { -0.1f, -0.1f,
+    _vertices = {
+      -0.1f, -0.1f,
       -0.1f, 0.1f,
       0.1f, -0.1f,
-      0.1f, 0.1f };
+      0.1f, 0.1f
+    };
     _indices = { 0, 1, 2, 3 };
 
     addAttribute( AttributeType::Float, 2 );
@@ -80,10 +82,12 @@ void GLMesh::init( const Lore::Mesh::Type type )
 
   case Mesh::Type::TexturedQuad:
     _mode = GL_TRIANGLE_STRIP;
-    _vertices = { -0.1f, -0.1f,     0.f, 0.f,
-      -0.1f, 0.1f,      0.f, 1.f,
+    _vertices = { 
       0.1f, -0.1f,      1.f, 0.f,
-      0.1f, 0.1f,       1.f, 1.f };
+      0.1f, 0.1f,       1.f, 1.f ,
+      -0.1f, -0.1f,    0.f, 0.f,
+      -0.1f, 0.1f,      0.f, 1.f
+    };
     _indices = { 0, 1, 2, 3 };
 
     addAttribute( AttributeType::Float, 2 );
@@ -92,10 +96,12 @@ void GLMesh::init( const Lore::Mesh::Type type )
 
   case Mesh::Type::FullscreenQuad:
     _mode = GL_TRIANGLE_STRIP;
-    _vertices = { -1.f, -1.f,     0.f, 0.f,
-      -1.f, 1.f,      0.f, 1.f,
+    _vertices = { 
       1.f, -1.f,      1.f, 0.f,
-      1.f, 1.f,       1.f, 1.f };
+      1.f, 1.f,       1.f, 1.f,
+      -1.f, -1.f,     0.f, 0.f,
+      -1.f, 1.f,      0.f, 1.f
+    };
     _indices = { 0, 1, 2, 3 };
 
     addAttribute( AttributeType::Float, 2 );

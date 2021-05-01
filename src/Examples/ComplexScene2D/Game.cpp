@@ -100,6 +100,9 @@ void Game::loadScene()
   // (The "player" sprite was loaded into the Core resource group in loadResources()).
   playerEntity->setSprite( Lore::Resource::GetSprite( "player" ) );
 
+  // Disable backface culling on player sprite since we flip its matrix during movement.
+  playerEntity->cullingMode = Lore::IRenderAPI::CullingMode::None;
+
   // Now attach the player entity to the player node, so wherever the node goes,
   // the player sprite will be rendered.
   _playerNode->attachObject( playerEntity );
@@ -120,6 +123,7 @@ void Game::loadScene()
   Lore::EntityPtr blockEntity = Lore::Resource::CreateEntity( "block", Lore::Mesh::Type::TexturedQuad );
   blockEntity->enableInstancing( 1000 );
   blockEntity->setSprite( Lore::Resource::GetSprite( "block" ) );
+  blockEntity->cullingMode = Lore::IRenderAPI::CullingMode::None; // Some blocks we rotate to the backface.
   for ( int i = 0; i < 10; ++i ) {
     auto blockNode = _scene->createNode( "block" + std::to_string( i ) );
     blockNode->attachObject( blockEntity );

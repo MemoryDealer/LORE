@@ -183,6 +183,7 @@ void Forward2DRenderer::present( const RenderView& rv, const WindowPtr window )
   _api->clear();
   _api->clearColor( bg.r, bg.g, bg.b, 1.f );
   _api->setPolygonMode( IRenderAPI::PolygonMode::Fill );
+  _api->setCullingMode( IRenderAPI::CullingMode::Back );
 
   // Setup view-projection matrix.
   // TODO: Take viewport dimensions into account. Cache more things inside window.
@@ -368,6 +369,8 @@ void Forward2DRenderer::renderSolids( const RenderView& rv,
       break;
     }
 
+    _api->setCullingMode( entity->cullingMode );
+
     program->use();
 
     program->updateUniforms( rv, material, queue.lights );
@@ -384,6 +387,8 @@ void Forward2DRenderer::renderSolids( const RenderView& rv,
     const MaterialPtr material = entity->getMaterial();
     const ModelPtr model = entity->getModel();
     const GPUProgramPtr program = material->program;
+
+    _api->setCullingMode( entity->cullingMode );
 
     program->use();
     program->updateUniforms( rv, material, queue.lights );
@@ -433,6 +438,7 @@ void Forward2DRenderer::renderTransparents( const RenderView& rv,
 
     // Set blending mode using material settings.
     _api->setBlendingFunc( material->blendingMode.srcFactor, material->blendingMode.dstFactor );
+    _api->setCullingMode( entity->cullingMode );
 
     program->use();
 
