@@ -185,16 +185,29 @@ void GLTexture::createCubemap( const uint32_t width, const uint32_t height )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLTexture::createFloatingPoint( const u32 width, const u32 height )
+void GLTexture::createFloatingPoint( const u32 width, const u32 height, const u32 sampleCount )
 {
-  _target = GL_TEXTURE_2D;
-  glGenTextures( 1, &_id );
-  glBindTexture( _target, _id );
+  if ( sampleCount ) {
+    _target = GL_TEXTURE_2D_MULTISAMPLE;
+    glGenTextures( 1, &_id );
+    glBindTexture( _target, _id );
 
-  glTexImage2D( _target, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, nullptr );
+    // Create texture.
+    glTexImage2DMultisample( _target, sampleCount, GL_RGBA16F, width, height, GL_TRUE );
 
-  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glTexParameteri( _target, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri( _target, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+  }
+  else {
+    _target = GL_TEXTURE_2D;
+    glGenTextures( 1, &_id );
+    glBindTexture( _target, _id );
+
+    glTexImage2D( _target, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, nullptr );
+
+    glTexParameteri( _target, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri( _target, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+  }
 
   glBindTexture( _target, 0 );
 }

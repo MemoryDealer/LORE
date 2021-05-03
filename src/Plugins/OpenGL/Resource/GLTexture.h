@@ -53,7 +53,7 @@ namespace Lore { namespace OpenGL {
 
     void createCubemap( const uint32_t width, const uint32_t height ) override;
 
-    void createFloatingPoint( const u32 width, const u32 height ) override;
+    void createFloatingPoint( const u32 width, const u32 height, const u32 sampleCount ) override;
 
     void bind( const uint32_t idx ) override;
 

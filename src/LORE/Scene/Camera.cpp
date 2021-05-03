@@ -174,7 +174,7 @@ void Camera::updateTracking()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Camera::initPostProcessing( const u32 width, const u32 height )
+void Camera::initPostProcessing( const u32 width, const u32 height, const u32 sampleCount )
 {
   if ( postProcessing ) {
     Resource::DestroyRenderTarget( postProcessing->renderTarget );
@@ -184,7 +184,7 @@ void Camera::initPostProcessing( const u32 width, const u32 height )
 
   postProcessing = std::make_unique<PostProcessing>();
 
-  postProcessing->renderTarget = Resource::CreatePostProcessingBuffer( _name + "_post_buffer", width, height, 0 ); // TODO: sample count
+  postProcessing->renderTarget = Resource::CreatePostProcessingBuffer( _name + "_post_buffer", width, height, sampleCount );
 
   // We need an entity for rendering our fullscreen quad.
   postProcessing->entity = Resource::CreateEntity( _name + "_entity", Mesh::Type::FullscreenQuad );

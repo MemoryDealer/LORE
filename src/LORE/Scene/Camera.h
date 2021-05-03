@@ -84,7 +84,7 @@ namespace Lore {
 
     virtual void lookAt( const glm::vec3& pos, const glm::vec3& target, const glm::vec3& up ) = 0;
 
-    void initPostProcessing( const u32 width, const u32 height );
+    void initPostProcessing( const u32 width, const u32 height, const u32 sampleCount );
 
     //
     // Getters.

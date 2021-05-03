@@ -588,10 +588,11 @@ TexturePtr Resource::CreateCubemap( const string& name,
 TexturePtr Resource::CreateFloatingPointBuffer( const string& name,
                                                 const u32 width,
                                                 const u32 height,
+                                                const u32 sampleCount,
                                                 const string& groupName )
 {
   auto texture = ActiveContext->getResourceController()->create<Texture>( name, groupName );
-  texture->createFloatingPoint( width, height );
+  texture->createFloatingPoint( width, height, sampleCount );
   return texture;
 }
 

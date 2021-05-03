@@ -214,7 +214,8 @@ void GLWindow::updateRenderViews()
 
     // Resize post-processing render targets.
     if ( rv.camera->postProcessing ) {
-      rv.camera->initPostProcessing( rv.gl_viewport.width, rv.gl_viewport.height );
+      const u32 sampleCount = rv.camera->postProcessing->renderTarget->_sampleCount;
+      rv.camera->initPostProcessing( rv.gl_viewport.width, rv.gl_viewport.height, sampleCount );
     }
   }
 }

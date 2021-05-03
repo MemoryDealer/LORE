@@ -71,12 +71,13 @@ namespace Lore {
       return _aspectRatio;
     }
 
-  protected:
+    ///
 
     TexturePtr _texture { nullptr };
     uint32_t _width { 0 };
     uint32_t _height { 0 };
     real _aspectRatio { 0.f };
+    u32 _sampleCount { 0 };
 
   };
 

@@ -64,6 +64,7 @@ void GLRenderTarget::init( const uint32_t width, const uint32_t height, const ui
   _height = height;
   _aspectRatio = static_cast< real >( _width ) / _height;
   _multiSampling = !!( sampleCount );
+  _sampleCount = sampleCount;
 
   // Create a framebuffer.
   glGenFramebuffers( 1, &_fbo );
@@ -116,6 +117,7 @@ void GLRenderTarget::initDepthShadowMap( const uint32_t width, const uint32_t he
   _height = height;
   _aspectRatio = static_cast<real>( _width ) / _height;
   _multiSampling = !!( sampleCount );
+  _sampleCount = sampleCount;
 
   // Create a framebuffer.
   glGenFramebuffers( 1, &_fbo );
@@ -167,12 +169,14 @@ void GLRenderTarget::initPostProcessing( const u32 width, const u32 height, cons
   _width = width;
   _height = height;
   _aspectRatio = static_cast<real>( _width ) / _height;
+  _multiSampling = !!( sampleCount );
+  _sampleCount = sampleCount;
 
   // Create a framebuffer.
   glGenFramebuffers( 1, &_fbo );
   glBindFramebuffer( GL_FRAMEBUFFER, _fbo );
 
-  _texture = Resource::CreateFloatingPointBuffer( _name + "_post_processing_tex", width, height, getResourceGroupName() );
+  _texture = Resource::CreateFloatingPointBuffer( _name + "_post_processing_tex", width, height, sampleCount, getResourceGroupName() );
   auto glTexturePtr = ResourceCast<GLTexture>( _texture );
   auto textureID = glTexturePtr->getID();
 
@@ -183,7 +187,7 @@ void GLRenderTarget::initPostProcessing( const u32 width, const u32 height, cons
   glGenRenderbuffers( 1, &_rbo );
   glBindRenderbuffer( GL_RENDERBUFFER, _rbo );
   if ( _multiSampling ) {
-    glRenderbufferStorageMultisample( GL_RENDERBUFFER, sampleCount, GL_DEPTH_COMPONENT, width, height );
+    glRenderbufferStorageMultisample( GL_RENDERBUFFER, sampleCount, GL_DEPTH_COMPONENT, _width, _height );
   }
   else {
     glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT, _width, _height );
@@ -202,7 +206,7 @@ void GLRenderTarget::initPostProcessing( const u32 width, const u32 height, cons
     glGenFramebuffers( 1, &_intermediateFBO );
     glBindFramebuffer( GL_FRAMEBUFFER, _intermediateFBO );
 
-    _intermediateTexture = Resource::CreateTexture( _name + "_int_render_target", _width, _height, 0, getResourceGroupName() );
+    _intermediateTexture = Resource::CreateFloatingPointBuffer( _name + "_int_render_target", _width, _height, 0, getResourceGroupName() );
     auto intGLTexturePtr = ResourceCast<GLTexture>( _intermediateTexture );
     auto intTextureID = intGLTexturePtr->getID();
     glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, intTextureID, 0 );

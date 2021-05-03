@@ -327,6 +327,7 @@ namespace Lore {
     static TexturePtr CreateFloatingPointBuffer( const string& name,
                                                  const u32 width,
                                                  const u32 height,
+                                                 const u32 sampleCount,
                                                  const string& groupName = ResourceController::DefaultGroupName );
     static TextboxPtr CreateTextbox( const string& name,
                                      const string& groupname = ResourceController::DefaultGroupName );
