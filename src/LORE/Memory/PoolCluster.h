@@ -86,6 +86,12 @@ namespace Lore {
             }
         }
 
+        template<typename T>
+        bool poolExists()
+        {
+          return _getPool<T>();
+        }
+
         //
         // Object management.
 

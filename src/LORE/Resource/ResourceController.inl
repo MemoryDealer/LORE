@@ -120,6 +120,11 @@ template<typename ResourceType>
 inline typename std::enable_if<std::is_base_of<Alloc<ResourceType>, ResourceType>::value, void>::type
 ResourceController::destroy( ResourceType* resource )
 {
+  if ( !MemoryAccess::GetPrimaryPoolCluster()->poolExists<ResourceType>() ) {
+    //LogWrite( warning, "Tried to delete resource from non-existent pool" );
+    return;
+  }
+
   auto groupName = resource->getResourceGroupName();
   _getGroup( groupName )->removeResource<ResourceType>( resource->getName() );
   MemoryAccess::GetPrimaryPoolCluster()->destroy<ResourceType>( resource );
@@ -131,6 +136,11 @@ template<typename ResourceType>
 inline typename std::enable_if<!std::is_base_of<Alloc<ResourceType>, ResourceType>::value, void>::type
 ResourceController::destroy( ResourceType* resource )
 {
+  if ( !MemoryAccess::GetPrimaryPoolCluster()->poolExists<ResourceType>() ) {
+    //LogWrite( warning, "Tried to delete resource from non-existent pool" );
+    return;
+  }
+
   auto groupName = resource->getResourceGroupName();
   _getGroup( groupName )->removeResource<ResourceType>( resource->getName() );
   auto functor = getDestructionFunctor<ResourceType>();
