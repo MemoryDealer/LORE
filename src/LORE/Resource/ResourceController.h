@@ -294,6 +294,11 @@ namespace Lore {
                                                      const uint32_t width,
                                                      const uint32_t height,
                                                      const string& groupName = ResourceController::DefaultGroupName );
+    static RenderTargetPtr CreatePostProcessingBuffer( const string& name,
+                                                       const u32 width,
+                                                       const u32 height,
+                                                       const u32 sampleCount,
+                                                       const string& groupName = ResourceController::DefaultGroupName );
     static ShaderPtr CreateShader( const string& name,
                                    const Shader::Type type,
                                    const string& groupName = ResourceController::DefaultGroupName );
@@ -319,6 +324,10 @@ namespace Lore {
                                      const uint32_t width,
                                      const uint32_t height,
                                      const string& groupName = ResourceController::DefaultGroupName );
+    static TexturePtr CreateFloatingPointBuffer( const string& name,
+                                                 const u32 width,
+                                                 const u32 height,
+                                                 const string& groupName = ResourceController::DefaultGroupName );
     static TextboxPtr CreateTextbox( const string& name,
                                      const string& groupname = ResourceController::DefaultGroupName );
 

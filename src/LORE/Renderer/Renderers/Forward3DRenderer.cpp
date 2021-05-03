@@ -180,12 +180,21 @@ void Forward3DRenderer::present( const RenderView& rv,
   //
   // Render scene.
 
-  if ( rv.renderTarget ) {
+  real aspectRatio = 0.f;
+  if ( rv.camera->postProcessing ) {
+    _api->setViewport( 0,
+                       0,
+                       static_cast<uint32_t>( rv.viewport.w * rv.camera->postProcessing->renderTarget->getWidth() ),
+                       static_cast<uint32_t>( rv.viewport.h * rv.camera->postProcessing->renderTarget->getHeight() ) );
+    rv.camera->postProcessing->renderTarget->bind();
+    aspectRatio = rv.camera->postProcessing->renderTarget->getAspectRatio();
+  } else if ( rv.renderTarget ) {
     _api->setViewport( 0,
                        0,
                        static_cast< uint32_t >( rv.viewport.w * rv.renderTarget->getWidth() ),
                        static_cast< uint32_t >( rv.viewport.h * rv.renderTarget->getHeight() ) );
     rv.renderTarget->bind();
+    aspectRatio = rv.renderTarget->getAspectRatio();
   }
   else {
     // TODO: Get rid of gl_viewport.
@@ -195,6 +204,7 @@ void Forward3DRenderer::present( const RenderView& rv,
                        rv.gl_viewport.height );
 
     _api->bindDefaultFramebuffer();
+    aspectRatio = rv.gl_viewport.aspectRatio;
   }
 
   Color bg = rv.scene->getSkyboxColor();
@@ -206,7 +216,6 @@ void Forward3DRenderer::present( const RenderView& rv,
 
   // Setup view-projection matrix.
   // TODO: Take viewport dimensions into account. Cache more things inside window.
-  const real aspectRatio = ( rv.renderTarget ) ? rv.renderTarget->getAspectRatio() : window->getAspectRatio();
   const glm::mat4 projection = glm::perspective( glm::radians( 45.f ),
                                                  aspectRatio,
                                                  0.1f, 20000.f );
@@ -235,10 +244,67 @@ void Forward3DRenderer::present( const RenderView& rv,
     _api->bindDefaultFramebuffer();
   }
 
+  // Post processing.
+  if ( rv.camera->postProcessing ) {
+    rv.camera->postProcessing->renderTarget->flush();
+    _presentPostProcessing( rv, window );
+  }
+
   _clearRenderQueues();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Forward3DRenderer::_presentPostProcessing( const RenderView& rv,
+                                                const WindowPtr window )
+{
+  real aspectRatio = 0.f;
+  if ( rv.renderTarget ) {
+    _api->setViewport( 0,
+                       0,
+                       static_cast<uint32_t>( rv.viewport.w * rv.renderTarget->getWidth() ),
+                       static_cast<uint32_t>( rv.viewport.h * rv.renderTarget->getHeight() ) );
+    rv.renderTarget->bind();
+    aspectRatio = rv.camera->postProcessing->renderTarget->getAspectRatio();
+  }
+  else {
+    // TODO: Get rid of gl_viewport.
+    _api->setViewport( rv.gl_viewport.x,
+                       rv.gl_viewport.y,
+                       rv.gl_viewport.width,
+                       rv.gl_viewport.height );
+
+    _api->bindDefaultFramebuffer();
+    aspectRatio = rv.gl_viewport.aspectRatio;
+  }
+
+  _api->clear();
+  _api->clearColor( 1.f, 0.f, 0.f, 1.f );
+
+  const glm::mat4 projection = glm::ortho( -aspectRatio, aspectRatio,
+                                           -1.f, 1.f,
+                                           1.f, -1.f );
+  static glm::mat4 view = Math::CreateTransformationMatrix( Vec3Zero,
+                                                            glm::quat( 1.f, 0.f, 0.f, 0.f ),
+                                                            glm::vec3( 1.f, 1.f, 0.f ) );
+  const glm::mat4 viewProjection = projection * view;
+
+  _api->setCullingMode( IRenderAPI::CullingMode::Back );
+
+  const Camera::PostProcessing* p = rv.camera->postProcessing.get();
+  ModelPtr model = p->entity->getModel();
+  GPUProgramPtr program = p->entity->_material->program;
+
+  program->use();
+
+  TexturePtr buffer = p->renderTarget->getTexture();
+  buffer->bind();
+  program->setUniformVar( "buffer", 0 );
+
+  model->draw( program );
+}
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Forward3DRenderer::_clearRenderQueues()

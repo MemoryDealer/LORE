@@ -40,12 +40,12 @@ GLRenderTarget::~GLRenderTarget()
   glDeleteRenderbuffers( 1, &_rbo );
   glDeleteFramebuffers( 1, &_fbo );
   if ( _texture ) {
-    //Resource::DestroyTexture( _texture );
+    Resource::DestroyTexture( _texture );
   }
 
   if ( _multiSampling ) {
     glDeleteFramebuffers( 1, &_intermediateFBO );
-    //Resource::DestroyTexture( _intermediateTexture );
+    Resource::DestroyTexture( _intermediateTexture );
   }
 }
 
@@ -156,6 +156,57 @@ void GLRenderTarget::initDepthShadowCubemap( const uint32_t width, const uint32_
   // We're not using color data.
   glDrawBuffer( GL_NONE );
   glReadBuffer( GL_NONE );
+
+  glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLRenderTarget::initPostProcessing( const u32 width, const u32 height, const u32 sampleCount )
+{
+  _width = width;
+  _height = height;
+  _aspectRatio = static_cast<real>( _width ) / _height;
+
+  // Create a framebuffer.
+  glGenFramebuffers( 1, &_fbo );
+  glBindFramebuffer( GL_FRAMEBUFFER, _fbo );
+
+  _texture = Resource::CreateFloatingPointBuffer( _name + "_post_processing_tex", width, height, getResourceGroupName() );
+  auto glTexturePtr = ResourceCast<GLTexture>( _texture );
+  auto textureID = glTexturePtr->getID();
+
+  glBindTexture( GL_TEXTURE_2D, textureID );
+  glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, ( _multiSampling ) ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D, textureID, 0 );
+
+  // Generate render buffer object for depth/stencil buffers.
+  glGenRenderbuffers( 1, &_rbo );
+  glBindRenderbuffer( GL_RENDERBUFFER, _rbo );
+  if ( _multiSampling ) {
+    glRenderbufferStorageMultisample( GL_RENDERBUFFER, sampleCount, GL_DEPTH_COMPONENT, width, height );
+  }
+  else {
+    glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT, _width, _height );
+  }
+  glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _rbo );
+
+  if ( GL_FRAMEBUFFER_COMPLETE != glCheckFramebufferStatus( GL_FRAMEBUFFER ) ) {
+    throw Lore::Exception( "Failed to create framebuffer for RenderTarget" );
+  }
+
+  glBindRenderbuffer( GL_RENDERBUFFER, 0 );
+  glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+
+  if ( _multiSampling ) {
+    // Configure second post-processing framebuffer.
+    glGenFramebuffers( 1, &_intermediateFBO );
+    glBindFramebuffer( GL_FRAMEBUFFER, _intermediateFBO );
+
+    _intermediateTexture = Resource::CreateTexture( _name + "_int_render_target", _width, _height, 0, getResourceGroupName() );
+    auto intGLTexturePtr = ResourceCast<GLTexture>( _intermediateTexture );
+    auto intTextureID = intGLTexturePtr->getID();
+    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, intTextureID, 0 );
+  }
 
   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 }

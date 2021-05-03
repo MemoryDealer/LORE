@@ -185,6 +185,22 @@ void GLTexture::createCubemap( const uint32_t width, const uint32_t height )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+void GLTexture::createFloatingPoint( const u32 width, const u32 height )
+{
+  _target = GL_TEXTURE_2D;
+  glGenTextures( 1, &_id );
+  glBindTexture( _target, _id );
+
+  glTexImage2D( _target, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, nullptr );
+
+  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+
+  glBindTexture( _target, 0 );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void GLTexture::create( const int width, const int height, const Lore::Color& color )
 {
   const auto size = width * height * 4;

@@ -94,7 +94,7 @@ void GLMesh::init( const Lore::Mesh::Type type )
     addAttribute( AttributeType::Float, 2 );
     break;
 
-  case Mesh::Type::FullscreenQuad:
+  case Mesh::Type::Skybox2D:
     _mode = GL_TRIANGLE_STRIP;
     _vertices = { 
       1.f, -1.f,      1.f, 0.f,
@@ -106,6 +106,11 @@ void GLMesh::init( const Lore::Mesh::Type type )
 
     addAttribute( AttributeType::Float, 2 );
     addAttribute( AttributeType::Float, 2 );
+    break;
+
+  case Mesh::Type::FullscreenQuad:
+    _mode = GL_TRIANGLES;
+    // Vertices/UVs should be generated in the vertex shader (see stock post-processing shader).
     break;
 
   case Mesh::Type::Cubemap:
@@ -580,8 +585,13 @@ void GLMesh::draw( const Lore::GPUProgramPtr program, const size_t instanceCount
   glBindVertexArray( _vao );
   switch ( _type ) {
   default:
+    glDrawArrays( _mode, 0, 3 );
   case Mesh::Type::Custom:
     glDrawElements( _mode, static_cast< GLsizei >( _indices.size() ), GL_UNSIGNED_INT, nullptr );
+    break;
+
+  case Mesh::Type::FullscreenQuad:
+    glDrawArrays( _mode, 0, 3 );
     break;
 
   case Mesh::Type::QuadInstanced:

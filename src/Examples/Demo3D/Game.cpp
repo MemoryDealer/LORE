@@ -84,6 +84,8 @@ void Game::loadScene()
   _camera = _context->createCamera( "core", Lore::Camera::Type::Type3D );
   _camera->lookAt( glm::vec3( 0.f, 1.5f, 0.f ), glm::vec3( 0.f, 0.f, -1.f ), glm::vec3( 0.f, 1.f, 0.f ) );
 
+  _camera->initPostProcessing( _window->getWidth(), _window->getHeight() );
+
   // TODO: This is a hack that should be taken care of internally.
   Lore::CLI::SetActiveScene( _scene );
 

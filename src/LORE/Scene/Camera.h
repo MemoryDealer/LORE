@@ -44,6 +44,12 @@ namespace Lore {
       Type3D
     };
 
+    struct PostProcessing
+    {
+      RenderTargetPtr renderTarget {};
+      EntityPtr entity {};
+    };
+
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     Camera() = default;
@@ -78,6 +84,8 @@ namespace Lore {
 
     virtual void lookAt( const glm::vec3& pos, const glm::vec3& target, const glm::vec3& up ) = 0;
 
+    void initPostProcessing( const u32 width, const u32 height );
+
     //
     // Getters.
 
@@ -100,7 +108,7 @@ namespace Lore {
 
     void updateTracking();
 
-  protected:
+  ///
 
     friend class Context;
 
@@ -122,6 +130,8 @@ namespace Lore {
 
     NodePtr _trackingNode { nullptr };
     TrackingStyle _trackingStyle { TrackingStyle::Simple };
+
+    std::unique_ptr<PostProcessing> postProcessing {};
 
   };
 

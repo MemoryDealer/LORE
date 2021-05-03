@@ -407,6 +407,7 @@ EntityPtr Resource::CreateEntity( const string& name, const Mesh::Type& modelTyp
   break;
 
   case Mesh::Type::TexturedQuad:
+  case Mesh::Type::FullscreenQuad:
   {
     auto material = StockResource::GetMaterial( "StandardTextured2D" );
     entity->setMaterial( material->clone( "StandardTextured2D_" + name ) );
@@ -507,6 +508,15 @@ RenderTargetPtr Resource::CreateDepthShadowCubemap( const string& name, const ui
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+RenderTargetPtr Resource::CreatePostProcessingBuffer( const string& name, const u32 width, const u32 height, const u32 sampleCount, const string& groupName )
+{
+  auto rt = ActiveContext->getResourceController()->create<RenderTarget>( name, groupName );
+  rt->initPostProcessing( width, height, sampleCount );
+  return rt;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 ShaderPtr Resource::CreateShader( const string& name,
                                   const Shader::Type type,
                                   const string& groupName )
@@ -570,6 +580,18 @@ TexturePtr Resource::CreateCubemap( const string& name,
 {
   auto texture = ActiveContext->getResourceController()->create<Texture>( name, groupName );
   texture->createCubemap( width, height );
+  return texture;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+TexturePtr Resource::CreateFloatingPointBuffer( const string& name,
+                                                const u32 width,
+                                                const u32 height,
+                                                const string& groupName )
+{
+  auto texture = ActiveContext->getResourceController()->create<Texture>( name, groupName );
+  texture->createFloatingPoint( width, height );
   return texture;
 }
 

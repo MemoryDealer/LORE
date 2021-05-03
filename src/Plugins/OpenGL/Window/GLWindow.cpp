@@ -211,6 +211,11 @@ void GLWindow::updateRenderViews()
     rv.gl_viewport.y = static_cast< int >( rv.viewport.y * static_cast< float >( _frameBufferHeight ) );
     rv.gl_viewport.width = static_cast< int >( rv.viewport.w * static_cast< float >( _frameBufferWidth ) );
     rv.gl_viewport.height = static_cast< int >( rv.viewport.h * static_cast< float >( _frameBufferHeight ) );
+
+    // Resize post-processing render targets.
+    if ( rv.camera->postProcessing ) {
+      rv.camera->initPostProcessing( rv.gl_viewport.width, rv.gl_viewport.height );
+    }
   }
 }
 

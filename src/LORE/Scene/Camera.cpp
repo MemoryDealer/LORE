@@ -27,7 +27,9 @@
 #include "Camera.h"
 
 #include <LORE/Math/Math.h>
+#include <LORE/Resource/Entity.h>
 #include <LORE/Resource/ResourceController.h>
+#include <LORE/Resource/StockResource.h>
 #include <LORE/Scene/Node.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -168,6 +170,31 @@ void Camera::updateTracking()
   }
 
   _dirty();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Camera::initPostProcessing( const u32 width, const u32 height )
+{
+  if ( postProcessing ) {
+    Resource::DestroyRenderTarget( postProcessing->renderTarget );
+    Resource::DestroySprite( postProcessing->entity->_material->sprite );
+    Resource::DestroyEntity( postProcessing->entity );
+  }
+
+  postProcessing = std::make_unique<PostProcessing>();
+
+  postProcessing->renderTarget = Resource::CreatePostProcessingBuffer( _name + "_post_buffer", width, height, 0 ); // TODO: sample count
+
+  // We need an entity for rendering our fullscreen quad.
+  postProcessing->entity = Resource::CreateEntity( _name + "_entity", Mesh::Type::FullscreenQuad );
+  postProcessing->entity->_material->program = StockResource::GetGPUProgram( "PostProcessing" );
+
+  // Create a sprite for our render target texture.
+  auto sprite = Resource::CreateSprite( _name + "_post_sprite" );
+  sprite->addTexture( Texture::Type::Diffuse, postProcessing->renderTarget->getTexture() );
+  postProcessing->entity->_material->sprite = sprite;
+  postProcessing->entity->_material->lighting = false;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

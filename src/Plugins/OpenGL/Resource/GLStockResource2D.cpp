@@ -630,6 +630,97 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createEnvironmentMappingProgram( c
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+Lore::GPUProgramPtr GLStockResource2DFactory::createPostProcessingProgram( const string& name, const PostProcessingProgramParameters& params )
+{
+  const string header = "#version " +
+    std::to_string( APIVersion::GetMajor() ) + std::to_string( APIVersion::GetMinor() ) + "0" +
+    " core\n";
+
+  //
+  // Vertex shader.
+
+  string src = header;
+
+  //
+  // Outs.
+
+  src += "out vec2 TexCoord;";
+
+  //
+  // main function.
+
+  src += "void main() {";
+  {
+    src += "uint idx = uint(gl_VertexID);";
+    src += "gl_Position = vec4( idx & 1U, idx >> 1U, 0.0, 0.5) * 4.0 - 1.0;"; // From https://gist.github.com/mhalber/0a9b8a78182eb62659fc18d23fe5e94e
+
+    src += "TexCoord = vec2(gl_Position.xy * 0.5 + 0.5);";
+  }
+  src += "}";
+
+  auto vsptr = _controller->create<Shader>( name + "_VS" );
+  vsptr->init( Shader::Type::Vertex );
+  if ( !vsptr->loadFromSource( src ) ) {
+    throw Lore::Exception( "Failed to compile text vertex shader for " + name );
+  }
+
+  // ::::::::::::::::::::::::::::::::: //
+
+  //
+  // Fragment shader.
+
+  src.clear();
+  src = header;
+
+  //
+  // Ins/outs and uniforms.
+
+  src += "out vec4 pixel;";
+  src += "in vec2 TexCoord;";
+
+  //
+  // Uniforms.
+
+  src += "uniform sampler2D frameBuffer;";
+
+  //
+  // main function.
+
+  src += "void main() {";
+  {
+    src += "vec3 hdrColor = texture(frameBuffer, TexCoord).rgb;";
+    src += "pixel = vec4(hdrColor, 1.0);";
+  }
+  src += "}";
+
+  auto fsptr = _controller->create<Shader>( name + "_FS" );
+  fsptr->init( Shader::Type::Fragment );
+  if ( !fsptr->loadFromSource( src ) ) {
+    throw Lore::Exception( "Failed to compile text fragment shader for " + name );
+    // TODO: Rollback vertex shaders in case of failed fragment shader.
+  }
+
+  // ::::::::::::::::::::::::::::::::: //
+
+  //
+  // GPU program.
+
+  auto program = _controller->create<Lore::GPUProgram>( name );
+  program->init();
+  program->attachShader( vsptr );
+  program->attachShader( fsptr );
+
+  if ( !program->link() ) {
+    throw Lore::Exception( "Failed to link GPUProgram " + name );
+  }
+
+  program->addUniformVar( "buffer" );
+
+  return program;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 Lore::GPUProgramPtr GLStockResource2DFactory::createBoxProgram( const string& name )
 {
   const string header = "#version " +

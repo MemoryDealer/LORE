@@ -65,6 +65,9 @@ namespace Lore {
 
   private:
 
+    void _presentPostProcessing( const RenderView& rv,
+                                 const WindowPtr window );
+
     void _clearRenderQueues() override;
 
     void _activateQueue( const uint id,
