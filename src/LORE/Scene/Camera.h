@@ -48,6 +48,8 @@ namespace Lore {
     {
       RenderTargetPtr renderTarget {};
       EntityPtr entity {};
+      float exposure { 0.5f };
+      float gamma { 2.2f };
     };
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

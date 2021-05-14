@@ -682,6 +682,8 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createPostProcessingProgram( const
   // Uniforms.
 
   src += "uniform sampler2D frameBuffer;";
+  src += "uniform float gamma;";
+  src += "uniform float exposure;";
 
   //
   // main function.
@@ -689,7 +691,12 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createPostProcessingProgram( const
   src += "void main() {";
   {
     src += "vec3 hdrColor = texture(frameBuffer, TexCoord).rgb;";
-    src += "pixel = vec4(hdrColor, 1.0);";
+
+    // Exposure tone mapping.
+    src += "vec3 mapped = vec3(1.0) - exp(-hdrColor * exposure);";
+    src += "mapped = pow(mapped, vec3(1.0 / gamma));";
+
+    src += "pixel = vec4(mapped, 1.0);";
   }
   src += "}";
 
@@ -715,6 +722,8 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createPostProcessingProgram( const
   }
 
   program->addUniformVar( "buffer" );
+  program->addUniformVar( "gamma" );
+  program->addUniformVar( "exposure" );
 
   return program;
 }

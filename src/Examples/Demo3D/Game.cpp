@@ -44,7 +44,7 @@ Game::Game()
   _context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
 
   // Create a window and set it to the active window.
-  _window = _context->createWindow( "Demo 3D", 1280, 720, 4, Lore::RendererType::Forward3D );
+  _window = _context->createWindow( "Demo 3D", 1280, 720, 8, Lore::RendererType::Forward3D );
   _window->setActive();
 
   Lore::Input::SetMouseMovedCallback( Game::onMouseMove );
@@ -84,7 +84,7 @@ void Game::loadScene()
   _camera = _context->createCamera( "core", Lore::Camera::Type::Type3D );
   _camera->lookAt( glm::vec3( 0.f, 1.5f, 0.f ), glm::vec3( 0.f, 0.f, -1.f ), glm::vec3( 0.f, 1.f, 0.f ) );
 
-  _camera->initPostProcessing( _window->getWidth(), _window->getHeight(), 4 );
+  _camera->initPostProcessing( _window->getWidth(), _window->getHeight(), 8 );
 
   // TODO: This is a hack that should be taken care of internally.
   Lore::CLI::SetActiveScene( _scene );
@@ -96,7 +96,7 @@ void Game::loadScene()
   rv.camera = _camera;
 
   //rv.renderTarget = Lore::Resource::CreateRenderTarget( "rt1", 1920, 1080, 8 );
-  //rv.gamma = 1.f;
+  rv.gamma = 1.f; // Post-processing will apply gamma.
 
   // Add the RenderView to the window so it will render our scene.
   _window->addRenderView( rv );

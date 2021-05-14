@@ -24,18 +24,15 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Config.h"
-
-#include <LORE/Util/StringUtils.h>
+#ifdef LORE_DEBUG_UI
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace LocalNS {
+#include "GFX.h"
 
-  static std::unordered_map<std::string, Lore::ConfigValue> ConfigValues;
+#include <External/imgui/imgui.h>
 
-}
-using namespace LocalNS;
+#include <LORE/Config/Config.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -43,32 +40,24 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Config::SetValue( const string& key, const string& value )
+DebugUI_GFX::DebugUI_GFX()
 {
-  ConfigValues[StringUtil::ToLower( key )] = value;
+
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Config::SetValue( const string& key, const bool value )
+void DebugUI_GFX::render()
 {
-  ConfigValues[StringUtil::ToLower( key )] = value;
+  ImGui::Begin( "GFX", nullptr );
+
+  ImGui::SliderFloat( "Exposure", &DebugConfig::hdrExposure, 0.01f, 5.0f );
+
+  ImGui::End();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-ConfigValue Config::GetValue( const string& key )
-{
-  auto it = ConfigValues.find( StringUtil::ToLower( key ) );
-  if ( ConfigValues.end() != it ) {
-    return it->second;
-  }
-
-  LogWrite( Error, "Config value %s does not exist", StringUtil::ToLower( key ).c_str() );
-  return ConfigValue();
-}
+#endif
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-float DebugConfig::hdrExposure = 0.5f;
-

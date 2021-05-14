@@ -108,6 +108,7 @@ Context::Context() noexcept
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImGuiIO& io = ImGui::GetIO(); ( void )io;
+  //io.IniFilename = FileUtil::ApplyWorkingDirectory( " + UI.ini" ).c_str(); // https://github.com/ocornut/imgui/issues/454
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
 

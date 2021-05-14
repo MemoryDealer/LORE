@@ -302,6 +302,15 @@ void Forward3DRenderer::_presentPostProcessing( const RenderView& rv,
   buffer->bind();
   program->setUniformVar( "buffer", 0 );
 
+  program->setUniformVar( "gamma", p->gamma );
+
+  // Debug UI enabled values.
+#ifdef LORE_DEBUG_UI
+  program->setUniformVar( "exposure", DebugConfig::hdrExposure );
+#else
+  program->setUniformVar( "exposure", p->exposure );
+#endif
+
   model->draw( program );
 }
 

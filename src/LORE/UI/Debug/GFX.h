@@ -1,3 +1,4 @@
+#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE
@@ -24,51 +25,42 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Config.h"
-
-#include <LORE/Util/StringUtils.h>
+#ifdef LORE_DEBUG_UI
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace LocalNS {
-
-  static std::unordered_map<std::string, Lore::ConfigValue> ConfigValues;
-
-}
-using namespace LocalNS;
+#include <LORE/Core/Timer.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-using namespace Lore;
+namespace Lore {
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+  struct DebugUI_GFX final
+  {
 
-void Config::SetValue( const string& key, const string& value )
-{
-  ConfigValues[StringUtil::ToLower( key )] = value;
-}
+    Dimensions windowDimensions {};
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Config::SetValue( const string& key, const bool value )
-{
-  ConfigValues[StringUtil::ToLower( key )] = value;
-}
+    DebugUI_GFX();
+    ~DebugUI_GFX() = default;
 
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    void render();
 
-ConfigValue Config::GetValue( const string& key )
-{
-  auto it = ConfigValues.find( StringUtil::ToLower( key ) );
-  if ( ConfigValues.end() != it ) {
-    return it->second;
-  }
+    //
+    // Modifiers.
 
-  LogWrite( Error, "Config value %s does not exist", StringUtil::ToLower( key ).c_str() );
-  return ConfigValue();
+    void setWindowDimensions( const Dimensions& dimensions )
+    {
+      windowDimensions = dimensions;
+    }
+
+  };
+
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-float DebugConfig::hdrExposure = 0.5f;
+#endif
 
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

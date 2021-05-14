@@ -31,6 +31,7 @@
 
 #include <LORE/UI/UI.h>
 #include <LORE/UI/Debug/Console.h>
+#include <LORE/UI/Debug/GFX.h>
 #include <LORE/UI/Debug/PerformanceStats.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -45,6 +46,7 @@ namespace Lore {
     enum class Panel
     {
       PerformanceStats,
+      GFX,
       Console,
       Memory
     };
@@ -70,6 +72,7 @@ namespace Lore {
 
     DebugUI_Console _console {};
     DebugUI_PerformanceStats _perfStats {};
+    DebugUI_GFX _gfx {};
 
   };
 
