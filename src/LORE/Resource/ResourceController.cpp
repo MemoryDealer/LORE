@@ -467,7 +467,8 @@ MaterialPtr Resource::CreateMaterial( const string& name, const string& groupNam
 
 MeshPtr Resource::CreateMesh( const string& name, const Mesh::Type& type, const string& groupName )
 {
-  auto mesh = ActiveContext->getResourceController()->create<Mesh>( name, groupName );
+  // Always duplicate meshes, else multiple entities loading the same model in a scene will break instancing/node setup.
+  auto mesh = ActiveContext->getResourceController()->create<Mesh>( name, groupName, true );
   mesh->init( type );
   return mesh;
 }
@@ -476,7 +477,8 @@ MeshPtr Resource::CreateMesh( const string& name, const Mesh::Type& type, const 
 
 ModelPtr Resource::CreateModel( const string& name, const Mesh::Type& type, const string& groupName )
 {
-  return ActiveContext->getResourceController()->create<Model>( name, groupName );
+  // Always duplicate models, else multiple entities loading the same model in a scene will break instancing/node setup.
+  return ActiveContext->getResourceController()->create<Model>( name, groupName, true );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

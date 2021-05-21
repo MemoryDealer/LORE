@@ -53,15 +53,22 @@ namespace Lore {
     {
     }
 
-    void insert( const ID& id, T* resource )
+    void insert( const ID& id, T* resource, const bool autoDuplicate = false )
     {
-      const auto transformedID = StringUtil::ToLower( id );
+      auto transformedID = StringUtil::ToLower( id );
       if ( _container.find( transformedID ) != _container.end() ) {
-        throw Lore::Exception( "Resource with id " + transformedID + " already exists" );
+        if ( autoDuplicate ) {
+          auto count = _count[id];
+          transformedID.append( std::to_string( count ) );
+        }
+        else {
+          throw Lore::Exception( "Resource with id " + transformedID + " already exists" );
+        }
       }
 
       auto it = _container.begin();
       _container.insert( it, std::pair<ID, T*>( transformedID, resource ) );
+      ++_count[id];
     }
 
     void remove( const ID& id )
@@ -74,11 +81,13 @@ namespace Lore {
       }
 
       _container.erase( transformedID );
+      --_count[id];
     }
 
     void clear()
     {
       _container.clear();
+      _count.clear();
     }
 
     T* get( const ID& id ) const
@@ -135,6 +144,7 @@ namespace Lore {
   private:
 
     MapType<string, T*, MapParams ...> _container {};
+    MapType<string, u32> _count {};
 
   };
 

@@ -75,7 +75,7 @@ namespace Lore {
     ~ResourceGroup() = default;
 
     template<typename T>
-    void insertResource( T* resource );
+    void insertResource( T* resource, const bool autoDuplicate = false );
 
     template<typename T>
     bool resourceExists( const string& id );
@@ -164,12 +164,12 @@ namespace Lore {
     // Creates resources that are implemented directly in LORE library.
     template<typename ResourceType>
     typename std::enable_if<std::is_base_of<Alloc<ResourceType>, ResourceType>::value, ResourceType*>::type
-      create( const string& name, const string& groupName = DefaultGroupName );
+      create( const string& name, const string& groupName = DefaultGroupName, const bool duplicate = false );
 
     // Creates resources that are implemented by a render plugin, using functors the plugin provides.
     template<typename ResourceType>
     typename std::enable_if<!std::is_base_of<Alloc<ResourceType>, ResourceType>::value, ResourceType*>::type
-      create( const string& name, const string& groupName = DefaultGroupName );
+      create( const string& name, const string& groupName = DefaultGroupName, const bool duplicate = false );
 
     // Returns true if specified resource exists.
     template<typename ResourceType>

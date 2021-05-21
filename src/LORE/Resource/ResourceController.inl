@@ -26,10 +26,10 @@
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 template<typename T>
-inline void ResourceGroup::insertResource( T* resource )
+inline void ResourceGroup::insertResource( T* resource, const bool autoDuplicate )
 {
   ResourceRegistry& registry = _resources[std::type_index( typeid( T ) )];
-  registry.insert( resource->getName(), resource );
+  registry.insert( resource->getName(), resource, autoDuplicate );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -64,7 +64,7 @@ inline void ResourceGroup::removeResource( const string& id )
 
 template<typename ResourceType>
 inline typename std::enable_if<std::is_base_of<Alloc<ResourceType>, ResourceType>::value, ResourceType*>::type
-ResourceController::create( const string& name, const string& groupName )
+ResourceController::create( const string& name, const string& groupName, const bool autoDuplicate )
 {
   static_assert( std::is_base_of<IResource, ResourceType>::value, "ResourceType must derived from IResource" );
   ResourceType* resource = nullptr;
@@ -73,7 +73,7 @@ ResourceController::create( const string& name, const string& groupName )
   resource = MemoryAccess::GetPrimaryPoolCluster()->create<ResourceType>();
   resource->setName( name );
   resource->setResourceGroupName( groupName );
-  _getGroup( groupName )->insertResource<ResourceType>( resource );
+  _getGroup( groupName )->insertResource<ResourceType>( resource, autoDuplicate );
   return resource;
 }
 
@@ -81,7 +81,7 @@ ResourceController::create( const string& name, const string& groupName )
 
 template<typename ResourceType>
 inline typename std::enable_if<!std::is_base_of<Alloc<ResourceType>, ResourceType>::value, ResourceType*>::type
-ResourceController::create( const string& name, const string& groupName )
+ResourceController::create( const string& name, const string& groupName, const bool autoDuplicate )
 {
   static_assert( std::is_base_of<IResource, ResourceType>::value, "ResourceType must derived from IResource" );
   ResourceType* resource = nullptr;
@@ -93,7 +93,7 @@ ResourceController::create( const string& name, const string& groupName )
     resource = static_cast< ResourceType* >( functor() );
     resource->setName( name );
     resource->setResourceGroupName( groupName );
-    _getGroup( groupName )->insertResource<ResourceType>( resource );
+    _getGroup( groupName )->insertResource<ResourceType>( resource, autoDuplicate );
   }
   return resource;
 }
