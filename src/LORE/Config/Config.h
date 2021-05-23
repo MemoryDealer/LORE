@@ -57,6 +57,10 @@ namespace Lore {
     // Post-processing.
 
     static float hdrExposure;
+
+    static bool bloomEnabled;
+    static float bloomThreshold;
+    static int bloomBlurPassCount;
     
   };
 

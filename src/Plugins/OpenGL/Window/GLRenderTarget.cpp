@@ -38,13 +38,13 @@ using namespace Lore::OpenGL;
 GLRenderTarget::~GLRenderTarget()
 {
   glDeleteRenderbuffers( 1, &_rbo );
-  glDeleteFramebuffers( 1, &_fbo );
+  glDeleteFramebuffers( _fboCount, _fbo );
   if ( _texture ) {
     Resource::DestroyTexture( _texture );
   }
 
   if ( _multiSampling ) {
-    glDeleteFramebuffers( 1, &_intermediateFBO );
+    glDeleteFramebuffers( _fboCount, _intermediateFBO );
     Resource::DestroyTexture( _intermediateTexture );
   }
 }
@@ -67,8 +67,8 @@ void GLRenderTarget::init( const uint32_t width, const uint32_t height, const ui
   _sampleCount = sampleCount;
 
   // Create a framebuffer.
-  glGenFramebuffers( 1, &_fbo );
-  glBindFramebuffer( GL_FRAMEBUFFER, _fbo );
+  glGenFramebuffers( 1, _fbo );
+  glBindFramebuffer( GL_FRAMEBUFFER, _fbo[0] );
 
   // Generate empty texture to bind to framebuffer.
   _texture = Resource::CreateTexture( _name + "_render_target", _width, _height, sampleCount, getResourceGroupName() );
@@ -97,8 +97,8 @@ void GLRenderTarget::init( const uint32_t width, const uint32_t height, const ui
 
   if ( _multiSampling ) {
     // Configure second post-processing framebuffer.
-    glGenFramebuffers( 1, &_intermediateFBO );
-    glBindFramebuffer( GL_FRAMEBUFFER, _intermediateFBO );
+    glGenFramebuffers( 1, _intermediateFBO );
+    glBindFramebuffer( GL_FRAMEBUFFER, _intermediateFBO[0] );
 
     _intermediateTexture = Resource::CreateTexture( _name + "_int_render_target", _width, _height, 0, getResourceGroupName() );
     auto intGLTexturePtr = ResourceCast<GLTexture>( _intermediateTexture );
@@ -120,8 +120,8 @@ void GLRenderTarget::initDepthShadowMap( const uint32_t width, const uint32_t he
   _sampleCount = sampleCount;
 
   // Create a framebuffer.
-  glGenFramebuffers( 1, &_fbo );
-  glBindFramebuffer( GL_FRAMEBUFFER, _fbo );
+  glGenFramebuffers( 1, _fbo );
+  glBindFramebuffer( GL_FRAMEBUFFER, _fbo[0] );
 
   // Generate empty texture to bind to framebuffer.
   _texture = Resource::CreateDepthTexture( _name + "_render_target", _width, _height, getResourceGroupName() );
@@ -151,8 +151,8 @@ void GLRenderTarget::initDepthShadowCubemap( const uint32_t width, const uint32_
   auto cubemapID = glTexturePtr->getID();
 
   // Create a framebuffer.
-  glGenFramebuffers( 1, &_fbo );
-  glBindFramebuffer( GL_FRAMEBUFFER, _fbo );
+  glGenFramebuffers( 1, _fbo );
+  glBindFramebuffer( GL_FRAMEBUFFER, _fbo[0] );
   glFramebufferTexture( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, cubemapID, 0 );
 
   // We're not using color data.
@@ -173,18 +173,20 @@ void GLRenderTarget::initPostProcessing( const u32 width, const u32 height, cons
   _sampleCount = sampleCount;
 
   // Create a framebuffer.
-  glGenFramebuffers( 1, &_fbo );
-  glBindFramebuffer( GL_FRAMEBUFFER, _fbo );
+  glGenFramebuffers( 1, _fbo );
+  glBindFramebuffer( GL_FRAMEBUFFER, _fbo[0] );
 
-  _texture = Resource::CreateFloatingPointBuffer( _name + "_post_processing_tex", width, height, sampleCount, getResourceGroupName() );
+  // Create textures and bind them to the frame buffer color attachments.
+  _texture = Resource::CreateFloatingPointBuffer( _name + "_post_processing_tex", width, height, sampleCount, 2, getResourceGroupName() );
   auto glTexturePtr = ResourceCast<GLTexture>( _texture );
-  auto textureID = glTexturePtr->getID();
+  glTexturePtr->bind( 0, 0 );
+  glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, ( _multiSampling ) ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D, glTexturePtr->getID( 0 ), 0 );
+  glTexturePtr->bind( 0, 1 );
+  glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, ( _multiSampling ) ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D, glTexturePtr->getID( 1 ), 0 );
 
-  glBindTexture( GL_TEXTURE_2D, textureID );
-  glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, ( _multiSampling ) ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D, textureID, 0 );
 
-  // Generate render buffer object for depth/stencil buffers.
   glGenRenderbuffers( 1, &_rbo );
+  // Use render buffer object for depth/stencil buffers.
   glBindRenderbuffer( GL_RENDERBUFFER, _rbo );
   if ( _multiSampling ) {
     glRenderbufferStorageMultisample( GL_RENDERBUFFER, sampleCount, GL_DEPTH_COMPONENT, _width, _height );
@@ -193,6 +195,10 @@ void GLRenderTarget::initPostProcessing( const u32 width, const u32 height, cons
     glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT, _width, _height );
   }
   glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _rbo );
+
+  // OpenGL needs to know which attachments are used for this fbo.
+  unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+  glDrawBuffers( 2, attachments );
 
   if ( GL_FRAMEBUFFER_COMPLETE != glCheckFramebufferStatus( GL_FRAMEBUFFER ) ) {
     throw Lore::Exception( "Failed to create framebuffer for RenderTarget" );
@@ -203,13 +209,15 @@ void GLRenderTarget::initPostProcessing( const u32 width, const u32 height, cons
 
   if ( _multiSampling ) {
     // Configure second post-processing framebuffer.
-    glGenFramebuffers( 1, &_intermediateFBO );
-    glBindFramebuffer( GL_FRAMEBUFFER, _intermediateFBO );
+    glGenFramebuffers( 1, _intermediateFBO );
+    glBindFramebuffer( GL_FRAMEBUFFER, _intermediateFBO[0] );
 
-    _intermediateTexture = Resource::CreateFloatingPointBuffer( _name + "_int_render_target", _width, _height, 0, getResourceGroupName() );
+    _intermediateTexture = Resource::CreateFloatingPointBuffer( _name + "_int_render_target", _width, _height, 0, 2, getResourceGroupName() );
     auto intGLTexturePtr = ResourceCast<GLTexture>( _intermediateTexture );
-    auto intTextureID = intGLTexturePtr->getID();
-    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, intTextureID, 0 );
+    intGLTexturePtr->bind( 0, 0 );
+    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, intGLTexturePtr->getID( 0 ), 0 );
+    intGLTexturePtr->bind( 0, 1 );
+    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, intGLTexturePtr->getID( 1 ), 0 );
   }
 
   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
@@ -217,9 +225,55 @@ void GLRenderTarget::initPostProcessing( const u32 width, const u32 height, cons
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLRenderTarget::bind() const
+void GLRenderTarget::initDoubleBuffer( const u32 width, const u32 height, const u32 sampleCount )
 {
-  glBindFramebuffer( GL_FRAMEBUFFER, _fbo );
+  _width = width;
+  _height = height;
+  _aspectRatio = static_cast<real>( _width ) / _height;
+  _multiSampling = !!( sampleCount );
+  _sampleCount = sampleCount;
+
+  // Create a framebuffer.
+  glGenFramebuffers( 2, _fbo );
+
+  // Create textures and bind them to the frame buffer color attachments.
+  _texture = Resource::CreateFloatingPointBuffer( _name + "_post_processing_tex", width, height, sampleCount, 2, getResourceGroupName() );
+  auto glTexturePtr = ResourceCast<GLTexture>( _texture );
+
+  for ( int i = 0; i < 2; ++i ) {
+    glBindFramebuffer( GL_FRAMEBUFFER, _fbo[i] );
+    glTexturePtr->bind( 0, i );
+    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, ( _multiSampling ) ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D, glTexturePtr->getID( i ), 0 );
+  }
+
+  if ( GL_FRAMEBUFFER_COMPLETE != glCheckFramebufferStatus( GL_FRAMEBUFFER ) ) {
+    throw Lore::Exception( "Failed to create framebuffer for RenderTarget" );
+  }
+
+  glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+
+  if ( _multiSampling ) {
+    // Configure second post-processing framebuffer.
+    glGenFramebuffers( 2, _intermediateFBO );
+
+    _intermediateTexture = Resource::CreateFloatingPointBuffer( _name + "_int_render_target", _width, _height, 0, 2, getResourceGroupName() );
+    auto intGLTexturePtr = ResourceCast<GLTexture>( _intermediateTexture );
+
+    for ( int i = 0; i < 2; ++i ) {
+      glBindFramebuffer( GL_FRAMEBUFFER, _intermediateFBO[i] );
+      intGLTexturePtr->bind( 0, i );
+      glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, intGLTexturePtr->getID( i ), 0 );
+    }
+  }
+
+  glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLRenderTarget::bind( const u32 fboIdx ) const
+{
+  glBindFramebuffer( GL_FRAMEBUFFER, _fbo[fboIdx] );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -227,9 +281,11 @@ void GLRenderTarget::bind() const
 void GLRenderTarget::flush() const
 {
   if ( _multiSampling ) {
-    glBindFramebuffer( GL_READ_FRAMEBUFFER, _fbo );
-    glBindFramebuffer( GL_DRAW_FRAMEBUFFER, _intermediateFBO );
-    glBlitFramebuffer( 0, 0, _width, _height, 0, 0, _width, _height, GL_COLOR_BUFFER_BIT, GL_NEAREST );
+    for ( u32 i = 0; i < _fboCount; ++i ) {
+      glBindFramebuffer( GL_READ_FRAMEBUFFER, _fbo[i] );
+      glBindFramebuffer( GL_DRAW_FRAMEBUFFER, _intermediateFBO[i] );
+      glBlitFramebuffer( 0, 0, _width, _height, 0, 0, _width, _height, GL_COLOR_BUFFER_BIT, GL_NEAREST );
+    }
   }
 }
 

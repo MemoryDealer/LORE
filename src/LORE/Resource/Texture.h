@@ -65,11 +65,13 @@ namespace Lore {
 
     virtual void createCubemap( const uint32_t width, const uint32_t height ) = 0;
 
-    virtual void createFloatingPoint( const u32 width, const u32 height, const u32 sampleCount ) = 0;
+    virtual void createFloatingPoint( const u32 width, const u32 height, const u32 sampleCount, const u32 texCount ) = 0;
 
-    virtual void bind( const uint32_t idx = 0 ) = 0;
+    virtual void bind( const u32 activeIdx = 0, const u32 texIdx = 0 ) = 0;
 
     virtual void setDefaultActiveTexture() = 0;
+
+    virtual unsigned int getID( const u32 idx = 0 ) const = 0;
 
   };
 

@@ -53,6 +53,10 @@ void DebugUI_GFX::render()
 
   ImGui::SliderFloat( "Exposure", &DebugConfig::hdrExposure, 0.01f, 5.0f );
 
+  ImGui::Checkbox( "Bloom Enabled", &DebugConfig::bloomEnabled );
+  ImGui::SliderFloat( "Bloom Threshold", &DebugConfig::bloomThreshold, 0.1f, 100.0f );
+  ImGui::SliderInt( "Bloom Blur Pass Count", &DebugConfig::bloomBlurPassCount, 1, 50 );
+
   ImGui::End();
 }
 

@@ -519,6 +519,15 @@ RenderTargetPtr Resource::CreatePostProcessingBuffer( const string& name, const 
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+RenderTargetPtr Resource::CreateDoubleBuffer( const string& name, const u32 width, const u32 height, const u32 sampleCount, const string& groupName )
+{
+  auto rt = ActiveContext->getResourceController()->create<RenderTarget>( name, groupName );
+  rt->initDoubleBuffer( width, height, sampleCount );
+  return rt;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 ShaderPtr Resource::CreateShader( const string& name,
                                   const Shader::Type type,
                                   const string& groupName )
@@ -591,10 +600,11 @@ TexturePtr Resource::CreateFloatingPointBuffer( const string& name,
                                                 const u32 width,
                                                 const u32 height,
                                                 const u32 sampleCount,
+                                                const u32 texCount,
                                                 const string& groupName )
 {
   auto texture = ActiveContext->getResourceController()->create<Texture>( name, groupName );
-  texture->createFloatingPoint( width, height, sampleCount );
+  texture->createFloatingPoint( width, height, sampleCount, texCount );
   return texture;
 }
 

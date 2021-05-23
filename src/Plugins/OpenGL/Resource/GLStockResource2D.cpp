@@ -661,7 +661,7 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createPostProcessingProgram( const
   auto vsptr = _controller->create<Shader>( name + "_VS" );
   vsptr->init( Shader::Type::Vertex );
   if ( !vsptr->loadFromSource( src ) ) {
-    throw Lore::Exception( "Failed to compile text vertex shader for " + name );
+    throw Lore::Exception( "Failed to compile vertex shader for " + name );
   }
 
   // ::::::::::::::::::::::::::::::::: //
@@ -682,6 +682,7 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createPostProcessingProgram( const
   // Uniforms.
 
   src += "uniform sampler2D frameBuffer;";
+  src += "uniform sampler2D bloomBlur;";
   src += "uniform float gamma;";
   src += "uniform float exposure;";
 
@@ -691,6 +692,8 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createPostProcessingProgram( const
   src += "void main() {";
   {
     src += "vec3 hdrColor = texture(frameBuffer, TexCoord).rgb;";
+    src += "vec3 bloomColor = texture(bloomBlur, TexCoord).rgb;";
+    src += "hdrColor += bloomColor;";
 
     // Exposure tone mapping.
     src += "vec3 mapped = vec3(1.0) - exp(-hdrColor * exposure);";
@@ -703,7 +706,7 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createPostProcessingProgram( const
   auto fsptr = _controller->create<Shader>( name + "_FS" );
   fsptr->init( Shader::Type::Fragment );
   if ( !fsptr->loadFromSource( src ) ) {
-    throw Lore::Exception( "Failed to compile text fragment shader for " + name );
+    throw Lore::Exception( "Failed to compile fragment shader for " + name );
     // TODO: Rollback vertex shaders in case of failed fragment shader.
   }
 
@@ -721,9 +724,130 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createPostProcessingProgram( const
     throw Lore::Exception( "Failed to link GPUProgram " + name );
   }
 
-  program->addUniformVar( "buffer" );
+  program->addUniformVar( "frameBuffer" );
+  program->addUniformVar( "bloomBlur" );
   program->addUniformVar( "gamma" );
   program->addUniformVar( "exposure" );
+
+  return program;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Lore::GPUProgramPtr GLStockResource2DFactory::createGaussianBlurProgram( const string& name )
+{
+  const string header = "#version " +
+    std::to_string( APIVersion::GetMajor() ) + std::to_string( APIVersion::GetMinor() ) + "0" +
+    " core\n";
+
+  //
+  // Vertex shader.
+
+  string src = header;
+
+  //
+  // Layout.
+
+  src += "layout (location = 0) in vec3 vertex;";
+  src += "layout (location = 1) in vec2 texCoord;";
+
+  //
+  // Uniforms and outs.
+
+  src += "out vec2 TexCoord;";
+
+  //
+  // main function.
+  src += "void main() {";
+  {
+    src += "uint idx = uint(gl_VertexID);";
+    src += "gl_Position = vec4( idx & 1U, idx >> 1U, 0.0, 0.5) * 4.0 - 1.0;"; // From https://gist.github.com/mhalber/0a9b8a78182eb62659fc18d23fe5e94e
+
+    src += "TexCoord = vec2(gl_Position.xy * 0.5 + 0.5);";
+  }
+  src += "}";
+
+  auto vsptr = _controller->create<Shader>( name + "_VS" );
+  vsptr->init( Shader::Type::Vertex );
+  if ( !vsptr->loadFromSource( src ) ) {
+    throw Lore::Exception( "Failed to compile vertex shader for " + name );
+  }
+
+  // ::::::::::::::::::::::::::::::::: //
+
+  //
+  // Fragment shader.
+
+  src.clear();
+  src = header;
+
+  //
+  // Ins/outs and uniforms.
+
+  src += "out vec4 pixel;";
+
+  src += "in vec2 TexCoord;";
+  src += "uniform sampler2D blurBuffer;";
+
+  src += "uniform bool horizontal;";
+
+  src += "uniform float weight[5] = float[] (0.2270270270, 0.1945945946, 0.1216216216, 0.0540540541, 0.0162162162);";
+
+  //
+  // main function.
+
+  src += "void main() {";
+  {
+    src += "vec2 texOffset = 1.0 / textureSize(blurBuffer, 0);"; // Get the size of the texel.
+    src += "vec3 result = texture(blurBuffer, TexCoord).rgb * weight[0];";
+    src += "if (horizontal) {";
+    {
+      src += "for (int i = 1; i < 5; ++i) {";
+      {
+        src += "result += texture(blurBuffer, TexCoord + vec2(texOffset.x * i, 0.0)).rgb * weight[i];";
+        src += "result += texture(blurBuffer, TexCoord - vec2(texOffset.x * i, 0.0)).rgb * weight[i];";
+      }
+      src += "}";
+    }
+    src += "}";
+    src += "else {";
+    {
+      src += "for (int i = 1; i < 5; ++i) {";
+      {
+        src += "result += texture(blurBuffer, TexCoord + vec2(0.0, texOffset.y * i)).rgb * weight[i];";
+        src += "result += texture(blurBuffer, TexCoord - vec2(0.0, texOffset.y * i)).rgb * weight[i];";
+      }
+      src += "}";
+    }
+    src += "}";
+
+    src += "pixel = vec4(result, 1.0);";
+  }
+  src += "}";
+
+  auto fsptr = _controller->create<Shader>( name + "_FS" );
+  fsptr->init( Shader::Type::Fragment );
+  if ( !fsptr->loadFromSource( src ) ) {
+    throw Lore::Exception( "Failed to compile fragment shader for " + name );
+    // TODO: Rollback vertex shaders in case of failed fragment shader.
+  }
+
+  // ::::::::::::::::::::::::::::::::: //
+
+  //
+  // GPU program.
+
+  auto program = _controller->create<Lore::GPUProgram>( name );
+  program->init();
+  program->attachShader( vsptr );
+  program->attachShader( fsptr );
+
+  if ( !program->link() ) {
+    throw Lore::Exception( "Failed to link GPUProgram " + name );
+  }
+
+  program->addUniformVar( "blurBuffer" );
+  program->addUniformVar( "horizontal" );
 
   return program;
 }

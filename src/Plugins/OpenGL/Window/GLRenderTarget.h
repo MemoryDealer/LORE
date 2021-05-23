@@ -46,13 +46,17 @@ namespace Lore { namespace OpenGL {
     void initDepthShadowMap( const uint32_t width, const uint32_t height, const uint32_t sampleCount ) override;
     void initDepthShadowCubemap( const uint32_t width, const uint32_t height ) override;
     void initPostProcessing( const u32 width, const u32 height, const u32 sampleCount ) override;
-    void bind() const override;
+    void initDoubleBuffer( const u32 width, const u32 height, const u32 sampleCount ) override;
+    void bind( const u32 fboIdx = 0 ) const override;
     void flush() const override;
 
   private:
 
-    GLuint _fbo { 0 };
-    GLuint _intermediateFBO { 0 };
+    static constexpr auto MaxFBO = 2;
+
+    GLuint _fbo[MaxFBO] { 0 };
+    u32 _fboCount = 1;
+    GLuint _intermediateFBO[MaxFBO] { 0 };
     GLuint _rbo { 0 };
 
     TexturePtr _intermediateTexture { nullptr };

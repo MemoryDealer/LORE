@@ -89,6 +89,7 @@ void StockResourceController::createStockResources()
     // Create standard program with all params enabled.
     auto& srf = _factories.at( RendererType::Forward2D );
     srf->createPostProcessingProgram( "PostProcessing", params );
+    srf->createGaussianBlurProgram( "GaussianBlur" );
   }
 
   //

@@ -37,7 +37,7 @@ using namespace Lore::OpenGL;
 
 GLTexture::~GLTexture()
 {
-  glDeleteTextures( 1, &_id );
+  glDeleteTextures( _texCount, _id );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -51,8 +51,8 @@ void GLTexture::loadFromFile( const string& file, const bool srgb )
   // Always load with four components so we can have a single code path (e.g., no changing GL_UNPACK_ALIGNMENT etc.).
   unsigned char* pixels = stbi_load( file.c_str(), &width, &height, &n, STBI_rgb_alpha );
   if ( pixels ) {
-    glGenTextures( 1, &_id );
-    glBindTexture( _target, _id );
+    glGenTextures( 1, _id );
+    glBindTexture( _target, _id[0] );
 
     glTexImage2D( _target, 0, ( srgb ) ? GL_SRGB_ALPHA : GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
 
@@ -84,8 +84,8 @@ void GLTexture::loadCubemap( const std::vector<string>& files )
   _target = GL_TEXTURE_CUBE_MAP;
 
   // Generate cubemap texture.
-  glGenTextures( 1, &_id );
-  glBindTexture( _target, _id );
+  glGenTextures( 1, _id );
+  glBindTexture( _target, _id[0] );
 
   // Load each cubemap texture.
   int width, height, comp;
@@ -121,18 +121,18 @@ void GLTexture::loadCubemap( const std::vector<string>& files )
 
 void GLTexture::create( const uint32_t width, const uint32_t height, const uint32_t sampleCount )
 {
-  glGenTextures( 1, &_id );
+  glGenTextures( 1, _id );
 
   if ( sampleCount ) {
     _target = GL_TEXTURE_2D_MULTISAMPLE;
-    glBindTexture( _target, _id );
+    glBindTexture( _target, _id[0] );
 
     // Create texture.
     glTexImage2DMultisample( _target, sampleCount, GL_RGB, width, height, GL_TRUE );
   }
   else {
     _target = GL_TEXTURE_2D;
-    glBindTexture( _target, _id );
+    glBindTexture( _target, _id[0] );
 
     // Create texture.
     glTexImage2D( _target, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr );
@@ -148,8 +148,8 @@ void GLTexture::create( const uint32_t width, const uint32_t height, const uint3
 
 void GLTexture::createDepth( const uint32_t width, const uint32_t height )
 {
-  glGenTextures( 1, &_id );
-  glBindTexture( GL_TEXTURE_2D, _id );
+  glGenTextures( 1, _id );
+  glBindTexture( GL_TEXTURE_2D, _id[0] );
   glTexImage2D( GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr );
   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
@@ -167,8 +167,8 @@ void GLTexture::createDepth( const uint32_t width, const uint32_t height )
 void GLTexture::createCubemap( const uint32_t width, const uint32_t height )
 {
   _target = GL_TEXTURE_CUBE_MAP;
-  glGenTextures( 1, &_id );
-  glBindTexture( _target, _id );
+  glGenTextures( 1, _id );
+  glBindTexture( _target, _id[0] );
 
   for ( uint32_t i = 0; i < 6; ++i ) {
     glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr );
@@ -185,31 +185,45 @@ void GLTexture::createCubemap( const uint32_t width, const uint32_t height )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLTexture::createFloatingPoint( const u32 width, const u32 height, const u32 sampleCount )
+void GLTexture::createFloatingPoint( const u32 width, const u32 height, const u32 sampleCount, const u32 texCount )
 {
+  assert( texCount <= MaxTextures );
+
   if ( sampleCount ) {
     _target = GL_TEXTURE_2D_MULTISAMPLE;
-    glGenTextures( 1, &_id );
-    glBindTexture( _target, _id );
+    glGenTextures( texCount, _id );
 
-    // Create texture.
-    glTexImage2DMultisample( _target, sampleCount, GL_RGBA16F, width, height, GL_TRUE );
+    for ( u32 i = 0; i < texCount; ++i ) {
+      glBindTexture( _target, _id[i] );
 
-    glTexParameteri( _target, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-    glTexParameteri( _target, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+      // Create texture.
+      glTexImage2DMultisample( _target, sampleCount, GL_RGBA16F, width, height, GL_TRUE );
+
+      glTexParameteri( _target, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+      glTexParameteri( _target, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+      glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+      glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+    }
   }
   else {
     _target = GL_TEXTURE_2D;
-    glGenTextures( 1, &_id );
-    glBindTexture( _target, _id );
+    glGenTextures( texCount, _id );
 
-    glTexImage2D( _target, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, nullptr );
+    for ( u32 i = 0; i < texCount; ++i ) {
+      glBindTexture( _target, _id[i] );
 
-    glTexParameteri( _target, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-    glTexParameteri( _target, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+      glTexImage2D( _target, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, nullptr );
+
+      glTexParameteri( _target, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+      glTexParameteri( _target, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+      glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+      glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+    }
   }
 
   glBindTexture( _target, 0 );
+
+  _texCount = texCount;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -253,10 +267,10 @@ void GLTexture::create( const int width, const int height, const Lore::Color& co
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLTexture::bind( const uint32_t idx )
+void GLTexture::bind( const u32 activeIdx, const u32 texIdx )
 {
-  glActiveTexture( GL_TEXTURE0 + idx );
-  glBindTexture( _target, _id );
+  glActiveTexture( GL_TEXTURE0 + activeIdx);
+  glBindTexture( _target, _id[texIdx] );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -271,8 +285,8 @@ void GLTexture::setDefaultActiveTexture()
 
 void GLTexture::_createGLTexture( const unsigned char* pixels, const int width, const int height, const bool srgb, const bool genMipMaps )
 {
-  glGenTextures( 1, &_id );
-  glBindTexture( _target, _id );
+  glGenTextures( 1, _id );
+  glBindTexture( _target, _id[0] );
 
   // Create the OpenGL texture.
   glTexImage2D( _target, 0, ( srgb ) ? GL_SRGB_ALPHA : GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels );

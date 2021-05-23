@@ -47,6 +47,18 @@ using namespace LocalNS;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+Camera::~Camera()
+{
+  Resource::DestroyRenderTarget( postProcessing->renderTarget );
+  Resource::DestroyRenderTarget( postProcessing->doubleBuffer );
+  Resource::DestroySprite( postProcessing->entity->_material->sprite );
+  Resource::DestroySprite( postProcessing->doubleBufferEntity->_material->sprite );
+  Resource::DestroyEntity( postProcessing->entity );
+  Resource::DestroyEntity( postProcessing->doubleBufferEntity );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 void Camera::setPosition( const glm::vec2& pos )
 {
   setPosition( glm::vec3( pos.x, pos.y, 0.f ) );
@@ -178,13 +190,17 @@ void Camera::initPostProcessing( const u32 width, const u32 height, const u32 sa
 {
   if ( postProcessing ) {
     Resource::DestroyRenderTarget( postProcessing->renderTarget );
+    Resource::DestroyRenderTarget( postProcessing->doubleBuffer );
     Resource::DestroySprite( postProcessing->entity->_material->sprite );
+    Resource::DestroySprite( postProcessing->doubleBufferEntity->_material->sprite );
     Resource::DestroyEntity( postProcessing->entity );
+    Resource::DestroyEntity( postProcessing->doubleBufferEntity );
   }
 
   postProcessing = std::make_unique<PostProcessing>();
 
-  postProcessing->renderTarget = Resource::CreatePostProcessingBuffer( _name + "_post_buffer", width, height, sampleCount );
+  postProcessing->renderTarget = Resource::CreatePostProcessingBuffer( _name + "_post_buffer", width, height, 0 ); // multisampling is fucking everything up
+  postProcessing->doubleBuffer = Resource::CreateDoubleBuffer( _name + "_double_buffer", width, height, 0 );
 
   // We need an entity for rendering our fullscreen quad.
   postProcessing->entity = Resource::CreateEntity( _name + "_entity", Mesh::Type::FullscreenQuad );
@@ -195,6 +211,15 @@ void Camera::initPostProcessing( const u32 width, const u32 height, const u32 sa
   sprite->addTexture( Texture::Type::Diffuse, postProcessing->renderTarget->getTexture() );
   postProcessing->entity->_material->sprite = sprite;
   postProcessing->entity->_material->lighting = false;
+
+  // Also create an entity for the double buffering.
+  postProcessing->doubleBufferEntity = Resource::CreateEntity( _name + "_db_entity", Mesh::Type::FullscreenQuad );
+  postProcessing->doubleBufferEntity->_material->program = StockResource::GetGPUProgram( "GaussianBlur" );
+
+  auto dbSprite = Resource::CreateSprite( _name + "_post_db_sprite" );
+  dbSprite->addTexture( Texture::Type::Diffuse, postProcessing->renderTarget->getTexture() );
+  postProcessing->doubleBufferEntity->_material->sprite = dbSprite;
+  postProcessing->doubleBufferEntity->_material->lighting = false;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

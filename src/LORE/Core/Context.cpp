@@ -68,6 +68,8 @@ Context::~Context()
 {
   NotificationUnsubscribe( WindowEventNotification, &Context::onWindowEvent );
 
+  destroyAllCameras();
+
   // Explicitly destroy Entity/Model/Scene objects before resources, otherwise the order of destruction
   // in the pool cluster can lead to crashes, since resources (such as Box or Light) can be destroyed
   // before the owning object tries to delete them (AABBs for Boxes).
@@ -212,6 +214,13 @@ void Context::destroyCamera( CameraPtr camera )
   auto name = camera->getName();
   LogWrite( Info, "Destroying camera %s", name.c_str() );
   _cameras.erase( name );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Context::destroyAllCameras()
+{
+  _cameras.clear();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

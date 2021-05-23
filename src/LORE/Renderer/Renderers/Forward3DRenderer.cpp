@@ -266,7 +266,7 @@ void Forward3DRenderer::_presentPostProcessing( const RenderView& rv,
                        static_cast<uint32_t>( rv.viewport.w * rv.renderTarget->getWidth() ),
                        static_cast<uint32_t>( rv.viewport.h * rv.renderTarget->getHeight() ) );
     rv.renderTarget->bind();
-    aspectRatio = rv.camera->postProcessing->renderTarget->getAspectRatio();
+    aspectRatio = rv.renderTarget->getAspectRatio();
   }
   else {
     // TODO: Get rid of gl_viewport.
@@ -293,14 +293,66 @@ void Forward3DRenderer::_presentPostProcessing( const RenderView& rv,
   _api->setCullingMode( IRenderAPI::CullingMode::Back );
 
   const Camera::PostProcessing* p = rv.camera->postProcessing.get();
+
+  //
+  // First do a Gaussian blur for bloom.
+
+  ModelPtr blurModel = p->doubleBufferEntity->getModel();
+  GPUProgramPtr blurProgram = p->doubleBufferEntity->_material->program;
+  blurProgram->use();
+
+  int blurAmount = 10;
+#ifdef LORE_DEBUG_UI
+  blurAmount = DebugConfig::bloomBlurPassCount;
+#endif
+
+  TexturePtr blurBuffer = p->doubleBuffer->getTexture();
+
+  bool horizontal = true, firstIt = true;
+  for ( int i = 0; i < blurAmount; ++i ) {
+    p->doubleBuffer->bind( static_cast<u32>( horizontal ) );
+
+    blurProgram->setUniformVar( "horizontal", horizontal );
+    if ( firstIt ) {
+      // Bind the bright pixel color buffer for first iteration.
+      p->renderTarget->getTexture()->bind( 0, 1 );
+      blurProgram->setUniformVar( "blurBuffer", p->renderTarget->getTexture()->getID( 1 ) );
+      firstIt = false;
+    }
+    else {
+      const auto idx = static_cast<u32>( !horizontal );
+      blurBuffer->bind( 0, idx);
+      blurProgram->setUniformVar( "blurBuffer", blurBuffer->getID( idx ) );
+    }
+
+    blurModel->draw( blurProgram );
+
+    horizontal = !horizontal;
+  }
+
+  if ( rv.renderTarget ) {
+    rv.renderTarget->bind();
+  }
+  else {
+    _api->bindDefaultFramebuffer();
+  }
+
+  //
+  // Render the final output to a fullscreen quad.
+
+  _api->clear();
+
   ModelPtr model = p->entity->getModel();
   GPUProgramPtr program = p->entity->_material->program;
-
   program->use();
 
   TexturePtr buffer = p->renderTarget->getTexture();
-  buffer->bind();
-  program->setUniformVar( "buffer", 0 );
+  buffer->bind( 0 );
+  program->setUniformVar( "frameBuffer", 0 );
+
+  const auto bloomIdx = static_cast<u32>( !horizontal );
+  blurBuffer->bind( 1, bloomIdx );
+  program->setUniformVar( "bloomBlur", 1 );
 
   program->setUniformVar( "gamma", p->gamma );
 

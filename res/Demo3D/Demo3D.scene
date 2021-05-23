@@ -33,7 +33,9 @@
     "Light": {
       "Model": "res/Demo3D/Models/cube.fbx",
       "MaterialSettings": {
-        "Ambient": [10.0, 10.0, 10.0]
+        "Ambient": [20.0, 20.0, 20.0],
+        "Diffuse": [20.0, 20.0, 20.0],
+        "Specular": [20.0, 20.0, 20.0]
       }
     },
     "Star": {
@@ -66,8 +68,8 @@
     "PointLight1": {
       "Type": "Point",
       "Ambient": [0.05, 0.05, 0.05],
-      "Diffuse": [2.8, 2.8, 2.0],
-      "Specular": [0.8, 0.8, 1.0],
+      "Diffuse": [0.3, 0.3, 0.3],
+      "Specular": [0.3, 0.3, 0.3],
       "Attenuation": [15.5, 0.5, 0.1, 0.1]
     }
   },
