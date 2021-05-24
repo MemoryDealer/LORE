@@ -693,6 +693,7 @@ Lore::GPUProgramPtr GLStockResource2DFactory::createPostProcessingProgram( const
   {
     src += "vec3 hdrColor = texture(frameBuffer, TexCoord).rgb;";
     src += "vec3 bloomColor = texture(bloomBlur, TexCoord).rgb;";
+
     src += "hdrColor += bloomColor;";
 
     // Exposure tone mapping.

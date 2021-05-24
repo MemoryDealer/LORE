@@ -609,8 +609,9 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     // Final pixel.
     src += "pixel = vec4(result, material.diffuse.a);";
 
-    // Bright pixel for bloom.
-    src += "float brightness = dot(result, vec3(0.2126, 0.7152, 0.0722));";
+    // Bright pixel pass for bloom.
+    src += "vec3 lumConst = vec3(0.2126, 0.7152, 0.0722);";
+    src += "float brightness = dot(result, lumConst);";
     src += "if (brightness > bloomThreshold) {";
     {
       src += "brightPixel = vec4(pixel.rgb, 1.0);";
