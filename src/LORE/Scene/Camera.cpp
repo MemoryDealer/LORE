@@ -49,12 +49,14 @@ using namespace LocalNS;
 
 Camera::~Camera()
 {
-  Resource::DestroyRenderTarget( postProcessing->renderTarget );
-  Resource::DestroyRenderTarget( postProcessing->doubleBuffer );
-  Resource::DestroySprite( postProcessing->entity->_material->sprite );
-  Resource::DestroySprite( postProcessing->doubleBufferEntity->_material->sprite );
-  Resource::DestroyEntity( postProcessing->entity );
-  Resource::DestroyEntity( postProcessing->doubleBufferEntity );
+  if ( postProcessing ) {
+    Resource::DestroyRenderTarget( postProcessing->renderTarget );
+    Resource::DestroyRenderTarget( postProcessing->doubleBuffer );
+    Resource::DestroySprite( postProcessing->entity->_material->sprite );
+    Resource::DestroySprite( postProcessing->doubleBufferEntity->_material->sprite );
+    Resource::DestroyEntity( postProcessing->entity );
+    Resource::DestroyEntity( postProcessing->doubleBufferEntity );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
