@@ -1271,7 +1271,8 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createSkyboxProgram( const string&
 
   // Ins/outs and uniforms.
 
-  src += "out vec4 pixel;";
+  src += "layout (location = 0) out vec4 pixel;";
+  src += "layout (location = 1) out vec4 brightPixel;";
 
   src += "in vec3 TexCoords;";
 
@@ -1284,6 +1285,9 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createSkyboxProgram( const string&
   {
     // Sample the texture value from the cubemap.
     src += "pixel = texture(skybox, TexCoords);";
+
+    // Don't bloom the skybox.
+    src += "brightPixel = vec4(0.0, 0.0, 0.0, 1.0);";
   }
   src += "}";
 
