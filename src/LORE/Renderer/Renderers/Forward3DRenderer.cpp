@@ -316,13 +316,11 @@ void Forward3DRenderer::_presentPostProcessing( const RenderView& rv,
     if ( firstIt ) {
       // Bind the bright pixel color buffer for first iteration.
       p->renderTarget->getTexture()->bind( 0, 1 );
-      blurProgram->setUniformVar( "blurBuffer", p->renderTarget->getTexture()->getID( 1 ) );
       firstIt = false;
     }
     else {
       const auto idx = static_cast<u32>( !horizontal );
       blurBuffer->bind( 0, idx);
-      blurProgram->setUniformVar( "blurBuffer", blurBuffer->getID( idx ) );
     }
 
     blurModel->draw( blurProgram );

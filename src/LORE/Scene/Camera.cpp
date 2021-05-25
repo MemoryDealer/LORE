@@ -201,7 +201,7 @@ void Camera::initPostProcessing( const u32 width, const u32 height, const u32 sa
 
   postProcessing = std::make_unique<PostProcessing>();
 
-  postProcessing->renderTarget = Resource::CreatePostProcessingBuffer( _name + "_post_buffer", width, height, 0 ); // multisampling is fucking everything up
+  postProcessing->renderTarget = Resource::CreatePostProcessingBuffer( _name + "_post_buffer", width, height, sampleCount );
   postProcessing->doubleBuffer = Resource::CreateDoubleBuffer( _name + "_double_buffer", width, height, 0 );
 
   // We need an entity for rendering our fullscreen quad.
@@ -219,7 +219,7 @@ void Camera::initPostProcessing( const u32 width, const u32 height, const u32 sa
   postProcessing->doubleBufferEntity->_material->program = StockResource::GetGPUProgram( "GaussianBlur" );
 
   auto dbSprite = Resource::CreateSprite( _name + "_post_db_sprite" );
-  dbSprite->addTexture( Texture::Type::Diffuse, postProcessing->renderTarget->getTexture() );
+  dbSprite->addTexture( Texture::Type::Diffuse, postProcessing->doubleBuffer->getTexture() );
   postProcessing->doubleBufferEntity->_material->sprite = dbSprite;
   postProcessing->doubleBufferEntity->_material->lighting = false;
 }

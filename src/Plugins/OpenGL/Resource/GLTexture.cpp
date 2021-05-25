@@ -197,12 +197,14 @@ void GLTexture::createFloatingPoint( const u32 width, const u32 height, const u3
       glBindTexture( _target, _id[i] );
 
       // Create texture.
+
       glTexImage2DMultisample( _target, sampleCount, GL_RGBA16F, width, height, GL_TRUE );
 
-      glTexParameteri( _target, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-      glTexParameteri( _target, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-      glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-      glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+      // TODO: Are any parameters needed/possible?
+      //glTexParameteri( _target, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+      //glTexParameteri( _target, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+      //glTexParameteri( _target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+      //glTexParameteri( _target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
     }
   }
   else {
@@ -216,8 +218,8 @@ void GLTexture::createFloatingPoint( const u32 width, const u32 height, const u3
 
       glTexParameteri( _target, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
       glTexParameteri( _target, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-      glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-      glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+      glTexParameteri( _target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+      glTexParameteri( _target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
     }
   }
 

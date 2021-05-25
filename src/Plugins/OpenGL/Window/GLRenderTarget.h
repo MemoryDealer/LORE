@@ -63,6 +63,9 @@ namespace Lore { namespace OpenGL {
 
     bool _multiSampling { false };
 
+    static constexpr auto MaxColorAttachments = 8;
+    u32 _colorAttachmentCount { 1 };
+    u32 _colorAttachments[MaxColorAttachments] {};
   };
 
 }}

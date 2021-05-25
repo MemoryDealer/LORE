@@ -107,6 +107,7 @@ void GLRenderTarget::init( const uint32_t width, const uint32_t height, const ui
   }
 
   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+  _colorAttachments[0] = GL_COLOR_ATTACHMENT0;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -184,9 +185,8 @@ void GLRenderTarget::initPostProcessing( const u32 width, const u32 height, cons
   glTexturePtr->bind( 0, 1 );
   glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, ( _multiSampling ) ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D, glTexturePtr->getID( 1 ), 0 );
 
-
-  glGenRenderbuffers( 1, &_rbo );
   // Use render buffer object for depth/stencil buffers.
+  glGenRenderbuffers( 1, &_rbo );
   glBindRenderbuffer( GL_RENDERBUFFER, _rbo );
   if ( _multiSampling ) {
     glRenderbufferStorageMultisample( GL_RENDERBUFFER, sampleCount, GL_DEPTH_COMPONENT, _width, _height );
@@ -196,9 +196,11 @@ void GLRenderTarget::initPostProcessing( const u32 width, const u32 height, cons
   }
   glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _rbo );
 
-  // OpenGL needs to know which attachments are used for this fbo.
-  unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-  glDrawBuffers( 2, attachments );
+  // We are rendering pixels for blooming to the second color attachment for blurring, setup the state on this FBO.
+  _colorAttachmentCount = 2;
+  _colorAttachments[0] = GL_COLOR_ATTACHMENT0;
+  _colorAttachments[1] = GL_COLOR_ATTACHMENT1;
+  glDrawBuffers( _colorAttachmentCount, _colorAttachments );
 
   if ( GL_FRAMEBUFFER_COMPLETE != glCheckFramebufferStatus( GL_FRAMEBUFFER ) ) {
     throw Lore::Exception( "Failed to create framebuffer for RenderTarget" );
@@ -218,6 +220,13 @@ void GLRenderTarget::initPostProcessing( const u32 width, const u32 height, cons
     glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, intGLTexturePtr->getID( 0 ), 0 );
     intGLTexturePtr->bind( 0, 1 );
     glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, intGLTexturePtr->getID( 1 ), 0 );
+
+    // Also setup the color attachment state for the blit target FBO.
+    glDrawBuffers( _colorAttachmentCount, _colorAttachments );
+
+    if ( GL_FRAMEBUFFER_COMPLETE != glCheckFramebufferStatus( GL_FRAMEBUFFER ) ) {
+      throw Lore::Exception( "Failed to create intermediate framebuffer for RenderTarget" );
+    }
   }
 
   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
@@ -267,6 +276,7 @@ void GLRenderTarget::initDoubleBuffer( const u32 width, const u32 height, const 
   }
 
   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+  _fboCount = 2;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -284,7 +294,16 @@ void GLRenderTarget::flush() const
     for ( u32 i = 0; i < _fboCount; ++i ) {
       glBindFramebuffer( GL_READ_FRAMEBUFFER, _fbo[i] );
       glBindFramebuffer( GL_DRAW_FRAMEBUFFER, _intermediateFBO[i] );
-      glBlitFramebuffer( 0, 0, _width, _height, 0, 0, _width, _height, GL_COLOR_BUFFER_BIT, GL_NEAREST );
+
+      // Blit each color attachment individually (otherwise only the first one will work).
+      for ( u32 colorAttachment = 0; colorAttachment < _colorAttachmentCount; ++colorAttachment ) {
+        glReadBuffer( GL_COLOR_ATTACHMENT0 + colorAttachment );
+        glDrawBuffer( GL_COLOR_ATTACHMENT0 + colorAttachment );
+        glBlitFramebuffer( 0, 0, _width, _height, 0, 0, _width, _height, GL_COLOR_BUFFER_BIT, GL_NEAREST );
+      }
+
+      // Restore the original framebuffer state.
+      glDrawBuffers( _colorAttachmentCount, _colorAttachments );
     }
   }
 }
