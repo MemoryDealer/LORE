@@ -1278,6 +1278,8 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createSkyboxProgram( const string&
 
   src += "uniform samplerCube skybox;";
 
+  src += "uniform float gamma;";
+
   //
   // main function.
 
@@ -1285,6 +1287,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createSkyboxProgram( const string&
   {
     // Sample the texture value from the cubemap.
     src += "pixel = texture(skybox, TexCoords);";
+    src += "pixel.rgb = pow(pixel.rgb, vec3(gamma));"; // Invert gamma correction for post-processing (it doesn't appear to be needed).
 
     // Don't bloom the skybox.
     src += "brightPixel = vec4(0.0, 0.0, 0.0, 1.0);";
@@ -1315,6 +1318,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createSkyboxProgram( const string&
   // Add uniforms.
 
   program->addUniformVar( "viewProjection" );
+  program->addUniformVar( "gamma" );
 
   // Uniform updaters.
 

@@ -539,6 +539,14 @@ void Forward3DRenderer::_renderSkybox( const RenderView& rv,
     program->updateUniforms( rv, material, emptyLightData );
     // TODO: Pass in camera node when camera is updated to use a scene node.
     program->updateNodeUniforms( material, nullptr, viewProjection );
+
+    if ( rv.camera->postProcessing ) {
+      program->setUniformVar( "gamma", rv.camera->postProcessing->gamma );
+    }
+    else {
+      program->setUniformVar( "gamma", 1.0f );
+    }
+
     model->draw( program );
   }
 
