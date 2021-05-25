@@ -183,6 +183,10 @@ void GLWindow::setTitle( const string& title )
 
 void GLWindow::setDimensions( const int width, const int height )
 {
+  if ( 0 == width && 0 == height ) {
+    return; // This can happen when hitting Windows + D for example.
+  }
+
   Lore::Window::setDimensions( width, height );
 
   glfwSetWindowSize( _window, width, height );
