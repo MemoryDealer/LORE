@@ -44,10 +44,21 @@ namespace Lore {
       Type3D
     };
 
+    struct PostProcessing
+    {
+      RenderTargetPtr renderTarget {};
+      RenderTargetPtr doubleBuffer {}; // For Gaussian blur.
+      EntityPtr entity {};
+      EntityPtr doubleBufferEntity {};
+      float exposure { 0.5f };
+      float bloomThreshold { 10.0f };
+      float gamma { 2.2f };
+    };
+
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     Camera() = default;
-    virtual ~Camera() = default;
+    virtual ~Camera();
 
     //
     // Modifiers.
@@ -78,6 +89,8 @@ namespace Lore {
 
     virtual void lookAt( const glm::vec3& pos, const glm::vec3& target, const glm::vec3& up ) = 0;
 
+    void initPostProcessing( const u32 width, const u32 height, const u32 sampleCount );
+
     //
     // Getters.
 
@@ -100,7 +113,7 @@ namespace Lore {
 
     void updateTracking();
 
-  protected:
+  ///
 
     friend class Context;
 
@@ -122,6 +135,8 @@ namespace Lore {
 
     NodePtr _trackingNode { nullptr };
     TrackingStyle _trackingStyle { TrackingStyle::Simple };
+
+    std::unique_ptr<PostProcessing> postProcessing {};
 
   };
 

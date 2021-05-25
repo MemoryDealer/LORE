@@ -62,6 +62,12 @@ namespace Lore {
     Mode mode { Mode::Reflect };
   };
 
+  struct PostProcessingProgramParameters
+  {
+    bool hdr { true };
+    bool bloom { false };
+  };
+
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
   
   ///
@@ -84,6 +90,8 @@ namespace Lore {
     virtual GPUProgramPtr createCubemapShadowProgram( const string& name, const bool instanced ) = 0;
     virtual GPUProgramPtr createSkyboxProgram( const string& name, const SkyboxProgramParameters& params ) = 0;
     virtual GPUProgramPtr createEnvironmentMappingProgram( const string& name, const EnvironmentMappingProgramParameters& params ) = 0;
+    virtual GPUProgramPtr createPostProcessingProgram( const string& name, const PostProcessingProgramParameters& params ) = 0;
+    virtual GPUProgramPtr createGaussianBlurProgram( const string& name ) = 0;
     virtual GPUProgramPtr createBoxProgram( const string& name ) = 0;
 
   protected:

@@ -407,6 +407,7 @@ EntityPtr Resource::CreateEntity( const string& name, const Mesh::Type& modelTyp
   break;
 
   case Mesh::Type::TexturedQuad:
+  case Mesh::Type::FullscreenQuad:
   {
     auto material = StockResource::GetMaterial( "StandardTextured2D" );
     entity->setMaterial( material->clone( "StandardTextured2D_" + name ) );
@@ -466,7 +467,8 @@ MaterialPtr Resource::CreateMaterial( const string& name, const string& groupNam
 
 MeshPtr Resource::CreateMesh( const string& name, const Mesh::Type& type, const string& groupName )
 {
-  auto mesh = ActiveContext->getResourceController()->create<Mesh>( name, groupName );
+  // Always duplicate meshes, else multiple entities loading the same model in a scene will break instancing/node setup.
+  auto mesh = ActiveContext->getResourceController()->create<Mesh>( name, groupName, true );
   mesh->init( type );
   return mesh;
 }
@@ -475,7 +477,8 @@ MeshPtr Resource::CreateMesh( const string& name, const Mesh::Type& type, const 
 
 ModelPtr Resource::CreateModel( const string& name, const Mesh::Type& type, const string& groupName )
 {
-  return ActiveContext->getResourceController()->create<Model>( name, groupName );
+  // Always duplicate models, else multiple entities loading the same model in a scene will break instancing/node setup.
+  return ActiveContext->getResourceController()->create<Model>( name, groupName, true );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -502,6 +505,24 @@ RenderTargetPtr Resource::CreateDepthShadowCubemap( const string& name, const ui
 {
   auto rt = ActiveContext->getResourceController()->create<RenderTarget>( name, groupName );
   rt->initDepthShadowCubemap( width, height );
+  return rt;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+RenderTargetPtr Resource::CreatePostProcessingBuffer( const string& name, const u32 width, const u32 height, const u32 sampleCount, const string& groupName )
+{
+  auto rt = ActiveContext->getResourceController()->create<RenderTarget>( name, groupName );
+  rt->initPostProcessing( width, height, sampleCount );
+  return rt;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+RenderTargetPtr Resource::CreateDoubleBuffer( const string& name, const u32 width, const u32 height, const u32 sampleCount, const string& groupName )
+{
+  auto rt = ActiveContext->getResourceController()->create<RenderTarget>( name, groupName );
+  rt->initDoubleBuffer( width, height, sampleCount );
   return rt;
 }
 
@@ -570,6 +591,20 @@ TexturePtr Resource::CreateCubemap( const string& name,
 {
   auto texture = ActiveContext->getResourceController()->create<Texture>( name, groupName );
   texture->createCubemap( width, height );
+  return texture;
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+TexturePtr Resource::CreateFloatingPointBuffer( const string& name,
+                                                const u32 width,
+                                                const u32 height,
+                                                const u32 sampleCount,
+                                                const u32 texCount,
+                                                const string& groupName )
+{
+  auto texture = ActiveContext->getResourceController()->create<Texture>( name, groupName );
+  texture->createFloatingPoint( width, height, sampleCount, texCount );
   return texture;
 }
 

@@ -1,4 +1,3 @@
-#pragma once
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // The MIT License (MIT)
 // This source file is part of LORE
@@ -25,49 +24,44 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE/Memory/Alloc.h>
-#include <LORE/Window/RenderTarget.h>
+#ifdef LORE_DEBUG_UI
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore { namespace OpenGL {
+#include "GFX.h"
 
-  class GLRenderTarget : public Lore::RenderTarget,
-                         public Alloc<GLRenderTarget>
-  {
+#include <External/imgui/imgui.h>
 
-  public:
+#include <LORE/Config/Config.h>
 
-    GLRenderTarget() = default;
-    ~GLRenderTarget() override;
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    TexturePtr getTexture() const override;
-    void init( const uint32_t width, const uint32_t height, const uint32_t sampleCount ) override;
-    void initDepthShadowMap( const uint32_t width, const uint32_t height, const uint32_t sampleCount ) override;
-    void initDepthShadowCubemap( const uint32_t width, const uint32_t height ) override;
-    void initPostProcessing( const u32 width, const u32 height, const u32 sampleCount ) override;
-    void initDoubleBuffer( const u32 width, const u32 height, const u32 sampleCount ) override;
-    void bind( const u32 fboIdx = 0 ) const override;
-    void flush() const override;
+using namespace Lore;
 
-  private:
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    static constexpr auto MaxFBO = 2;
+DebugUI_GFX::DebugUI_GFX()
+{
 
-    GLuint _fbo[MaxFBO] { 0 };
-    u32 _fboCount = 1;
-    GLuint _intermediateFBO[MaxFBO] { 0 };
-    GLuint _rbo { 0 };
+}
 
-    TexturePtr _intermediateTexture { nullptr };
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    bool _multiSampling { false };
+void DebugUI_GFX::render()
+{
+  ImGui::Begin( "GFX", nullptr );
 
-    static constexpr auto MaxColorAttachments = 8;
-    u32 _colorAttachmentCount { 1 };
-    u32 _colorAttachments[MaxColorAttachments] {};
-  };
+  ImGui::SliderFloat( "Exposure", &DebugConfig::hdrExposure, 0.01f, 5.0f );
 
-}}
+  ImGui::Checkbox( "Bloom Enabled", &DebugConfig::bloomEnabled );
+  ImGui::SliderFloat( "Bloom Threshold", &DebugConfig::bloomThreshold, 0.1f, 100.0f );
+  ImGui::SliderInt( "Bloom Blur Pass Count", &DebugConfig::bloomBlurPassCount, 1, 50 );
+
+  ImGui::End();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+#endif
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

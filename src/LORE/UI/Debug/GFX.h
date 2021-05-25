@@ -25,49 +25,42 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE/Memory/Alloc.h>
-#include <LORE/Window/RenderTarget.h>
+#ifdef LORE_DEBUG_UI
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-namespace Lore { namespace OpenGL {
+#include <LORE/Core/Timer.h>
 
-  class GLRenderTarget : public Lore::RenderTarget,
-                         public Alloc<GLRenderTarget>
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+namespace Lore {
+
+  struct DebugUI_GFX final
   {
 
-  public:
+    Dimensions windowDimensions {};
 
-    GLRenderTarget() = default;
-    ~GLRenderTarget() override;
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    TexturePtr getTexture() const override;
-    void init( const uint32_t width, const uint32_t height, const uint32_t sampleCount ) override;
-    void initDepthShadowMap( const uint32_t width, const uint32_t height, const uint32_t sampleCount ) override;
-    void initDepthShadowCubemap( const uint32_t width, const uint32_t height ) override;
-    void initPostProcessing( const u32 width, const u32 height, const u32 sampleCount ) override;
-    void initDoubleBuffer( const u32 width, const u32 height, const u32 sampleCount ) override;
-    void bind( const u32 fboIdx = 0 ) const override;
-    void flush() const override;
+    DebugUI_GFX();
+    ~DebugUI_GFX() = default;
 
-  private:
+    void render();
 
-    static constexpr auto MaxFBO = 2;
+    //
+    // Modifiers.
 
-    GLuint _fbo[MaxFBO] { 0 };
-    u32 _fboCount = 1;
-    GLuint _intermediateFBO[MaxFBO] { 0 };
-    GLuint _rbo { 0 };
+    void setWindowDimensions( const Dimensions& dimensions )
+    {
+      windowDimensions = dimensions;
+    }
 
-    TexturePtr _intermediateTexture { nullptr };
-
-    bool _multiSampling { false };
-
-    static constexpr auto MaxColorAttachments = 8;
-    u32 _colorAttachmentCount { 1 };
-    u32 _colorAttachments[MaxColorAttachments] {};
   };
 
-}}
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+#endif
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

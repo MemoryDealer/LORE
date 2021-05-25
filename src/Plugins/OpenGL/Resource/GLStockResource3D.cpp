@@ -26,6 +26,7 @@
 
 #include "GLStockResource.h"
 
+#include <LORE/Config/Config.h>
 #include <LORE/Core/APIVersion.h>
 #include <LORE/Resource/Material.h>
 #include <LORE/Resource/Sprite.h>
@@ -280,6 +281,8 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     }
   }
 
+  src += "uniform float bloomThreshold;";
+
   // Material.
   src += "struct Material {";
   {
@@ -292,7 +295,8 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
   src += "uniform Material material;";
 
   // Final pixel output color.
-  src += "out vec4 pixel;";
+  src += "layout (location = 0) out vec4 pixel;";
+  src += "layout (location = 1) out vec4 brightPixel;";
 
   // Lighting.
   if ( lit ) {
@@ -605,6 +609,20 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     // Final pixel.
     src += "pixel = vec4(result, material.diffuse.a);";
 
+    // Bright pixel pass for bloom.
+    src += "vec3 lumConst = vec3(0.2126, 0.7152, 0.0722);";
+    src += "float brightness = dot(result, lumConst);";
+    src += "if (brightness > bloomThreshold) {";
+    {
+      src += "brightPixel = vec4(pixel.rgb, 1.0);";
+    }
+    src += "}";
+    src += "else {";
+    {
+      src += "brightPixel = vec4(0.0, 0.0, 0.0, 1.0);";
+    }
+    src += "}";
+
     // Gamma correction.
     src += "pixel.rgb = pow(pixel.rgb, vec3(1.0 / gamma));";
   }
@@ -639,6 +657,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
   program->addTransformVar( "transform" );
 
   program->addUniformVar( "gamma" );
+  program->addUniformVar( "bloomThreshold" );
 
   if ( lit ) {
     program->addUniformVar( "model" );
@@ -713,6 +732,11 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       program->setUniformVar( "viewPos", rv.camera->getPosition() );
 
       program->setUniformVar( "gamma", rv.gamma );
+#ifdef LORE_DEBUG_UI
+      program->setUniformVar( "bloomThreshold", DebugConfig::bloomEnabled ? DebugConfig::bloomThreshold : 9999999.0f );
+#else
+      program->setUniformVar( "bloomThreshold", rv.camera->postProcessing->bloomThreshold );
+#endif
 
       // Update material uniforms.
       program->setUniformVar( "material.ambient", material->ambient );
@@ -1247,11 +1271,14 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createSkyboxProgram( const string&
 
   // Ins/outs and uniforms.
 
-  src += "out vec4 pixel;";
+  src += "layout (location = 0) out vec4 pixel;";
+  src += "layout (location = 1) out vec4 brightPixel;";
 
   src += "in vec3 TexCoords;";
 
   src += "uniform samplerCube skybox;";
+
+  src += "uniform float gamma;";
 
   //
   // main function.
@@ -1260,6 +1287,10 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createSkyboxProgram( const string&
   {
     // Sample the texture value from the cubemap.
     src += "pixel = texture(skybox, TexCoords);";
+    src += "pixel.rgb = pow(pixel.rgb, vec3(gamma));"; // Invert gamma correction for post-processing (it doesn't appear to be needed).
+
+    // Don't bloom the skybox.
+    src += "brightPixel = vec4(0.0, 0.0, 0.0, 1.0);";
   }
   src += "}";
 
@@ -1287,6 +1318,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createSkyboxProgram( const string&
   // Add uniforms.
 
   program->addUniformVar( "viewProjection" );
+  program->addUniformVar( "gamma" );
 
   // Uniform updaters.
 

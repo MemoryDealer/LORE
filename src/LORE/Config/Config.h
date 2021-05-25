@@ -44,6 +44,31 @@ namespace Lore {
 
   };
 
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  // Global debug values (used in debug UI).
+#ifdef LORE_DEBUG_UI
+
+  struct LORE_EXPORT DebugConfig final
+  {
+    //
+    // GFX.
+
+    // Post-processing.
+
+    static float hdrExposure;
+
+    static bool bloomEnabled;
+    static float bloomThreshold;
+    static int bloomBlurPassCount;
+    
+  };
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  
+
+#endif
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

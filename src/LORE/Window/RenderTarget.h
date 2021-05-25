@@ -49,8 +49,10 @@ namespace Lore {
     virtual void init( const uint32_t width, const uint32_t height, const uint32_t sampleCount ) = 0;
     virtual void initDepthShadowMap( const uint32_t width, const uint32_t height, const uint32_t sampleCount ) = 0;
     virtual void initDepthShadowCubemap( const uint32_t width, const uint32_t height ) = 0;
+    virtual void initPostProcessing( const u32 width, const u32 height, const u32 sampleCount ) = 0;
+    virtual void initDoubleBuffer( const u32 width, const u32 height, const u32 sampleCount ) = 0;
 
-    virtual void bind() const = 0;
+    virtual void bind( const u32 idx = 0 ) const = 0;
     virtual void flush() const = 0;
 
     virtual TexturePtr getTexture() const = 0;
@@ -70,12 +72,13 @@ namespace Lore {
       return _aspectRatio;
     }
 
-  protected:
+    ///
 
     TexturePtr _texture { nullptr };
     uint32_t _width { 0 };
     uint32_t _height { 0 };
     real _aspectRatio { 0.f };
+    u32 _sampleCount { 0 };
 
   };
 

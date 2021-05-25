@@ -180,12 +180,21 @@ void Forward3DRenderer::present( const RenderView& rv,
   //
   // Render scene.
 
-  if ( rv.renderTarget ) {
+  real aspectRatio = 0.f;
+  if ( rv.camera->postProcessing ) {
+    _api->setViewport( 0,
+                       0,
+                       static_cast<uint32_t>( rv.viewport.w * rv.camera->postProcessing->renderTarget->getWidth() ),
+                       static_cast<uint32_t>( rv.viewport.h * rv.camera->postProcessing->renderTarget->getHeight() ) );
+    rv.camera->postProcessing->renderTarget->bind();
+    aspectRatio = rv.camera->postProcessing->renderTarget->getAspectRatio();
+  } else if ( rv.renderTarget ) {
     _api->setViewport( 0,
                        0,
                        static_cast< uint32_t >( rv.viewport.w * rv.renderTarget->getWidth() ),
                        static_cast< uint32_t >( rv.viewport.h * rv.renderTarget->getHeight() ) );
     rv.renderTarget->bind();
+    aspectRatio = rv.renderTarget->getAspectRatio();
   }
   else {
     // TODO: Get rid of gl_viewport.
@@ -195,6 +204,7 @@ void Forward3DRenderer::present( const RenderView& rv,
                        rv.gl_viewport.height );
 
     _api->bindDefaultFramebuffer();
+    aspectRatio = rv.gl_viewport.aspectRatio;
   }
 
   Color bg = rv.scene->getSkyboxColor();
@@ -206,7 +216,6 @@ void Forward3DRenderer::present( const RenderView& rv,
 
   // Setup view-projection matrix.
   // TODO: Take viewport dimensions into account. Cache more things inside window.
-  const real aspectRatio = ( rv.renderTarget ) ? rv.renderTarget->getAspectRatio() : window->getAspectRatio();
   const glm::mat4 projection = glm::perspective( glm::radians( 45.f ),
                                                  aspectRatio,
                                                  0.1f, 20000.f );
@@ -235,10 +244,126 @@ void Forward3DRenderer::present( const RenderView& rv,
     _api->bindDefaultFramebuffer();
   }
 
+  // Post processing.
+  if ( rv.camera->postProcessing ) {
+    rv.camera->postProcessing->renderTarget->flush();
+    _presentPostProcessing( rv, window );
+  }
+
   _clearRenderQueues();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Forward3DRenderer::_presentPostProcessing( const RenderView& rv,
+                                                const WindowPtr window )
+{
+  real aspectRatio = 0.f;
+  if ( rv.renderTarget ) {
+    _api->setViewport( 0,
+                       0,
+                       static_cast<uint32_t>( rv.viewport.w * rv.renderTarget->getWidth() ),
+                       static_cast<uint32_t>( rv.viewport.h * rv.renderTarget->getHeight() ) );
+    rv.renderTarget->bind();
+    aspectRatio = rv.renderTarget->getAspectRatio();
+  }
+  else {
+    // TODO: Get rid of gl_viewport.
+    _api->setViewport( rv.gl_viewport.x,
+                       rv.gl_viewport.y,
+                       rv.gl_viewport.width,
+                       rv.gl_viewport.height );
+
+    _api->bindDefaultFramebuffer();
+    aspectRatio = rv.gl_viewport.aspectRatio;
+  }
+
+  _api->clear();
+  _api->clearColor( 1.f, 0.f, 0.f, 1.f );
+
+  const glm::mat4 projection = glm::ortho( -aspectRatio, aspectRatio,
+                                           -1.f, 1.f,
+                                           1.f, -1.f );
+  static glm::mat4 view = Math::CreateTransformationMatrix( Vec3Zero,
+                                                            glm::quat( 1.f, 0.f, 0.f, 0.f ),
+                                                            glm::vec3( 1.f, 1.f, 0.f ) );
+  const glm::mat4 viewProjection = projection * view;
+
+  _api->setCullingMode( IRenderAPI::CullingMode::Back );
+
+  const Camera::PostProcessing* p = rv.camera->postProcessing.get();
+
+  //
+  // First do a Gaussian blur for bloom.
+
+  ModelPtr blurModel = p->doubleBufferEntity->getModel();
+  GPUProgramPtr blurProgram = p->doubleBufferEntity->_material->program;
+  blurProgram->use();
+
+  int blurAmount = 10;
+#ifdef LORE_DEBUG_UI
+  blurAmount = DebugConfig::bloomBlurPassCount;
+#endif
+
+  TexturePtr blurBuffer = p->doubleBuffer->getTexture();
+
+  bool horizontal = true, firstIt = true;
+  for ( int i = 0; i < blurAmount; ++i ) {
+    p->doubleBuffer->bind( static_cast<u32>( horizontal ) );
+
+    blurProgram->setUniformVar( "horizontal", horizontal );
+    if ( firstIt ) {
+      // Bind the bright pixel color buffer for first iteration.
+      p->renderTarget->getTexture()->bind( 0, 1 );
+      firstIt = false;
+    }
+    else {
+      const auto idx = static_cast<u32>( !horizontal );
+      blurBuffer->bind( 0, idx);
+    }
+
+    blurModel->draw( blurProgram );
+
+    horizontal = !horizontal;
+  }
+
+  if ( rv.renderTarget ) {
+    rv.renderTarget->bind();
+  }
+  else {
+    _api->bindDefaultFramebuffer();
+  }
+
+  //
+  // Render the final output to a fullscreen quad.
+
+  _api->clear();
+
+  ModelPtr model = p->entity->getModel();
+  GPUProgramPtr program = p->entity->_material->program;
+  program->use();
+
+  TexturePtr buffer = p->renderTarget->getTexture();
+  buffer->bind( 0 );
+  program->setUniformVar( "frameBuffer", 0 );
+
+  const auto bloomIdx = static_cast<u32>( !horizontal );
+  blurBuffer->bind( 1, bloomIdx );
+  program->setUniformVar( "bloomBlur", 1 );
+
+  program->setUniformVar( "gamma", p->gamma );
+
+  // Debug UI enabled values.
+#ifdef LORE_DEBUG_UI
+  program->setUniformVar( "exposure", DebugConfig::hdrExposure );
+#else
+  program->setUniformVar( "exposure", p->exposure );
+#endif
+
+  model->draw( program );
+}
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Forward3DRenderer::_clearRenderQueues()
@@ -414,6 +539,14 @@ void Forward3DRenderer::_renderSkybox( const RenderView& rv,
     program->updateUniforms( rv, material, emptyLightData );
     // TODO: Pass in camera node when camera is updated to use a scene node.
     program->updateNodeUniforms( material, nullptr, viewProjection );
+
+    if ( rv.camera->postProcessing ) {
+      program->setUniformVar( "gamma", rv.camera->postProcessing->gamma );
+    }
+    else {
+      program->setUniformVar( "gamma", 1.0f );
+    }
+
     model->draw( program );
   }
 

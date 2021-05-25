@@ -108,6 +108,10 @@ namespace Lore {
     /// \brief Destroys specified camera.
     void destroyCamera( CameraPtr camera );
 
+    ///
+    /// \brief Destroys all created cameras.
+    void destroyAllCameras();
+
     //
     // Information.
 

@@ -31,9 +31,15 @@
       }
     },
     "Light": {
-      "ModelType": "Cube",
+      "Model": "res/Demo3D/Models/cube.fbx",
       "MaterialSettings": {
-        "Ambient": [1.0, 1.0, 1.0]
+        "Ambient": [10.0, 10.0, 100.0]
+      }
+    },
+    "Light2": {
+      "Model": "res/Demo3D/Models/cube.fbx",
+      "MaterialSettings": {
+        "Ambient": [10.0, 100.0, 10.0]
       }
     },
     "Star": {
@@ -44,30 +50,18 @@
     }
   },
   "Lighting": {
-    "DirectionalLight0": {
-      "Type": "Directional",
-      "Direction": [-0.5, -0.2, -0.5],
-      "Diffuse": [0.2, 0.2, 0.525],
-      "Specular": [0.2, 0.2, 0.525]
-    },
-    "DirectionalLight1": {
-      "Type": "Directional",
-      "Direction": [0.2, -0.3, -0.2],
-      "Diffuse": [0.5, 0.5, 0.5],
-      "Specular": [0.5, 0.5, 0.5]
-    },
     "PointLight0": {
       "Type": "Point",
       "Ambient": [0.05, 0.05, 0.05],
-      "Diffuse": [0.3, 0.3, 0.3],
-      "Specular": [0.3, 0.3, 0.3],
+      "Diffuse": [0.0, 0.0, 0.3],
+      "Specular": [0.0, 0.0, 0.3],
       "Attenuation": [10.5, 0.5, 0.1, 0.1]
     },
     "PointLight1": {
       "Type": "Point",
       "Ambient": [0.05, 0.05, 0.05],
-      "Diffuse": [0.8, 0.8, 1.0],
-      "Specular": [0.8, 0.8, 1.0],
+      "Diffuse": [0.0, 0.3, 0.0],
+      "Specular": [0.0, 0.3, 0.0],
       "Attenuation": [15.5, 0.5, 0.1, 0.1]
     }
   },
@@ -80,7 +74,7 @@
         "Scale": 0.25
       },
       "Light1": {
-        "Entity": "Light",
+        "Entity": "Light2",
         "Light": "PointLight1",
         "Position": [-5.0, 2.5, -2.0],
         "Scale": 0.25

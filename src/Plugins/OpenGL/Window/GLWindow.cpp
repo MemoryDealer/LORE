@@ -183,6 +183,10 @@ void GLWindow::setTitle( const string& title )
 
 void GLWindow::setDimensions( const int width, const int height )
 {
+  if ( 0 == width && 0 == height ) {
+    return; // This can happen when hitting Windows + D for example.
+  }
+
   Lore::Window::setDimensions( width, height );
 
   glfwSetWindowSize( _window, width, height );
@@ -211,6 +215,12 @@ void GLWindow::updateRenderViews()
     rv.gl_viewport.y = static_cast< int >( rv.viewport.y * static_cast< float >( _frameBufferHeight ) );
     rv.gl_viewport.width = static_cast< int >( rv.viewport.w * static_cast< float >( _frameBufferWidth ) );
     rv.gl_viewport.height = static_cast< int >( rv.viewport.h * static_cast< float >( _frameBufferHeight ) );
+
+    // Resize post-processing render targets.
+    if ( rv.camera->postProcessing ) {
+      const u32 sampleCount = rv.camera->postProcessing->renderTarget->_sampleCount;
+      rv.camera->initPostProcessing( rv.gl_viewport.width, rv.gl_viewport.height, sampleCount );
+    }
   }
 }
 

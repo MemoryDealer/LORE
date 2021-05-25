@@ -53,16 +53,18 @@ namespace Lore { namespace OpenGL {
 
     void createCubemap( const uint32_t width, const uint32_t height ) override;
 
-    void bind( const uint32_t idx ) override;
+    void createFloatingPoint( const u32 width, const u32 height, const u32 sampleCount, const u32 texCount ) override;
+
+    void bind( const u32 activeIdx = 0, const u32 texIdx = 0 ) override;
 
     void setDefaultActiveTexture() override;
 
     //
     // Getters.
 
-    GLuint getID() const
+    unsigned int getID( const u32 idx = 0 ) const override
     {
-        return _id;
+        return _id[idx];
     }
 
   private:
@@ -71,7 +73,10 @@ namespace Lore { namespace OpenGL {
 
   private:
 
-    GLuint _id { 0 };
+    static constexpr u32 MaxTextures = 2;
+
+    GLuint _id[MaxTextures] { 0 };
+    u32 _texCount = 1;
     GLenum _target { GL_TEXTURE_2D };
 
   };

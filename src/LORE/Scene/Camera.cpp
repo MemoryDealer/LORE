@@ -27,7 +27,9 @@
 #include "Camera.h"
 
 #include <LORE/Math/Math.h>
+#include <LORE/Resource/Entity.h>
 #include <LORE/Resource/ResourceController.h>
+#include <LORE/Resource/StockResource.h>
 #include <LORE/Scene/Node.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -42,6 +44,20 @@ namespace LocalNS {
 
 }
 using namespace LocalNS;
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Camera::~Camera()
+{
+  if ( postProcessing ) {
+    Resource::DestroyRenderTarget( postProcessing->renderTarget );
+    Resource::DestroyRenderTarget( postProcessing->doubleBuffer );
+    Resource::DestroySprite( postProcessing->entity->_material->sprite );
+    Resource::DestroySprite( postProcessing->doubleBufferEntity->_material->sprite );
+    Resource::DestroyEntity( postProcessing->entity );
+    Resource::DestroyEntity( postProcessing->doubleBufferEntity );
+  }
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -168,6 +184,44 @@ void Camera::updateTracking()
   }
 
   _dirty();
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Camera::initPostProcessing( const u32 width, const u32 height, const u32 sampleCount )
+{
+  if ( postProcessing ) {
+    Resource::DestroyRenderTarget( postProcessing->renderTarget );
+    Resource::DestroyRenderTarget( postProcessing->doubleBuffer );
+    Resource::DestroySprite( postProcessing->entity->_material->sprite );
+    Resource::DestroySprite( postProcessing->doubleBufferEntity->_material->sprite );
+    Resource::DestroyEntity( postProcessing->entity );
+    Resource::DestroyEntity( postProcessing->doubleBufferEntity );
+  }
+
+  postProcessing = std::make_unique<PostProcessing>();
+
+  postProcessing->renderTarget = Resource::CreatePostProcessingBuffer( _name + "_post_buffer", width, height, sampleCount );
+  postProcessing->doubleBuffer = Resource::CreateDoubleBuffer( _name + "_double_buffer", width, height, 0 );
+
+  // We need an entity for rendering our fullscreen quad.
+  postProcessing->entity = Resource::CreateEntity( _name + "_entity", Mesh::Type::FullscreenQuad );
+  postProcessing->entity->_material->program = StockResource::GetGPUProgram( "PostProcessing" );
+
+  // Create a sprite for our render target texture.
+  auto sprite = Resource::CreateSprite( _name + "_post_sprite" );
+  sprite->addTexture( Texture::Type::Diffuse, postProcessing->renderTarget->getTexture() );
+  postProcessing->entity->_material->sprite = sprite;
+  postProcessing->entity->_material->lighting = false;
+
+  // Also create an entity for the double buffering.
+  postProcessing->doubleBufferEntity = Resource::CreateEntity( _name + "_db_entity", Mesh::Type::FullscreenQuad );
+  postProcessing->doubleBufferEntity->_material->program = StockResource::GetGPUProgram( "GaussianBlur" );
+
+  auto dbSprite = Resource::CreateSprite( _name + "_post_db_sprite" );
+  dbSprite->addTexture( Texture::Type::Diffuse, postProcessing->doubleBuffer->getTexture() );
+  postProcessing->doubleBufferEntity->_material->sprite = dbSprite;
+  postProcessing->doubleBufferEntity->_material->lighting = false;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

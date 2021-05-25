@@ -41,13 +41,18 @@ using namespace Lore;
 
 void DebugUI_Console::render()
 {
+  static bool resetKeyboardFocus = false;
+
   const real ConsoleHeight = 10.f;
   const real ConsoleYOffset = 32.f;
   ImGui::SetNextWindowSize( ImVec2( static_cast<float>( _windowDimensions.width ), ConsoleHeight ) );
   ImGui::SetNextWindowPos( ImVec2( 0.f, _windowDimensions.height - ConsoleYOffset ) );
 
   ImGui::Begin( "Console", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav );
-  ImGui::SetKeyboardFocusHere();
+  if ( resetKeyboardFocus ) {
+    ImGui::SetKeyboardFocusHere();
+    resetKeyboardFocus = false;
+  }
 
   char buf[256] {};
   bool executed = ImGui::InputText( "Console", buf, IM_ARRAYSIZE( buf ), ImGuiInputTextFlags_EnterReturnsTrue );
@@ -67,6 +72,7 @@ void DebugUI_Console::render()
     string input( buf );
     if ( !input.empty() ) {
       _cliOutput = CLI::Execute( buf );
+      resetKeyboardFocus = true; // Keep focus in textbox after hitting enter.
     }
   }
 

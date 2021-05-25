@@ -44,6 +44,8 @@ namespace Lore { namespace OpenGL {
     GPUProgramPtr createCubemapShadowProgram( const string& name, const bool instanced ) override { return nullptr; }
     GPUProgramPtr createSkyboxProgram( const string& name, const SkyboxProgramParameters& params ) override;
     GPUProgramPtr createEnvironmentMappingProgram( const string& name, const EnvironmentMappingProgramParameters& params ) override;
+    GPUProgramPtr createPostProcessingProgram( const string& name, const PostProcessingProgramParameters& params ) override;
+    GPUProgramPtr createGaussianBlurProgram( const string& name ) override;
     GPUProgramPtr createBoxProgram( const string& name ) override;
 
   };
@@ -63,6 +65,8 @@ namespace Lore { namespace OpenGL {
     GPUProgramPtr createCubemapShadowProgram( const string& name, const bool instanced ) override;
     GPUProgramPtr createSkyboxProgram( const string& name, const SkyboxProgramParameters& params ) override;
     GPUProgramPtr createEnvironmentMappingProgram( const string& name, const EnvironmentMappingProgramParameters& params ) override;
+    GPUProgramPtr createPostProcessingProgram( const string& name, const PostProcessingProgramParameters& params ) override { return nullptr; }
+    GPUProgramPtr createGaussianBlurProgram( const string& name ) { return nullptr; }
     GPUProgramPtr createBoxProgram( const string& name ) override;
 
   };

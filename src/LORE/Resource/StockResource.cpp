@@ -82,6 +82,17 @@ void StockResourceController::createStockResources()
   }
 
   //
+  // Create post-processing programs.
+  {
+    PostProcessingProgramParameters params;
+
+    // Create standard program with all params enabled.
+    auto& srf = _factories.at( RendererType::Forward2D );
+    srf->createPostProcessingProgram( "PostProcessing", params );
+    srf->createGaussianBlurProgram( "GaussianBlur" );
+  }
+
+  //
   // Create stock textures/sprites.
 
   {
@@ -131,7 +142,7 @@ void StockResourceController::createRendererStockResources( const RendererType t
       const string skybox = "Skybox" + suffix;
       auto model = _controller->create<Model>( skybox );
       auto mesh = _controller->create<Mesh>( skybox );
-      mesh->init( Mesh::Type::FullscreenQuad );
+      mesh->init( Mesh::Type::Skybox2D );
       model->attachMesh( mesh );
     }
     break;
@@ -319,6 +330,7 @@ ModelPtr StockResource::GetModel( const Mesh::Type type )
     return ActiveContext->getStockResourceController()->get<Model>( "Quad" );
 
   case Mesh::Type::TexturedQuad:
+  case Mesh::Type::FullscreenQuad:
     return ActiveContext->getStockResourceController()->get<Model>( "TexturedQuad" );
 
   case Mesh::Type::Quad3D:

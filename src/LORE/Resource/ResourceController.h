@@ -75,7 +75,7 @@ namespace Lore {
     ~ResourceGroup() = default;
 
     template<typename T>
-    void insertResource( T* resource );
+    void insertResource( T* resource, const bool autoDuplicate = false );
 
     template<typename T>
     bool resourceExists( const string& id );
@@ -164,12 +164,12 @@ namespace Lore {
     // Creates resources that are implemented directly in LORE library.
     template<typename ResourceType>
     typename std::enable_if<std::is_base_of<Alloc<ResourceType>, ResourceType>::value, ResourceType*>::type
-      create( const string& name, const string& groupName = DefaultGroupName );
+      create( const string& name, const string& groupName = DefaultGroupName, const bool duplicate = false );
 
     // Creates resources that are implemented by a render plugin, using functors the plugin provides.
     template<typename ResourceType>
     typename std::enable_if<!std::is_base_of<Alloc<ResourceType>, ResourceType>::value, ResourceType*>::type
-      create( const string& name, const string& groupName = DefaultGroupName );
+      create( const string& name, const string& groupName = DefaultGroupName, const bool duplicate = false );
 
     // Returns true if specified resource exists.
     template<typename ResourceType>
@@ -294,6 +294,16 @@ namespace Lore {
                                                      const uint32_t width,
                                                      const uint32_t height,
                                                      const string& groupName = ResourceController::DefaultGroupName );
+    static RenderTargetPtr CreatePostProcessingBuffer( const string& name,
+                                                       const u32 width,
+                                                       const u32 height,
+                                                       const u32 sampleCount,
+                                                       const string& groupName = ResourceController::DefaultGroupName );
+    static RenderTargetPtr CreateDoubleBuffer( const string& name,
+                                               const u32 width,
+                                               const u32 height,
+                                               const u32 sampleCount,
+                                               const string& groupName = ResourceController::DefaultGroupName );
     static ShaderPtr CreateShader( const string& name,
                                    const Shader::Type type,
                                    const string& groupName = ResourceController::DefaultGroupName );
@@ -319,6 +329,12 @@ namespace Lore {
                                      const uint32_t width,
                                      const uint32_t height,
                                      const string& groupName = ResourceController::DefaultGroupName );
+    static TexturePtr CreateFloatingPointBuffer( const string& name,
+                                                 const u32 width,
+                                                 const u32 height,
+                                                 const u32 sampleCount,
+                                                 const u32 texCount,
+                                                 const string& groupName = ResourceController::DefaultGroupName );
     static TextboxPtr CreateTextbox( const string& name,
                                      const string& groupname = ResourceController::DefaultGroupName );
 

@@ -58,6 +58,7 @@ namespace LocalNS {
         break;
 
       case Keycode::GraveAccent:
+      case Keycode::Escape:
         if ( initialized ) {
           DebugUIInstance->setEnabled( false );
           Input::SetCursorEnabled( false );
@@ -71,6 +72,7 @@ namespace LocalNS {
         break;
 
       case Keycode::GraveAccent:
+      case Keycode::Escape:
         initialized = !initialized;
         if ( !initialized ) {
           Input::ResetHooks();
@@ -124,6 +126,7 @@ void DebugUI::render( ImGuiContext* context )
 
   case Panel::Console:
     _perfStats.render();
+    _gfx.render();
     _console.render();
     break;
   }
@@ -143,6 +146,7 @@ void DebugUI::setWindowDimensions( const Dimensions& dimensions )
   UI::setWindowDimensions( dimensions );
   _perfStats.setWindowDimensions( dimensions );
   _console.setWindowDimensions( dimensions );
+  _gfx.setWindowDimensions( dimensions );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
