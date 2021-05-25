@@ -566,6 +566,15 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
   src += "void main(){";
   {
+    if ( textured ) {
+      src += "vec4 diffuse = texture(diffuseTexture0, TexCoord + texSampleOffset);";
+      src += "if (diffuse.a < 0.1) {";
+      {
+        src += "discard;";
+      }
+      src += "}";
+    }
+
     src += "vec3 result = vec3(0.0, 0.0, 0.0);";
 
     if ( lit ) {
