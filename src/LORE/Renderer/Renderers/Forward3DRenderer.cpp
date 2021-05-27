@@ -427,7 +427,7 @@ void Forward3DRenderer::_renderShadowMaps( const RenderView& rv,
       shadowProgram->updateUniforms( rv, nullptr, queue.lights );
       shadowProgram->updateNodeUniforms( nullptr, node, dirLight->viewProj );
 
-      model->draw( shadowProgram, entity->getInstanceCount() );
+      model->draw( shadowProgram, entity->getInstanceCount(), false );
     }
 
     shadowProgram = StockResource::GetGPUProgram( "DirectionalShadowMap" );
@@ -445,6 +445,16 @@ void Forward3DRenderer::_renderShadowMaps( const RenderView& rv,
         shadowProgram->updateNodeUniforms( nullptr, node, dirLight->viewProj ); // Note: dirLight->viewProj not used.
         model->draw( shadowProgram, 0, false );
       }
+    }
+
+    // Render transparents.
+    for ( auto it = queue.transparents.rbegin(); it != queue.transparents.rend(); ++it ) {
+      const EntityPtr entity = it->second.first;
+      NodePtr node = it->second.second;
+      ModelPtr model = entity->getModel();
+
+      shadowProgram->updateNodeUniforms( nullptr, node, dirLight->viewProj ); // Note: dirLight->viewProj not used.
+      model->draw( shadowProgram, 0, false );
     }
   }
 
@@ -482,7 +492,7 @@ void Forward3DRenderer::_renderShadowMaps( const RenderView& rv,
       glm::mat4 ident; // Not used in updater.
       shadowProgram->updateNodeUniforms( nullptr, node, ident );
 
-      model->draw( shadowProgram, entity->getInstanceCount() );
+      model->draw( shadowProgram, entity->getInstanceCount(), false );
     }
 
     // Non-instanced solids.
@@ -506,6 +516,17 @@ void Forward3DRenderer::_renderShadowMaps( const RenderView& rv,
         shadowProgram->updateNodeUniforms( nullptr, node, ident );
         model->draw( shadowProgram, 0, false );
       }
+    }
+
+    // Render transparents.
+    for ( auto it = queue.transparents.rbegin(); it != queue.transparents.rend(); ++it ) {
+      const EntityPtr entity = it->second.first;
+      NodePtr node = it->second.second;
+      ModelPtr model = entity->getModel();
+
+      glm::mat4 ident; // Not used in updater.
+      shadowProgram->updateNodeUniforms( nullptr, node, ident );
+      model->draw( shadowProgram, 0, false );
     }
   }
 }
