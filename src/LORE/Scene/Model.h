@@ -46,10 +46,12 @@ namespace Lore {
 
     void updateInstanced( const size_t idx, const glm::mat4& matrix );
 
-    void draw( const GPUProgramPtr program, const size_t instanceCount = 0, const bool bindTextures = true );
+    void draw( const GPUProgramPtr program, const size_t instanceCount = 0, const bool bindTextures = true, const bool applyMaterial = true );
     void draw( const Vertices& verts );
 
     void attachMesh( const MeshPtr mesh );
+
+    void setupShader(EntityPtr entity);
 
     //
     // Accessors.

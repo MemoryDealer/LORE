@@ -26,9 +26,31 @@
 
 #include "Mesh.h"
 
+#include <LORE/Resource/ResourceController.h>
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 using namespace Lore;
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Mesh::initMaterial()
+{
+  if ( !_material ) {
+    _material = Resource::CreateMaterial( getName() + "_material", getResourceGroupName() );
+    _material->sprite = &_sprite;
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+Mesh::~Mesh()
+{
+  if ( _material ) {
+    Resource::DestroyMaterial( _material );
+    _material = nullptr;
+  }
+}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 

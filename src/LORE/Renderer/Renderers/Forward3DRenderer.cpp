@@ -427,7 +427,7 @@ void Forward3DRenderer::_renderShadowMaps( const RenderView& rv,
       shadowProgram->updateUniforms( rv, nullptr, queue.lights );
       shadowProgram->updateNodeUniforms( nullptr, node, dirLight->viewProj );
 
-      model->draw( shadowProgram, entity->getInstanceCount(), false );
+      model->draw( shadowProgram, entity->getInstanceCount(), false, false );
     }
 
     shadowProgram = StockResource::GetGPUProgram( "DirectionalShadowMap" );
@@ -443,18 +443,19 @@ void Forward3DRenderer::_renderShadowMaps( const RenderView& rv,
       // Render each node associated with this entity.
       for ( const auto& node : nodes ) {
         shadowProgram->updateNodeUniforms( nullptr, node, dirLight->viewProj ); // Note: dirLight->viewProj not used.
-        model->draw( shadowProgram, 0, false );
+        model->draw( shadowProgram, 0, false, false );
       }
     }
 
     // Render transparents.
+    // TODO: Account for shadow strength based on opacity...
     for ( auto it = queue.transparents.rbegin(); it != queue.transparents.rend(); ++it ) {
       const EntityPtr entity = it->second.first;
       NodePtr node = it->second.second;
       ModelPtr model = entity->getModel();
 
       shadowProgram->updateNodeUniforms( nullptr, node, dirLight->viewProj ); // Note: dirLight->viewProj not used.
-      model->draw( shadowProgram, 0, false );
+      model->draw( shadowProgram, 0, false, false );
     }
   }
 
@@ -492,7 +493,7 @@ void Forward3DRenderer::_renderShadowMaps( const RenderView& rv,
       glm::mat4 ident; // Not used in updater.
       shadowProgram->updateNodeUniforms( nullptr, node, ident );
 
-      model->draw( shadowProgram, entity->getInstanceCount(), false );
+      model->draw( shadowProgram, entity->getInstanceCount(), false, false );
     }
 
     // Non-instanced solids.
@@ -514,11 +515,12 @@ void Forward3DRenderer::_renderShadowMaps( const RenderView& rv,
       glm::mat4 ident; // Not used in updater.
       for ( const auto& node : nodes ) {
         shadowProgram->updateNodeUniforms( nullptr, node, ident );
-        model->draw( shadowProgram, 0, false );
+        model->draw( shadowProgram, 0, false, false );
       }
     }
 
     // Render transparents.
+    // TODO: Account for shadow strength based on opacity...
     for ( auto it = queue.transparents.rbegin(); it != queue.transparents.rend(); ++it ) {
       const EntityPtr entity = it->second.first;
       NodePtr node = it->second.second;
@@ -526,7 +528,7 @@ void Forward3DRenderer::_renderShadowMaps( const RenderView& rv,
 
       glm::mat4 ident; // Not used in updater.
       shadowProgram->updateNodeUniforms( nullptr, node, ident );
-      model->draw( shadowProgram, 0, false );
+      model->draw( shadowProgram, 0, false, false );
     }
   }
 }

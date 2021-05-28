@@ -410,6 +410,8 @@ void GLMesh::init( const Lore::Mesh::Type type )
 
 void GLMesh::init( const CustomMeshData& data )
 {
+  initMaterial();
+
   // This is a custom mesh type.
   _type = Mesh::Type::Custom;
   _mode = GL_TRIANGLES;
@@ -484,7 +486,7 @@ void GLMesh::initInstanced( const Type type, const size_t maxCount )
     break;
 
   case Mesh::Type::CustomInstanced:
-    // Nothing to do...
+    initMaterial(); // Materials are only for custom meshes.
     break;
   }
 
@@ -542,8 +544,13 @@ void GLMesh::updateInstanced( const size_t idx, const glm::mat4& matrix )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void GLMesh::draw( const Lore::GPUProgramPtr program, const size_t instanceCount, const bool bindTextures )
+void GLMesh::draw( const Lore::GPUProgramPtr program, const size_t instanceCount, const bool bindTextures, const bool applyMaterial )
 {
+  // Apply custom material settings for this mesh.
+  if ( applyMaterial && _material ) {
+    program->setUniformVar( "material.diffuse", _material->diffuse );
+  }
+
   // Bind any textures that are assigned to this mesh.
   // TODO: Sprite animations (e.g., replace 0 with spriteFrame).
   u8 diffuseCount = 0;

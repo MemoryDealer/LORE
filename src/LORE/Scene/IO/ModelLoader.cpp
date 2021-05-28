@@ -128,9 +128,22 @@ void ModelLoader::_processMesh( aiMesh* mesh, const aiScene* scene )
   _model->attachMesh( loreMesh );
 
   // Process material and load the associated textures.
-  if ( _loadTextures ) {
-    if ( mesh->mMaterialIndex >= 0 ) {
-      aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+  if ( mesh->mMaterialIndex >= 0 ) {
+    aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+
+    // Add custom per-mesh material settings.
+    aiColor4D diffuse;
+    material->Get( AI_MATKEY_COLOR_DIFFUSE, diffuse );
+    float opacity = 1.0f;
+    material->Get( AI_MATKEY_OPACITY, opacity );
+
+    MaterialPtr loreMat = loreMesh->_material;
+    loreMat->diffuse.r = diffuse.r;
+    loreMat->diffuse.g = diffuse.g;
+    loreMat->diffuse.b = diffuse.b;
+    loreMat->diffuse.a = opacity;
+
+    if ( _loadTextures ) {
       _processTexture( material, aiTextureType_DIFFUSE, loreMesh );
       _processTexture( material, aiTextureType_SPECULAR, loreMesh );
       _processTexture( material, aiTextureType_NORMALS, loreMesh );

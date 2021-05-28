@@ -90,8 +90,9 @@ namespace Lore {
   public:
 
     Mesh() = default;
-    virtual ~Mesh() = default;
+    virtual ~Mesh();
 
+    void initMaterial();
     virtual void init( const Type type ) = 0;
     virtual void init( const CustomMeshData& data ) = 0;
     virtual void initInstanced( const Type type, const size_t maxCount ) = 0;
@@ -100,7 +101,7 @@ namespace Lore {
 
     void addAttribute( const AttributeType& type, const uint size );
 
-    virtual void draw( const GPUProgramPtr program, const size_t instanceCount = 0, const bool bindTextures = true ) = 0;
+    virtual void draw( const GPUProgramPtr program, const size_t instanceCount = 0, const bool bindTextures = true, const bool applyMaterial = true ) = 0;
     virtual void draw( const Vertices& verts ) = 0;
 
     //
@@ -122,7 +123,7 @@ namespace Lore {
 
     using TextureList = std::vector<TexturePtr>;
 
-  protected:
+  public:
 
     Type _type { Type::Custom };
     std::vector<Attribute> _attributes {};
@@ -131,6 +132,7 @@ namespace Lore {
     // Note it is not allocated via the ResourceController but is explicitly
     // owned by the Mesh.
     Sprite _sprite {};
+    MaterialPtr _material {};
 
   };
 

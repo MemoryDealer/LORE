@@ -46,7 +46,7 @@ namespace Lore { namespace OpenGL {
 
     void updateInstanced( const size_t idx, const glm::mat4& matrix ) override;
 
-    void draw( const GPUProgramPtr program, const size_t instanceCount, const bool bindTextures ) override;
+    void draw( const GPUProgramPtr program, const size_t instanceCount, const bool bindTextures, const bool applyMaterial = true ) override;
     void draw( const Vertices& verts ) override;
 
   private:

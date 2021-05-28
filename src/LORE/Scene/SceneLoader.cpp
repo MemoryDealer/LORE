@@ -334,6 +334,11 @@ void SceneLoader::_processMaterialSettings( const SerializerValue& value, Entity
     material->specular = glm::vec4( specular.toVec3(), 1.f );
   }
 
+  const auto& blending = value.getValue( "Blending" );
+  if ( !blending.isNull() ) {
+    material->blendingMode.enabled = blending.toBool();
+  }
+
   // Other properties.
   const auto& shininess = value.getValue( "Shininess" );
   if ( !shininess.isNull() ) {

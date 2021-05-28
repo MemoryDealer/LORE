@@ -369,6 +369,9 @@ EntityPtr Resource::LoadEntity( const string& name, const string& path, const st
   auto model = loader.load( path );
   entity->setModel( model );
 
+  // Assign normal mapping shader if normal maps are found.
+  model->setupShader( entity );
+
   return entity;
 }
 
@@ -460,7 +463,7 @@ GPUProgramPtr Resource::CreateGPUProgram( const string& name, const string& grou
 
 MaterialPtr Resource::CreateMaterial( const string& name, const string& groupName )
 {
-  return ActiveContext->getResourceController()->create<Material>( name, groupName );
+  return ActiveContext->getResourceController()->create<Material>( name, groupName, true );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

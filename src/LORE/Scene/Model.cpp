@@ -26,7 +26,9 @@
 
 #include "Model.h"
 
+#include <LORE/Resource/Entity.h>
 #include <LORE/Resource/ResourceController.h>
+#include <LORE/Resource/StockResource.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -53,10 +55,10 @@ void Model::updateInstanced( const size_t idx, const glm::mat4& matrix )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Model::draw( const GPUProgramPtr program, const size_t instanceCount, const bool bindTextures )
+void Model::draw( const GPUProgramPtr program, const size_t instanceCount, const bool bindTextures, const bool applyMaterial )
 {
   for ( const auto& mesh : _meshes ) {
-    mesh->draw( program, instanceCount, bindTextures );
+    mesh->draw( program, instanceCount, bindTextures, applyMaterial );
   }
 }
 
@@ -87,6 +89,19 @@ void Model::attachMesh( const MeshPtr mesh )
       throw Lore::Exception( "No more than one built-in mesh type allowed for a single model" );
     }
     break;
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Model::setupShader( EntityPtr entity )
+{
+  for ( const auto& mesh : _meshes ) {
+    SpritePtr sprite = mesh->getSprite();
+    if ( sprite->getTextureCount( 0, Texture::Type::Normal ) > 0 ) {
+      entity->_material->program = StockResource::GetGPUProgram( "StandardTexturedNormalMapping3D" );
+      return;
+    }
   }
 }
 

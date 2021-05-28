@@ -30,6 +30,12 @@
         "Shininess": 32.0
       }
     },
+    "Structure": {
+      "Model": "res/Demo3D/Models/Structure/Structure.obj",
+      "MaterialSettings": {
+        "Blending": true
+      }
+    },
     "Light": {
       "Model": "res/Demo3D/Models/cube.fbx",
       "MaterialSettings": {
@@ -98,6 +104,11 @@
         "Entity": "CheckeredCube",
         "Position": [1.0, 2.0, 4.0],
         "Scale": 2.0
+      },
+      "Structure": {
+        "Entity": "Structure",
+        "Position": [8.0, 0.0, -10.0],
+        "Scale": 1.0
       }
     }
   }
