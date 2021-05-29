@@ -49,6 +49,9 @@ namespace Lore { namespace OpenGL {
     void initDoubleBuffer( const u32 width, const u32 height, const u32 sampleCount ) override;
     void bind( const u32 fboIdx = 0 ) const override;
     void flush() const override;
+    void setColorAttachmentCount( const u32 count ) override;
+
+    void initColorAttachments();
 
   private:
 

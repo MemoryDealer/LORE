@@ -181,6 +181,7 @@ void Forward3DRenderer::present( const RenderView& rv,
   // Render scene.
 
   real aspectRatio = 0.f;
+  RenderTargetPtr rt = nullptr;
   if ( rv.camera->postProcessing ) {
     _api->setViewport( 0,
                        0,
@@ -188,6 +189,8 @@ void Forward3DRenderer::present( const RenderView& rv,
                        static_cast<uint32_t>( rv.viewport.h * rv.camera->postProcessing->renderTarget->getHeight() ) );
     rv.camera->postProcessing->renderTarget->bind();
     aspectRatio = rv.camera->postProcessing->renderTarget->getAspectRatio();
+
+    rt = rv.camera->postProcessing->renderTarget;
   } else if ( rv.renderTarget ) {
     _api->setViewport( 0,
                        0,
@@ -195,6 +198,8 @@ void Forward3DRenderer::present( const RenderView& rv,
                        static_cast< uint32_t >( rv.viewport.h * rv.renderTarget->getHeight() ) );
     rv.renderTarget->bind();
     aspectRatio = rv.renderTarget->getAspectRatio();
+
+    rt = rv.renderTarget;
   }
   else {
     // TODO: Get rid of gl_viewport.
@@ -234,9 +239,17 @@ void Forward3DRenderer::present( const RenderView& rv,
   _api->setDepthFunc( IRenderAPI::DepthFunc::Less );
 
   // Render any blended objects last.
+  if ( rt ) {
+    // We don't want to render to the 2nd color output (bright buffer), so bloom isn't occluded by transparent objects.
+    rt->setColorAttachmentCount( 1 );
+  }
   for ( const auto& activeQueue : _activeQueues ) {
     RenderQueue& queue = activeQueue.second;
     _renderTransparents( rv, queue, viewProjection );
+  }
+  if ( rt ) {
+    // Restore bright buffer output.
+    rt->setColorAttachmentCount( 2 );
   }
 
   if ( rv.renderTarget ) {

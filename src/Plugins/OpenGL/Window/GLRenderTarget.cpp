@@ -60,6 +60,8 @@ Lore::TexturePtr GLRenderTarget::getTexture() const
 
 void GLRenderTarget::init( const uint32_t width, const uint32_t height, const uint32_t sampleCount )
 {
+  initColorAttachments();
+
   _width = width;
   _height = height;
   _aspectRatio = static_cast< real >( _width ) / _height;
@@ -114,6 +116,8 @@ void GLRenderTarget::init( const uint32_t width, const uint32_t height, const ui
 
 void GLRenderTarget::initDepthShadowMap( const uint32_t width, const uint32_t height, const uint32_t sampleCount )
 {
+  initColorAttachments();
+
   _width = width;
   _height = height;
   _aspectRatio = static_cast<real>( _width ) / _height;
@@ -142,6 +146,8 @@ void GLRenderTarget::initDepthShadowMap( const uint32_t width, const uint32_t he
 
 void GLRenderTarget::initDepthShadowCubemap( const uint32_t width, const uint32_t height )
 {
+  initColorAttachments();
+
   _width = width;
   _height = height;
   _aspectRatio = static_cast<real>( _width ) / _height;
@@ -167,6 +173,8 @@ void GLRenderTarget::initDepthShadowCubemap( const uint32_t width, const uint32_
 
 void GLRenderTarget::initPostProcessing( const u32 width, const u32 height, const u32 sampleCount )
 {
+  initColorAttachments();
+
   _width = width;
   _height = height;
   _aspectRatio = static_cast<real>( _width ) / _height;
@@ -198,8 +206,6 @@ void GLRenderTarget::initPostProcessing( const u32 width, const u32 height, cons
 
   // We are rendering pixels for blooming to the second color attachment for blurring, setup the state on this FBO.
   _colorAttachmentCount = 2;
-  _colorAttachments[0] = GL_COLOR_ATTACHMENT0;
-  _colorAttachments[1] = GL_COLOR_ATTACHMENT1;
   glDrawBuffers( _colorAttachmentCount, _colorAttachments );
 
   if ( GL_FRAMEBUFFER_COMPLETE != glCheckFramebufferStatus( GL_FRAMEBUFFER ) ) {
@@ -236,6 +242,8 @@ void GLRenderTarget::initPostProcessing( const u32 width, const u32 height, cons
 
 void GLRenderTarget::initDoubleBuffer( const u32 width, const u32 height, const u32 sampleCount )
 {
+  initColorAttachments();
+
   _width = width;
   _height = height;
   _aspectRatio = static_cast<real>( _width ) / _height;
@@ -305,6 +313,24 @@ void GLRenderTarget::flush() const
       // Restore the original framebuffer state.
       glDrawBuffers( _colorAttachmentCount, _colorAttachments );
     }
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLRenderTarget::setColorAttachmentCount( const u32 count )
+{
+  assert( count <= MaxColorAttachments );
+  _colorAttachmentCount = count;
+  glDrawBuffers( _colorAttachmentCount, _colorAttachments );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void GLRenderTarget::initColorAttachments()
+{
+  for ( u32 i = 0; i < MaxColorAttachments; ++i ) {
+    _colorAttachments[i] = GL_COLOR_ATTACHMENT0 + i;
   }
 }
 

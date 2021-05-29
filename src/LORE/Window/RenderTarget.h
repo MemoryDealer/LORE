@@ -55,6 +55,8 @@ namespace Lore {
     virtual void bind( const u32 idx = 0 ) const = 0;
     virtual void flush() const = 0;
 
+    virtual void setColorAttachmentCount( const u32 count ) = 0;
+
     virtual TexturePtr getTexture() const = 0;
 
     uint32_t getWidth() const
