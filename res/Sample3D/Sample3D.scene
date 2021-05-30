@@ -7,126 +7,86 @@
     "AmbientLightColor": [0.05, 0.05, 0.05]
   },
   "Prefab": {
-    "CheckeredQuad": {
-      "Model": "res/Sample3D/Models/quad.fbx",
-      "Sprite":"checkerboard",
-      "MaterialSettings": {
-        "ScrollSpeed": [0.01, 0.0]
-      }
-    },
-    "CheckeredCube": {
-      "Model": "res/Sample3D/Models/cube.fbx",
-      "Instanced": 5,
-      "Sprite": "checkerboard",
-      "MaterialSettings": {
-        "ScrollSpeed": [0.0, 0.0]
-      }
-    },
     "StoneQuad": {
       "Model": "res/Sample3D/Models/quad.fbx",
-      "Instanced": 100,
+      "Instanced": 500,
       "Sprite":"stone",
       "MaterialSettings": {
         "Shininess": 32.0
       }
     },
-    "Structure": {
-      "Model": "res/Sample3D/Models/Structure/Structure.obj",
-      "MaterialSettings": {
-        "Blending": true
-      }
-    },
-    "Light": {
+    "GlowingRedCube": {
       "Model": "res/Sample3D/Models/cube.fbx",
       "MaterialSettings": {
-        "Ambient": [10.0, 10.0, 100.0]
+        "Ambient": [100.0, 10.0, 10.0]
       }
     },
-    "Light2": {
+    "GlowingGreenCube": {
       "Model": "res/Sample3D/Models/cube.fbx",
       "MaterialSettings": {
         "Ambient": [10.0, 100.0, 10.0]
       }
     },
-    "Star": {
-      "Model": "res/Sample3D/Models/star/star.obj",
+    "GlowingBlueCube": {
+      "Model": "res/Sample3D/Models/cube.fbx",
       "MaterialSettings": {
-        "Ambient": [1.0, 1.0, 1.0]
+        "Ambient": [10.0, 10.0, 100.0]
       }
     },
-    "Sphere": {
+    "MagicSphere": {
       "Model": "res/Sample3D/Models/sphere.fbx",
+      "StockMaterial": "Reflect3D",
       "MaterialSettings": {
-        "Ambient": [100.0, 10.0, 10.0]
-      }
+
+      },
+      "Sprite": "space"
     }
   },
   "Lighting": {
-    "PointLight0": {
+    "LightRed": {
       "Type": "Point",
       "Ambient": [0.05, 0.05, 0.05],
-      "Diffuse": [0.0, 0.0, 0.3],
-      "Specular": [0.0, 0.0, 0.3],
-      "Attenuation": [10.5, 0.5, 0.1, 0.1]
+      "Diffuse": [0.3, 0.0, 0.0],
+      "Specular": [0.3, 0.0, 0.0],
+      "Attenuation": [15.5, 0.5, 0.1, 0.1]
     },
-    "PointLight1": {
+    "LightGreen": {
       "Type": "Point",
       "Ambient": [0.05, 0.05, 0.05],
       "Diffuse": [0.0, 0.3, 0.0],
       "Specular": [0.0, 0.3, 0.0],
       "Attenuation": [15.5, 0.5, 0.1, 0.1]
     },
-    "PointLight2": {
+    "LightBlue": {
       "Type": "Point",
       "Ambient": [0.05, 0.05, 0.05],
-      "Diffuse": [0.3, 0.0, 0.0],
-      "Specular": [0.3, 0.0, 0.0],
-      "Attenuation": [15.5, 0.5, 0.1, 0.1]
+      "Diffuse": [0.0, 0.0, 0.3],
+      "Specular": [0.0, 0.0, 0.3],
+      "Attenuation": [32.0, 1.0, 0.14, 0.07]
     }
   },
   "Layout": {
     "Nodes": {
-      "Light0": {
-        "Prefab": "Light",
-        "Light": "PointLight0",
-        "Position": [0.0, 3.5, 0.0],
-        "Scale": 0.25
-      },
-      "Light1": {
-        "Prefab": "Light2",
-        "Light": "PointLight1",
-        "Position": [-5.0, 2.5, -2.0],
-        "Scale": 0.25
-      },
-      "Star": {
-        "Prefab": "Star",
-        "Position": [0.0, 2.0, -8.0],
-        "Scale": 0.4
-      },
-      "Cube0": {
-        "Prefab": "CheckeredCube",
-        "Position": [3.0, 1.0, 0.0],
-        "Scale": 1.0
-      },
-      "Cube1": {
-        "Prefab": "CheckeredCube",
-        "Position": [-3.0, 1.0, 0.0],
-        "Scale": 1.0
-      },
-      "Cube2": {
-        "Prefab": "CheckeredCube",
-        "Position": [1.0, 2.0, 4.0],
-        "Scale": 2.0
-      },
-      "Structure": {
-        "Prefab": "Structure",
-        "Position": [8.0, 0.0, -10.0],
-        "Scale": 1.0
-      },
-      "Sphere": {
-        "Prefab": "Sphere",
-        "Light": "PointLight2",
-        "Position": [-8.0, 3.0, -10.0]
+      "MagicSphere": {
+        "Prefab": "MagicSphere",
+        "Position": [0.0, 3.0, 0.0],
+        "ChildNodes": {
+          "RedCube": {
+            "Prefab": "GlowingRedCube",
+            "Light": "LightRed",
+            "Scale": 0.25
+          },
+          "GreenCube": {
+            "Prefab": "GlowingGreenCube",
+            "Light": "LightGreen",
+            "Scale": 0.25
+          },
+          "BlueCube": {
+            "Prefab": "GlowingBlueCube",
+            "Light": "LightBlue",
+            "Scale": 0.25
+          }
+        }
       }
     }
   }

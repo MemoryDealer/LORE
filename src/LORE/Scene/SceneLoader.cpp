@@ -28,6 +28,7 @@
 
 #include <LORE/Resource/Prefab.h>
 #include <LORE/Resource/ResourceController.h>
+#include <LORE/Resource/StockResource.h>
 #include <LORE/Scene/IO/ModelLoader.h>
 #include <LORE/Scene/Model.h>
 #include <LORE/Scene/Scene.h>
@@ -184,16 +185,23 @@ void SceneLoader::_loadPrefabs()
         prefab->enableInstancing( instanceCount );
       }
 
+      // Process material settings for the prefab.
+      const auto& stockMaterial = value.getValue( "StockMaterial" );
+      if ( !stockMaterial.isNull() ) {
+        if ( stockMaterial.getType() == SerializerValue::Type::String ) {
+          auto mat = StockResource::GetMaterial( stockMaterial.toString() );
+          prefab->setMaterial( mat->clone( mat->getName() + "_" + prefab->getName() ) );
+        }
+      }
+      const auto& materialSettings = value.getValue( "MaterialSettings" );
+      if ( !materialSettings.isNull() ) {
+        _processMaterialSettings( materialSettings, prefab );
+      }
+
       // Attach a sprite if specified.
       const auto& spriteName = value.getValue( "Sprite" );
       if ( !spriteName.isNull() ) {
         prefab->setSprite( Resource::GetSprite( spriteName.toString() ) );
-      }
-
-      // Process material settings for the prefab.
-      const auto& materialSettings = value.getValue( "MaterialSettings" );
-      if ( !materialSettings.isNull() ) {
-        _processMaterialSettings( materialSettings, prefab );
       }
     }
   }

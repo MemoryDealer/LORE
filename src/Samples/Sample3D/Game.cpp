@@ -134,7 +134,7 @@ void Game::loadScene()
   // Create stone flooring.
   auto stonePrefab = Lore::Resource::GetPrefab( "StoneQuad", "Sample3D" );
   constexpr Lore::real StoneFloorScale = 2.f;
-  constexpr int stoneFloorGridSize = 8;
+  constexpr int stoneFloorGridSize = 16;
   for ( int i = -( stoneFloorGridSize / 2 ); i < ( stoneFloorGridSize / 2 ); ++i ) {
     for ( int j = -( stoneFloorGridSize / 2 ); j < ( stoneFloorGridSize / 2 ); ++j ) {
       auto node = _scene->createNode( "stone-floor" + std::to_string( i ) + std::to_string( j ) );
@@ -143,6 +143,23 @@ void Game::loadScene()
       node->rotate( Lore::Vec3PosX, glm::radians( 90.f ) );
       node->scale( StoneFloorScale );
     }
+  }
+
+  // Setup three cube lights at equidistant points around magic sphere.
+  for ( int i = 0; i < 3; ++i ) {
+    Lore::NodePtr cube {};
+    switch ( i ) {
+    case 0: default: cube = _scene->getNode( "RedCube" ); break;
+    case 1: cube = _scene->getNode( "GreenCube" ); break;
+    case 2: cube = _scene->getNode( "BlueCube" ); break;
+    }
+
+    constexpr auto r = 3.0f;
+    float angle = glm::radians( 120.0f * i );
+    glm::vec2 p;
+    p.x = r * glm::cos( angle );
+    p.y = r * glm::sin( angle );
+    cube->setPosition( p.x, 0.0f, p.y );
   }
 }
 
@@ -187,7 +204,7 @@ void Game::processInput()
 
 void Game::update()
 {
-  auto node = _scene->getNode( "Cube2" );
+  auto node = _scene->getNode( "MagicSphere" );
   node->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( 0.0001f ) );
 }
 

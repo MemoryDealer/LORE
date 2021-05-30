@@ -127,6 +127,9 @@ void Node::attachChildNode( NodePtr node )
 void Node::removeChildNode( NodePtr node )
 {
   _childNodes.remove( node->getName() );
+  if ( _scene ) {
+    _scene->_nodes.remove( node->getName() );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
