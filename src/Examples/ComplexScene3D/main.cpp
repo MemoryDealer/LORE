@@ -50,7 +50,7 @@ int main( int argc, char** argv )
   // Setup is complete, begin processing the scene.
 
   // Start a frame rate independent game loop with a fixed timestep.
-  constexpr const std::chrono::nanoseconds timestep( 16ms );
+  constexpr std::chrono::nanoseconds timestep( 16ms );
   bool running = true;
   std::chrono::nanoseconds lag( 0ns );
   auto lastTime = Clock::now();
@@ -64,8 +64,8 @@ int main( int argc, char** argv )
     // Increment our lag counter to track how much "catching up" we need to do.
     lag += std::chrono::duration_cast< std::chrono::nanoseconds >( dt );
 
-    // TODO: Fix timestep which was causing frame stuttering.
-    //while ( lag > timestep ) {
+    game.processInput();
+    while ( lag > timestep ) {
       lag -= timestep;
 
       //
@@ -77,9 +77,8 @@ int main( int argc, char** argv )
         running = false;
       }
 
-      game.processInput();
       game.update();
-    //}
+    }
 
     // We are done updating, render a frame.
     game.render();

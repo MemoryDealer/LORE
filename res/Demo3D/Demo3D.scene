@@ -53,6 +53,12 @@
       "MaterialSettings": {
         "Ambient": [1.0, 1.0, 1.0]
       }
+    },
+    "Sphere": {
+      "Model": "res/Demo3D/Models/sphere.fbx",
+      "MaterialSettings": {
+        "Ambient": [100.0, 10.0, 10.0]
+      }
     }
   },
   "Lighting": {
@@ -68,6 +74,13 @@
       "Ambient": [0.05, 0.05, 0.05],
       "Diffuse": [0.0, 0.3, 0.0],
       "Specular": [0.0, 0.3, 0.0],
+      "Attenuation": [15.5, 0.5, 0.1, 0.1]
+    },
+    "PointLight2": {
+      "Type": "Point",
+      "Ambient": [0.05, 0.05, 0.05],
+      "Diffuse": [0.3, 0.0, 0.0],
+      "Specular": [0.3, 0.0, 0.0],
       "Attenuation": [15.5, 0.5, 0.1, 0.1]
     }
   },
@@ -109,6 +122,11 @@
         "Entity": "Structure",
         "Position": [8.0, 0.0, -10.0],
         "Scale": 1.0
+      },
+      "Sphere": {
+        "Entity": "Sphere",
+        "Light": "PointLight2",
+        "Position": [-8.0, 3.0, -10.0]
       }
     }
   }
