@@ -78,8 +78,6 @@ namespace Lore {
     /// \brief Traverses scene graph and updates node transforms based on parent nodes.
     void updateSceneGraph();
 
-    bool reload();
-
     //
     // Setters.
 

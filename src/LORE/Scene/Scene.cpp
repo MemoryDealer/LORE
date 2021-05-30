@@ -212,27 +212,3 @@ void Scene::updateSceneGraph()
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-bool Scene::reload()
-{
-  if ( _sceneFile.empty() ) {
-    LogWrite( Warning, "No scene file found for scene, not reloading" );
-    return false;
-  }
-
-  auto nodeIt = _nodes.getIterator();
-  while( nodeIt.hasMore() ) {
-    auto node = nodeIt.getNext();
-    destroyNode( node );
-  }
-  destroyAllLights();
-  _skybox->removeAllLayers();
-
-  SceneLoader loader;
-  loader.setUnloadEntities( true );
-  loader.process( _sceneFile, this );
-
-  return true;
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

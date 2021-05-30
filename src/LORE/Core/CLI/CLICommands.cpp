@@ -123,21 +123,6 @@ namespace LocalNS {
   // Global commands.
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-  struct ReloadScene : public CLI::Command
-  {
-
-    string execute( string& args ) override
-    {
-      if ( CLI::GetActiveScene()->reload() ) {
-        return string( "Scene reloaded." );
-      }
-      else {
-        return string( "Scene reload failed." );
-      }
-    }
-
-  };
-
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 }
@@ -157,7 +142,7 @@ void CLI::Init()
   CLI::RegisterCommand( new SetLightColor(), 2, "SetLightColor", "slc" );
 
   // Global commands.
-  CLI::RegisterCommand( new ReloadScene(), 2, "ReloadScene", "Reload" );
+  
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
