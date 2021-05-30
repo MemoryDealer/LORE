@@ -44,7 +44,7 @@ Game::Game()
   _context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
 
   // Create a window and set it to the active window.
-  _window = _context->createWindow( "Demo 3D", 1280, 720, 8, Lore::RendererType::Forward3D );
+  _window = _context->createWindow( "Sample 3D", 1280, 720, 8, Lore::RendererType::Forward3D );
   _window->setActive();
 
   Lore::Input::SetMouseMovedCallback( Game::onMouseMove );
@@ -67,8 +67,8 @@ void Game::loadResources()
 {
   Lore::Resource::SetWorkingDirectory( "../../../" );
 
-  // Index all resource locations for complex scene as specified in the configuration file.
-  Lore::Resource::LoadResourceConfiguration( Lore::FileUtil::ApplyWorkingDirectory( "res/demo3d/resources.json" ) );
+  // Index all resource locations for scene as specified in the configuration file.
+  Lore::Resource::LoadResourceConfiguration( Lore::FileUtil::ApplyWorkingDirectory( "res/sample3d/resources.json" ) );
   // Now load the Core resource group, which contains the resource locations we just indexed.
   Lore::Resource::LoadGroup( Lore::ResourceController::DefaultGroupName );
 }
@@ -129,10 +129,10 @@ void Game::loadScene()
 
   // Load the scene from disk.
   Lore::SceneLoader loader;
-  loader.process( Lore::FileUtil::ApplyWorkingDirectory( "res/demo3d/demo3d.scene" ), _scene );
+  loader.process( Lore::FileUtil::ApplyWorkingDirectory( "res/sample3d/sample3d.scene" ), _scene );
 
   // Create stone flooring.
-  auto stoneEntity = Lore::Resource::GetEntity( "StoneQuad", "Demo3D" );
+  auto stoneEntity = Lore::Resource::GetEntity( "StoneQuad", "Sample3D" );
   constexpr Lore::real StoneFloorScale = 2.f;
   constexpr int stoneFloorGridSize = 8;
   for ( int i = -( stoneFloorGridSize / 2 ); i < ( stoneFloorGridSize / 2 ); ++i ) {

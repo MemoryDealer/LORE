@@ -1,0 +1,8 @@
+{
+  "Core": [
+    "res/sample2d/animations",
+    "res/sample2d/materials",
+    "res/sample2d/sprites",
+    "res/sample2d/textures"
+  ]
+}

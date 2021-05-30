@@ -35,7 +35,7 @@ Game::Game()
   _context = Lore::CreateContext( Lore::RenderPlugin::OpenGL );
 
   // Create a window and set it to the active window.
-  _window = _context->createWindow( "Complex Scene 2D", 640, 480, 4, Lore::RendererType::Forward2D );
+  _window = _context->createWindow( "Sample 2D", 640, 480, 4, Lore::RendererType::Forward2D );
   _window->setActive();
 }
 
@@ -53,8 +53,8 @@ void Game::loadResources()
 {
   Lore::Resource::SetWorkingDirectory( "../../../" );
 
-  // Index all resource locations for complex scene as specified in the configuration file.
-  Lore::Resource::LoadResourceConfiguration( Lore::FileUtil::ApplyWorkingDirectory( "res/complexscene/resources.json" ) );
+  // Index all resource locations for scene as specified in the configuration file.
+  Lore::Resource::LoadResourceConfiguration( Lore::FileUtil::ApplyWorkingDirectory( "res/sample2d/resources.json" ) );
   // Now load the Core resource group, which contains the resource locations we just indexed.
   Lore::Resource::LoadGroup( Lore::ResourceController::DefaultGroupName );
 }
@@ -231,7 +231,7 @@ void Game::loadScene()
 void Game::processInput()
 {
   // Player movement.
-  constexpr const Lore::real PlayerSpeed = 0.01f;
+  constexpr const Lore::real PlayerSpeed = 0.005f;
   auto spc = _playerNode->getSpriteController();
   glm::vec2 playerOffset {};
   if ( Lore::Input::GetKeyState( Lore::Keycode::W ) ) {

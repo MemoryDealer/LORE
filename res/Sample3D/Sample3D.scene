@@ -1,21 +1,21 @@
 {
   "SceneProperties": {
     "Type": "Generic",
-    "ResourceGroup": "Demo3D",
+    "ResourceGroup": "Sample3D",
     "SkyboxColor": [0.3, 0.8, 0.75],
     "SkyboxSprite": "space",
     "AmbientLightColor": [0.05, 0.05, 0.05]
   },
   "Entity": {
     "CheckeredQuad": {
-      "Model": "res/Demo3D/Models/quad.fbx",
+      "Model": "res/Sample3D/Models/quad.fbx",
       "Sprite":"checkerboard",
       "MaterialSettings": {
         "ScrollSpeed": [0.01, 0.0]
       }
     },
     "CheckeredCube": {
-      "Model": "res/Demo3D/Models/cube.fbx",
+      "Model": "res/Sample3D/Models/cube.fbx",
       "Instanced": 5,
       "Sprite": "checkerboard",
       "MaterialSettings": {
@@ -23,7 +23,7 @@
       }
     },
     "StoneQuad": {
-      "Model": "res/Demo3D/Models/quad.fbx",
+      "Model": "res/Sample3D/Models/quad.fbx",
       "Instanced": 100,
       "Sprite":"stone",
       "MaterialSettings": {
@@ -31,31 +31,31 @@
       }
     },
     "Structure": {
-      "Model": "res/Demo3D/Models/Structure/Structure.obj",
+      "Model": "res/Sample3D/Models/Structure/Structure.obj",
       "MaterialSettings": {
         "Blending": true
       }
     },
     "Light": {
-      "Model": "res/Demo3D/Models/cube.fbx",
+      "Model": "res/Sample3D/Models/cube.fbx",
       "MaterialSettings": {
         "Ambient": [10.0, 10.0, 100.0]
       }
     },
     "Light2": {
-      "Model": "res/Demo3D/Models/cube.fbx",
+      "Model": "res/Sample3D/Models/cube.fbx",
       "MaterialSettings": {
         "Ambient": [10.0, 100.0, 10.0]
       }
     },
     "Star": {
-      "Model": "res/Demo3D/Models/star/star.obj",
+      "Model": "res/Sample3D/Models/star/star.obj",
       "MaterialSettings": {
         "Ambient": [1.0, 1.0, 1.0]
       }
     },
     "Sphere": {
-      "Model": "res/Demo3D/Models/sphere.fbx",
+      "Model": "res/Sample3D/Models/sphere.fbx",
       "MaterialSettings": {
         "Ambient": [100.0, 10.0, 10.0]
       }
