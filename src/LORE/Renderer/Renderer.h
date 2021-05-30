@@ -77,10 +77,10 @@ namespace Lore {
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     using NodeList = std::vector<NodePtr>;
-    using EntityNodeMap = std::map<EntityPtr, NodeList>;
-    using InstancedEntitySet = std::unordered_set<EntityPtr>;
-    using EntityNodePair = std::pair<EntityPtr, NodePtr>;
-    using TransparentsMap = std::multimap<real, EntityNodePair>;
+    using PrefabNodeMap = std::map<PrefabPtr, NodeList>;
+    using InstancedPrefabSet = std::unordered_set<PrefabPtr>;
+    using PrefabNodePair = std::pair<PrefabPtr, NodePtr>;
+    using TransparentsMap = std::multimap<real, PrefabNodePair>;
     using BoxList = std::vector<BoxData>;
     using TextboxList = std::vector<TextboxData>;
 
@@ -91,8 +91,8 @@ namespace Lore {
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    EntityNodeMap solids {};
-    InstancedEntitySet instancedSolids {};
+    PrefabNodeMap solids {};
+    InstancedPrefabSet instancedSolids {};
     TransparentsMap transparents {};
     BoxList boxes {};
     TextboxList textboxes {};
@@ -118,7 +118,7 @@ namespace Lore {
     ///
     /// \brief Registers a Renderable object for rendering. This should be
     ///     called when a Renderable is attached to a Node.
-    virtual void addRenderData( Lore::EntityPtr e,
+    virtual void addRenderData( Lore::PrefabPtr e,
                                 Lore::NodePtr node ) = 0;
 
     virtual void addBox( Lore::BoxPtr box,

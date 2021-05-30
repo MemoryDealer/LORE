@@ -67,8 +67,8 @@ TEST_CASE( "Memory Pool", "[memory]" )
 TEST_CASE( "Multiple create/destroy", "[memory]" )
 {
   constexpr const size_t size = 2;
-  Lore::MemoryPool<Lore::Entity> pool( "test", size );
-  REQUIRE( pool.getSizeInBytes() == ( sizeof( Lore::Entity ) * size ) );
+  Lore::MemoryPool<Lore::Prefab> pool( "test", size );
+  REQUIRE( pool.getSizeInBytes() == ( sizeof( Lore::Prefab ) * size ) );
 
   SECTION( "Creation/destruction" )
   {

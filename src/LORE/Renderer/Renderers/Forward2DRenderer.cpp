@@ -29,7 +29,7 @@
 #include <LORE/Config/Config.h>
 #include <LORE/Math/Math.h>
 #include <LORE/Resource/Box.h>
-#include <LORE/Resource/Entity.h>
+#include <LORE/Resource/Prefab.h>
 #include <LORE/Renderer/IRenderAPI.h>
 #include <LORE/Resource/Font.h>
 #include <LORE/Resource/Sprite.h>
@@ -59,37 +59,37 @@ Forward2DRenderer::Forward2DRenderer()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Forward2DRenderer::addRenderData( EntityPtr entity,
+void Forward2DRenderer::addRenderData( PrefabPtr prefab,
                                      NodePtr node )
 {
   // TODO: Consider a way of optimizing this by skipping processing data here
   // and directly storing references to nodes in lists in the renderer.
-  const uint queueId = entity->getRenderQueue();
-  const bool blended = entity->getMaterial()->blendingMode.enabled;
+  const uint queueId = prefab->getRenderQueue();
+  const bool blended = prefab->getMaterial()->blendingMode.enabled;
 
   // TODO: Fix two lookups here.
   // Add this queue to the active queue list if not already there.
   activateQueue( queueId, _queues[queueId] );
 
   //
-  // Add render data for this entity at the node's position to the queue.
+  // Add render data for this prefab at the node's position to the queue.
 
   RenderQueue& queue = _queues.at( queueId );
 
   if ( blended ) {
-    RenderQueue::EntityNodePair pair { entity, node };
+    RenderQueue::PrefabNodePair pair { prefab, node };
     queue.transparents.insert( { node->getDepth(), pair } );
   }
   else {
-    if ( entity->isInstanced() ) {
-      RenderQueue::InstancedEntitySet& set = queue.instancedSolids;
-      // Only add instanced entities that haven't been processed yet.
-      if ( set.find( entity ) == set.end() ) {
-        set.insert( entity );
+    if ( prefab->isInstanced() ) {
+      RenderQueue::InstancedPrefabSet& set = queue.instancedSolids;
+      // Only add instanced prefabs that haven't been processed yet.
+      if ( set.find( prefab ) == set.end() ) {
+        set.insert( prefab );
       }
     }
     else {
-      RenderQueue::NodeList& nodes = queue.solids[entity];
+      RenderQueue::NodeList& nodes = queue.solids[prefab];
       nodes.push_back( node );
     }
   }
@@ -193,7 +193,7 @@ void Forward2DRenderer::present( const RenderView& rv, const WindowPtr window )
 
   const glm::mat4 viewProjection = projection * rv.camera->getViewMatrix();
 
-  // Render skybox before scene node entities.
+  // Render skybox before scene node prefabs.
   renderSkybox( rv, aspectRatio, projection );
 
   // Iterate through all active render queues and render each object.
@@ -348,17 +348,17 @@ void Forward2DRenderer::renderSolids( const RenderView& rv,
                                       const glm::mat4& viewProjection ) const
 {
   // Render instanced solids.
-  for ( const auto& entity : queue.instancedSolids ) {
-    MaterialPtr material = entity->getMaterial();
-    ModelPtr model = entity->getInstancedModel();
+  for ( const auto& prefab : queue.instancedSolids ) {
+    MaterialPtr material = prefab->getMaterial();
+    ModelPtr model = prefab->getInstancedModel();
     GPUProgramPtr program = nullptr;
 
-    const NodePtr node = entity->getInstanceControllerNode();
+    const NodePtr node = prefab->getInstanceControllerNode();
 
     // Acquire the correct GPUProgram for this instanced model type.
     switch ( model->getType() ) {
     default:
-      throw Lore::Exception( "Instanced entity must have an instanced model" );
+      throw Lore::Exception( "Instanced prefab must have an instanced model" );
 
     case Mesh::Type::QuadInstanced:
       program = StockResource::GetGPUProgram( "StandardInstanced2D" );
@@ -369,31 +369,31 @@ void Forward2DRenderer::renderSolids( const RenderView& rv,
       break;
     }
 
-    _api->setCullingMode( entity->cullingMode );
+    _api->setCullingMode( prefab->cullingMode );
 
     program->use();
 
     program->updateUniforms( rv, material, queue.lights );
     program->updateNodeUniforms( material, node, viewProjection );
 
-    model->draw( program, entity->getInstanceCount() );
+    model->draw( program, prefab->getInstanceCount() );
   }
 
   // Render non-instanced solids.
   for ( auto& pair : queue.solids ) {
-    const EntityPtr entity = pair.first;
+    const PrefabPtr prefab = pair.first;
     const RenderQueue::NodeList& nodes = pair.second;
 
-    const MaterialPtr material = entity->getMaterial();
-    const ModelPtr model = entity->getModel();
+    const MaterialPtr material = prefab->getMaterial();
+    const ModelPtr model = prefab->getModel();
     const GPUProgramPtr program = material->program;
 
-    _api->setCullingMode( entity->cullingMode );
+    _api->setCullingMode( prefab->cullingMode );
 
     program->use();
     program->updateUniforms( rv, material, queue.lights );
 
-    // Render each node associated with this entity.
+    // Render each node associated with this prefab.
     for ( const auto& node : nodes ) {
       program->updateNodeUniforms( material, node, viewProjection );
       model->draw( program );
@@ -412,19 +412,19 @@ void Forward2DRenderer::renderTransparents( const RenderView& rv,
   // Render in forward order, so the farthest back is rendered first.
   // (Depth values increase going farther back).
   for (const auto& pair : queue.transparents) {
-    const EntityPtr entity = pair.second.first;
+    const PrefabPtr prefab = pair.second.first;
     NodePtr node = pair.second.second;
 
-    const MaterialPtr material = entity->getMaterial();
+    const MaterialPtr material = prefab->getMaterial();
     GPUProgramPtr program = material->program;
-    ModelPtr model = entity->getModel();
+    ModelPtr model = prefab->getModel();
 
-    if ( entity->isInstanced() ) {
-      node = entity->getInstanceControllerNode();
-      model = entity->getInstancedModel();
+    if ( prefab->isInstanced() ) {
+      node = prefab->getInstanceControllerNode();
+      model = prefab->getInstancedModel();
       switch ( model->getType() ) {
       default:
-        throw Lore::Exception( "Instanced entity must have an instanced model" );
+        throw Lore::Exception( "Instanced prefab must have an instanced model" );
 
       case Mesh::Type::QuadInstanced:
         program = StockResource::GetGPUProgram( "StandardInstanced2D" );
@@ -438,15 +438,15 @@ void Forward2DRenderer::renderTransparents( const RenderView& rv,
 
     // Set blending mode using material settings.
     _api->setBlendingFunc( material->blendingMode.srcFactor, material->blendingMode.dstFactor );
-    _api->setCullingMode( entity->cullingMode );
+    _api->setCullingMode( prefab->cullingMode );
 
     program->use();
 
     program->updateUniforms( rv, material, queue.lights );
     program->updateNodeUniforms( material, node, viewProjection );
 
-    // Draw the entity.
-    model->draw( program, entity->getInstanceCount() );
+    // Draw the prefab.
+    model->draw( program, prefab->getInstanceCount() );
   }
 
   _api->setBlendingEnabled( false );

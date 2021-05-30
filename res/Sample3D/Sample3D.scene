@@ -6,7 +6,7 @@
     "SkyboxSprite": "space",
     "AmbientLightColor": [0.05, 0.05, 0.05]
   },
-  "Entity": {
+  "Prefab": {
     "CheckeredQuad": {
       "Model": "res/Sample3D/Models/quad.fbx",
       "Sprite":"checkerboard",
@@ -87,44 +87,44 @@
   "Layout": {
     "Nodes": {
       "Light0": {
-        "Entity": "Light",
+        "Prefab": "Light",
         "Light": "PointLight0",
         "Position": [0.0, 3.5, 0.0],
         "Scale": 0.25
       },
       "Light1": {
-        "Entity": "Light2",
+        "Prefab": "Light2",
         "Light": "PointLight1",
         "Position": [-5.0, 2.5, -2.0],
         "Scale": 0.25
       },
       "Star": {
-        "Entity": "Star",
+        "Prefab": "Star",
         "Position": [0.0, 2.0, -8.0],
         "Scale": 0.4
       },
       "Cube0": {
-        "Entity": "CheckeredCube",
+        "Prefab": "CheckeredCube",
         "Position": [3.0, 1.0, 0.0],
         "Scale": 1.0
       },
       "Cube1": {
-        "Entity": "CheckeredCube",
+        "Prefab": "CheckeredCube",
         "Position": [-3.0, 1.0, 0.0],
         "Scale": 1.0
       },
       "Cube2": {
-        "Entity": "CheckeredCube",
+        "Prefab": "CheckeredCube",
         "Position": [1.0, 2.0, 4.0],
         "Scale": 2.0
       },
       "Structure": {
-        "Entity": "Structure",
+        "Prefab": "Structure",
         "Position": [8.0, 0.0, -10.0],
         "Scale": 1.0
       },
       "Sphere": {
-        "Entity": "Sphere",
+        "Prefab": "Sphere",
         "Light": "PointLight2",
         "Position": [-8.0, 3.0, -10.0]
       }

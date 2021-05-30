@@ -43,7 +43,7 @@ namespace Lore {
   class Camera;
   class Context;
   struct DirectionalLight;
-  class Entity;
+  class Prefab;
   class Font;
   class GPUProgram;
   class InputController;
@@ -82,7 +82,7 @@ namespace Lore {
   using ContextPtr = Context*;
   using DirectionalLightPtr = DirectionalLight*;
   using FontPtr = Font*;
-  using EntityPtr = Entity*;
+  using PrefabPtr = Prefab*;
   using GPUProgramPtr = GPUProgram*;
   using InputControllerPtr = InputController*;
   using IResourcePtr = IResource*;

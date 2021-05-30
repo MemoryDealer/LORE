@@ -27,7 +27,7 @@
 #include "Node.h"
 
 #include <LORE/Resource/Box.h>
-#include <LORE/Resource/Entity.h>
+#include <LORE/Resource/Prefab.h>
 #include <LORE/Resource/ResourceController.h>
 #include <LORE/Resource/Textbox.h>
 
@@ -63,7 +63,7 @@ NodePtr Node::clone( const string& name, const bool cloneChildNodes )
   // TODO: Clone sprite controller...
   node->_transform = _transform;
   node->_depth = _depth;
-  node->_entities = _entities.clone();
+  node->_prefabs = _prefabs.clone();
   node->_boxes = _boxes.clone();
   node->_textboxes = _textboxes.clone();
   node->_parent = _parent;
@@ -79,11 +79,11 @@ NodePtr Node::clone( const string& name, const bool cloneChildNodes )
   }
   node->_lights = _lights.clone();
 
-  // Simulate attaching entities to this node.
-  auto it = _entities.getConstIterator();
+  // Simulate attaching prefabs to this node.
+  auto it = _prefabs.getConstIterator();
   while ( it.hasMore() ) {
-    auto entity = it.getNext();
-    entity->_notifyAttached( node );
+    auto prefab = it.getNext();
+    prefab->_notifyAttached( node );
   }
 
   _parent->_childNodes.insert( name, node );
@@ -168,10 +168,10 @@ void Node::detachFromParent()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Node::attachObject( EntityPtr entity )
+void Node::attachObject( PrefabPtr prefab )
 {
-  _entities.insert( entity->getName(), entity );
-  entity->_notifyAttached( this );
+  _prefabs.insert( prefab->getName(), prefab );
+  prefab->_notifyAttached( this );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

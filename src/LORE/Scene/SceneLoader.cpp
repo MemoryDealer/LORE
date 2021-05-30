@@ -26,7 +26,7 @@
 
 #include <LORE/Scene/SceneLoader.h>
 
-#include <LORE/Resource/Entity.h>
+#include <LORE/Resource/Prefab.h>
 #include <LORE/Resource/ResourceController.h>
 #include <LORE/Scene/IO/ModelLoader.h>
 #include <LORE/Scene/Model.h>
@@ -73,7 +73,7 @@ bool SceneLoader::process( const string& sceneFile, ScenePtr scene )
 
   // Load each section of the scene file according to priority.
   _loadProperties();
-  _loadEntities();
+  _loadPrefabs();
   _loadLighting();
   _loadLayout();
 
@@ -85,9 +85,9 @@ bool SceneLoader::process( const string& sceneFile, ScenePtr scene )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void SceneLoader::setUnloadEntities( const bool unload )
+void SceneLoader::setUnloadPrefabs( const bool unload )
 {
-  _unloadEntities = unload;
+  _unloadPrefabs = unload;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -135,23 +135,23 @@ void SceneLoader::_loadProperties()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void SceneLoader::_loadEntities()
+void SceneLoader::_loadPrefabs()
 {
-  if ( _unloadEntities ) {
-    // Unload all entities in the scene's resource group.
-    Resource::DestroyEntitiesInGroup( _resourceGroupName );
+  if ( _unloadPrefabs ) {
+    // Unload all prefabs in the scene's resource group.
+    Resource::DestroyPrefabsInGroup( _resourceGroupName );
   }
 
-  const string SceneEntities = "Entity";
-  const auto& entities = _serializer.getValue( SceneEntities );
-  if ( !entities.isNull() && SerializerValue::Type::Container == entities.getType() ) {
-    // Iterate over each entity entry and load them.
-    auto entityValues = entities.getValues();
-    for ( const auto& entity : entityValues ) {
-      const auto entityName = entity.first;
-      const SerializerValue& value = entity.second;
+  const string ScenePrefabs = "Prefab";
+  const auto& prefabs = _serializer.getValue( ScenePrefabs );
+  if ( !prefabs.isNull() && SerializerValue::Type::Container == prefabs.getType() ) {
+    // Iterate over each prefab entry and load them.
+    auto prefabValues = prefabs.getValues();
+    for ( const auto& prefab : prefabValues ) {
+      const auto prefabName = prefab.first;
+      const SerializerValue& value = prefab.second;
 
-      EntityPtr entity = nullptr;
+      PrefabPtr prefab = nullptr;
 
       // Get the model type.
       const auto& modelType = value.getValue( "ModelType" );
@@ -159,41 +159,41 @@ void SceneLoader::_loadEntities()
         // If there is no model type, look for a model path to load.
         const auto& modelPath = value.getValue( "Model" );
         if ( modelPath.isNull() ) {
-          throw Lore::SerializerException( "Entity value " + entityName + " did not specify model type or a model" );
+          throw Lore::SerializerException( "Prefab value " + prefabName + " did not specify model type or a model" );
         }
 
-        // Load the entity (load model from disk and assign a material).
+        // Load the prefab (load model from disk and assign a material).
         try {
-          entity = Resource::LoadEntity( entityName, modelPath.toString(), _resourceGroupName );
+          prefab = Resource::LoadPrefab( prefabName, modelPath.toString(), _resourceGroupName );
         }
         catch ( Lore::Exception& e ) {
-          LogWrite( Error, "Error loading entity %s: %s", entityName.c_str(), e.what() );
-          entity = Resource::GetEntity( entityName, _resourceGroupName );
-          entity->setModel( Resource::GetModel( FileUtil::GetFileName( modelPath.toString() ), _resourceGroupName ) );
+          LogWrite( Error, "Error loading prefab %s: %s", prefabName.c_str(), e.what() );
+          prefab = Resource::GetPrefab( prefabName, _resourceGroupName );
+          prefab->setModel( Resource::GetModel( FileUtil::GetFileName( modelPath.toString() ), _resourceGroupName ) );
         }
       }
       else {
-        // Create the entity.
-        entity = Resource::CreateEntity( entityName, StringToMeshType( modelType.toString() ), _resourceGroupName );
+        // Create the prefab.
+        prefab = Resource::CreatePrefab( prefabName, StringToMeshType( modelType.toString() ), _resourceGroupName );
       }
 
       // Enable instancing if specified.
       const auto& instanced = value.getValue( "Instanced" );
       if ( !instanced.isNull() && SerializerValue::Type::Int == instanced.getType() ) {
         const auto instanceCount = instanced.toInt();
-        entity->enableInstancing( instanceCount );
+        prefab->enableInstancing( instanceCount );
       }
 
       // Attach a sprite if specified.
       const auto& spriteName = value.getValue( "Sprite" );
       if ( !spriteName.isNull() ) {
-        entity->setSprite( Resource::GetSprite( spriteName.toString() ) );
+        prefab->setSprite( Resource::GetSprite( spriteName.toString() ) );
       }
 
-      // Process material settings for the entity.
+      // Process material settings for the prefab.
       const auto& materialSettings = value.getValue( "MaterialSettings" );
       if ( !materialSettings.isNull() ) {
-        _processMaterialSettings( materialSettings, entity );
+        _processMaterialSettings( materialSettings, prefab );
       }
     }
   }
@@ -313,9 +313,9 @@ void SceneLoader::_loadLayout()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void SceneLoader::_processMaterialSettings( const SerializerValue& value, EntityPtr entity )
+void SceneLoader::_processMaterialSettings( const SerializerValue& value, PrefabPtr prefab )
 {
-  auto material = entity->getMaterial();
+  auto material = prefab->getMaterial();
 
   //
   // Look for material settings.
@@ -366,11 +366,11 @@ void SceneLoader::_processNode( const string& nodeName, const SerializerValue& n
     node = _scene->createNode( nodeName );
   }
 
-  // Get the entity to attach to this node and attach it.
-  const auto& entityName = nodeData.getValue( "Entity" );
-  if ( !entityName.isNull() ) {
-    auto entity = Resource::GetEntity( entityName.toString(), _resourceGroupName );
-    node->attachObject( entity );
+  // Get the prefab to attach to this node and attach it.
+  const auto& prefabName = nodeData.getValue( "Prefab" );
+  if ( !prefabName.isNull() ) {
+    auto prefab = Resource::GetPrefab( prefabName.toString(), _resourceGroupName );
+    node->attachObject( prefab );
   }
 
   // Get the light to attach to this node if any.

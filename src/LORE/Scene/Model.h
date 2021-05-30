@@ -51,7 +51,7 @@ namespace Lore {
 
     void attachMesh( const MeshPtr mesh );
 
-    void setupShader(EntityPtr entity);
+    void setupShader(PrefabPtr prefab);
 
     //
     // Accessors.

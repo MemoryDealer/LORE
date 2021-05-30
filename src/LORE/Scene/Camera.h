@@ -48,8 +48,8 @@ namespace Lore {
     {
       RenderTargetPtr renderTarget {};
       RenderTargetPtr doubleBuffer {}; // For Gaussian blur.
-      EntityPtr entity {};
-      EntityPtr doubleBufferEntity {};
+      PrefabPtr prefab {};
+      PrefabPtr doubleBufferPrefab {};
       float exposure { 0.5f };
       float bloomThreshold { 10.0f };
       float gamma { 2.2f };

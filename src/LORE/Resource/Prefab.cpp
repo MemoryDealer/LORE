@@ -24,7 +24,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include "Entity.h"
+#include "Prefab.h"
 
 #include <LORE/Resource/Material.h>
 #include <LORE/Resource/ResourceController.h>
@@ -36,7 +36,7 @@ using namespace Lore;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Entity::~Entity()
+Prefab::~Prefab()
 {
   // HACK?
   if ( _material ) {
@@ -48,35 +48,35 @@ Entity::~Entity()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-EntityPtr Entity::clone( const string& name )
+PrefabPtr Prefab::clone( const string& name )
 {
   auto rc = Resource::GetResourceController();
-  auto entity = rc->create<Entity>( name, getResourceGroupName() );
+  auto prefab = rc->create<Prefab>( name, getResourceGroupName() );
 
-  entity->_material = _material;
-  entity->_model = _model;
-  entity->_renderQueue = _renderQueue;
+  prefab->_material = _material;
+  prefab->_model = _model;
+  prefab->_renderQueue = _renderQueue;
 
-  return entity;
+  return prefab;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-ModelPtr Entity::getInstancedModel() const
+ModelPtr Prefab::getInstancedModel() const
 {
   return _instancedModel;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-size_t Entity::getInstanceCount() const
+size_t Prefab::getInstanceCount() const
 {
   return _instanceCount;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Entity::enableInstancing( const size_t max )
+void Prefab::enableInstancing( const size_t max )
 {
   if ( isInstanced() ) {
    LogWrite( Info, "Instancing is already enabled" );
@@ -114,7 +114,7 @@ void Entity::enableInstancing( const size_t max )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Entity::disableInstancing()
+void Prefab::disableInstancing()
 {
   if ( isInstanced() ) {
     Resource::DestroyModel( _instancedModel );
@@ -126,18 +126,18 @@ void Entity::disableInstancing()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Entity::setInstanceControllerNode( const NodePtr node )
+void Prefab::setInstanceControllerNode( const NodePtr node )
 {
   _instanceControllerNode = node;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Entity::setSprite( SpritePtr sprite )
+void Prefab::setSprite( SpritePtr sprite )
 {
   _material->sprite = sprite;
 
-  // Program was assigned in Resource::LoadEntity()...if normal maps are
+  // Program was assigned in Resource::LoadPrefab()...if normal maps are
   // detected auto-switch to the normal mapping program.
   if ( _material->sprite->getTextureCount( 0, Texture::Type::Normal ) > 0 ) {
     _material->program = StockResource::GetGPUProgram( "StandardTexturedNormalMapping3D" );
@@ -146,56 +146,56 @@ void Entity::setSprite( SpritePtr sprite )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Entity::setMaterial( MaterialPtr material )
+void Prefab::setMaterial( MaterialPtr material )
 {
   _material = material;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Entity::setModel( ModelPtr buffer )
+void Prefab::setModel( ModelPtr buffer )
 {
   _model = buffer;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-NodePtr Entity::getInstanceControllerNode() const
+NodePtr Prefab::getInstanceControllerNode() const
 {
   return _instanceControllerNode;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-MaterialPtr Entity::getMaterial() const
+MaterialPtr Prefab::getMaterial() const
 {
   return _material;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-ModelPtr Entity::getModel() const
+ModelPtr Prefab::getModel() const
 {
   return _model;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-uint Entity::getRenderQueue() const
+uint Prefab::getRenderQueue() const
 {
   return _renderQueue;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-bool Entity::isInstanced() const
+bool Prefab::isInstanced() const
 {
   return !!( _instancedModel );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Entity::updateInstancedMatrix( const size_t idx, const glm::mat4& matrix )
+void Prefab::updateInstancedMatrix( const size_t idx, const glm::mat4& matrix )
 {
   _instancedModel->updateInstanced( idx, matrix );
 }
@@ -203,7 +203,7 @@ void Entity::updateInstancedMatrix( const size_t idx, const glm::mat4& matrix )
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Entity::_notifyAttached( const NodePtr node )
+void Prefab::_notifyAttached( const NodePtr node )
 {
   if ( isInstanced() ) {
     node->_instanceID = _instanceCount++;

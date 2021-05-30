@@ -38,7 +38,7 @@ TEST_CASE( "Load and unload resources in code", "[resource]" )
 
   for ( size_t i = 0; i < size; ++i ) {
     REQUIRE( Lore::Resource::CreateBox( names[i] ) );
-    REQUIRE( Lore::Resource::CreateEntity( names[i], Lore::Mesh::Type::TexturedQuad ) );
+    REQUIRE( Lore::Resource::CreatePrefab( names[i], Lore::Mesh::Type::TexturedQuad ) );
     REQUIRE( Lore::Resource::CreateGPUProgram( names[i] ) );
     REQUIRE( Lore::Resource::CreateMaterial( names[i] ) );
     REQUIRE( Lore::Resource::CreateRenderTarget( names[i], 640, 480, 0 ) );
@@ -53,7 +53,7 @@ TEST_CASE( "Load and unload resources in code", "[resource]" )
 
   for ( size_t i = 0; i < size; ++i ) {
     REQUIRE( Lore::Resource::GetBox( names[i] ) );
-    REQUIRE( Lore::Resource::GetEntity( names[i] ) );
+    REQUIRE( Lore::Resource::GetPrefab( names[i] ) );
     REQUIRE( Lore::Resource::GetGPUProgram( names[i] ) );
     REQUIRE( Lore::Resource::GetMaterial( names[i] ) );
     REQUIRE( Lore::Resource::GetRenderTarget( names[i] ) );
@@ -70,7 +70,7 @@ TEST_CASE( "Load and unload resources in code", "[resource]" )
 
   for ( size_t i = 0; i < size; ++i ) {
     CHECK_THROWS( Lore::Resource::GetBox( names[i] ) );
-    CHECK_THROWS( Lore::Resource::GetEntity( names[i] ) );
+    CHECK_THROWS( Lore::Resource::GetPrefab( names[i] ) );
     CHECK_THROWS( Lore::Resource::GetFont( names[i] ) );
     CHECK_THROWS( Lore::Resource::GetGPUProgram( names[i] ) );
     CHECK_THROWS( Lore::Resource::GetMaterial( names[i] ) );
@@ -97,7 +97,7 @@ TEST_CASE( "Load and unload resources in code, different group", "[resource]" )
 
   for ( size_t i = 0; i < size; ++i ) {
     REQUIRE( Lore::Resource::CreateBox( names[i], groupName ) );
-    REQUIRE( Lore::Resource::CreateEntity( names[i], Lore::Mesh::Type::TexturedQuad, groupName ) );
+    REQUIRE( Lore::Resource::CreatePrefab( names[i], Lore::Mesh::Type::TexturedQuad, groupName ) );
     REQUIRE( Lore::Resource::CreateGPUProgram( names[i], groupName ) );
     REQUIRE( Lore::Resource::CreateMaterial( names[i], groupName ) );
     REQUIRE( Lore::Resource::CreateRenderTarget( names[i], 640, 480, 0, groupName ) );
@@ -112,7 +112,7 @@ TEST_CASE( "Load and unload resources in code, different group", "[resource]" )
 
   for ( size_t i = 0; i < size; ++i ) {
     REQUIRE( Lore::Resource::GetBox( names[i], groupName ) );
-    REQUIRE( Lore::Resource::GetEntity( names[i], groupName ) );
+    REQUIRE( Lore::Resource::GetPrefab( names[i], groupName ) );
     REQUIRE( Lore::Resource::GetGPUProgram( names[i], groupName ) );
     REQUIRE( Lore::Resource::GetMaterial( names[i], groupName ) );
     REQUIRE( Lore::Resource::GetRenderTarget( names[i], groupName ) );
@@ -129,7 +129,7 @@ TEST_CASE( "Load and unload resources in code, different group", "[resource]" )
 
   for ( size_t i = 0; i < size; ++i ) {
     CHECK_THROWS( Lore::Resource::GetBox( names[i], groupName ) );
-    CHECK_THROWS( Lore::Resource::GetEntity( names[i], groupName ) );
+    CHECK_THROWS( Lore::Resource::GetPrefab( names[i], groupName ) );
     CHECK_THROWS( Lore::Resource::GetFont( names[i], groupName ) );
     CHECK_THROWS( Lore::Resource::GetGPUProgram( names[i], groupName ) );
     CHECK_THROWS( Lore::Resource::GetMaterial( names[i], groupName ) );

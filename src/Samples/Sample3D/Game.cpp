@@ -108,7 +108,7 @@ void Game::loadScene()
 //   postProcessor.camera = _context->createCamera( "postCam", Lore::Camera::Type::Type2D );
 //   _window->addRenderView( postProcessor );
 // 
-//   auto ppe = Lore::Resource::CreateEntity( "ppe", Lore::Mesh::Type::TexturedQuad );
+//   auto ppe = Lore::Resource::CreatePrefab( "ppe", Lore::Mesh::Type::TexturedQuad );
 //   ppe->getMaterial()->program = Lore::StockResource::GetGPUProgram( "UnlitTexturedRTT" );
 // 
 //   auto rttSprite = Lore::Resource::CreateSprite( "rtt" );
@@ -132,13 +132,13 @@ void Game::loadScene()
   loader.process( Lore::FileUtil::ApplyWorkingDirectory( "res/sample3d/sample3d.scene" ), _scene );
 
   // Create stone flooring.
-  auto stoneEntity = Lore::Resource::GetEntity( "StoneQuad", "Sample3D" );
+  auto stonePrefab = Lore::Resource::GetPrefab( "StoneQuad", "Sample3D" );
   constexpr Lore::real StoneFloorScale = 2.f;
   constexpr int stoneFloorGridSize = 8;
   for ( int i = -( stoneFloorGridSize / 2 ); i < ( stoneFloorGridSize / 2 ); ++i ) {
     for ( int j = -( stoneFloorGridSize / 2 ); j < ( stoneFloorGridSize / 2 ); ++j ) {
       auto node = _scene->createNode( "stone-floor" + std::to_string( i ) + std::to_string( j ) );
-      node->attachObject( stoneEntity );
+      node->attachObject( stonePrefab );
       node->setPosition( static_cast<Lore::real>( i ) * StoneFloorScale * 2.f, 0.f, static_cast<Lore::real>( j ) * StoneFloorScale * 2.f);
       node->rotate( Lore::Vec3PosX, glm::radians( 90.f ) );
       node->scale( StoneFloorScale );

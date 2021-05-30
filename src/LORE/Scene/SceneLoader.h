@@ -44,17 +44,17 @@ namespace Lore {
 
     bool process( const string& sceneFile, ScenePtr scene );
 
-    // If unload is true, all entities in scene's resource group will be unloaded first.
-    void setUnloadEntities( const bool unload );
+    // If unload is true, all prefabs in scene's resource group will be unloaded first.
+    void setUnloadPrefabs( const bool unload );
 
   private:
 
     void _loadProperties();
-    void _loadEntities();
+    void _loadPrefabs();
     void _loadLighting();
     void _loadLayout();
 
-    void _processMaterialSettings( const SerializerValue& value, EntityPtr entity);
+    void _processMaterialSettings( const SerializerValue& value, PrefabPtr prefab);
     void _processNode( const string& nodeName, const SerializerValue& nodeData, const NodePtr parent = nullptr );
 
   private:
@@ -62,7 +62,7 @@ namespace Lore {
     Serializer _serializer {};
     ScenePtr _scene { nullptr };
     string _resourceGroupName {};
-    bool _unloadEntities { false };
+    bool _unloadPrefabs { false };
 
   };
 

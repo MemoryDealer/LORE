@@ -47,7 +47,7 @@
 
 // Resource.
 #include <LORE/Resource/Box.h>
-#include <LORE/Resource/Entity.h>
+#include <LORE/Resource/Prefab.h>
 #include <LORE/Resource/Material.h>
 #include <LORE/Resource/Sprite.h>
 #include <LORE/Resource/StockResource.h>

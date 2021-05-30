@@ -92,20 +92,20 @@ void Game::loadScene()
   _playerNode->setDepth( -50.f );
   _playerNode->setPosition( 0.f, 0.25f );
 
-  // In order to render our player sprite, we must create an entity, which describes
+  // In order to render our player sprite, we must create an prefab, which describes
   // how to render a sprite (most of the time this is a TexturedQuad).
-  Lore::EntityPtr playerEntity = Lore::Resource::CreateEntity( "player", Lore::Mesh::Type::TexturedQuad );
+  Lore::PrefabPtr playerPrefab = Lore::Resource::CreatePrefab( "player", Lore::Mesh::Type::TexturedQuad );
 
-  // Assign our player sprite to the entity so it can be rendered with it.
+  // Assign our player sprite to the prefab so it can be rendered with it.
   // (The "player" sprite was loaded into the Core resource group in loadResources()).
-  playerEntity->setSprite( Lore::Resource::GetSprite( "player" ) );
+  playerPrefab->setSprite( Lore::Resource::GetSprite( "player" ) );
 
   // Disable backface culling on player sprite since we flip its matrix during movement.
-  playerEntity->cullingMode = Lore::IRenderAPI::CullingMode::None;
+  playerPrefab->cullingMode = Lore::IRenderAPI::CullingMode::None;
 
-  // Now attach the player entity to the player node, so wherever the node goes,
+  // Now attach the player prefab to the player node, so wherever the node goes,
   // the player sprite will be rendered.
-  _playerNode->attachObject( playerEntity );
+  _playerNode->attachObject( playerPrefab );
 
   // Setup animations for player sprite (this animation set was loaded from main.animation).
   auto spc = _playerNode->createSpriteController();
@@ -120,13 +120,13 @@ void Game::loadScene()
   //
   // Add some blocks to the scene.
 
-  Lore::EntityPtr blockEntity = Lore::Resource::CreateEntity( "block", Lore::Mesh::Type::TexturedQuad );
-  blockEntity->enableInstancing( 1000 );
-  blockEntity->setSprite( Lore::Resource::GetSprite( "block" ) );
-  blockEntity->cullingMode = Lore::IRenderAPI::CullingMode::None; // Some blocks we rotate to the backface.
+  Lore::PrefabPtr blockPrefab = Lore::Resource::CreatePrefab( "block", Lore::Mesh::Type::TexturedQuad );
+  blockPrefab->enableInstancing( 1000 );
+  blockPrefab->setSprite( Lore::Resource::GetSprite( "block" ) );
+  blockPrefab->cullingMode = Lore::IRenderAPI::CullingMode::None; // Some blocks we rotate to the backface.
   for ( int i = 0; i < 10; ++i ) {
     auto blockNode = _scene->createNode( "block" + std::to_string( i ) );
-    blockNode->attachObject( blockEntity );
+    blockNode->attachObject( blockPrefab );
 
     blockNode->scale( 0.4f );
     blockNode->setPosition( -1.f + static_cast< Lore::real >( i * 0.2f ), 0.f );
@@ -136,17 +136,17 @@ void Game::loadScene()
   //
   // Add some stone walls behind the blocks.
 
-  Lore::EntityPtr stoneEntity = Lore::Resource::CreateEntity( "stone", Lore::Mesh::Type::TexturedQuad );
+  Lore::PrefabPtr stonePrefab = Lore::Resource::CreatePrefab( "stone", Lore::Mesh::Type::TexturedQuad );
 #ifdef _DEBUG
   const size_t count = 100;
 #else
   const size_t count = 10000;
 #endif
-  stoneEntity->enableInstancing( count );
-  stoneEntity->setSprite( Lore::Resource::GetSprite( "stone" ) );
+  stonePrefab->enableInstancing( count );
+  stonePrefab->setSprite( Lore::Resource::GetSprite( "stone" ) );
   for ( int i = 0; i < count / 2; ++i ) {
     auto stoneNode = _scene->createNode( "stone" + std::to_string( i ) );
-    stoneNode->attachObject( stoneEntity );
+    stoneNode->attachObject( stonePrefab );
 
     stoneNode->scale( 2.f );
     stoneNode->setDepth( 10.f );
@@ -154,7 +154,7 @@ void Game::loadScene()
 
     // Add a 2nd row that will go above the stained glass.
     auto stoneNode2 = _scene->createNode( "2stone" + std::to_string( i ) );
-    stoneNode2->attachObject( stoneEntity );
+    stoneNode2->attachObject( stonePrefab );
     stoneNode2->scale( 2.f );
     stoneNode2->setDepth( 10.f );
     stoneNode2->setPosition( -4.f + static_cast< Lore::real >( i * 0.4f ), .8f );
@@ -163,11 +163,11 @@ void Game::loadScene()
   //
   // Create some torches.
 
-  Lore::EntityPtr torchEntity = Lore::Resource::CreateEntity( "torch", Lore::Mesh::Type::TexturedQuad );
-  torchEntity->setSprite( Lore::Resource::GetSprite( "torch" ) );
+  Lore::PrefabPtr torchPrefab = Lore::Resource::CreatePrefab( "torch", Lore::Mesh::Type::TexturedQuad );
+  torchPrefab->setSprite( Lore::Resource::GetSprite( "torch" ) );
   for ( int i = 0; i < 3; ++i ) {
     auto torchNode = _scene->createNode( "torch" + std::to_string( i ) );
-    torchNode->attachObject( torchEntity );
+    torchNode->attachObject( torchPrefab );
     torchNode->setPosition( 0.5f - static_cast<float>(i * 2), 0.24f );
     torchNode->scale( 0.5f );
     auto torchSPC = torchNode->createSpriteController();
@@ -186,12 +186,12 @@ void Game::loadScene()
   //
   // Add blended stained glass.
 
-  Lore::EntityPtr glassEntity = Lore::Resource::CreateEntity( "glass1", Lore::Mesh::Type::TexturedQuad );
-  glassEntity->enableInstancing( 10 );
-  glassEntity->setMaterial( Lore::Resource::GetMaterial( "glass1" ) );
+  Lore::PrefabPtr glassPrefab = Lore::Resource::CreatePrefab( "glass1", Lore::Mesh::Type::TexturedQuad );
+  glassPrefab->enableInstancing( 10 );
+  glassPrefab->setMaterial( Lore::Resource::GetMaterial( "glass1" ) );
   for ( int i = 0; i < 5; ++i ) {
     auto glassNode = _scene->createNode( "glass1" + std::to_string( i ) );
-    glassNode->attachObject( glassEntity );
+    glassNode->attachObject( glassPrefab );
     glassNode->scale( 2.f );
     glassNode->setPosition( -1.f + static_cast< Lore::real >( i * 0.4f ), .4f );
   }

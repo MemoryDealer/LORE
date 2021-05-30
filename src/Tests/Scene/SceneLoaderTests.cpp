@@ -54,9 +54,9 @@ TEST_CASE( "Load scene from file", "[scene]" )
   const Lore::Color ambientLightColor( .05f, .05f, .05f, 1.f );
   REQUIRE( scene->getAmbientLightColor() == ambientLightColor );
 
-  // Check loaded entities.
-  REQUIRE( Lore::Resource::GetEntity( "CheckeredFloor", resourceGroup ) );
-  REQUIRE( Lore::Resource::GetEntity( "CheckeredCube", resourceGroup ) );
+  // Check loaded prefabs.
+  REQUIRE( Lore::Resource::GetPrefab( "CheckeredFloor", resourceGroup ) );
+  REQUIRE( Lore::Resource::GetPrefab( "CheckeredCube", resourceGroup ) );
 
   // Check lights.
   REQUIRE( 1 == scene->getDirectionalLightCount() );

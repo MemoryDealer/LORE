@@ -34,7 +34,7 @@
 #include <LORE/Renderer/RendererFactory.h>
 #include <LORE/Renderer/SceneGraphVisitor.h>
 #include <LORE/Resource/Box.h>
-#include <LORE/Resource/Entity.h>
+#include <LORE/Resource/Prefab.h>
 #include <LORE/Resource/StockResource.h>
 #include <LORE/Resource/Sprite.h>
 #include <LORE/Resource/Textbox.h>
@@ -70,13 +70,13 @@ Context::~Context()
 
   destroyAllCameras();
 
-  // Explicitly destroy Entity/Model/Scene objects before resources, otherwise the order of destruction
+  // Explicitly destroy Prefab/Model/Scene objects before resources, otherwise the order of destruction
   // in the pool cluster can lead to crashes, since resources (such as Box or Light) can be destroyed
   // before the owning object tries to delete them (AABBs for Boxes).
 
   // TODO: I keep having to add more to this ordering, need to find a real solution to this inter-dependency problem.
   _poolCluster.unregisterPool<RenderTarget>();
-  _poolCluster.unregisterPool<Entity>();
+  _poolCluster.unregisterPool<Prefab>();
   _poolCluster.unregisterPool<Model>();
   _poolCluster.unregisterPool<Scene>();
 }
@@ -93,7 +93,7 @@ void Context::initConfiguration()
   _poolCluster.registerPool<SpotLight>( 4 );
 
   _poolCluster.registerPool<Box>( 1024 );
-  _poolCluster.registerPool<Entity>( 16 );
+  _poolCluster.registerPool<Prefab>( 16 );
   _poolCluster.registerPool<Material>( 64 );
   _poolCluster.registerPool<Model>( 32 );
   _poolCluster.registerPool<Node>( 1024 );

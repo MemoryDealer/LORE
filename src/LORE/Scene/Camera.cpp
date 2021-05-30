@@ -27,7 +27,7 @@
 #include "Camera.h"
 
 #include <LORE/Math/Math.h>
-#include <LORE/Resource/Entity.h>
+#include <LORE/Resource/Prefab.h>
 #include <LORE/Resource/ResourceController.h>
 #include <LORE/Resource/StockResource.h>
 #include <LORE/Scene/Node.h>
@@ -52,10 +52,10 @@ Camera::~Camera()
   if ( postProcessing ) {
     Resource::DestroyRenderTarget( postProcessing->renderTarget );
     Resource::DestroyRenderTarget( postProcessing->doubleBuffer );
-    Resource::DestroySprite( postProcessing->entity->_material->sprite );
-    Resource::DestroySprite( postProcessing->doubleBufferEntity->_material->sprite );
-    Resource::DestroyEntity( postProcessing->entity );
-    Resource::DestroyEntity( postProcessing->doubleBufferEntity );
+    Resource::DestroySprite( postProcessing->prefab->_material->sprite );
+    Resource::DestroySprite( postProcessing->doubleBufferPrefab->_material->sprite );
+    Resource::DestroyPrefab( postProcessing->prefab );
+    Resource::DestroyPrefab( postProcessing->doubleBufferPrefab );
   }
 }
 
@@ -193,10 +193,10 @@ void Camera::initPostProcessing( const u32 width, const u32 height, const u32 sa
   if ( postProcessing ) {
     Resource::DestroyRenderTarget( postProcessing->renderTarget );
     Resource::DestroyRenderTarget( postProcessing->doubleBuffer );
-    Resource::DestroySprite( postProcessing->entity->_material->sprite );
-    Resource::DestroySprite( postProcessing->doubleBufferEntity->_material->sprite );
-    Resource::DestroyEntity( postProcessing->entity );
-    Resource::DestroyEntity( postProcessing->doubleBufferEntity );
+    Resource::DestroySprite( postProcessing->prefab->_material->sprite );
+    Resource::DestroySprite( postProcessing->doubleBufferPrefab->_material->sprite );
+    Resource::DestroyPrefab( postProcessing->prefab );
+    Resource::DestroyPrefab( postProcessing->doubleBufferPrefab );
   }
 
   postProcessing = std::make_unique<PostProcessing>();
@@ -204,24 +204,24 @@ void Camera::initPostProcessing( const u32 width, const u32 height, const u32 sa
   postProcessing->renderTarget = Resource::CreatePostProcessingBuffer( _name + "_post_buffer", width, height, sampleCount );
   postProcessing->doubleBuffer = Resource::CreateDoubleBuffer( _name + "_double_buffer", width, height, 0 );
 
-  // We need an entity for rendering our fullscreen quad.
-  postProcessing->entity = Resource::CreateEntity( _name + "_entity", Mesh::Type::FullscreenQuad );
-  postProcessing->entity->_material->program = StockResource::GetGPUProgram( "PostProcessing" );
+  // We need an prefab for rendering our fullscreen quad.
+  postProcessing->prefab = Resource::CreatePrefab( _name + "_prefab", Mesh::Type::FullscreenQuad );
+  postProcessing->prefab->_material->program = StockResource::GetGPUProgram( "PostProcessing" );
 
   // Create a sprite for our render target texture.
   auto sprite = Resource::CreateSprite( _name + "_post_sprite" );
   sprite->addTexture( Texture::Type::Diffuse, postProcessing->renderTarget->getTexture() );
-  postProcessing->entity->_material->sprite = sprite;
-  postProcessing->entity->_material->lighting = false;
+  postProcessing->prefab->_material->sprite = sprite;
+  postProcessing->prefab->_material->lighting = false;
 
-  // Also create an entity for the double buffering.
-  postProcessing->doubleBufferEntity = Resource::CreateEntity( _name + "_db_entity", Mesh::Type::FullscreenQuad );
-  postProcessing->doubleBufferEntity->_material->program = StockResource::GetGPUProgram( "GaussianBlur" );
+  // Also create an prefab for the double buffering.
+  postProcessing->doubleBufferPrefab = Resource::CreatePrefab( _name + "_db_prefab", Mesh::Type::FullscreenQuad );
+  postProcessing->doubleBufferPrefab->_material->program = StockResource::GetGPUProgram( "GaussianBlur" );
 
   auto dbSprite = Resource::CreateSprite( _name + "_post_db_sprite" );
   dbSprite->addTexture( Texture::Type::Diffuse, postProcessing->doubleBuffer->getTexture() );
-  postProcessing->doubleBufferEntity->_material->sprite = dbSprite;
-  postProcessing->doubleBufferEntity->_material->lighting = false;
+  postProcessing->doubleBufferPrefab->_material->sprite = dbSprite;
+  postProcessing->doubleBufferPrefab->_material->lighting = false;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

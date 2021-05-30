@@ -34,15 +34,15 @@
 
 namespace Lore {
 
-  class LORE_EXPORT Entity final : public Alloc<Entity>, public IResource
+  class LORE_EXPORT Prefab final : public Alloc<Prefab>, public IResource
   {
 
   public:
 
-    Entity() = default;
-    ~Entity() override;
+    Prefab() = default;
+    ~Prefab() override;
 
-    EntityPtr clone( const string& name );
+    PrefabPtr clone( const string& name );
 
     //
     // Special instancing functions.
@@ -51,10 +51,10 @@ namespace Lore {
     size_t getInstanceCount() const;
 
     ///
-    /// \brief All nodes that use this Entity after a call to this function will be
+    /// \brief All nodes that use this Prefab after a call to this function will be
     /// rendered with instancing. This greatly improves performance for many Nodes
-    /// using the same Entity.
-    /// Note: This should be called before attaching this Entity to all nodes desired
+    /// using the same Prefab.
+    /// Note: This should be called before attaching this Prefab to all nodes desired
     /// to use instancing.
     void enableInstancing( const size_t max );
 
@@ -106,7 +106,7 @@ namespace Lore {
     MaterialPtr _material { nullptr };
     ModelPtr _model { nullptr };
 
-    // Only used if Entity is instanced.
+    // Only used if Prefab is instanced.
     ModelPtr _instancedModel { nullptr };
     size_t _instanceCount { 0 };
     NodePtr _instanceControllerNode { nullptr };
