@@ -4,8 +4,12 @@
     "diffuse": "stone",
     "normal": "stone-normal"
   },
-  "brick": {
-    "diffuse":"brickwall",
-    "normal":"brickwall_normal"
+  "VioletMetal": {
+    "diffuse": "violet-metal-diffuse",
+    "normal": "violet-metal-normal"
+  },
+  "RomanTravertine": {
+    "diffuse": "roman-travertine-diffuse",
+    "normal": "roman-travertine-normal"
   }
 }

@@ -33,12 +33,26 @@
         "Ambient": [10.0, 10.0, 100.0]
       }
     },
+    "Cube": {
+      "Model": "res/Sample3D/Models/cube.fbx",
+      "Sprite": "VioletMetal",
+      "MaterialSettings": {
+        "Ambient": [1.0, 1.0, 1.0],
+        "ScrollSpeed": [1.0, 0.0],
+        "Shininess": 32.0
+      }
+    },
+    "MarblePillar": {
+      "Model": "res/Sample3D/Models/cylinder.obj",
+      "Sprite": "RomanTravertine"
+    },
+    "Roof": {
+      "Model": "res/Sample3D/Models/roof.obj",
+      "Sprite": "stone"
+    },
     "MagicSphere": {
       "Model": "res/Sample3D/Models/sphere.fbx",
       "StockMaterial": "Reflect3D",
-      "MaterialSettings": {
-
-      },
       "Sprite": "space"
     }
   },
@@ -87,6 +101,34 @@
             "Scale": 0.25
           }
         }
+      },
+      "MetalCube": {
+        "Prefab": "Cube",
+        "Position": [3.0, 0.5, 0.5]
+      },
+      "Pillars": {
+        "ChildNodes": {
+          "Pillar1": {
+            "Prefab": "MarblePillar",
+            "Position": [12.0, 0.0, 12.0]
+          },
+          "Pillar2": {
+            "Prefab": "MarblePillar",
+            "Position": [-12.0, 0.0, 12.0]
+          },
+          "Pillar3": {
+            "Prefab": "MarblePillar",
+            "Position": [-12.0, 0.0, -12.0]
+          },
+          "Pillar4": {
+            "Prefab": "MarblePillar",
+            "Position": [12.0, 0.0, -12.0]
+          }
+        }
+      },
+      "Roof": {
+        "Prefab": "Roof",
+        "Position": [0.0, 6.0, 0.0]
       }
     }
   }
