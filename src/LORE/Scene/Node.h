@@ -211,7 +211,7 @@ namespace Lore {
       return _transform.position;
     }
 
-    inline glm::vec3 getDerivedPosition() const
+    inline glm::vec3 getWorldPosition() const
     {
       return glm::vec3( _transform.world[3][0], _transform.world[3][1], _transform.world[3][2] );
     }

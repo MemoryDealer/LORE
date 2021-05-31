@@ -150,7 +150,7 @@ void Forward3DRenderer::addLight( LightPtr light,
     break;
 
   case Light::Type::Point:
-    queue.lights.pointLights.emplace_back( static_cast< PointLightPtr >( light ), node->getDerivedPosition() );
+    queue.lights.pointLights.emplace_back( static_cast<PointLightPtr>( light ), node->getWorldPosition() );
     break;
   }
 }

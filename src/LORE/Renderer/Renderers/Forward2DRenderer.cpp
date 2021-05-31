@@ -147,7 +147,7 @@ void Forward2DRenderer::addLight( LightPtr light, const NodePtr node )
     break;
 
   case Light::Type::Point:
-    queue.lights.pointLights.emplace_back( static_cast< PointLightPtr >( light ), node->getDerivedPosition() );
+    queue.lights.pointLights.emplace_back( static_cast< PointLightPtr >( light ), node->getWorldPosition() );
     break;
   }
 }
@@ -220,7 +220,7 @@ void Forward2DRenderer::present( const RenderView& rv, const WindowPtr window )
       if ( aabb ) {
         RenderQueue::BoxData data;
         data.box = aabb->getBox();
-        data.model = Math::CreateTransformationMatrix( node->getDerivedPosition(), glm::quat(), aabb->getDimensions() * 5.f );
+        data.model = Math::CreateTransformationMatrix( node->getWorldPosition(), glm::quat(), aabb->getDimensions() * 5.f );
         data.model[3][2] = Node::Depth::Min;
 
         tmpQueue.boxes.push_back( data );

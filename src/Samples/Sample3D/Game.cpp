@@ -204,8 +204,8 @@ void Game::processInput()
 
 void Game::update()
 {
-  auto node = _scene->getNode( "MagicSphere" );
-  node->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( 0.0001f ) );
+  static auto magicSphere = _scene->getNode( "MagicSphere" );
+  magicSphere->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( 0.0001f ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

@@ -476,7 +476,7 @@ void Node::_updateWorldTransform( const glm::mat4& m )
   while ( it.hasMore() ) {
     auto light = it.getNext();
     if ( Light::Type::Point == light->_type ) {
-      light->updateShadowTransforms( _transform.position );
+      light->updateShadowTransforms( getWorldPosition() );
     }
   }
 }
