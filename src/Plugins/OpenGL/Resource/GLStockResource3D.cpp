@@ -256,7 +256,8 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
   if ( textured ) {
     src += "in vec2 TexCoord;";
-    src += "uniform vec2 texSampleOffset = vec2(1.0, 1.0);";
+    src += "uniform vec2 texSampleOffset = vec2(0.0, 0.0);";
+    src += "uniform vec2 uvScale = vec2(0.0, 0.0);";
   }
 
   if ( textured ) {
@@ -440,11 +441,11 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       {
         for ( uint32_t i = 0; i < params.maxDiffuseTextures; ++i ) {
           if ( 0 == i ) {
-            src += "vec3 diffuse0 = vec3(texture(diffuseTexture0, TexCoord + texSampleOffset));";
+            src += "vec3 diffuse0 = vec3(texture(diffuseTexture0, TexCoord * uvScale + texSampleOffset));";
           }
           else {
             src += "vec3 diffuse" + std::to_string( i ) + " = mix(vec3(texture(diffuseTexture" +
-              std::to_string( i ) + ", TexCoord + texSampleOffset)), diffuse" + std::to_string( i - 1 ) +
+              std::to_string( i ) + ", TexCoord * uvScale + texSampleOffset)), diffuse" + std::to_string( i - 1 ) +
               ", diffuseMixValues[" + std::to_string( i ) + "]);";
           }
         }
@@ -455,7 +456,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
       src += "vec3 SampleSpecularTextures() {";
       {
-        src += "return vec3(texture(specularTexture0, TexCoord + texSampleOffset));";
+        src += "return vec3(texture(specularTexture0, TexCoord * uvScale + texSampleOffset));";
       }
       src += "}";
 
@@ -465,7 +466,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
           src += "vec3 normal;";
 
           // TODO: Multitexturing...
-          src += "normal = texture(normalTexture0, TexCoord + texSampleOffset).rgb;";
+          src += "normal = texture(normalTexture0, TexCoord * uvScale + texSampleOffset).rgb;";
           src += "normal = normalize(normal * 2.0 - 1.0);";
 
           src += "return normal;";
@@ -567,7 +568,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
   src += "void main(){";
   {
     if ( textured ) {
-      src += "vec4 diffuse = texture(diffuseTexture0, TexCoord + texSampleOffset);";
+      src += "vec4 diffuse = texture(diffuseTexture0, TexCoord * uvScale + texSampleOffset);";
       src += "if (diffuse.a < 0.1) {";
       {
         src += "discard;";
@@ -725,6 +726,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     program->addUniformVar( "specularTexture0");
 
     program->addUniformVar( "texSampleOffset" );
+    program->addUniformVar( "uvScale" );
     program->addUniformVar( "texSampleRegion.x" );
     program->addUniformVar( "texSampleRegion.y" );
     program->addUniformVar( "texSampleRegion.w" );
@@ -856,6 +858,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       }
 
       program->setUniformVar( "texSampleOffset", material->getTexCoordOffset() );
+      program->setUniformVar( "uvScale", material->uvScale );
 
       const Rect sampleRegion = material->getTexSampleRegion();
       program->setUniformVar( "texSampleRegion.x", sampleRegion.x );
@@ -916,6 +919,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       }
 
       program->setUniformVar( "texSampleOffset", material->getTexCoordOffset() );
+      program->setUniformVar( "uvScale", material->uvScale );
 
       const Rect sampleRegion = material->getTexSampleRegion();
       program->setUniformVar( "texSampleRegion.x", sampleRegion.x );

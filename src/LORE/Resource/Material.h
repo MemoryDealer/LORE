@@ -108,6 +108,8 @@ namespace Lore {
     real shininess { 32.f };
     SpritePtr sprite { nullptr };
     GPUProgramPtr program { nullptr };
+    
+    glm::vec2 uvScale { 1.f, 1.f };
 
     struct
     {

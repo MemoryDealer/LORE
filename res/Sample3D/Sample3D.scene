@@ -33,13 +33,22 @@
         "Ambient": [10.0, 10.0, 100.0]
       }
     },
-    "Cube": {
+    "VioletMetalCube": {
       "Model": "res/Sample3D/Models/cube.fbx",
       "Sprite": "VioletMetal",
       "MaterialSettings": {
         "Ambient": [1.0, 1.0, 1.0],
-        "ScrollSpeed": [1.0, 0.0],
         "Shininess": 32.0
+      }
+    },
+    "CheckeredCube": {
+      "Model": "res/Sample3D/Models/cube.fbx",
+      "Sprite": "Checkerboard",
+      "MaterialSettings": {
+        "Ambient": [1.0, 1.0, 1.0],
+        "Shininess": 32.0,
+        "UVScale": [5.0, 5.0],
+        "ScrollSpeed": [0.001, 0.0]
       }
     },
     "MarblePillar": {
@@ -102,8 +111,8 @@
           }
         }
       },
-      "MetalCube": {
-        "Prefab": "Cube",
+      "VioletMetalCube": {
+        "Prefab": "VioletMetalCube",
         "Position": [3.0, 0.5, 0.5]
       },
       "Pillars": {
@@ -123,6 +132,18 @@
           "Pillar4": {
             "Prefab": "MarblePillar",
             "Position": [12.0, 0.0, -12.0]
+          }
+        }
+      },
+      "CheckeredCubes": {
+        "ChildNodes": {
+          "CheckeredCube1": {
+            "Prefab": "CheckeredCube",
+            "Position": [6.0, 5.0, 6.0]
+          },
+          "CheckeredCube2": {
+            "Prefab": "CheckeredCube",
+            "Position": [-6.0, 5.0, -6.0]
           }
         }
       },

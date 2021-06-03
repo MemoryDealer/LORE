@@ -353,6 +353,12 @@ void SceneLoader::_processMaterialSettings( const SerializerValue& value, Prefab
     material->shininess = shininess.toReal();
   }
 
+  // UV scaling.
+  const auto& uvScale = value.getValue( "UVScale" );
+  if ( !uvScale.isNull() ) {
+    material->uvScale = uvScale.toVec2();
+  }
+
   // Scrolling.
   const auto& scrollSpeed = value.getValue( "ScrollSpeed" );
   if ( !scrollSpeed.isNull() ) {
