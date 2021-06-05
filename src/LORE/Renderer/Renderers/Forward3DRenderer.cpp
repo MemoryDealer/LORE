@@ -544,6 +544,8 @@ void Forward3DRenderer::_renderShadowMaps( const RenderView& rv,
       model->draw( shadowProgram, 0, false, false );
     }
   }
+
+  _api->setCullingMode( IRenderAPI::CullingMode::Back);
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

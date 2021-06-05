@@ -51,6 +51,8 @@ void DebugUI_GFX::render()
 {
   ImGui::Begin( "GFX", nullptr );
 
+  ImGui::SliderFloat( "Omni Bias", &DebugConfig::omniBias, 0.01f, 0.5f );
+
   ImGui::SliderFloat( "Exposure", &DebugConfig::hdrExposure, 0.01f, 5.0f );
 
   ImGui::Checkbox( "Bloom Enabled", &DebugConfig::bloomEnabled );

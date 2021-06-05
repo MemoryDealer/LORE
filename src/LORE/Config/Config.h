@@ -54,6 +54,10 @@ namespace Lore {
     //
     // GFX.
 
+    // Shadows.
+
+    static float omniBias;
+
     // Post-processing.
 
     static float hdrExposure;

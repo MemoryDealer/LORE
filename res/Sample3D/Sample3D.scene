@@ -113,7 +113,7 @@
       },
       "VioletMetalCube": {
         "Prefab": "VioletMetalCube",
-        "Position": [3.0, 0.5, 0.5]
+        "Position": [9.0, 0.5, 0.5]
       },
       "Pillars": {
         "ChildNodes": {

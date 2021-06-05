@@ -331,6 +331,8 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     if ( shadows ) {
       src += "in vec4 FragPosDirLightSpace[" + std::to_string( params.maxDirectionalLights ) + "];";
       src += "uniform sampler2D dirLightShadowMap[" + std::to_string( params.maxDirectionalLights ) + "];";
+
+      src += "uniform float omniBias = 0.05f;";
     }
     src += "uniform int numDirLights;";
 
@@ -406,8 +408,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
         src += "closestDepth *= light.shadowFarPlane;"; // Re-map back to original space.
 
         src += "float currentDepth = length(fragToLight);";
-        src += "float bias = 0.05;";
-        src += "float shadow = (currentDepth - bias) > closestDepth ? 1.0 : 0.0;";
+        src += "float shadow = (currentDepth - omniBias) > closestDepth ? 1.0 : 0.0;";
 
         //src += "float shadow = 0.0;";
         //src += "int samples = 20;";
@@ -690,6 +691,8 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       if ( shadows ) {
         program->addUniformVar( "dirLightSpaceMatrix[" + std::to_string( i ) + "]" );
         program->addUniformVar( "dirLightShadowMap[" + std::to_string( i ) + "]" );
+
+        program->addUniformVar( "omniBias" );
       }
     }
 
@@ -804,6 +807,10 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
           program->setUniformVar( "shadowCubemap[" + std::to_string( i ) + "]", shadowMapTexUnit );
 
           ++shadowMapTexUnit;
+
+#ifdef LORE_DEBUG_UI
+          program->setUniformVar( "omniBias", DebugConfig::omniBias );
+#endif
         }
 
         ++i;
