@@ -203,6 +203,12 @@ void SceneLoader::_loadPrefabs()
       if ( !spriteName.isNull() ) {
         prefab->setSprite( Resource::GetSprite( spriteName.toString() ) );
       }
+
+      // Shadow settings.
+      const auto& castShadows = value.getValue( "CastShadows" );
+      if ( !castShadows.isNull() ) {
+        prefab->castShadows = castShadows.toBool();
+      }
     }
   }
 }

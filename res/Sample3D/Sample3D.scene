@@ -39,7 +39,8 @@
       "MaterialSettings": {
         "Ambient": [1.0, 1.0, 1.0],
         "Shininess": 32.0
-      }
+      },
+      "CastShadows": false
     },
     "CheckeredCube": {
       "Model": "res/Sample3D/Models/cube.fbx",
@@ -49,11 +50,13 @@
         "Shininess": 32.0,
         "UVScale": [5.0, 5.0],
         "ScrollSpeed": [0.001, 0.0]
-      }
+      },
+      "CastShadows": false
     },
     "Multicube": {
       "Model": "res/Sample3D/Models/cube.fbx",
-      "Sprite": "stars"
+      "Sprite": "stars",
+      "CastShadows": false
     },
     "MarblePillar": {
       "Model": "res/Sample3D/Models/cylinder.obj",

@@ -106,6 +106,8 @@ namespace Lore {
     MaterialPtr _material { nullptr };
     ModelPtr _model { nullptr };
 
+    bool castShadows { true };
+
     // Only used if Prefab is instanced.
     ModelPtr _instancedModel { nullptr };
     size_t _instanceCount { 0 };

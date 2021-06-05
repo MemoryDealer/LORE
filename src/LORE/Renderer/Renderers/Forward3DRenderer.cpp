@@ -433,6 +433,10 @@ void Forward3DRenderer::_renderShadowMaps( const RenderView& rv,
 
     // Instanced solids.
     for ( const auto& prefab : queue.instancedSolids ) {
+      if ( !prefab->castShadows ) {
+        continue;
+      }
+
       ModelPtr model = prefab->getInstancedModel();
 
       const NodePtr node = prefab->getInstanceControllerNode();
@@ -450,6 +454,10 @@ void Forward3DRenderer::_renderShadowMaps( const RenderView& rv,
     // Render non-instanced solids.
     for ( auto& pair : queue.solids ) {
       const PrefabPtr prefab = pair.first;
+      if ( !prefab->castShadows ) {
+        continue;
+      }
+
       const RenderQueue::NodeList& nodes = pair.second;
       const ModelPtr model = prefab->getModel();
 
@@ -464,6 +472,10 @@ void Forward3DRenderer::_renderShadowMaps( const RenderView& rv,
     // TODO: Account for shadow strength based on opacity...
     for ( auto it = queue.transparents.rbegin(); it != queue.transparents.rend(); ++it ) {
       const PrefabPtr prefab = it->second.first;
+      if ( !prefab->castShadows ) {
+        continue;
+      }
+
       NodePtr node = it->second.second;
       ModelPtr model = prefab->getModel();
 
@@ -499,6 +511,10 @@ void Forward3DRenderer::_renderShadowMaps( const RenderView& rv,
     shadowProgram->setUniformVar( "farPlane", pointLight->shadowFarPlane );
 
     for ( const auto& prefab : queue.instancedSolids ) {
+      if ( !prefab->castShadows ) {
+        continue;
+      }
+
       ModelPtr model = prefab->getInstancedModel();
 
       const NodePtr node = prefab->getInstanceControllerNode();
@@ -521,6 +537,10 @@ void Forward3DRenderer::_renderShadowMaps( const RenderView& rv,
 
     for ( auto& pair : queue.solids ) {
       const PrefabPtr prefab = pair.first;
+      if ( !prefab->castShadows ) {
+        continue;
+      }
+
       const RenderQueue::NodeList& nodes = pair.second;
       const ModelPtr model = prefab->getModel();
 
@@ -536,6 +556,10 @@ void Forward3DRenderer::_renderShadowMaps( const RenderView& rv,
     // TODO: Account for shadow strength based on opacity...
     for ( auto it = queue.transparents.rbegin(); it != queue.transparents.rend(); ++it ) {
       const PrefabPtr prefab = it->second.first;
+      if ( !prefab->castShadows ) {
+        continue;
+      }
+
       NodePtr node = it->second.second;
       ModelPtr model = prefab->getModel();
 
