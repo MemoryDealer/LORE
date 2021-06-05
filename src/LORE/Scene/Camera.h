@@ -126,9 +126,10 @@ namespace Lore {
 
     string _name { };
 
-    glm::vec3 _position { 0.f };
-    glm::vec3 _target { 0.f };
-    glm::mat4 _view { 0.f };
+    glm::vec3 _position {};
+    glm::vec3 _target {};
+    glm::mat4 _view {};
+    glm::mat4 _model {};
     real _zoom { 1.f };
 
     bool _viewMatrixDirty { true };

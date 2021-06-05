@@ -1263,6 +1263,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createSkyboxProgram( const string&
   src += "out vec3 TexCoords;";
 
   src += "uniform mat4 viewProjection;";
+  src += "uniform mat4 cameraModel;";
 
   //
   // main function.
@@ -1270,7 +1271,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createSkyboxProgram( const string&
   src += "void main(){";
   {
     src += "TexCoords = pos;";
-    src += "vec4 opPos = viewProjection * vec4(pos, 1.0);";
+    src += "vec4 opPos = viewProjection * cameraModel *  vec4(pos, 1.0);";
     src += "gl_Position = opPos.xyww;";
   }
   src += "}";
@@ -1337,6 +1338,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createSkyboxProgram( const string&
   //
   // Add uniforms.
 
+  program->addUniformVar( "cameraModel" );
   program->addUniformVar( "viewProjection" );
   program->addUniformVar( "gamma" );
 

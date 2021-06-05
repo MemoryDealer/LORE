@@ -335,6 +335,9 @@ void Camera3D::_updateViewMatrix()
 
   _view = glm::lookAt( _position, _position + _target, _up );
 
+  // Only need position in this matrix for the skybox.
+  _model = Math::CreateTransformationMatrix( _position, glm::quat(), glm::vec3( 1.f ) );
+
   _viewMatrixDirty = false;
 }
 
