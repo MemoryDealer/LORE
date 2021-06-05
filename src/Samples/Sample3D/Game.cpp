@@ -32,6 +32,8 @@ namespace LocalNS {
 
   static Game* GameInstance = nullptr;
 
+  static const std::string SampleResourceGroupName = "Sample3D";
+
 }
 using namespace LocalNS;
 
@@ -132,7 +134,7 @@ void Game::loadScene()
   loader.process( Lore::FileUtil::ApplyWorkingDirectory( "res/sample3d/sample3d.scene" ), _scene );
 
   // Create stone flooring.
-  auto stonePrefab = Lore::Resource::GetPrefab( "StoneQuad", "Sample3D" );
+  auto stonePrefab = Lore::Resource::GetPrefab( "StoneQuad", SampleResourceGroupName );
   constexpr Lore::real StoneFloorScale = 2.f;
   constexpr int stoneFloorGridSize = 16;
   for ( int i = -( stoneFloorGridSize / 2 ); i < ( stoneFloorGridSize / 2 ); ++i ) {
@@ -206,6 +208,20 @@ void Game::update()
 {
   static auto magicSphere = _scene->getNode( "MagicSphere" );
   magicSphere->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( 0.0001f ) );
+
+  static auto multicube1 = _scene->getNode( "Multicube1" );
+  static auto multicube2 = _scene->getNode( "Multicube2" );
+  static auto mixSprite = Lore::Resource::GetPrefab( "Multicube", SampleResourceGroupName )->_material->sprite;
+  static auto mixTime = 0.0f;
+  mixSprite->setMixValue( 0, Lore::Texture::Type::Diffuse, 1, Lore::Util::Pulse( mixTime, 0.5f ) );
+  mixTime += 0.01f;
+  multicube1->rotate( glm::vec3( 1.f, 1.f, 0.f ), glm::degrees( 0.0001f ) );
+  multicube2->rotate( glm::vec3( 1.f, 1.f, 0.f ), glm::degrees( -0.0001f ) );
+
+  static auto checkeredCube1 = _scene->getNode( "checkeredcube1" );
+  static auto checkeredCube2 = _scene->getNode( "checkeredcube2" );
+  checkeredCube1->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( 0.0001f ) );
+  checkeredCube2->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( -0.0001f ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

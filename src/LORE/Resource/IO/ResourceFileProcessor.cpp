@@ -277,13 +277,37 @@ void ResourceFileProcessor::processSpriteList( const string& groupName, Resource
       const auto& normal = container.getValue( "normal" );
 
       if ( !diffuse.isNull() ) {
-        sprite->addTexture( Texture::Type::Diffuse, resourceController->get<Texture>( diffuse.toString(), groupName ) );
+        if ( SerializerValue::Type::Array == diffuse.getType() ) {
+          const auto& diffuseNames = diffuse.toArray();
+          for ( const auto& diffuseName : diffuseNames ) {
+            sprite->addTexture( Texture::Type::Diffuse, resourceController->get<Texture>( diffuseName.toString(), groupName ), 0 );
+          }
+        }
+        else {
+          sprite->addTexture( Texture::Type::Diffuse, resourceController->get<Texture>( diffuse.toString(), groupName ) );
+        }
       }
       if ( !specular.isNull() ) {
-        sprite->addTexture( Texture::Type::Specular, resourceController->get<Texture>( specular.toString(), groupName ) );
+        if ( SerializerValue::Type::Array == specular.getType() ) {
+          const auto& specularNames = specular.toArray();
+          for ( const auto& specularName : specularNames ) {
+            sprite->addTexture( Texture::Type::Specular, resourceController->get<Texture>( specularName.toString(), groupName ), 0 );
+          }
+        }
+        else {
+          sprite->addTexture( Texture::Type::Specular, resourceController->get<Texture>( specular.toString(), groupName ) );
+        }
       }
       if ( !normal.isNull() ) {
-        sprite->addTexture( Texture::Type::Normal, resourceController->get<Texture>( normal.toString(), groupName ) );
+        if ( SerializerValue::Type::Array == normal.getType() ) {
+          const auto& normalNames = normal.toArray();
+          for ( const auto& normalName : normalNames ) {
+            sprite->addTexture( Texture::Type::Normal, resourceController->get<Texture>( normalName.toString(), groupName ), 0 );
+          }
+        }
+        else {
+          sprite->addTexture( Texture::Type::Normal, resourceController->get<Texture>( normal.toString(), groupName ) );
+        }
       }
     }
     break;

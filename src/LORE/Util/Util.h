@@ -68,6 +68,14 @@ namespace Lore { namespace Util {
       return reinterpret_cast< size_t >( fp );
     }
 
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    // Oscillate between a range of [0, 1].
+    inline float LORE_EXPORT Pulse( const float time, const float freq )
+    {
+      return 0.5f * ( 1.0f + glm::sin( 2.0f * glm::pi<float>() * freq * time ) );
+    }
+
 }}
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

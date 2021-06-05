@@ -51,6 +51,10 @@
         "ScrollSpeed": [0.001, 0.0]
       }
     },
+    "Multicube": {
+      "Model": "res/Sample3D/Models/cube.fbx",
+      "Sprite": "stars"
+    },
     "MarblePillar": {
       "Model": "res/Sample3D/Models/cylinder.obj",
       "Sprite": "RomanTravertine"
@@ -113,7 +117,7 @@
       },
       "VioletMetalCube": {
         "Prefab": "VioletMetalCube",
-        "Position": [9.0, 0.5, 0.5]
+        "Position": [9.0, 2.5, 0.5]
       },
       "Pillars": {
         "ChildNodes": {
@@ -139,11 +143,23 @@
         "ChildNodes": {
           "CheckeredCube1": {
             "Prefab": "CheckeredCube",
-            "Position": [6.0, 5.0, 6.0]
+            "Position": [8.0, 5.0, 8.0]
           },
           "CheckeredCube2": {
             "Prefab": "CheckeredCube",
-            "Position": [-6.0, 5.0, -6.0]
+            "Position": [-8.0, 5.0, -8.0]
+          }
+        }
+      },
+      "Multicube": {
+        "ChildNodes": {
+          "Multicube1": {
+            "Prefab": "Multicube",
+            "Position": [8.0, 2.75, -8.0]
+          },
+          "Multicube2": {
+            "Prefab": "Multicube",
+            "Position": [-8.0, 2.75, 8.0]
           }
         }
       },

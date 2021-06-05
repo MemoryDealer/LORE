@@ -11,5 +11,8 @@
   "RomanTravertine": {
     "diffuse": "roman-travertine-diffuse",
     "normal": "roman-travertine-normal"
+  },
+  "stars": {
+    "diffuse": ["nebula", "checkerboard"]
   }
 }
