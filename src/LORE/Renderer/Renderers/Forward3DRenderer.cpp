@@ -316,7 +316,7 @@ void Forward3DRenderer::_presentPostProcessing( const RenderView& rv,
 
   int blurAmount = 10;
 #ifdef LORE_DEBUG_UI
-  blurAmount = DebugConfig::bloomBlurPassCount;
+  blurAmount = ( !DebugConfig::bloomEnabled ) ? 1 : DebugConfig::bloomBlurPassCount;
 #endif
 
   TexturePtr blurBuffer = p->doubleBuffer->getTexture();
