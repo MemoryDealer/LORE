@@ -337,18 +337,35 @@ void SceneLoader::_processMaterialSettings( const SerializerValue& value, Prefab
   // Colors.
   const auto& ambient = value.getValue( "Ambient" );
   if ( !ambient.isNull() ) {
-    material->ambient = glm::vec4( ambient.toVec3(), 1.f );
+    const auto size = ambient.toArray().size();
+    if ( 3 == size ) {
+      material->ambient = glm::vec4( ambient.toVec3(), 1.f );
+    }
+    else if ( 4 == size ) {
+      material->ambient = glm::vec4( ambient.toVec4() );
+    }
   }
   const auto& diffuse = value.getValue( "Diffuse" );
   if ( !diffuse.isNull() ) {
-    material->diffuse = glm::vec4( diffuse.toVec3(), 1.f );
+    const auto size = diffuse.toArray().size();
+    if ( 3 == size ) {
+      material->diffuse = glm::vec4( diffuse.toVec3(), 1.f );
+    }
+    else if ( 4 == size ) {
+      material->diffuse = glm::vec4( diffuse.toVec4() );
+    }
   }
   const auto& specular = value.getValue( "Specular" );
   if ( !specular.isNull() ) {
     material->specular = glm::vec4( specular.toVec3(), 1.f );
   }
 
-  const auto& blending = value.getValue( "Blending" );
+  const auto& opacity = value.getValue( "Opacity" );
+  if ( !opacity.isNull() ) {
+    material->opacity = opacity.toReal();
+  }
+
+  const auto& blending = value.getValue( "Blend" );
   if ( !blending.isNull() ) {
     material->blendingMode.enabled = blending.toBool();
   }

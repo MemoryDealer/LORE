@@ -1,5 +1,6 @@
 {
   "checkerboard":"checkerboard",
+  "glass":"glass",
   "stone": {
     "diffuse": "stone",
     "normal": "stone-normal"

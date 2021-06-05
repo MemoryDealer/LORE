@@ -106,6 +106,7 @@ namespace Lore {
     Color diffuse { StockColor::White };
     Color specular { StockColor::White };
     real shininess { 32.f };
+    real opacity { 1.f };
     SpritePtr sprite { nullptr };
     GPUProgramPtr program { nullptr };
     

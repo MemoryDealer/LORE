@@ -291,6 +291,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     src += "vec4 diffuse;";
     src += "vec4 specular;";
     src += "float shininess;";
+    src += "float opacity;";
   }
   src += "};";
   src += "uniform Material material;";
@@ -610,15 +611,15 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     // Apply scene ambient lighting.
     if ( lit ) {
       if ( textured ) {
-        src += "result += sceneAmbient.xyz *  SampleDiffuseTextures();";
+        src += "result += sceneAmbient.rgb *  SampleDiffuseTextures();";
       }
       else {
-        src += "result += sceneAmbient.xyz * material.ambient.xyz;";
+        src += "result += sceneAmbient.rgb * material.ambient.rgb;";
       }
     }
 
     // Final pixel.
-    src += "pixel = vec4(result, material.diffuse.a);";
+    src += "pixel = vec4(result, material.opacity);";
 
     // Bright pixel pass for bloom.
     src += "vec3 lumConst = vec3(0.2126, 0.7152, 0.0722);";
@@ -670,12 +671,14 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
   program->addUniformVar( "gamma" );
   program->addUniformVar( "bloomThreshold" );
 
+  program->addUniformVar( "material.ambient" );
+  program->addUniformVar( "material.diffuse" );
+  program->addUniformVar( "material.specular" );
+  program->addUniformVar( "material.shininess" );
+  program->addUniformVar( "material.opacity" );
+
   if ( lit ) {
     program->addUniformVar( "model" );
-    program->addUniformVar( "material.ambient" );
-    program->addUniformVar( "material.diffuse" );
-    program->addUniformVar( "material.specular" );
-    program->addUniformVar( "material.shininess" );
     program->addUniformVar( "numDirLights" );
     program->addUniformVar( "numPointLights" );
     program->addUniformVar( "sceneAmbient" );
@@ -757,6 +760,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       program->setUniformVar( "material.diffuse", material->diffuse );
       program->setUniformVar( "material.specular", material->specular );
       program->setUniformVar( "material.shininess", material->shininess );
+      program->setUniformVar( "material.opacity", material->opacity );
       program->setUniformVar( "sceneAmbient", rv.scene->getAmbientLightColor() );
 
       // Update uniforms for light data.

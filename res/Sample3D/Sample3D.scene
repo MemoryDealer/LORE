@@ -38,7 +38,11 @@
       "Sprite": "VioletMetal",
       "MaterialSettings": {
         "Ambient": [1.0, 1.0, 1.0],
-        "Shininess": 32.0
+        "Shininess": 32.0,
+        "Blend": true,
+        "Opacity": 0.5,
+        "Ambient": [1.0, 1.0, 1.0, 1.0],
+        "Diffuse": [1.0, 1.0, 1.0, 0.5]
       },
       "CastShadows": false
     },
@@ -64,7 +68,8 @@
     },
     "Roof": {
       "Model": "res/Sample3D/Models/roof.obj",
-      "Sprite": "stone"
+      "Sprite": "glass",
+      "CastShadows": false
     },
     "MagicSphere": {
       "Model": "res/Sample3D/Models/sphere.fbx",
