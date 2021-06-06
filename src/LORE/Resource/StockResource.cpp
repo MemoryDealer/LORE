@@ -273,13 +273,20 @@ void StockResourceController::createRendererStockResources( const RendererType t
       material->program = program;
     }
 
+    params.instanced = true;
+    program = srf->createEnvironmentMappingProgram( "Reflect" + suffix + "Instanced", params );
+
     params.mode = EnvironmentMappingProgramParameters::Mode::Refract;
+    params.instanced = false;
     program = srf->createEnvironmentMappingProgram( "Refract" + suffix, params );
     if ( program ) {
       auto material = _controller->create<Material>( "Refract" + suffix );
       material->lighting = false;
       material->program = program;
     }
+
+    params.instanced = true;
+    program = srf->createEnvironmentMappingProgram( "Refract" + suffix + "Instanced", params );
   }
 
   //

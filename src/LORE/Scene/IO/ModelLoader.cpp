@@ -187,7 +187,13 @@ void ModelLoader::_processTexture( aiMaterial* material, const aiTextureType typ
       LogWrite( Info, "Texture %s loaded for model %s", textureName.c_str(), _name.c_str() );
     }
     else {
-      LogWrite( Warning, "Tried loading texture %s which already exists", textureName.c_str() );
+      LogWrite( Warning, "Tried loading texture %s which already exists, using existing one", textureName.c_str() );
+
+      const auto loreTextureType = ConvertTextureType( type );
+
+      // Load texture and specify SRGB only for diffuse maps.
+      auto texture = rc->get<Texture>( textureName, _resourceGroupName );
+      mesh->getSprite()->addTexture( loreTextureType, texture );
     }
   }
 }

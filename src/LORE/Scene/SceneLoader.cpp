@@ -165,7 +165,8 @@ void SceneLoader::_loadPrefabs()
 
         // Load the prefab (load model from disk and assign a material).
         try {
-          prefab = Resource::LoadPrefab( prefabName, modelPath.toString(), _resourceGroupName );
+          const auto& spriteName = value.getValue( "Sprite" ); // Only load the textures if no sprite is specified.
+          prefab = Resource::LoadPrefab( prefabName, modelPath.toString(), spriteName.isNull(), _resourceGroupName );
         }
         catch ( Lore::Exception& e ) {
           LogWrite( Error, "Error loading prefab %s: %s", prefabName.c_str(), e.what() );
@@ -176,13 +177,6 @@ void SceneLoader::_loadPrefabs()
       else {
         // Create the prefab.
         prefab = Resource::CreatePrefab( prefabName, StringToMeshType( modelType.toString() ), _resourceGroupName );
-      }
-
-      // Enable instancing if specified.
-      const auto& instanced = value.getValue( "Instanced" );
-      if ( !instanced.isNull() && SerializerValue::Type::Int == instanced.getType() ) {
-        const auto instanceCount = instanced.toInt();
-        prefab->enableInstancing( instanceCount );
       }
 
       // Process material settings for the prefab.
@@ -208,6 +202,13 @@ void SceneLoader::_loadPrefabs()
       const auto& castShadows = value.getValue( "CastShadows" );
       if ( !castShadows.isNull() ) {
         prefab->castShadows = castShadows.toBool();
+      }
+
+      // Enable instancing if specified.
+      const auto& instanced = value.getValue( "Instanced" );
+      if ( !instanced.isNull() && SerializerValue::Type::Int == instanced.getType() ) {
+        const auto instanceCount = instanced.toInt();
+        prefab->enableInstancing( instanceCount );
       }
     }
   }

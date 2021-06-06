@@ -260,6 +260,7 @@ namespace Lore {
                                    const string& groupName = ResourceController::DefaultGroupName );
     static PrefabPtr LoadPrefab( const string& name,
                                  const string& path,
+                                 const bool loadTextures = true,
                                  const string& groupName = ResourceController::DefaultGroupName );
 
     //

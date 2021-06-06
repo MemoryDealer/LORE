@@ -44,12 +44,9 @@
       "Model": "res/Sample3D/Models/cube.fbx",
       "Sprite": "VioletMetal",
       "MaterialSettings": {
-        "Ambient": [1.0, 1.0, 1.0],
         "Shininess": 32.0,
         "Blend": true,
-        "Opacity": 0.5,
-        "Ambient": [1.0, 1.0, 1.0, 1.0],
-        "Diffuse": [1.0, 1.0, 1.0, 0.5]
+        "Opacity": 0.5
       },
       "CastShadows": false
     },
@@ -88,6 +85,12 @@
     },
     "star": {
       "Model": "res/Sample3D/Models/star/star.obj"
+    },
+    "MetalStar": {
+      "Model": "res/Sample3D/Models/star/star.obj",
+      "Instanced": 5000,
+      "StockMaterial": "Reflect3D",
+      "Sprite": "metal"
     }
   },
   "Lighting": {

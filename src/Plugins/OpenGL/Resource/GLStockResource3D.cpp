@@ -1378,6 +1378,8 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createEnvironmentMappingProgram( c
     std::to_string( APIVersion::GetMajor() ) + std::to_string( APIVersion::GetMinor() ) + "0" +
     " core\n";
 
+  const bool instanced = params.instanced;
+
   //
   // Vertex shader.
 
@@ -1388,6 +1390,10 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createEnvironmentMappingProgram( c
 
   src += "layout (location = 0) in vec3 pos;";
   src += "layout (location = 1) in vec3 normal;";
+
+  if ( instanced ) {
+    src += "layout (location = " + std::to_string( instancedMatrixTexUnit ) + ") in mat4 instanceMatrix;";
+  }
 
   //
   // Uniforms and outs.
@@ -1403,9 +1409,16 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createEnvironmentMappingProgram( c
 
   src += "void main(){";
   {
-    src += "Normal = mat3(transpose(inverse(model))) * normal;";
-    src += "Position = vec3(model * vec4(pos, 1.0));";
-    src += "gl_Position = viewProjection * model * vec4(pos, 1.0);";
+    if ( instanced ) {
+      src += "Normal = mat3(transpose(inverse(instanceMatrix))) * normal;";
+      src += "Position = vec3(instanceMatrix * vec4(pos, 1.0));";
+      src += "gl_Position = viewProjection * instanceMatrix* vec4(pos, 1.0);";
+    }
+    else {
+      src += "Normal = mat3(transpose(inverse(model))) * normal;";
+      src += "Position = vec3(model * vec4(pos, 1.0));";
+      src += "gl_Position = viewProjection * model * vec4(pos, 1.0);";
+    }
   }
   src += "}";
 

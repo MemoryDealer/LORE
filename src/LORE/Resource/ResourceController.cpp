@@ -350,7 +350,7 @@ TexturePtr Resource::LoadTexture( const string& name, const string& file, const 
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-PrefabPtr Resource::LoadPrefab( const string& name, const string& path, const string& groupName )
+PrefabPtr Resource::LoadPrefab( const string& name, const string& path, const bool loadTextures, const string& groupName )
 {
   auto rc = ActiveContext->getResourceController();
   if ( rc->resourceExists<Prefab>( name, groupName ) ) {
@@ -366,7 +366,7 @@ PrefabPtr Resource::LoadPrefab( const string& name, const string& path, const st
 
   // Load the specified model.
   ModelLoader loader( groupName );
-  auto model = loader.load( path );
+  auto model = loader.load( path, loadTextures );
   prefab->setModel( model );
 
   // Assign normal mapping shader if normal maps are found.

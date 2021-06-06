@@ -160,6 +160,23 @@ void Game::loadScene()
       node->scale( glm::vec3( 1.3f, 1.f, 1.f ) );
     }
   }
+
+  auto metalStarPrefab = Lore::Resource::GetPrefab( "MetalStar", SampleResourceGroupName );
+#ifdef _DEBUG
+  constexpr auto MetalStarCount = 10;
+#else
+  constexpr auto MetalStarCount = 50;
+#endif
+  ctr = 0;
+  for ( int i = -( MetalStarCount / 2 ); i < ( MetalStarCount / 2 ); ++i ) {
+    for ( int j = -( MetalStarCount / 2 ); j < ( MetalStarCount / 2 ); ++j ) {
+      auto node = _scene->createNode( "MetalStar" + std::to_string( ctr++ ) );
+      node->attachObject( metalStarPrefab );
+      Lore::real x = 4.f * i;
+      Lore::real y = 4.f * j + 10.0f;
+      node->setPosition( x, y, -40.f );
+    }
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

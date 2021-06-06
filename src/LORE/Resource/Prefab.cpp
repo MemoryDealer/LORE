@@ -110,6 +110,45 @@ void Prefab::enableInstancing( const size_t max )
       _instancedModel->attachMesh( mesh );
     }
   }
+
+  // Acquire the correct GPUProgram for this instanced model type.
+  switch ( _instancedModel->getType() ) {
+  default:
+    throw Lore::Exception( "Instanced prefab must have an instanced model" );
+
+  case Mesh::Type::TexturedQuadInstanced:
+    _material->program = StockResource::GetGPUProgram( "StandardTexturedInstanced2D" );
+    break;
+
+  case Mesh::Type::QuadInstanced:
+    _material->program = StockResource::GetGPUProgram( "StandardInstanced2D" );
+    break;
+
+  case Mesh::Type::Quad3DInstanced:
+  case Mesh::Type::CubeInstanced:
+    _material->program = StockResource::GetGPUProgram( "StandardInstanced3D" );
+    break;
+
+  case Mesh::Type::TexturedQuad3DInstanced:
+  case Mesh::Type::TexturedCubeInstanced:
+  case Mesh::Type::CustomInstanced:
+    if ( _material->sprite->getTextureCount( 0, Texture::Type::Cubemap ) ) {
+      if ( _material->program->getName() == "Reflect3D" ) {
+        _material->program = StockResource::GetGPUProgram( "Reflect3DInstanced" );
+      }
+      else if ( _material->program->getName() == "Refract3D" ) {
+        _material->program = StockResource::GetGPUProgram( "Refract3DInstanced" );
+      }
+      return;
+    }
+    if ( _material->sprite->getTextureCount( 0, Texture::Type::Normal ) > 0 ) {
+      _material->program = StockResource::GetGPUProgram( "StandardTexturedNormalMappingInstanced3D" );
+    }
+    else {
+      _material->program = StockResource::GetGPUProgram( "StandardTexturedInstanced3D" );
+    }
+    break;
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

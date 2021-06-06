@@ -83,6 +83,10 @@ void Model::attachMesh( const MeshPtr mesh )
     _type = Mesh::Type::Custom;
     break;
 
+  case Mesh::Type::CustomInstanced:
+    _type = Mesh::Type::CustomInstanced;
+    break;
+
   default:
     _type = mesh->getType();
     if ( _meshes.size() > 1 ) {

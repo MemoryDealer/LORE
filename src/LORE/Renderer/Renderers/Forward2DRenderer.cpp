@@ -351,28 +351,13 @@ void Forward2DRenderer::renderSolids( const RenderView& rv,
   for ( const auto& prefab : queue.instancedSolids ) {
     MaterialPtr material = prefab->getMaterial();
     ModelPtr model = prefab->getInstancedModel();
-    GPUProgramPtr program = nullptr;
+    GPUProgramPtr program = material->program;
 
     const NodePtr node = prefab->getInstanceControllerNode();
-
-    // Acquire the correct GPUProgram for this instanced model type.
-    switch ( model->getType() ) {
-    default:
-      throw Lore::Exception( "Instanced prefab must have an instanced model" );
-
-    case Mesh::Type::QuadInstanced:
-      program = StockResource::GetGPUProgram( "StandardInstanced2D" );
-      break;
-
-    case Mesh::Type::TexturedQuadInstanced:
-      program = StockResource::GetGPUProgram( "StandardTexturedInstanced2D" );
-      break;
-    }
 
     _api->setCullingMode( prefab->cullingMode );
 
     program->use();
-
     program->updateUniforms( rv, material, queue.lights );
     program->updateNodeUniforms( material, node, viewProjection );
 

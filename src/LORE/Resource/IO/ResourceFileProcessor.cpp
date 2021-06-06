@@ -184,7 +184,7 @@ void ResourceFileProcessor::load( const string& groupName, ResourceControllerPtr
 
   case SerializableResource::Texture: {
     auto textureName = FileUtil::GetFileName( _file );
-    auto texture = resourceController->create<Texture>( textureName, groupName );
+    auto texture = resourceController->create<Texture>( textureName, groupName, true );
     const bool srgb = !StringUtil::Contains( _file, "normal" ); // Hack: Don't use srgb mode for normal maps.
     texture->loadFromFile( _file, srgb );
   } break;

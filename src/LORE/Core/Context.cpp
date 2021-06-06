@@ -93,8 +93,8 @@ void Context::initConfiguration()
   _poolCluster.registerPool<SpotLight>( 4 );
 
   _poolCluster.registerPool<Box>( 4096 );
-  _poolCluster.registerPool<Prefab>( 64 );
-  _poolCluster.registerPool<Material>( 64 );
+  _poolCluster.registerPool<Prefab>( 128 );
+  _poolCluster.registerPool<Material>( 128 );
   _poolCluster.registerPool<Model>( 64 );
   _poolCluster.registerPool<Node>( 4096 );
   _poolCluster.registerPool<Scene>( 4 );
