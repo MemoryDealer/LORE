@@ -141,6 +141,25 @@ void Game::loadScene()
   auto rttPrefab = Lore::Resource::GetPrefab( "RTTCube", SampleResourceGroupName );
   rttPrefab->_material->sprite = _rttSprite;
   //rttPrefab->_material->program = Lore::StockResource::GetGPUProgram( "UnlitTextured3D" );
+
+#ifdef _DEBUG
+  constexpr auto RTTQuadCount = 10;
+#else
+  constexpr auto RTTQuadCount = 50;
+#endif
+  Lore::u32 ctr = 0;
+  for ( int i = - ( RTTQuadCount / 2 ); i < ( RTTQuadCount / 2 ); ++i ) {
+    for ( int j = -( RTTQuadCount / 2 ); j < ( RTTQuadCount / 2 ); ++j ) {
+      auto node = _scene->createNode( "RTTQuad" + std::to_string( ctr++ ) );
+      node->attachObject( rttPrefab );
+      Lore::real x = 3.f * i;
+      Lore::real y = 3.f * j + 10.0f;
+      node->setPosition( -40.f, y, x );
+      node->rotate( Lore::Vec3PosY, glm::radians( -90.0f ) );
+      node->rotate( Lore::Vec3PosX, glm::radians( 180.0f ) );
+      node->scale( glm::vec3( 1.3f, 1.f, 1.f ) );
+    }
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -371,6 +390,16 @@ void Game::update()
   static auto checkeredCube2 = _scene->getNode( "checkeredcube2" );
   checkeredCube1->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( 0.0001f ) );
   checkeredCube2->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( -0.0001f ) );
+
+  // 2D scene updates.
+
+  static float blockOffset = 0.f;
+  float blockExtraOffset = 0.f;
+  int i = 0;
+  for ( auto& block : _floatingBlocks ) {
+    block->rotate( ( i++ % 2 == 0 ) ? glm::vec3( 0.f, 0.f, 1.f ) : glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( 0.00031f ) );
+  }
+  blockOffset += 0.01f;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

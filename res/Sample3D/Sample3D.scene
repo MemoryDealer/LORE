@@ -17,6 +17,7 @@
     },
     "RTTCube": {
       "Model": "res/Sample3D/Models/quad.fbx",
+      "Instanced": 500,
       "MaterialSettings": {
         "CastShadows": false
       }
@@ -183,9 +184,9 @@
       },
       "RTTCube": {
         "Prefab": "RTTCube",
-        "Position": [15.0, 3.0, 0.0],
+        "Position": [40.0, 11.0, 0.0],
         "Orientation": [0.0, 90.0, 180.0],
-        "Scale": [1.5, 1.0, 1.0]
+        "Scale": [18.0, 10.0, 10.0]
       }
     }
   }
