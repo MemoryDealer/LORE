@@ -136,14 +136,14 @@ void Game::loadScene()
   //
   // Add some stone walls behind the blocks.
 
-  Lore::PrefabPtr stonePrefab = Lore::Resource::CreatePrefab( "stone", Lore::Mesh::Type::TexturedQuad );
+  Lore::PrefabPtr stonePrefab = Lore::Resource::CreatePrefab( "stone2d", Lore::Mesh::Type::TexturedQuad );
 #ifdef _DEBUG
   const size_t count = 100;
 #else
   const size_t count = 10000;
 #endif
   stonePrefab->enableInstancing( count );
-  stonePrefab->setSprite( Lore::Resource::GetSprite( "stone" ) );
+  stonePrefab->setSprite( Lore::Resource::GetSprite( "stone2d" ) );
   for ( int i = 0; i < count / 2; ++i ) {
     auto stoneNode = _scene->createNode( "stone" + std::to_string( i ) );
     stoneNode->attachObject( stonePrefab );

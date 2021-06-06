@@ -79,6 +79,8 @@ void Game::loadResources()
 
 void Game::loadScene()
 {
+  loadScene2D();
+
   // Create a scene with default skybox color.
   _scene = _context->createScene( "core", Lore::RendererType::Forward3D );
 
@@ -96,38 +98,10 @@ void Game::loadScene()
   // entire window.
   Lore::RenderView rv( "core", _scene, Lore::Rect( 0.f, 0.f, 1.f, 1.f ) );
   rv.camera = _camera;
-
-  //rv.renderTarget = Lore::Resource::CreateRenderTarget( "rt1", 1920, 1080, 8 );
   rv.gamma = 1.f; // Post-processing will apply gamma.
 
   // Add the RenderView to the window so it will render our scene.
   _window->addRenderView( rv );
-
-
-// 
-//   Lore::ScenePtr postScene = _context->createScene( "pp", Lore::RendererType::Forward2D );
-//   Lore::RenderView postProcessor( "pp", postScene, Lore::Rect( 0.f, 0.f, 1.f, 1.f ) );
-//   postProcessor.camera = _context->createCamera( "postCam", Lore::Camera::Type::Type2D );
-//   _window->addRenderView( postProcessor );
-// 
-//   auto ppe = Lore::Resource::CreatePrefab( "ppe", Lore::Mesh::Type::TexturedQuad );
-//   ppe->getMaterial()->program = Lore::StockResource::GetGPUProgram( "UnlitTexturedRTT" );
-// 
-//   auto rttSprite = Lore::Resource::CreateSprite( "rtt" );
-//   rttSprite->addTexture( Lore::Texture::Type::Diffuse, rv.renderTarget->getTexture() );
-//   ppe->getMaterial()->lighting = false;
-//   ppe->getMaterial()->sprite = rttSprite;
-//   auto ppeNode = postScene->createNode( "ppe" );
-//   ppeNode->attachObject( ppe );
-//   ppeNode->scale( glm::vec2( 10.6664f, 8.f ) );
-
-//   Lore::SkyboxPtr skybox = postScene->getSkybox();
-// 
-//   // The first layer will be some scrolling clouds.
-//   auto& layer0 = skybox->addLayer( "rtt" );
-//   layer0.setSprite( ppe->getMaterial()->sprite );
-
-
 
   // Load the scene from disk.
   Lore::SceneLoader loader;
@@ -163,6 +137,167 @@ void Game::loadScene()
     p.y = r * glm::sin( angle );
     cube->setPosition( p.x, 0.0f, p.y );
   }
+
+  auto rttPrefab = Lore::Resource::GetPrefab( "RTTCube", SampleResourceGroupName );
+  rttPrefab->_material->sprite = _rttSprite;
+  //rttPrefab->_material->program = Lore::StockResource::GetGPUProgram( "UnlitTextured3D" );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Game::loadScene2D()
+{
+  //
+  // Setup secondary 2D scene for render to texture.
+
+  Lore::Resource::LoadResourceConfiguration( Lore::FileUtil::ApplyWorkingDirectory( "res/sample2d/resources.json" ) );
+  // Now load the Core resource group, which contains the resource locations we just indexed.
+  Lore::Resource::LoadGroup( Lore::ResourceController::DefaultGroupName );
+
+  _scene2D = _context->createScene( "2D", Lore::RendererType::Forward2D );
+  _scene2D->setSkyboxColor( Lore::StockColor::White );
+  _scene2D->setAmbientLightColor( Lore::Color( 0.75f, 0.75f, 0.75f, 1.f ) );
+
+  _camera2D = _context->createCamera( "2D", Lore::Camera::Type::Type2D );
+  _camera2D->initPostProcessing( 1920, 1080, 8 );
+
+  // TODO: This is a hack that should be taken care of internally.
+  Lore::CLI::SetActiveScene( _scene2D );
+
+  Lore::RenderView rv( "2D", _scene2D, Lore::Rect( 0.f, 0.f, 1.f, 1.f ) );
+  rv.camera = _camera2D;
+  rv.renderTarget = Lore::Resource::CreateRenderTarget( "rt1", 1920, 1080, 0 );
+  _window->addRenderView( rv );
+
+  // Create a sprite to sample the 2D render target texture.
+  _rttSprite = Lore::Resource::CreateSprite( "rtt" );
+  _rttSprite->addTexture( Lore::Texture::Type::Diffuse, rv.renderTarget->getTexture() );
+
+  // Create a node for our player sprite.
+  _playerNode2D = _scene2D->createNode( "player" );
+  // Decrease its depth so it is rendered above other nodes.
+  _playerNode2D->setDepth( -50.f );
+  _playerNode2D->setPosition( 0.f, 0.25f );
+
+  Lore::PrefabPtr playerPrefab = Lore::Resource::CreatePrefab( "player", Lore::Mesh::Type::TexturedQuad );
+  playerPrefab->setSprite( Lore::Resource::GetSprite( "player" ) );
+  playerPrefab->cullingMode = Lore::IRenderAPI::CullingMode::None;
+  _playerNode2D->attachObject( playerPrefab );
+
+  auto spc = _playerNode2D->createSpriteController();
+  spc->useAnimationSet( Lore::Resource::GetSpriteAnimationSet( "player" ) );
+  spc->startAnimation( "idle" );
+
+  _camera2D->trackNode( _playerNode2D );
+  _camera2D->setZoom( 2.4f );
+
+  //
+  // Add some blocks to the scene.
+
+  Lore::PrefabPtr blockPrefab = Lore::Resource::CreatePrefab( "block", Lore::Mesh::Type::TexturedQuad );
+  blockPrefab->enableInstancing( 1000 );
+  blockPrefab->setSprite( Lore::Resource::GetSprite( "block" ) );
+  blockPrefab->cullingMode = Lore::IRenderAPI::CullingMode::None; // Some blocks we rotate to the backface.
+  for ( int i = 0; i < 10; ++i ) {
+    auto blockNode = _scene2D->createNode( "block" + std::to_string( i ) );
+    blockNode->attachObject( blockPrefab );
+
+    blockNode->scale( 0.4f );
+    blockNode->setPosition( -1.f + static_cast<Lore::real>( i * 0.2f ), 0.f );
+    _floatingBlocks.push_back( blockNode );
+  }
+
+  //
+  // Add some stone walls behind the blocks.
+
+  Lore::PrefabPtr stonePrefab = Lore::Resource::CreatePrefab( "stone2d", Lore::Mesh::Type::TexturedQuad );
+#ifdef _DEBUG
+  const size_t count = 100;
+#else
+  const size_t count = 10000;
+#endif
+  stonePrefab->enableInstancing( count );
+  stonePrefab->setSprite( Lore::Resource::GetSprite( "stone2d" ) );
+  for ( int i = 0; i < count / 2; ++i ) {
+    auto stoneNode = _scene2D->createNode( "stone" + std::to_string( i ) );
+    stoneNode->attachObject( stonePrefab );
+
+    stoneNode->scale( 2.f );
+    stoneNode->setDepth( 10.f );
+    stoneNode->setPosition( -4.f + static_cast<Lore::real>( i * 0.4f ), 0.f );
+
+    // Add a 2nd row that will go above the stained glass.
+    auto stoneNode2 = _scene2D->createNode( "2stone" + std::to_string( i ) );
+    stoneNode2->attachObject( stonePrefab );
+    stoneNode2->scale( 2.f );
+    stoneNode2->setDepth( 10.f );
+    stoneNode2->setPosition( -4.f + static_cast<Lore::real>( i * 0.4f ), .8f );
+  }
+
+  //
+  // Create some torches.
+
+  Lore::PrefabPtr torchPrefab = Lore::Resource::CreatePrefab( "torch", Lore::Mesh::Type::TexturedQuad );
+  torchPrefab->setSprite( Lore::Resource::GetSprite( "torch" ) );
+  for ( int i = 0; i < 3; ++i ) {
+    auto torchNode = _scene2D->createNode( "torch" + std::to_string( i ) );
+    torchNode->attachObject( torchPrefab );
+    torchNode->setPosition( 0.5f - static_cast<float>( i * 2 ), 0.24f );
+    torchNode->scale( 0.5f );
+    auto torchSPC = torchNode->createSpriteController();
+    torchSPC->useAnimationSet( Lore::Resource::GetSpriteAnimationSet( "torch" ) );
+    torchSPC->startAnimation( "flame" );
+
+    //
+    // Add some lights to the torches.
+
+    auto torchLight = _scene2D->createPointLight( "torch" + std::to_string( i ) );
+    //torchLight->setDiffuse( Lore::Color( 1.f, .69f, .4f, 1.f ) );
+    torchLight->setAttenuation( 2.0f, 1.0f, 0.4f, 0.8f );
+    torchNode->attachObject( torchLight );
+  }
+
+  //
+  // Add blended stained glass.
+
+  Lore::PrefabPtr glassPrefab = Lore::Resource::CreatePrefab( "glass1", Lore::Mesh::Type::TexturedQuad );
+  glassPrefab->enableInstancing( 10 );
+  glassPrefab->setMaterial( Lore::Resource::GetMaterial( "glass1" ) );
+  for ( int i = 0; i < 5; ++i ) {
+    auto glassNode = _scene2D->createNode( "glass1" + std::to_string( i ) );
+    glassNode->attachObject( glassPrefab );
+    glassNode->scale( 2.f );
+    glassNode->setPosition( -1.f + static_cast<Lore::real>( i * 0.4f ), .4f );
+  }
+
+  //
+  // Add a skybox to the scene.
+
+  Lore::SkyboxPtr skybox = _scene2D->getSkybox();
+
+  // The first layer will be some scrolling clouds.
+  auto& layerClouds = skybox->addLayer( "clouds" );
+  layerClouds.setSprite( Lore::Resource::GetSprite( "clouds" ) );
+  layerClouds.setScrollSpeed( glm::vec2( 0.001f, 0.00005f ) );
+  layerClouds.setDepth( 1000.f ); // This is the default but we are setting it here for reference.
+
+  // Add far layer with heavy parallax.
+  auto& layerFar = skybox->addLayer( "far" );
+  layerFar.setSprite( Lore::Resource::GetSprite( "bg-far" ) );
+  layerFar.setDepth( 990.f );
+  layerFar.setParallax( glm::vec2( 0.1f, 0.08f ) );
+
+  // Add middle layer with lighter parallax.
+  auto& layerMiddle = skybox->addLayer( "middle" );
+  layerMiddle.setSprite( Lore::Resource::GetSprite( "bg-middle" ) );
+  layerMiddle.setDepth( 980.f );
+  layerMiddle.setParallax( glm::vec2( .3f, .10f ) );
+
+  // Add closest layer with the least amount of parallax.
+  auto& layerForeground = skybox->addLayer( "foreground" );
+  layerForeground.setSprite( Lore::Resource::GetSprite( "bg-foreground" ) );
+  layerForeground.setDepth( 970.f );
+  layerForeground.setParallax( glm::vec2( .4f, 0.12f ) );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -194,12 +329,26 @@ void Game::processInput()
     _camera->translate( playerOffset );
   }
 
+  // 2D scene.
+  // Player movement.
+  constexpr const Lore::real PlayerSpeed2D = 0.005f;
+  auto spc = _playerNode2D->getSpriteController();
+  glm::vec2 playerOffset2D {};
+  if ( Lore::Input::GetKeyState( Lore::Keycode::Up ) ) {
+    playerOffset2D.y += PlayerSpeed2D;
+  }
   if ( Lore::Input::GetKeyState( Lore::Keycode::Left ) ) {
-    _camera->yaw( -1.f );
+    playerOffset2D.x -= PlayerSpeed2D;
+    spc->setXFlipped( false );
+  }
+  if ( Lore::Input::GetKeyState( Lore::Keycode::Down ) ) {
+    playerOffset2D.y -= PlayerSpeed2D;
   }
   if ( Lore::Input::GetKeyState( Lore::Keycode::Right ) ) {
-    _camera->yaw( 1.f );
+    playerOffset2D.x += PlayerSpeed2D;
+    spc->setXFlipped( true );
   }
+  _playerNode2D->translate( playerOffset2D );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

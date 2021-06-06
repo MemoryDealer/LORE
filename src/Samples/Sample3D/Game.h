@@ -39,13 +39,11 @@ public:
   ~Game();
 
   void loadResources();
-
   void loadScene();
+  void loadScene2D();
 
   void processInput();
-
   void update();
-
   void render();
 
   //
@@ -63,11 +61,17 @@ private:
   // This class is the owner of the Lore context, so it must use a unique_ptr.
   // Most other Lore objects are accessed via raw pointers, since they are owned
   // inside the Lore library.
-  std::unique_ptr<Lore::Context> _context { nullptr };
-  Lore::WindowPtr _window { nullptr };
+  std::unique_ptr<Lore::Context> _context {};
+  Lore::WindowPtr _window {};
 
-  Lore::ScenePtr _scene { nullptr };
-  Lore::CameraPtr _camera { nullptr };
+  Lore::ScenePtr _scene {};
+  Lore::ScenePtr _scene2D {};
+  Lore::CameraPtr _camera {};
+  Lore::CameraPtr _camera2D {};
+
+  Lore::NodePtr _playerNode2D {};
+  std::vector<Lore::NodePtr> _floatingBlocks {};
+  Lore::SpritePtr _rttSprite {};
 
 };
 

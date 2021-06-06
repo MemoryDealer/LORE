@@ -15,6 +15,12 @@
         "Shininess": 32.0
       }
     },
+    "RTTCube": {
+      "Model": "res/Sample3D/Models/quad.fbx",
+      "MaterialSettings": {
+        "CastShadows": false
+      }
+    },
     "GlowingRedCube": {
       "Model": "res/Sample3D/Models/cube.fbx",
       "MaterialSettings": {
@@ -174,6 +180,12 @@
       "Roof": {
         "Prefab": "Roof",
         "Position": [0.0, 6.0, 0.0]
+      },
+      "RTTCube": {
+        "Prefab": "RTTCube",
+        "Position": [15.0, 3.0, 0.0],
+        "Orientation": [0.0, 90.0, 180.0],
+        "Scale": [1.5, 1.0, 1.0]
       }
     }
   }

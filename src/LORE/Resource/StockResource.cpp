@@ -180,6 +180,7 @@ void StockResourceController::createRendererStockResources( const RendererType t
     UberProgramParameters params;
     params.maxPointLights = params.maxDirectionalLights = 0;
 
+    params.maxNormalTextures = 0;
     srf->createUberProgram( "UnlitTextured" + suffix, params );
 
     params.textured = false;

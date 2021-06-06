@@ -5,7 +5,7 @@
     "eye2",
     "eye3"
   ],
-  "stone":"stone",
+  "stone2d":"stone2d",
   "block":"block",
   "torch":[
     "torch0",
