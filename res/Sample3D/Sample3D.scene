@@ -82,6 +82,12 @@
       "Model": "res/Sample3D/Models/sphere.fbx",
       "StockMaterial": "Reflect3D",
       "Sprite": "space"
+    },
+    "dorrie": {
+      "Model": "res/Sample3D/Models/dorrie/dorrie.obj"
+    },
+    "star": {
+      "Model": "res/Sample3D/Models/star/star.obj"
     }
   },
   "Lighting": {
@@ -187,6 +193,21 @@
         "Position": [40.0, 11.0, 0.0],
         "Orientation": [0.0, 90.0, 180.0],
         "Scale": [18.0, 10.0, 10.0]
+      },
+      "dorrieParent": {
+        "Position": [0.0, 3.0, 63.5],
+        "ChildNodes": {
+          "dorrie": {
+            "Prefab": "dorrie",
+            "Position": [21.0, 0.0, 0.0],
+            "Orientation": [90.0, 0.0, 90.0],
+            "Scale": [0.2, 0.2, 0.2]
+          },
+          "dorrieStar": {
+            "Prefab": "star",
+            "Scale": [1.0, 1.0, 1.0]
+          }
+        }
       }
     }
   }

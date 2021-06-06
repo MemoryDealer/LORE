@@ -95,6 +95,7 @@ namespace Lore {
 
     inline T* create()
     {
+      assert( _next );
       if ( !_next ) {
         throw MemoryException( "Pool " + _name + " has reached maximum capacity" );
         // TODO: Resize...

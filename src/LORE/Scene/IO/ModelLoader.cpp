@@ -51,7 +51,8 @@ ModelPtr ModelLoader::load( const string& path, const bool loadTextures )
   _loadTextures = loadTextures;
 
   Assimp::Importer importer;
-  const aiScene* scene = importer.ReadFile( adjustedPath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace );
+  const aiScene* scene = importer.ReadFile( adjustedPath,
+    aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace | aiProcess_OptimizeMeshes | aiProcess_OptimizeGraph | aiProcess_SortByPType | aiProcess_JoinIdenticalVertices );
 
   if ( !scene || ( scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE ) || !scene->mRootNode ) {
     throw Exception( "Failed to load model at " + adjustedPath + ": " + importer.GetErrorString() );
@@ -142,6 +143,7 @@ void ModelLoader::_processMesh( aiMesh* mesh, const aiScene* scene )
     loreMat->diffuse.g = diffuse.g;
     loreMat->diffuse.b = diffuse.b;
     loreMat->diffuse.a = opacity;
+    loreMat->opacity = opacity;
 
     if ( _loadTextures ) {
       _processTexture( material, aiTextureType_DIFFUSE, loreMesh );

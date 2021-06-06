@@ -391,6 +391,11 @@ void Game::update()
   checkeredCube1->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( 0.0001f ) );
   checkeredCube2->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( -0.0001f ) );
 
+  static auto dorrieParent = _scene->getNode( "dorrieParent" );
+  dorrieParent->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees(-0.0004f ) );
+  static auto dorrieStar = _scene->getNode( "dorrieStar" );
+  dorrieStar->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( 0.0012f ) );
+
   // 2D scene updates.
 
   static float blockOffset = 0.f;
