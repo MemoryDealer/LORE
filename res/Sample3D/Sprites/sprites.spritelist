@@ -13,6 +13,10 @@
     "diffuse": "roman-travertine-diffuse",
     "normal": "roman-travertine-normal"
   },
+  "Marble": {
+    "diffuse": "marble",
+    "normal": "marble-normal"
+  },
   "stars": {
     "diffuse": ["nebula", "checkerboard"]
   }

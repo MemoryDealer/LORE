@@ -68,7 +68,7 @@
     },
     "MarblePillar": {
       "Model": "res/Sample3D/Models/cylinder.obj",
-      "Sprite": "RomanTravertine"
+      "Sprite": "Marble"
     },
     "MagicSphere": {
       "Model": "res/Sample3D/Models/sphere.fbx",
