@@ -71,7 +71,7 @@ ConfigValue Config::GetValue( const string& key )
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 float DebugConfig::omniBias = 0.184f;
-float DebugConfig::hdrExposure = 0.5f;
+float DebugConfig::hdrExposure = 2.5f;
 bool DebugConfig::bloomEnabled = true;
 float DebugConfig::bloomThreshold = 10.0f;
 int DebugConfig::bloomBlurPassCount = 10;

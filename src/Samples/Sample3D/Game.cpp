@@ -152,12 +152,12 @@ void Game::loadScene()
     for ( int j = -( RTTQuadCount / 2 ); j < ( RTTQuadCount / 2 ); ++j ) {
       auto node = _scene->createNode( "RTTQuad" + std::to_string( ctr++ ) );
       node->attachObject( rttPrefab );
-      Lore::real x = 3.f * i;
+      Lore::real x = 4.f * i;
       Lore::real y = 3.f * j + 10.0f;
       node->setPosition( -40.f, y, x );
       node->rotate( Lore::Vec3PosY, glm::radians( -90.0f ) );
       node->rotate( Lore::Vec3PosX, glm::radians( 180.0f ) );
-      node->scale( glm::vec3( 1.3f, 1.f, 1.f ) );
+      node->scale( glm::vec3( 1.6f, 1.f, 1.f ) );
     }
   }
 
@@ -209,6 +209,7 @@ void Game::loadScene2D()
   Lore::RenderView rv( "2D", _scene2D, Lore::Rect( 0.f, 0.f, 1.f, 1.f ) );
   rv.camera = _camera2D;
   rv.renderTarget = Lore::Resource::CreateRenderTarget( "rt1", 1920, 1080, 0 );
+  rv.gamma = 1.0f; // Don't need gamma correction since this is sampled in the 3D scene.
   _window->addRenderView( rv );
 
   // Create a sprite to sample the 2D render target texture.
