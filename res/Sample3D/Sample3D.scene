@@ -70,11 +70,6 @@
       "Model": "res/Sample3D/Models/cylinder.obj",
       "Sprite": "RomanTravertine"
     },
-    "Roof": {
-      "Model": "res/Sample3D/Models/roof.obj",
-      "Sprite": "glass",
-      "CastShadows": false
-    },
     "MagicSphere": {
       "Model": "res/Sample3D/Models/sphere.fbx",
       "StockMaterial": "Reflect3D",
@@ -91,6 +86,11 @@
       "Instanced": 5000,
       "StockMaterial": "Reflect3D",
       "Sprite": "metal"
+    },
+    "MagicSphere2": {
+      "Model": "res/Sample3D/Models/sphere.fbx",
+      "StockMaterial": "Refract3D",
+      "Sprite": "space"
     }
   },
   "Lighting": {
@@ -160,6 +160,26 @@
           "Pillar4": {
             "Prefab": "MarblePillar",
             "Position": [12.0, 0.0, -12.0]
+          },
+          "Sphere1": {
+            "Prefab": "MagicSphere2",
+            "Position": [12.0, 7.0, 12.0],
+            "Scale": [1.3, 1.3, 1.3]
+          },
+          "Sphere2": {
+            "Prefab": "MagicSphere2",
+            "Position": [-12.0, 7.0, 12.0],
+            "Scale": [1.3, 1.3, 1.3]
+          },
+          "Sphere3": {
+            "Prefab": "MagicSphere2",
+            "Position": [-12.0, 7.0, -12.0],
+            "Scale": [1.3, 1.3, 1.3]
+          },
+          "Sphere4": {
+            "Prefab": "MagicSphere2",
+            "Position": [12.0, 7.0, -12.0],
+            "Scale": [1.3, 1.3, 1.3]
           }
         }
       },
@@ -186,10 +206,6 @@
             "Position": [-8.0, 2.75, 8.0]
           }
         }
-      },
-      "Roof": {
-        "Prefab": "Roof",
-        "Position": [0.0, 6.0, 0.0]
       },
       "RTTCube": {
         "Prefab": "RTTCube",
