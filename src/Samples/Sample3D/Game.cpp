@@ -168,6 +168,7 @@ void Game::loadScene()
   constexpr auto MetalStarCount = 50;
 #endif
   ctr = 0;
+  float rot = 0.f;
   for ( int i = -( MetalStarCount / 2 ); i < ( MetalStarCount / 2 ); ++i ) {
     for ( int j = -( MetalStarCount / 2 ); j < ( MetalStarCount / 2 ); ++j ) {
       auto node = _scene->createNode( "MetalStar" + std::to_string( ctr++ ) );
@@ -175,7 +176,12 @@ void Game::loadScene()
       Lore::real x = 4.f * i;
       Lore::real y = 4.f * j + 10.0f;
       node->setPosition( x, y, -40.f );
+      node->rotate( Lore::Vec3PosY, glm::radians( rot ) );
+
+      _metalStars.push_back( node );
     }
+
+    rot += 20.0f;
   }
 }
 
@@ -412,6 +418,10 @@ void Game::update()
   dorrieParent->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees(-0.0004f ) );
   static auto dorrieStar = _scene->getNode( "dorrieStar" );
   dorrieStar->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( 0.0012f ) );
+
+  for ( auto& metalStar : _metalStars ) {
+    metalStar->rotate( Lore::Vec3PosY, glm::radians( 1.f ) );
+  }
 
   // 2D scene updates.
 

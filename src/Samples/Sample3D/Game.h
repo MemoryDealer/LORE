@@ -69,6 +69,8 @@ private:
   Lore::CameraPtr _camera {};
   Lore::CameraPtr _camera2D {};
 
+  std::vector<Lore::NodePtr> _metalStars {};
+
   Lore::NodePtr _playerNode2D {};
   std::vector<Lore::NodePtr> _floatingBlocks {};
   Lore::SpritePtr _rttSprite {};
