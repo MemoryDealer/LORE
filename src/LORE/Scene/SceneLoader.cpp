@@ -187,15 +187,16 @@ void SceneLoader::_loadPrefabs()
           prefab->setMaterial( mat->clone( mat->getName() + "_" + prefab->getName() ) );
         }
       }
-      const auto& materialSettings = value.getValue( "MaterialSettings" );
-      if ( !materialSettings.isNull() ) {
-        _processMaterialSettings( materialSettings, prefab );
-      }
 
       // Attach a sprite if specified.
       const auto& spriteName = value.getValue( "Sprite" );
       if ( !spriteName.isNull() ) {
         prefab->setSprite( Resource::GetSprite( spriteName.toString() ) );
+      }
+
+      const auto& materialSettings = value.getValue( "MaterialSettings" );
+      if ( !materialSettings.isNull() ) {
+        _processMaterialSettings( materialSettings, prefab );
       }
 
       // Shadow settings.
@@ -375,6 +376,11 @@ void SceneLoader::_processMaterialSettings( const SerializerValue& value, Prefab
   const auto& shininess = value.getValue( "Shininess" );
   if ( !shininess.isNull() ) {
     material->shininess = shininess.toReal();
+  }
+
+  const auto& program = value.getValue( "Program" );
+  if ( !program.isNull() ) {
+    material->program = Lore::Resource::GetGPUProgram( program.toString() );
   }
 
   // UV scaling.

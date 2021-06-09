@@ -26,6 +26,8 @@
 
 #include "Game.h"
 
+#include <LORE/Core/APIVersion.h>
+
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 namespace LocalNS {
@@ -341,6 +343,91 @@ void Game::loadScene2D()
   layerForeground.setSprite( Lore::Resource::GetSprite( "bg-foreground" ) );
   layerForeground.setDepth( 970.f );
   layerForeground.setParallax( glm::vec2( .4f, 0.12f ) );
+}
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+void Game::loadCustomShaders()
+{
+  const std::string name = "space1";
+  const std::string header = "#version " +
+    std::to_string( Lore::APIVersion::GetMajor() ) + std::to_string( Lore::APIVersion::GetMinor() ) + "0" +
+    " core\n";
+
+  //
+  // Vertex shader.
+
+  std::string src = header;
+  
+  src.append( R"(
+    layout (location = 0) in vec3 vertex;
+
+    uniform mat4 transform;
+
+    void main()
+    {
+      gl_Position = transform * vec4(vertex, 1.0);
+    }
+
+  )" );
+
+  auto vsptr = Lore::Resource::CreateShader( name + "_VS", Lore::Shader::Type::Vertex );
+  if ( !vsptr->loadFromSource( src ) ) {
+    throw Lore::Exception( "Failed to compile vertex shader for " + name );
+  }
+
+  //
+  // Fragment shader.
+
+  src = header;
+
+  src.append( R"(
+    out vec4 pixel;
+
+    void main()
+    {
+      pixel = vec4(0.0, 1.0, 0.0, 1.0);
+    }
+  )" );
+
+  auto fsptr = Lore::Resource::CreateShader( name + "_FS", Lore::Shader::Type::Fragment );
+  if ( !fsptr->loadFromSource( src ) ) {
+    throw Lore::Exception( "Failed to compile fragment shader for " + name );
+  }
+
+  //
+  // Link and setup uniforms/updaters.
+
+  auto program = Lore::Resource::CreateGPUProgram( name );
+  program->attachShader( vsptr );
+  program->attachShader( fsptr );
+  if ( !program->link() ) {
+    throw Lore::Exception( "Failed to link program " + name );
+  }
+
+  program->addTransformVar( "transform" );
+
+  {
+    auto UniformUpdater = []( const Lore::RenderView& rv,
+                              const Lore::GPUProgramPtr program,
+                              const Lore::MaterialPtr material,
+                              const Lore::RenderQueue::LightData& lights ) {
+    };
+
+    auto UniformNodeUpdater = []( const Lore::GPUProgramPtr program,
+                                  const Lore::MaterialPtr material,
+                                  const Lore::NodePtr node,
+                                  const glm::mat4& viewProjection ) {
+      const glm::mat4 model = node->getFullTransform();
+      const glm::mat4 mvp = viewProjection * model;
+      program->setTransformVar( mvp );
+    };
+
+    program->setUniformUpdater( UniformUpdater );
+    program->setUniformNodeUpdater( UniformNodeUpdater );
+  }
+
+  program->allowMeshMaterialSettings = false;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

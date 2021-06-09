@@ -42,6 +42,8 @@ public:
   void loadScene();
   void loadScene2D();
 
+  void loadCustomShaders();
+
   void processInput();
   void update();
   void render();

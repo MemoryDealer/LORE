@@ -9,10 +9,6 @@
     "diffuse": "violet-metal-diffuse",
     "normal": "violet-metal-normal"
   },
-  "RomanTravertine": {
-    "diffuse": "roman-travertine-diffuse",
-    "normal": "roman-travertine-normal"
-  },
   "Marble": {
     "diffuse": "marble",
     "normal": "marble-normal"

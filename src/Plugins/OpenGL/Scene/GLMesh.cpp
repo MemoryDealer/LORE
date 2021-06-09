@@ -547,7 +547,7 @@ void GLMesh::updateInstanced( const size_t idx, const glm::mat4& matrix )
 void GLMesh::draw( const Lore::GPUProgramPtr program, const size_t instanceCount, const bool bindTextures, const bool applyMaterial )
 {
   // Apply custom material settings for this mesh.
-  if ( applyMaterial && _material ) {
+  if ( program->allowMeshMaterialSettings && applyMaterial && _material ) {
     program->setUniformVar( "material.diffuse", _material->diffuse );
   }
 

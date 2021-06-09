@@ -41,6 +41,7 @@ int main( int argc, char** argv )
   Game game;
 
   // Index and load resources specified in res/complexscene/resources.json.
+  game.loadCustomShaders();
   game.loadResources();
 
   // Add some contents to the scene.

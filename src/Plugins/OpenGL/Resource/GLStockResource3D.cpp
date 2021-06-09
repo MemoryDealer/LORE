@@ -1519,6 +1519,8 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createEnvironmentMappingProgram( c
   program->setUniformUpdater( UniformUpdater );
   program->setUniformNodeUpdater( UniformNodeUpdater );
 
+  program->allowMeshMaterialSettings = false;
+
   return program;
 }
 

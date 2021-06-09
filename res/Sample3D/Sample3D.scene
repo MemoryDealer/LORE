@@ -15,6 +15,12 @@
         "Shininess": 32.0
       }
     },
+    "SpaceQuad1": {
+      "Model": "res/Sample3D/Models/quad.fbx",
+      "MaterialSettings": {
+        "Program": "space1"
+      }
+    },
     "RTTCube": {
       "Model": "res/Sample3D/Models/quad.fbx",
       "Instanced": 500,
@@ -227,6 +233,12 @@
             "Scale": [1.0, 1.0, 1.0]
           }
         }
+      },
+      "SpaceQuad1": {
+        "Prefab": "SpaceQuad1",
+        "Position": [0.0, 10.0, 100.0],
+        "Orientation": [0.0, 180.0, 0.0],
+        "Scale": [20.0, 20.0, 20.0]
       }
     }
   }
