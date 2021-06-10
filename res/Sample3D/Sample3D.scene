@@ -95,8 +95,9 @@
     },
     "MagicSphere2": {
       "Model": "res/Sample3D/Models/sphere.fbx",
-      "StockMaterial": "Refract3D",
-      "Sprite": "space"
+      "MaterialSettings": {
+        "Program": "space1"
+      }
     }
   },
   "Lighting": {
