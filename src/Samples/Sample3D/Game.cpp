@@ -361,15 +361,18 @@ void Game::loadCustomShaders()
   
   src.append( R"(
     layout (location = 0) in vec3 vertex;
+    layout (location = 1) in vec2 texCoord;
 
     uniform mat4 transform;
 
     out vec4 FragPos;
+    out vec2 UV;
 
     void main()
     {
       gl_Position = transform * vec4(vertex, 1.0);
       FragPos = transform * vec4(vertex, 1.0);
+      UV = texCoord;
     }
 
   )" );
@@ -403,9 +406,11 @@ void Game::loadCustomShaders()
     layout (location = 1) out vec4 brightPixel;
 
     in vec4 FragPos;
+    in vec2 UV;
 
     uniform float time;
     uniform mat4 view;
+    uniform vec2 resolution;
 
     #define iterations 15
     #define formuparam 0.530
@@ -413,7 +418,7 @@ void Game::loadCustomShaders()
     #define volsteps 18
     #define stepsize 0.120
 
-    #define zoom   1.900
+    #define zoom   0.5
     #define tile   0.850
     #define speed  0.2
 
@@ -424,12 +429,9 @@ void Game::loadCustomShaders()
 
     void main()
     {
-      vec2 resolution = vec2(1000.0, 1000.0);
-
       //get coords and direction
-      vec4 fragCoord = gl_FragCoord;
-      vec2 uv=fragCoord.xy/resolution.xy-.5;
-      uv.y*=resolution.y/resolution.x;
+      vec2 uv = UV;
+      //uv.y*=resolution.y/resolution.x;
       vec3 dir=vec3(uv*zoom,1.);
   
       float a2=time*0.0+.5;
@@ -469,7 +471,7 @@ void Game::loadCustomShaders()
       }
       v=mix(vec3(length(v)),v,saturation); //color adjust
       pixel = vec4(v*.01,1.);
-      brightPixel = vec4(0.0, 0.0, 0.0, 1.0); // no bloom
+      brightPixel = pixel * 0.01; //vec4(0.0, 0.0, 0.0, 1.0); // no bloom
     }
   )" );
 
@@ -491,6 +493,7 @@ void Game::loadCustomShaders()
   program->addTransformVar( "transform" );
   program->addUniformVar( "time" );
   program->addUniformVar( "view" );
+  program->addUniformVar( "resolution" );
 
   {
     auto UniformUpdater = []( const Lore::RenderView& rv,
@@ -502,6 +505,7 @@ void Game::loadCustomShaders()
       program->setUniformVar( "time", time );
 
       program->setUniformVar( "view", rv.camera->getViewMatrix() );
+      program->setUniformVar( "resolution", glm::vec2( rv.gl_viewport.width, rv.gl_viewport.height ) );
     };
 
     auto UniformNodeUpdater = []( const Lore::GPUProgramPtr program,

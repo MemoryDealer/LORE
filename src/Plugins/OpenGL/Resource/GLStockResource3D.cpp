@@ -1449,6 +1449,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createEnvironmentMappingProgram( c
 
   src += "uniform vec3 cameraPos;";
   src += "uniform samplerCube envTexture;";
+  src += "uniform bool bloom;";
 
   //
   // main function.
@@ -1471,8 +1472,12 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createEnvironmentMappingProgram( c
       break;
     }
 
-    // Don't bloom env mapped objects.
     src += "brightPixel = vec4(0.0, 0.0, 0.0, 1.0);";
+    src += "if (bloom) {";
+    {
+      src += "brightPixel = pixel;";
+    }
+    src += "}";
   }
   src += "}";
 
@@ -1502,6 +1507,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createEnvironmentMappingProgram( c
   program->addUniformVar( "model" );
   program->addUniformVar( "viewProjection" );
   program->addUniformVar( "cameraPos" );
+  program->addUniformVar( "bloom" );
 
   // Uniform updaters.
 
@@ -1510,6 +1516,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createEnvironmentMappingProgram( c
                             const MaterialPtr material,
                             const RenderQueue::LightData& lights ) {
     program->setUniformVar( "cameraPos", rv.camera->getPosition() );
+    program->setUniformVar( "bloom", material->bloom );
   };
 
   auto UniformNodeUpdater = []( const GPUProgramPtr program,
