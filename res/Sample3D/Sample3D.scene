@@ -15,10 +15,10 @@
         "Shininess": 32.0
       }
     },
-    "SpaceQuad1": {
-      "Model": "res/Sample3D/Models/quad.fbx",
+    "SpaceCylinder": {
+      "Model": "res/Sample3D/Models/cylinder.obj",
       "MaterialSettings": {
-        "Program": "space1"
+        "Program": "space2"
       }
     },
     "RTTCube": {
@@ -82,7 +82,10 @@
     "MagicSphere": {
       "Model": "res/Sample3D/Models/sphere.fbx",
       "StockMaterial": "Reflect3D",
-      "Sprite": "space"
+      "Sprite": "space",
+      "MaterialSettings": {
+        "Bloom": true
+      }
     },
     "dorrie": {
       "Model": "res/Sample3D/Models/dorrie/dorrie.obj"
@@ -238,10 +241,10 @@
           }
         }
       },
-      "SpaceQuad1": {
-        "Prefab": "SpaceQuad1",
-        "Position": [0.0, 10.0, 100.0],
-        "Orientation": [0.0, 180.0, 0.0],
+      "SpaceCylinder": {
+        "Prefab": "SpaceCylinder",
+        "Position": [50.0, 10.0, 100.0],
+        "Orientation": [0.0, 180.0, 90.0],
         "Scale": [20.0, 20.0, 20.0]
       }
     }
