@@ -31,19 +31,22 @@
     "GlowingRedCube": {
       "Model": "res/Sample3D/Models/cube.fbx",
       "MaterialSettings": {
-        "Ambient": [100.0, 10.0, 10.0]
+        "Ambient": [100.0, 10.0, 10.0],
+        "Bloom": true
       }
     },
     "GlowingGreenCube": {
       "Model": "res/Sample3D/Models/cube.fbx",
       "MaterialSettings": {
-        "Ambient": [10.0, 100.0, 10.0]
+        "Ambient": [10.0, 100.0, 10.0],
+        "Bloom": true
       }
     },
     "GlowingBlueCube": {
       "Model": "res/Sample3D/Models/cube.fbx",
       "MaterialSettings": {
-        "Ambient": [10.0, 10.0, 100.0]
+        "Ambient": [10.0, 10.0, 100.0],
+        "Bloom": true
       }
     },
     "VioletMetalCube": {

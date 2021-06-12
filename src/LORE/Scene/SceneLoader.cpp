@@ -367,6 +367,11 @@ void SceneLoader::_processMaterialSettings( const SerializerValue& value, Prefab
     material->opacity = opacity.toReal();
   }
 
+  const auto& bloom = value.getValue( "Bloom" );
+  if ( !bloom.isNull() ) {
+    material->bloom = bloom.toBool();
+  }
+
   const auto& blending = value.getValue( "Blend" );
   if ( !blending.isNull() ) {
     material->blendingMode.enabled = blending.toBool();

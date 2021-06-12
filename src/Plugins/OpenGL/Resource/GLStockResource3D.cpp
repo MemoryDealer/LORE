@@ -292,6 +292,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     src += "vec4 specular;";
     src += "float shininess;";
     src += "float opacity;";
+    src += "bool bloom;";
   }
   src += "};";
   src += "uniform Material material;";
@@ -620,18 +621,18 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
     // Final pixel.
     src += "pixel = vec4(result, material.opacity);";
+    src += "brightPixel = vec4(0.0, 0.0, 0.0, 1.0);";
 
-    // Bright pixel pass for bloom.
-    src += "vec3 lumConst = vec3(0.2126, 0.7152, 0.0722);";
-    src += "float brightness = dot(result, lumConst);";
-    src += "if (brightness > bloomThreshold) {";
+    src += "if (material.bloom) {";
     {
-      src += "brightPixel = vec4(pixel.rgb, 1.0);";
-    }
-    src += "}";
-    src += "else {";
-    {
-      src += "brightPixel = vec4(0.0, 0.0, 0.0, 1.0);";
+      // Bright pixel pass for bloom.
+      src += "vec3 lumConst = vec3(0.2126, 0.7152, 0.0722);";
+      src += "float brightness = dot(result, lumConst);";
+      src += "if (brightness > bloomThreshold) {";
+      {
+        src += "brightPixel = vec4(pixel.rgb, 1.0);";
+      }
+      src += "}";
     }
     src += "}";
 
@@ -676,6 +677,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
   program->addUniformVar( "material.specular" );
   program->addUniformVar( "material.shininess" );
   program->addUniformVar( "material.opacity" );
+  program->addUniformVar( "material.bloom" );
 
   if ( lit ) {
     program->addUniformVar( "model" );
@@ -761,6 +763,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       program->setUniformVar( "material.specular", material->specular );
       program->setUniformVar( "material.shininess", material->shininess );
       program->setUniformVar( "material.opacity", material->opacity );
+      program->setUniformVar( "material.bloom", material->bloom );
       program->setUniformVar( "sceneAmbient", rv.scene->getAmbientLightColor() );
 
       // Update uniforms for light data.
@@ -1438,7 +1441,8 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createEnvironmentMappingProgram( c
 
   // Ins/outs and uniforms.
 
-  src += "out vec4 pixel;";
+  src += "layout (location = 0) out vec4 pixel;";
+  src += "layout (location = 1) out vec4 brightPixel;";
 
   src += "in vec3 Position;";
   src += "in vec3 Normal;";
@@ -1466,6 +1470,9 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createEnvironmentMappingProgram( c
       src += "pixel = vec4(texture(envTexture, R).rgb, 1.0);";
       break;
     }
+
+    // Don't bloom env mapped objects.
+    src += "brightPixel = vec4(0.0, 0.0, 0.0, 1.0);";
   }
   src += "}";
 
