@@ -1,6 +1,6 @@
 # LORE - Lightweight Object-oriented Rendering Engine
 
-## NOTE: **I do not condone object-oriented programming as _the way_ of developing software. This project was partially an experiment in OOP.**
+### NOTE: **I do not condone object-oriented programming as _the way_ of developing software. This project was partially an experiment in OOP.**
 
 ### I recommend [this video](https://www.youtube.com/watch?v=QM1iUe6IofM) on the topic of OOP.
 <br/>
@@ -15,7 +15,7 @@
 ![Lore3](images/lore3.gif)
 ![Lore4](images/lore4.gif)
 
-LORE is a 2D and 3D rendering engine intended to provide an abstraction layer on graphics APIs, while also providing built-in shaders, rendering algorithms, and scene management, to name a few. I started this project to learn more about graphics, modern C++, and software architecture.
+LORE is a 2D and 3D rendering engine intended to provide an abstraction layer on graphics APIs, while also providing built-in shaders, rendering algorithms, and scene management, to name a few. I started this project to learn more about graphics, modern C++, and software architecture. It is also intended to be lightweight with minimal dependencies (hence the name).
 
 ### Engine Features
 - Scene graph
@@ -77,7 +77,7 @@ The provided samples showcase how to setup the main LORE objects (The `Context` 
 Then build the project "assimp" inside the Assimp Visual Studio solution or by command line.
 
 ### Generate the LORE project files and build
-Navigate to `LORE/src` and run `generate_project.bat` to generate the Visual Studio project files using Premake.
+Navigate to `src` and run `generate_project.bat` to generate the Visual Studio project files using Premake.
 
 Open `LORE.sln` and build the solution (you probably want the release build for good performance).
 
