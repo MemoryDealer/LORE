@@ -32,6 +32,10 @@
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+#define HUGE_SCENE true
+
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
 namespace LocalNS {
 
   static Game* GameInstance = nullptr;
@@ -148,8 +152,10 @@ void Game::loadScene()
 
 #ifdef _DEBUG
   constexpr auto RTTQuadCount = 10;
-#else
+#elif HUGE_SCENE
   constexpr auto RTTQuadCount = 50;
+#else
+  constexpr auto RTTQuadCount = 15;
 #endif
   Lore::u32 ctr = 0;
   for ( int i = - ( RTTQuadCount / 2 ); i < ( RTTQuadCount / 2 ); ++i ) {
@@ -157,8 +163,14 @@ void Game::loadScene()
       auto node = _scene->createNode( "RTTQuad" + std::to_string( ctr++ ) );
       node->attachObject( rttPrefab );
       Lore::real x = 4.f * i;
+#ifdef HUGE_SCENE
+      Lore::real y = 3.f * j + 50.0f;
+      node->setPosition( -80.f, y, x );
+#else
       Lore::real y = 3.f * j + 10.0f;
       node->setPosition( -40.f, y, x );
+#endif
+
       node->rotate( Lore::Vec3PosY, glm::radians( -90.0f ) );
       node->rotate( Lore::Vec3PosX, glm::radians( 180.0f ) );
       node->scale( glm::vec3( 1.6f, 1.f, 1.f ) );
@@ -168,8 +180,10 @@ void Game::loadScene()
   auto metalStarPrefab = Lore::Resource::GetPrefab( "MetalStar", SampleResourceGroupName );
 #ifdef _DEBUG
   constexpr auto MetalStarCount = 10;
-#else
+#elif HUGE_SCENE
   constexpr auto MetalStarCount = 50;
+#else
+  constexpr auto MetalStarCount = 15;
 #endif
   ctr = 0;
   float rot = 0.f;
@@ -177,9 +191,17 @@ void Game::loadScene()
     for ( int j = -( MetalStarCount / 2 ); j < ( MetalStarCount / 2 ); ++j ) {
       auto node = _scene->createNode( "MetalStar" + std::to_string( ctr++ ) );
       node->attachObject( metalStarPrefab );
+      
+#ifdef HUGE_SCENE
+      Lore::real x = 4.f * i + 25.0f;
+      Lore::real y = 4.f * j + 90.0f;
+      node->setPosition( x, y, -80.f );
+#else
       Lore::real x = 4.f * i;
       Lore::real y = 4.f * j + 10.0f;
       node->setPosition( x, y, -40.f );
+#endif
+
       node->rotate( Lore::Vec3PosY, glm::radians( rot ) );
 
       _metalStars.push_back( node );

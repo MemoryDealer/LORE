@@ -23,7 +23,7 @@
     },
     "RTTCube": {
       "Model": "res/Sample3D/Models/quad.fbx",
-      "Instanced": 500,
+      "Instanced": 5000,
       "MaterialSettings": {
         "CastShadows": false
       }
