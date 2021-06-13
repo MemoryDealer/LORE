@@ -1,0 +1,19 @@
+{
+  "checkerboard":"checkerboard",
+  "glass":"glass",
+  "stone": {
+    "diffuse": "stone",
+    "normal": "stone-normal"
+  },
+  "VioletMetal": {
+    "diffuse": "violet-metal-diffuse",
+    "normal": "violet-metal-normal"
+  },
+  "Marble": {
+    "diffuse": "marble",
+    "normal": "marble-normal"
+  },
+  "stars": {
+    "diffuse": ["nebula", "checkerboard"]
+  }
+}

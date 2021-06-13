@@ -53,8 +53,8 @@ AABB::~AABB()
 
 void AABB::update()
 {
-  const auto x = _node->getDerivedPosition().x;
-  const auto y = _node->getDerivedPosition().y;
+  const auto x = _node->getWorldPosition().x;
+  const auto y = _node->getWorldPosition().y;
   const auto w = _node->getDerivedScale().x * 0.2f;
   const auto h = _node->getDerivedScale().y * 0.2f;
 

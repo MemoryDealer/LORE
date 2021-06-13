@@ -226,7 +226,7 @@ namespace Lore {
 
     std::vector<glm::mat4> shadowTransforms;
     glm::mat4 _shadowProj;
-    real shadowFarPlane = 25.f;
+    real shadowFarPlane = 250.f;
   };
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

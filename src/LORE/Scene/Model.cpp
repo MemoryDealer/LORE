@@ -26,7 +26,7 @@
 
 #include "Model.h"
 
-#include <LORE/Resource/Entity.h>
+#include <LORE/Resource/Prefab.h>
 #include <LORE/Resource/ResourceController.h>
 #include <LORE/Resource/StockResource.h>
 
@@ -83,6 +83,10 @@ void Model::attachMesh( const MeshPtr mesh )
     _type = Mesh::Type::Custom;
     break;
 
+  case Mesh::Type::CustomInstanced:
+    _type = Mesh::Type::CustomInstanced;
+    break;
+
   default:
     _type = mesh->getType();
     if ( _meshes.size() > 1 ) {
@@ -94,12 +98,12 @@ void Model::attachMesh( const MeshPtr mesh )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Model::setupShader( EntityPtr entity )
+void Model::setupShader( PrefabPtr prefab )
 {
   for ( const auto& mesh : _meshes ) {
     SpritePtr sprite = mesh->getSprite();
     if ( sprite->getTextureCount( 0, Texture::Type::Normal ) > 0 ) {
-      entity->_material->program = StockResource::GetGPUProgram( "StandardTexturedNormalMapping3D" );
+      prefab->_material->program = StockResource::GetGPUProgram( "StandardTexturedNormalMapping3D" );
       return;
     }
   }

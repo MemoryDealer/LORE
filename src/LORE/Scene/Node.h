@@ -50,8 +50,8 @@ namespace Lore {
     using NodeMap = Registry<std::map, Node>;
     using ChildNodeIterator = NodeMap::Iterator;
     using ConstChildNodeIterator = NodeMap::ConstIterator;
-    using EntityList = Registry<std::map, Entity>;
-    using EntityListConstIterator = EntityList::ConstIterator;
+    using PrefabList = Registry<std::map, Prefab>;
+    using PrefabListConstIterator = PrefabList::ConstIterator;
     using BoxList = Registry<std::map, Box>;
     using BoxListConstIterator = BoxList::ConstIterator;
     using TextboxList = Registry<std::map, Textbox>;
@@ -106,7 +106,7 @@ namespace Lore {
     //
     // Renderable attachments.
 
-    void attachObject( EntityPtr e );
+    void attachObject( PrefabPtr e );
 
     void attachObject( LightPtr l );
 
@@ -114,9 +114,9 @@ namespace Lore {
 
     void attachObject( TextboxPtr t );
 
-    inline EntityListConstIterator getEntityListConstIterator() const
+    inline PrefabListConstIterator getPrefabListConstIterator() const
     {
-      return _entities.getConstIterator();
+      return _prefabs.getConstIterator();
     }
 
     inline BoxListConstIterator getBoxListConstIterator() const
@@ -211,7 +211,7 @@ namespace Lore {
       return _transform.position;
     }
 
-    inline glm::vec3 getDerivedPosition() const
+    inline glm::vec3 getWorldPosition() const
     {
       return glm::vec3( _transform.world[3][0], _transform.world[3][1], _transform.world[3][2] );
     }
@@ -266,7 +266,7 @@ namespace Lore {
   private:
 
     friend class AABB;
-    friend class Entity;
+    friend class Prefab;
     friend class Scene; // Only scenes can construct nodes.
     friend class SceneGraphVisitor;
     friend class MemoryPool<Node>;
@@ -293,7 +293,7 @@ namespace Lore {
 
   private:
 
-    // TODO: Node is getting large, consider holding node -> entity mappings somewhere else.
+    // TODO: Node is getting large, consider holding node -> prefab mappings somewhere else.
 
     string _name {};
 
@@ -304,7 +304,7 @@ namespace Lore {
 
     real _depth { Depth::Default };
 
-    EntityList _entities {};
+    PrefabList _prefabs {};
     size_t _instanceID { 0 };
 
     BoxList _boxes {};

@@ -48,7 +48,7 @@ namespace Lore {
     Forward3DRenderer();
     ~Forward3DRenderer() override = default;
 
-    void addRenderData( EntityPtr e,
+    void addRenderData( PrefabPtr e,
                         NodePtr node ) override;
 
     void addBox( BoxPtr box,

@@ -27,7 +27,7 @@
 #include "SceneGraphVisitor.h"
 
 #include <LORE/Renderer/Renderer.h>
-#include <LORE/Resource/Entity.h>
+#include <LORE/Resource/Prefab.h>
 #include <LORE/Scene/AABB.h>
 #include <LORE/Scene/Node.h>
 
@@ -74,17 +74,17 @@ void SceneGraphVisitor::visit( Renderer* renderer, bool parentDirty )
   }
 
   // Add any Renderables attached to this node to the Renderer.
-  auto it = _node->getEntityListConstIterator();
+  auto it = _node->getPrefabListConstIterator();
   while ( it.hasMore() ) {
-    EntityPtr entity = it.getNext();
-    // Ensure this entity hasn't been reclaimed by the pool.
-    if ( entity->isInUse() ) {
-      renderer->addRenderData( entity, _node );
+    PrefabPtr prefab = it.getNext();
+    // Ensure this prefab hasn't been reclaimed by the pool.
+    if ( prefab->isInUse() ) {
+      renderer->addRenderData( prefab, _node );
 
       // Update instancing.
-      if ( entity->isInstanced() ) {
+      if ( prefab->isInstanced() ) {
         // Applies node's transform to the buffer for instanced data.
-        entity->updateInstancedMatrix( _node->_instanceID, _node->getFullTransform() );
+        prefab->updateInstancedMatrix( _node->_instanceID, _node->getFullTransform() );
       }
     }
   }

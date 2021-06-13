@@ -25,7 +25,7 @@ characterset ( "MBCS" )
 
 solution "LORE"
     configurations { "Debug", "Release" }
-    startproject "Demo3D"
+    startproject "Sample3D"
 
 --
 -- Configurations
@@ -100,39 +100,27 @@ project "glad"
 --
 -- Examples
 
-project "Demo3D"
-    location "Examples/Demo3D"
+project "Sample3D"
+    location "Samples/Sample3D"
     kind "ConsoleApp"
     language "C++"
     defines { "_HAS_CXX17", "_HAS_CXX20" }
     buildoptions { "/std:c++latest" }
     files {
-        "Examples/Demo3D/**.h",
-        "Examples/Demo3D/**.cpp"
+        "Samples/Sample3D/**.h",
+        "Samples/Sample3D/**.cpp"
     }
     links { "LORE" }
 
-project "Example_ComplexScene2D"
-    location "Examples/ComplexScene2D"
+project "Sample2D"
+    location "Samples/Sample2D"
     kind "ConsoleApp"
     language "C++"
     defines { "_HAS_CXX17", "_HAS_CXX20" }
     buildoptions { "/std:c++latest" }
     files { 
-        "Examples/ComplexScene2D/**.h",
-        "Examples/ComplexScene2D/**.cpp"
-    }
-    links { "LORE" }
-
-project "Example_ComplexScene3D"
-    location "Examples/ComplexScene3D"
-    kind "ConsoleApp"
-    language "C++"
-    defines { "_HAS_CXX17", "_HAS_CXX20" }
-    buildoptions { "/std:c++latest" }
-    files { 
-        "Examples/ComplexScene3D/**.h",
-        "Examples/ComplexScene3D/**.cpp"
+        "Samples/Sample2D/**.h",
+        "Samples/Sample2D/**.cpp"
     }
     links { "LORE" }
 

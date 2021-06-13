@@ -256,7 +256,8 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
   if ( textured ) {
     src += "in vec2 TexCoord;";
-    src += "uniform vec2 texSampleOffset = vec2(1.0, 1.0);";
+    src += "uniform vec2 texSampleOffset = vec2(0.0, 0.0);";
+    src += "uniform vec2 uvScale = vec2(0.0, 0.0);";
   }
 
   if ( textured ) {
@@ -290,6 +291,8 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     src += "vec4 diffuse;";
     src += "vec4 specular;";
     src += "float shininess;";
+    src += "float opacity;";
+    src += "bool bloom;";
   }
   src += "};";
   src += "uniform Material material;";
@@ -330,6 +333,8 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     if ( shadows ) {
       src += "in vec4 FragPosDirLightSpace[" + std::to_string( params.maxDirectionalLights ) + "];";
       src += "uniform sampler2D dirLightShadowMap[" + std::to_string( params.maxDirectionalLights ) + "];";
+
+      src += "uniform float omniBias = 0.05f;";
     }
     src += "uniform int numDirLights;";
 
@@ -405,8 +410,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
         src += "closestDepth *= light.shadowFarPlane;"; // Re-map back to original space.
 
         src += "float currentDepth = length(fragToLight);";
-        src += "float bias = 0.05;";
-        src += "float shadow = (currentDepth - bias) > closestDepth ? 1.0 : 0.0;";
+        src += "float shadow = (currentDepth - omniBias) > closestDepth ? 1.0 : 0.0;";
 
         //src += "float shadow = 0.0;";
         //src += "int samples = 20;";
@@ -440,11 +444,11 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       {
         for ( uint32_t i = 0; i < params.maxDiffuseTextures; ++i ) {
           if ( 0 == i ) {
-            src += "vec3 diffuse0 = vec3(texture(diffuseTexture0, TexCoord + texSampleOffset));";
+            src += "vec3 diffuse0 = vec3(texture(diffuseTexture0, TexCoord * uvScale + texSampleOffset));";
           }
           else {
             src += "vec3 diffuse" + std::to_string( i ) + " = mix(vec3(texture(diffuseTexture" +
-              std::to_string( i ) + ", TexCoord + texSampleOffset)), diffuse" + std::to_string( i - 1 ) +
+              std::to_string( i ) + ", TexCoord * uvScale + texSampleOffset)), diffuse" + std::to_string( i - 1 ) +
               ", diffuseMixValues[" + std::to_string( i ) + "]);";
           }
         }
@@ -455,7 +459,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
 
       src += "vec3 SampleSpecularTextures() {";
       {
-        src += "return vec3(texture(specularTexture0, TexCoord + texSampleOffset));";
+        src += "return vec3(texture(specularTexture0, TexCoord * uvScale + texSampleOffset));";
       }
       src += "}";
 
@@ -465,7 +469,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
           src += "vec3 normal;";
 
           // TODO: Multitexturing...
-          src += "normal = texture(normalTexture0, TexCoord + texSampleOffset).rgb;";
+          src += "normal = texture(normalTexture0, TexCoord * uvScale + texSampleOffset).rgb;";
           src += "normal = normalize(normal * 2.0 - 1.0);";
 
           src += "return normal;";
@@ -567,7 +571,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
   src += "void main(){";
   {
     if ( textured ) {
-      src += "vec4 diffuse = texture(diffuseTexture0, TexCoord + texSampleOffset);";
+      src += "vec4 diffuse = texture(diffuseTexture0, TexCoord * uvScale + texSampleOffset);";
       src += "if (diffuse.a < 0.1) {";
       {
         src += "discard;";
@@ -608,27 +612,27 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     // Apply scene ambient lighting.
     if ( lit ) {
       if ( textured ) {
-        src += "result += sceneAmbient.xyz *  SampleDiffuseTextures();";
+        src += "result += sceneAmbient.rgb *  SampleDiffuseTextures();";
       }
       else {
-        src += "result += sceneAmbient.xyz * material.ambient.xyz;";
+        src += "result += sceneAmbient.rgb * material.ambient.rgb;";
       }
     }
 
     // Final pixel.
-    src += "pixel = vec4(result, material.diffuse.a);";
+    src += "pixel = vec4(result, material.opacity);";
+    src += "brightPixel = vec4(0.0, 0.0, 0.0, 1.0);";
 
-    // Bright pixel pass for bloom.
-    src += "vec3 lumConst = vec3(0.2126, 0.7152, 0.0722);";
-    src += "float brightness = dot(result, lumConst);";
-    src += "if (brightness > bloomThreshold) {";
+    src += "if (material.bloom) {";
     {
-      src += "brightPixel = vec4(pixel.rgb, 1.0);";
-    }
-    src += "}";
-    src += "else {";
-    {
-      src += "brightPixel = vec4(0.0, 0.0, 0.0, 1.0);";
+      // Bright pixel pass for bloom.
+      src += "vec3 lumConst = vec3(0.2126, 0.7152, 0.0722);";
+      src += "float brightness = dot(result, lumConst);";
+      src += "if (brightness > bloomThreshold) {";
+      {
+        src += "brightPixel = vec4(pixel.rgb, 1.0);";
+      }
+      src += "}";
     }
     src += "}";
 
@@ -668,12 +672,15 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
   program->addUniformVar( "gamma" );
   program->addUniformVar( "bloomThreshold" );
 
+  program->addUniformVar( "material.ambient" );
+  program->addUniformVar( "material.diffuse" );
+  program->addUniformVar( "material.specular" );
+  program->addUniformVar( "material.shininess" );
+  program->addUniformVar( "material.opacity" );
+  program->addUniformVar( "material.bloom" );
+
   if ( lit ) {
     program->addUniformVar( "model" );
-    program->addUniformVar( "material.ambient" );
-    program->addUniformVar( "material.diffuse" );
-    program->addUniformVar( "material.specular" );
-    program->addUniformVar( "material.shininess" );
     program->addUniformVar( "numDirLights" );
     program->addUniformVar( "numPointLights" );
     program->addUniformVar( "sceneAmbient" );
@@ -689,6 +696,8 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       if ( shadows ) {
         program->addUniformVar( "dirLightSpaceMatrix[" + std::to_string( i ) + "]" );
         program->addUniformVar( "dirLightShadowMap[" + std::to_string( i ) + "]" );
+
+        program->addUniformVar( "omniBias" );
       }
     }
 
@@ -725,6 +734,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
     program->addUniformVar( "specularTexture0");
 
     program->addUniformVar( "texSampleOffset" );
+    program->addUniformVar( "uvScale" );
     program->addUniformVar( "texSampleRegion.x" );
     program->addUniformVar( "texSampleRegion.y" );
     program->addUniformVar( "texSampleRegion.w" );
@@ -752,6 +762,8 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       program->setUniformVar( "material.diffuse", material->diffuse );
       program->setUniformVar( "material.specular", material->specular );
       program->setUniformVar( "material.shininess", material->shininess );
+      program->setUniformVar( "material.opacity", material->opacity );
+      program->setUniformVar( "material.bloom", material->bloom );
       program->setUniformVar( "sceneAmbient", rv.scene->getAmbientLightColor() );
 
       // Update uniforms for light data.
@@ -802,6 +814,10 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
           program->setUniformVar( "shadowCubemap[" + std::to_string( i ) + "]", shadowMapTexUnit );
 
           ++shadowMapTexUnit;
+
+#ifdef LORE_DEBUG_UI
+          program->setUniformVar( "omniBias", DebugConfig::omniBias );
+#endif
         }
 
         ++i;
@@ -856,6 +872,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       }
 
       program->setUniformVar( "texSampleOffset", material->getTexCoordOffset() );
+      program->setUniformVar( "uvScale", material->uvScale );
 
       const Rect sampleRegion = material->getTexSampleRegion();
       program->setUniformVar( "texSampleRegion.x", sampleRegion.x );
@@ -916,6 +933,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createUberProgram( const string& n
       }
 
       program->setUniformVar( "texSampleOffset", material->getTexCoordOffset() );
+      program->setUniformVar( "uvScale", material->uvScale );
 
       const Rect sampleRegion = material->getTexSampleRegion();
       program->setUniformVar( "texSampleRegion.x", sampleRegion.x );
@@ -1252,6 +1270,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createSkyboxProgram( const string&
   src += "out vec3 TexCoords;";
 
   src += "uniform mat4 viewProjection;";
+  src += "uniform mat4 cameraModel;";
 
   //
   // main function.
@@ -1259,7 +1278,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createSkyboxProgram( const string&
   src += "void main(){";
   {
     src += "TexCoords = pos;";
-    src += "vec4 opPos = viewProjection * vec4(pos, 1.0);";
+    src += "vec4 opPos = viewProjection * cameraModel *  vec4(pos, 1.0);";
     src += "gl_Position = opPos.xyww;";
   }
   src += "}";
@@ -1326,6 +1345,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createSkyboxProgram( const string&
   //
   // Add uniforms.
 
+  program->addUniformVar( "cameraModel" );
   program->addUniformVar( "viewProjection" );
   program->addUniformVar( "gamma" );
 
@@ -1361,6 +1381,8 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createEnvironmentMappingProgram( c
     std::to_string( APIVersion::GetMajor() ) + std::to_string( APIVersion::GetMinor() ) + "0" +
     " core\n";
 
+  const bool instanced = params.instanced;
+
   //
   // Vertex shader.
 
@@ -1371,6 +1393,10 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createEnvironmentMappingProgram( c
 
   src += "layout (location = 0) in vec3 pos;";
   src += "layout (location = 1) in vec3 normal;";
+
+  if ( instanced ) {
+    src += "layout (location = " + std::to_string( instancedMatrixTexUnit ) + ") in mat4 instanceMatrix;";
+  }
 
   //
   // Uniforms and outs.
@@ -1386,9 +1412,16 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createEnvironmentMappingProgram( c
 
   src += "void main(){";
   {
-    src += "Normal = mat3(transpose(inverse(model))) * normal;";
-    src += "Position = vec3(model * vec4(pos, 1.0));";
-    src += "gl_Position = viewProjection * model * vec4(pos, 1.0);";
+    if ( instanced ) {
+      src += "Normal = mat3(transpose(inverse(instanceMatrix))) * normal;";
+      src += "Position = vec3(instanceMatrix * vec4(pos, 1.0));";
+      src += "gl_Position = viewProjection * instanceMatrix* vec4(pos, 1.0);";
+    }
+    else {
+      src += "Normal = mat3(transpose(inverse(model))) * normal;";
+      src += "Position = vec3(model * vec4(pos, 1.0));";
+      src += "gl_Position = viewProjection * model * vec4(pos, 1.0);";
+    }
   }
   src += "}";
 
@@ -1408,13 +1441,15 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createEnvironmentMappingProgram( c
 
   // Ins/outs and uniforms.
 
-  src += "out vec4 pixel;";
+  src += "layout (location = 0) out vec4 pixel;";
+  src += "layout (location = 1) out vec4 brightPixel;";
 
   src += "in vec3 Position;";
   src += "in vec3 Normal;";
 
   src += "uniform vec3 cameraPos;";
   src += "uniform samplerCube envTexture;";
+  src += "uniform bool bloom;";
 
   //
   // main function.
@@ -1436,6 +1471,13 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createEnvironmentMappingProgram( c
       src += "pixel = vec4(texture(envTexture, R).rgb, 1.0);";
       break;
     }
+
+    src += "brightPixel = vec4(0.0, 0.0, 0.0, 1.0);";
+    src += "if (bloom) {";
+    {
+      src += "brightPixel = pixel;";
+    }
+    src += "}";
   }
   src += "}";
 
@@ -1465,6 +1507,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createEnvironmentMappingProgram( c
   program->addUniformVar( "model" );
   program->addUniformVar( "viewProjection" );
   program->addUniformVar( "cameraPos" );
+  program->addUniformVar( "bloom" );
 
   // Uniform updaters.
 
@@ -1473,6 +1516,7 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createEnvironmentMappingProgram( c
                             const MaterialPtr material,
                             const RenderQueue::LightData& lights ) {
     program->setUniformVar( "cameraPos", rv.camera->getPosition() );
+    program->setUniformVar( "bloom", material->bloom );
   };
 
   auto UniformNodeUpdater = []( const GPUProgramPtr program,
@@ -1488,6 +1532,8 @@ Lore::GPUProgramPtr GLStockResource3DFactory::createEnvironmentMappingProgram( c
 
   program->setUniformUpdater( UniformUpdater );
   program->setUniformNodeUpdater( UniformNodeUpdater );
+
+  program->allowMeshMaterialSettings = false;
 
   return program;
 }

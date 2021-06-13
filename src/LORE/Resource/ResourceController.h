@@ -120,7 +120,7 @@ namespace Lore {
 
   ///
   /// \class ResourceController
-  /// \brief The prime entity which controls all resource lifetime.
+  /// \brief The prime prefab which controls all resource lifetime.
   /// \details Holds all resource groups, provides creation, accessor, and destruction generic functions
   /// which are necessary to use a resource group. Must be overriden by render plugins to provide functors
   /// for resources that require render plugin APIs (e.g., textures, render targets, etc.).
@@ -258,8 +258,9 @@ namespace Lore {
     static TexturePtr LoadTexture( const string& name,
                                    const string& file,
                                    const string& groupName = ResourceController::DefaultGroupName );
-    static EntityPtr LoadEntity( const string& name,
+    static PrefabPtr LoadPrefab( const string& name,
                                  const string& path,
+                                 const bool loadTextures = true,
                                  const string& groupName = ResourceController::DefaultGroupName );
 
     //
@@ -267,7 +268,7 @@ namespace Lore {
 
     static BoxPtr CreateBox( const string& name,
                              const string& groupname = ResourceController::DefaultGroupName );
-    static EntityPtr CreateEntity( const string& name,
+    static PrefabPtr CreatePrefab( const string& name,
                                    const Mesh::Type& modelType,
                                    const string& groupName = ResourceController::DefaultGroupName );
     static GPUProgramPtr CreateGPUProgram( const string& name,
@@ -343,7 +344,7 @@ namespace Lore {
 
     static BoxPtr GetBox( const string& name,
                           const string& groupName = ResourceController::DefaultGroupName );
-    static EntityPtr GetEntity( const string& name,
+    static PrefabPtr GetPrefab( const string& name,
                                 const string& groupName = ResourceController::DefaultGroupName );
     static FontPtr GetFont( const string& name,
                             const string& groupName = ResourceController::DefaultGroupName );
@@ -372,7 +373,7 @@ namespace Lore {
     // Destruction methods.
 
     static void DestroyBox( BoxPtr box );
-    static void DestroyEntity( EntityPtr entity );
+    static void DestroyPrefab( PrefabPtr prefab );
     static void DestroyFont( FontPtr font );
     static void DestroyGPUProgram( GPUProgramPtr program );
     static void DestroyMaterial( MaterialPtr material );
@@ -385,7 +386,7 @@ namespace Lore {
     static void DestroyTexture( TexturePtr texture );
     static void DestroyTextbox( TextboxPtr textbox );
 
-    static void DestroyEntitiesInGroup( const string& groupName );
+    static void DestroyPrefabsInGroup( const string& groupName );
 
     //
     // Accessors.

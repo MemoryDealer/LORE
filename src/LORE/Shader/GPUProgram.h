@@ -125,6 +125,7 @@ namespace Lore {
 
     u8 maxPointLights = 0;
 
+    bool allowMeshMaterialSettings { true };
   };
 
 }

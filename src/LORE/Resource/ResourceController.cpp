@@ -28,7 +28,7 @@
 
 #include <LORE/Core/Context.h>
 #include <LORE/Resource/Box.h>
-#include <LORE/Resource/Entity.h>
+#include <LORE/Resource/Prefab.h>
 #include <LORE/Resource/IO/ResourceFileProcessor.h>
 #include <LORE/Resource/Sprite.h>
 #include <LORE/Resource/StockResource.h>
@@ -56,7 +56,7 @@ ResourceGroup::ResourceGroup( const string& name )
 {
   // Initialize resource registries for all resource types.
   _addResourceType<Box>();
-  _addResourceType<Entity>();
+  _addResourceType<Prefab>();
   _addResourceType<Font>();
   _addResourceType<Material>();
   _addResourceType<Mesh>();
@@ -179,7 +179,7 @@ void ResourceController::unloadGroup( const string& groupName )
   }
 
   destroyAllInGroup<Box>( groupName );
-  destroyAllInGroup<Entity>( groupName );
+  destroyAllInGroup<Prefab>( groupName );
   destroyAllInGroup<Font>( groupName );
   destroyAllInGroup<GPUProgram>( groupName );
   destroyAllInGroup<Material>( groupName );
@@ -350,29 +350,29 @@ TexturePtr Resource::LoadTexture( const string& name, const string& file, const 
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-EntityPtr Resource::LoadEntity( const string& name, const string& path, const string& groupName )
+PrefabPtr Resource::LoadPrefab( const string& name, const string& path, const bool loadTextures, const string& groupName )
 {
   auto rc = ActiveContext->getResourceController();
-  if ( rc->resourceExists<Entity>( name, groupName ) ) {
-    LogWrite( Warning, "Entity %s already exists, returning existing entity", name.c_str() );
-    return rc->get<Entity>( name, groupName );
+  if ( rc->resourceExists<Prefab>( name, groupName ) ) {
+    LogWrite( Warning, "Prefab %s already exists, returning existing prefab", name.c_str() );
+    return rc->get<Prefab>( name, groupName );
   }
-  auto entity = ActiveContext->getResourceController()->create<Entity>( name, groupName );
+  auto prefab = ActiveContext->getResourceController()->create<Prefab>( name, groupName );
 
-  // Give the entity a material.
+  // Give the prefab a material.
   auto material = StockResource::GetMaterial( "StandardTextured3D" );
-  auto entityMaterial = material->clone( "StandardTextured3D_" + name );
-  entity->setMaterial( entityMaterial );
+  auto prefabMaterial = material->clone( "StandardTextured3D_" + name );
+  prefab->setMaterial( prefabMaterial );
 
   // Load the specified model.
   ModelLoader loader( groupName );
-  auto model = loader.load( path );
-  entity->setModel( model );
+  auto model = loader.load( path, loadTextures );
+  prefab->setModel( model );
 
   // Assign normal mapping shader if normal maps are found.
-  model->setupShader( entity );
+  model->setupShader( prefab );
 
-  return entity;
+  return prefab;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -384,17 +384,17 @@ BoxPtr Resource::CreateBox( const string& name, const string& groupName )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-EntityPtr Resource::CreateEntity( const string& name, const Mesh::Type& modelType, const string& groupName )
+PrefabPtr Resource::CreatePrefab( const string& name, const Mesh::Type& modelType, const string& groupName )
 {
   auto rc = ActiveContext->getResourceController();
-  if ( rc->resourceExists<Entity>( name, groupName ) ) {
-    LogWrite( Warning, "Entity %s already exists, returning existing entity", name.c_str() );
-    return rc->get<Entity>( name, groupName );
+  if ( rc->resourceExists<Prefab>( name, groupName ) ) {
+    LogWrite( Warning, "Prefab %s already exists, returning existing prefab", name.c_str() );
+    return rc->get<Prefab>( name, groupName );
   }
-  auto entity = ActiveContext->getResourceController()->create<Entity>( name, groupName );
+  auto prefab = ActiveContext->getResourceController()->create<Prefab>( name, groupName );
 
   // Lookup stock model and assign it.
-  entity->setModel( StockResource::GetModel( modelType ) );
+  prefab->setModel( StockResource::GetModel( modelType ) );
 
   // Set default material.
   switch ( modelType ) {
@@ -405,7 +405,7 @@ EntityPtr Resource::CreateEntity( const string& name, const Mesh::Type& modelTyp
   case Mesh::Type::Quad:
   {
     auto material = StockResource::GetMaterial( "Standard2D" );
-    entity->setMaterial( material->clone( "Standard2D_" + name ) );
+    prefab->setMaterial( material->clone( "Standard2D_" + name ) );
   }
   break;
 
@@ -413,41 +413,41 @@ EntityPtr Resource::CreateEntity( const string& name, const Mesh::Type& modelTyp
   case Mesh::Type::FullscreenQuad:
   {
     auto material = StockResource::GetMaterial( "StandardTextured2D" );
-    entity->setMaterial( material->clone( "StandardTextured2D_" + name ) );
+    prefab->setMaterial( material->clone( "StandardTextured2D_" + name ) );
   }
   break;
 
   case Mesh::Type::Cube:
   {
     auto material = StockResource::GetMaterial( "Standard3D" );
-    entity->setMaterial( material->clone( "Standard3D_" + name ) );
+    prefab->setMaterial( material->clone( "Standard3D_" + name ) );
   }
   break;
 
   case Mesh::Type::TexturedCube:
   {
     auto material = StockResource::GetMaterial( "StandardTextured3D" );
-    entity->setMaterial( material->clone( "StandardTextured3D_" + name ) );
+    prefab->setMaterial( material->clone( "StandardTextured3D_" + name ) );
   }
   break;
 
   case Mesh::Type::Quad3D:
   {
     auto material = StockResource::GetMaterial( "Standard3D" );
-    entity->setMaterial( material->clone( "Standard3D_" + name ) );
+    prefab->setMaterial( material->clone( "Standard3D_" + name ) );
   }
   break;
 
   case Mesh::Type::TexturedQuad3D:
   {
     auto material = StockResource::GetMaterial( "StandardTextured3D" );
-    entity->setMaterial( material->clone( "StandardTextured3D_" + name ) );
+    prefab->setMaterial( material->clone( "StandardTextured3D_" + name ) );
   }
   break;
 
   }
 
-  return entity;
+  return prefab;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -470,7 +470,7 @@ MaterialPtr Resource::CreateMaterial( const string& name, const string& groupNam
 
 MeshPtr Resource::CreateMesh( const string& name, const Mesh::Type& type, const string& groupName )
 {
-  // Always duplicate meshes, else multiple entities loading the same model in a scene will break instancing/node setup.
+  // Always duplicate meshes, else multiple prefabs loading the same model in a scene will break instancing/node setup.
   auto mesh = ActiveContext->getResourceController()->create<Mesh>( name, groupName, true );
   mesh->init( type );
   return mesh;
@@ -480,7 +480,7 @@ MeshPtr Resource::CreateMesh( const string& name, const Mesh::Type& type, const 
 
 ModelPtr Resource::CreateModel( const string& name, const Mesh::Type& type, const string& groupName )
 {
-  // Always duplicate models, else multiple entities loading the same model in a scene will break instancing/node setup.
+  // Always duplicate models, else multiple prefabs loading the same model in a scene will break instancing/node setup.
   return ActiveContext->getResourceController()->create<Model>( name, groupName, true );
 }
 
@@ -629,9 +629,9 @@ BoxPtr Resource::GetBox( const string& name, const string& groupName )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-EntityPtr Resource::GetEntity( const string& name, const string& groupName )
+PrefabPtr Resource::GetPrefab( const string& name, const string& groupName )
 {
-  return ActiveContext->getResourceController()->get<Entity>( name, groupName );
+  return ActiveContext->getResourceController()->get<Prefab>( name, groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -720,9 +720,9 @@ void Resource::DestroyBox( BoxPtr box )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Resource::DestroyEntity( EntityPtr entity )
+void Resource::DestroyPrefab( PrefabPtr prefab )
 {
-  ActiveContext->getResourceController()->destroy<Entity>( entity );
+  ActiveContext->getResourceController()->destroy<Prefab>( prefab );
 }
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -803,9 +803,9 @@ void Resource::DestroyTextbox( TextboxPtr textbox )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Resource::DestroyEntitiesInGroup( const string& groupName )
+void Resource::DestroyPrefabsInGroup( const string& groupName )
 {
-  ActiveContext->getResourceController()->destroyAllInGroup<Entity>( groupName );
+  ActiveContext->getResourceController()->destroyAllInGroup<Prefab>( groupName );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

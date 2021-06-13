@@ -29,7 +29,7 @@
 #include <LORE/Config/Config.h>
 #include <LORE/Math/Math.h>
 #include <LORE/Resource/Box.h>
-#include <LORE/Resource/Entity.h>
+#include <LORE/Resource/Prefab.h>
 #include <LORE/Renderer/IRenderAPI.h>
 #include <LORE/Resource/Font.h>
 #include <LORE/Resource/Sprite.h>
@@ -61,37 +61,37 @@ Forward3DRenderer::Forward3DRenderer()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Forward3DRenderer::addRenderData( EntityPtr entity,
+void Forward3DRenderer::addRenderData( PrefabPtr prefab,
                                        NodePtr node )
 {
   // TODO: Consider a way of optimizing this by skipping processing data here
   // and directly storing references to nodes in lists in the renderer.
-  const uint queueId = entity->getRenderQueue();
-  const bool blended = entity->getMaterial()->blendingMode.enabled;
+  const uint queueId = prefab->getRenderQueue();
+  const bool blended = prefab->getMaterial()->blendingMode.enabled;
 
   // TODO: Fix two lookups here.
   // Add this queue to the active queue list if not already there.
   _activateQueue( queueId, _queues[queueId] );
 
   //
-  // Add render data for this entity at the node's position to the queue.
+  // Add render data for this prefab at the node's position to the queue.
 
   RenderQueue& queue = _queues.at( queueId );
 
   if ( blended ) {
-    RenderQueue::EntityNodePair pair { entity, node };
+    RenderQueue::PrefabNodePair pair { prefab, node };
     queue.transparents.insert( { glm::length2( _camera->getPosition() - node->getPosition() ), pair } );
   }
   else {
-    if ( entity->isInstanced() ) {
-      RenderQueue::InstancedEntitySet& set = queue.instancedSolids;
-      // Only add instanced entities that haven't been processed yet.
-      if ( set.find( entity ) == set.end() ) {
-        set.insert( entity );
+    if ( prefab->isInstanced() ) {
+      RenderQueue::InstancedPrefabSet& set = queue.instancedSolids;
+      // Only add instanced prefabs that haven't been processed yet.
+      if ( set.find( prefab ) == set.end() ) {
+        set.insert( prefab );
       }
     }
     else {
-      RenderQueue::NodeList& nodes = queue.solids[entity];
+      RenderQueue::NodeList& nodes = queue.solids[prefab];
       nodes.push_back( node );
     }
   }
@@ -150,7 +150,7 @@ void Forward3DRenderer::addLight( LightPtr light,
     break;
 
   case Light::Type::Point:
-    queue.lights.pointLights.emplace_back( static_cast< PointLightPtr >( light ), node->getDerivedPosition() );
+    queue.lights.pointLights.emplace_back( static_cast<PointLightPtr>( light ), node->getWorldPosition() );
     break;
   }
 }
@@ -310,13 +310,13 @@ void Forward3DRenderer::_presentPostProcessing( const RenderView& rv,
   //
   // First do a Gaussian blur for bloom.
 
-  ModelPtr blurModel = p->doubleBufferEntity->getModel();
-  GPUProgramPtr blurProgram = p->doubleBufferEntity->_material->program;
+  ModelPtr blurModel = p->doubleBufferPrefab->getModel();
+  GPUProgramPtr blurProgram = p->doubleBufferPrefab->_material->program;
   blurProgram->use();
 
   int blurAmount = 10;
 #ifdef LORE_DEBUG_UI
-  blurAmount = DebugConfig::bloomBlurPassCount;
+  blurAmount = ( !DebugConfig::bloomEnabled ) ? 1 : DebugConfig::bloomBlurPassCount;
 #endif
 
   TexturePtr blurBuffer = p->doubleBuffer->getTexture();
@@ -353,8 +353,8 @@ void Forward3DRenderer::_presentPostProcessing( const RenderView& rv,
 
   _api->clear();
 
-  ModelPtr model = p->entity->getModel();
-  GPUProgramPtr program = p->entity->_material->program;
+  ModelPtr model = p->prefab->getModel();
+  GPUProgramPtr program = p->prefab->_material->program;
   program->use();
 
   TexturePtr buffer = p->renderTarget->getTexture();
@@ -432,15 +432,19 @@ void Forward3DRenderer::_renderShadowMaps( const RenderView& rv,
     shadowProgram->setUniformVar( "viewProjection", dirLight->viewProj );
 
     // Instanced solids.
-    for ( const auto& entity : queue.instancedSolids ) {
-      ModelPtr model = entity->getInstancedModel();
+    for ( const auto& prefab : queue.instancedSolids ) {
+      if ( !prefab->castShadows ) {
+        continue;
+      }
 
-      const NodePtr node = entity->getInstanceControllerNode();
+      ModelPtr model = prefab->getInstancedModel();
+
+      const NodePtr node = prefab->getInstanceControllerNode();
 
       shadowProgram->updateUniforms( rv, nullptr, queue.lights );
       shadowProgram->updateNodeUniforms( nullptr, node, dirLight->viewProj );
 
-      model->draw( shadowProgram, entity->getInstanceCount(), false, false );
+      model->draw( shadowProgram, prefab->getInstanceCount(), false, false );
     }
 
     shadowProgram = StockResource::GetGPUProgram( "DirectionalShadowMap" );
@@ -449,11 +453,15 @@ void Forward3DRenderer::_renderShadowMaps( const RenderView& rv,
 
     // Render non-instanced solids.
     for ( auto& pair : queue.solids ) {
-      const EntityPtr entity = pair.first;
-      const RenderQueue::NodeList& nodes = pair.second;
-      const ModelPtr model = entity->getModel();
+      const PrefabPtr prefab = pair.first;
+      if ( !prefab->castShadows ) {
+        continue;
+      }
 
-      // Render each node associated with this entity.
+      const RenderQueue::NodeList& nodes = pair.second;
+      const ModelPtr model = prefab->getModel();
+
+      // Render each node associated with this prefab.
       for ( const auto& node : nodes ) {
         shadowProgram->updateNodeUniforms( nullptr, node, dirLight->viewProj ); // Note: dirLight->viewProj not used.
         model->draw( shadowProgram, 0, false, false );
@@ -463,9 +471,13 @@ void Forward3DRenderer::_renderShadowMaps( const RenderView& rv,
     // Render transparents.
     // TODO: Account for shadow strength based on opacity...
     for ( auto it = queue.transparents.rbegin(); it != queue.transparents.rend(); ++it ) {
-      const EntityPtr entity = it->second.first;
+      const PrefabPtr prefab = it->second.first;
+      if ( !prefab->castShadows ) {
+        continue;
+      }
+
       NodePtr node = it->second.second;
-      ModelPtr model = entity->getModel();
+      ModelPtr model = prefab->getModel();
 
       shadowProgram->updateNodeUniforms( nullptr, node, dirLight->viewProj ); // Note: dirLight->viewProj not used.
       model->draw( shadowProgram, 0, false, false );
@@ -498,15 +510,19 @@ void Forward3DRenderer::_renderShadowMaps( const RenderView& rv,
     shadowProgram->setUniformVar( "lightPos", lightPos );
     shadowProgram->setUniformVar( "farPlane", pointLight->shadowFarPlane );
 
-    for ( const auto& entity : queue.instancedSolids ) {
-      ModelPtr model = entity->getInstancedModel();
+    for ( const auto& prefab : queue.instancedSolids ) {
+      if ( !prefab->castShadows ) {
+        continue;
+      }
 
-      const NodePtr node = entity->getInstanceControllerNode();
+      ModelPtr model = prefab->getInstancedModel();
+
+      const NodePtr node = prefab->getInstanceControllerNode();
 
       glm::mat4 ident; // Not used in updater.
       shadowProgram->updateNodeUniforms( nullptr, node, ident );
 
-      model->draw( shadowProgram, entity->getInstanceCount(), false, false );
+      model->draw( shadowProgram, prefab->getInstanceCount(), false, false );
     }
 
     // Non-instanced solids.
@@ -520,11 +536,15 @@ void Forward3DRenderer::_renderShadowMaps( const RenderView& rv,
     shadowProgram->setUniformVar( "farPlane", pointLight->shadowFarPlane );
 
     for ( auto& pair : queue.solids ) {
-      const EntityPtr entity = pair.first;
-      const RenderQueue::NodeList& nodes = pair.second;
-      const ModelPtr model = entity->getModel();
+      const PrefabPtr prefab = pair.first;
+      if ( !prefab->castShadows ) {
+        continue;
+      }
 
-      // Render each node associated with this entity.
+      const RenderQueue::NodeList& nodes = pair.second;
+      const ModelPtr model = prefab->getModel();
+
+      // Render each node associated with this prefab.
       glm::mat4 ident; // Not used in updater.
       for ( const auto& node : nodes ) {
         shadowProgram->updateNodeUniforms( nullptr, node, ident );
@@ -535,15 +555,21 @@ void Forward3DRenderer::_renderShadowMaps( const RenderView& rv,
     // Render transparents.
     // TODO: Account for shadow strength based on opacity...
     for ( auto it = queue.transparents.rbegin(); it != queue.transparents.rend(); ++it ) {
-      const EntityPtr entity = it->second.first;
+      const PrefabPtr prefab = it->second.first;
+      if ( !prefab->castShadows ) {
+        continue;
+      }
+
       NodePtr node = it->second.second;
-      ModelPtr model = entity->getModel();
+      ModelPtr model = prefab->getModel();
 
       glm::mat4 ident; // Not used in updater.
       shadowProgram->updateNodeUniforms( nullptr, node, ident );
       model->draw( shadowProgram, 0, false, false );
     }
   }
+
+  _api->setCullingMode( IRenderAPI::CullingMode::Back);
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -573,8 +599,10 @@ void Forward3DRenderer::_renderSkybox( const RenderView& rv,
     GPUProgramPtr program = material->program;
     program->use();
     program->updateUniforms( rv, material, emptyLightData );
-    // TODO: Pass in camera node when camera is updated to use a scene node.
     program->updateNodeUniforms( material, nullptr, viewProjection );
+
+    // TODO: Pass in camera node when camera is updated to use a scene node.
+    program->setUniformVar( "cameraModel", rv.camera->_model );
 
     if ( rv.camera->postProcessing ) {
       program->setUniformVar( "gamma", rv.camera->postProcessing->gamma );
@@ -598,60 +626,37 @@ void Forward3DRenderer::_renderSolids( const RenderView& rv,
   const ScenePtr scene = rv.scene;
 
   // Render instanced solids.
-  for ( const auto& entity : queue.instancedSolids ) {
-    MaterialPtr material = entity->getMaterial();
-    ModelPtr model = entity->getInstancedModel();
-    GPUProgramPtr program = nullptr;
+  for ( const auto& prefab : queue.instancedSolids ) {
+    MaterialPtr material = prefab->getMaterial();
+    ModelPtr model = prefab->getInstancedModel();
+    GPUProgramPtr program = material->program;
 
-    const NodePtr node = entity->getInstanceControllerNode();
+    const NodePtr node = prefab->getInstanceControllerNode();
 
-    // Acquire the correct GPUProgram for this instanced model type.
-    switch ( model->getType() ) {
-    default:
-      throw Lore::Exception( "Instanced entity must have an instanced model" );
-
-    case Mesh::Type::Quad3DInstanced:
-    case Mesh::Type::CubeInstanced:
-      program = StockResource::GetGPUProgram( "StandardInstanced3D" );
-      break;
-
-    case Mesh::Type::TexturedQuad3DInstanced:
-    case Mesh::Type::TexturedCubeInstanced:
-    case Mesh::Type::CustomInstanced:
-      if ( material->sprite->getTextureCount( 0, Texture::Type::Normal ) > 0 ) {
-        program = StockResource::GetGPUProgram( "StandardTexturedNormalMappingInstanced3D" );
-      }
-      else {
-        program = StockResource::GetGPUProgram( "StandardTexturedInstanced3D" );
-      }
-      break;
-    }
-
-    _api->setCullingMode( entity->cullingMode );
+    _api->setCullingMode( prefab->cullingMode );
 
     program->use();
-
     program->updateUniforms( rv, material, queue.lights );
     program->updateNodeUniforms( material, node, viewProjection );
 
-    model->draw( program, entity->getInstanceCount() );
+    model->draw( program, prefab->getInstanceCount() );
   }
 
   // Render non-instanced solids.
   for ( auto& pair : queue.solids ) {
-    const EntityPtr entity = pair.first;
+    const PrefabPtr prefab = pair.first;
     const RenderQueue::NodeList& nodes = pair.second;
 
-    const MaterialPtr material = entity->getMaterial();
-    const ModelPtr model = entity->getModel();
+    const MaterialPtr material = prefab->getMaterial();
+    const ModelPtr model = prefab->getModel();
     const GPUProgramPtr program = material->program;
 
-    _api->setCullingMode( entity->cullingMode );
+    _api->setCullingMode( prefab->cullingMode );
 
     program->use();
     program->updateUniforms( rv, material, queue.lights );
 
-    // Render each node associated with this entity.
+    // Render each node associated with this prefab.
     for ( const auto& node : nodes ) {
       program->updateNodeUniforms( material, node, viewProjection );
       model->draw( program );
@@ -669,19 +674,19 @@ void Forward3DRenderer::_renderTransparents( const RenderView& rv,
 
   // Render in reverse order, so the farthest back is rendered first.
   for ( auto it = queue.transparents.rbegin(); it != queue.transparents.rend(); ++it ) {
-    const EntityPtr entity = it->second.first;
+    const PrefabPtr prefab = it->second.first;
     NodePtr node = it->second.second;
 
-    const MaterialPtr material = entity->getMaterial();
+    const MaterialPtr material = prefab->getMaterial();
     GPUProgramPtr program = material->program;
-    ModelPtr model = entity->getModel();
+    ModelPtr model = prefab->getModel();
 
-    if ( entity->isInstanced() ) {
-      node = entity->getInstanceControllerNode();
-      model = entity->getInstancedModel();
+    if ( prefab->isInstanced() ) {
+      node = prefab->getInstanceControllerNode();
+      model = prefab->getInstancedModel();
       switch ( model->getType() ) {
       default:
-        throw Lore::Exception( "Instanced entity must have an instanced model" );
+        throw Lore::Exception( "Instanced prefab must have an instanced model" );
 
       case Mesh::Type::QuadInstanced:
         program = StockResource::GetGPUProgram( "StandardInstanced2D" );
@@ -695,14 +700,14 @@ void Forward3DRenderer::_renderTransparents( const RenderView& rv,
 
     // Set blending mode using material settings.
     _api->setBlendingFunc( material->blendingMode.srcFactor, material->blendingMode.dstFactor );
-    _api->setCullingMode( entity->cullingMode );
+    _api->setCullingMode( prefab->cullingMode );
 
     program->use();
     program->updateUniforms( rv, material, queue.lights );
     program->updateNodeUniforms( material, node, viewProjection );
 
-    // Draw the entity.
-    model->draw( program, entity->getInstanceCount() );
+    // Draw the prefab.
+    model->draw( program, prefab->getInstanceCount() );
   }
 
   _api->setBlendingEnabled( false );

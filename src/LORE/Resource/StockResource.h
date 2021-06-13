@@ -60,6 +60,7 @@ namespace Lore {
       Refract
     };
     Mode mode { Mode::Reflect };
+    bool instanced { false };
   };
 
   struct PostProcessingProgramParameters

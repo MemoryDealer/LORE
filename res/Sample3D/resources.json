@@ -1,0 +1,10 @@
+{
+  "Core": [
+    "res/sample3d/animations",
+    "res/sample3d/cubemaps",
+    "res/sample3d/fonts",
+    "res/sample3d/materials",
+    "res/sample3d/sprites",
+    "res/sample3d/textures"
+  ]
+}

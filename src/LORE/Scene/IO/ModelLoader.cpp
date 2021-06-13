@@ -51,7 +51,8 @@ ModelPtr ModelLoader::load( const string& path, const bool loadTextures )
   _loadTextures = loadTextures;
 
   Assimp::Importer importer;
-  const aiScene* scene = importer.ReadFile( adjustedPath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace );
+  const aiScene* scene = importer.ReadFile( adjustedPath,
+    aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace | aiProcess_OptimizeMeshes | aiProcess_OptimizeGraph | aiProcess_SortByPType | aiProcess_JoinIdenticalVertices );
 
   if ( !scene || ( scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE ) || !scene->mRootNode ) {
     throw Exception( "Failed to load model at " + adjustedPath + ": " + importer.GetErrorString() );
@@ -142,6 +143,7 @@ void ModelLoader::_processMesh( aiMesh* mesh, const aiScene* scene )
     loreMat->diffuse.g = diffuse.g;
     loreMat->diffuse.b = diffuse.b;
     loreMat->diffuse.a = opacity;
+    loreMat->opacity = opacity;
 
     if ( _loadTextures ) {
       _processTexture( material, aiTextureType_DIFFUSE, loreMesh );
@@ -185,7 +187,13 @@ void ModelLoader::_processTexture( aiMaterial* material, const aiTextureType typ
       LogWrite( Info, "Texture %s loaded for model %s", textureName.c_str(), _name.c_str() );
     }
     else {
-      LogWrite( Warning, "Tried loading texture %s which already exists", textureName.c_str() );
+      LogWrite( Warning, "Tried loading texture %s which already exists, using existing one", textureName.c_str() );
+
+      const auto loreTextureType = ConvertTextureType( type );
+
+      // Load texture and specify SRGB only for diffuse maps.
+      auto texture = rc->get<Texture>( textureName, _resourceGroupName );
+      mesh->getSprite()->addTexture( loreTextureType, texture );
     }
   }
 }
