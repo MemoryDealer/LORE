@@ -70,7 +70,7 @@ ConfigValue Config::GetValue( const string& key )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-float DebugConfig::omniBias = 0.230f;
+float DebugConfig::omniBias = 0.275f;
 float DebugConfig::hdrExposure = 2.5f;
 bool DebugConfig::bloomEnabled = true;
 float DebugConfig::bloomThreshold = 10.0f;

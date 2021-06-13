@@ -149,6 +149,13 @@
       "Diffuse": [0.0, 0.0, 0.3],
       "Specular": [0.0, 0.0, 0.3],
       "Attenuation": [32.0, 1.0, 0.14, 0.07]
+    },
+    "StarLight": {
+      "Type": "Point",
+      "Ambient": [0.05, 0.05, 0.05],
+      "Diffuse": [0.8, 0.8, 0.1],
+      "Specular": [0.8, 0.8, 0.1],
+      "Attenuation": [32.0, 1.0, 0.14, 0.07]
     }
   },
   "Layout": {
@@ -259,6 +266,7 @@
           },
           "dorrieStar": {
             "Prefab": "star",
+            "Light": "StarLight",
             "Scale": [1.0, 1.0, 1.0]
           }
         }

@@ -68,14 +68,6 @@ The provided samples showcase how to setup the main LORE objects (The `Context` 
 
 `git submodule update --init --recursive`
 
-### Build assimp, first you will need to install CMake and run the following commands
-
-`cd src/External/assimp`
-
-`cmake CMakeLists.txt`
-
-Then build the project "assimp" inside the Assimp Visual Studio solution or by command line.
-
 ### Generate the LORE project files and build
 Navigate to `src` and run `generate_project.bat` to generate the Visual Studio project files using Premake.
 
