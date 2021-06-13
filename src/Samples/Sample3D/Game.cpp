@@ -435,6 +435,12 @@ void Game::update()
     metalStar->rotate( Lore::Vec3PosY, glm::radians( 1.f ) );
   }
 
+  static auto discoBall = _scene->getNode( "DiscoBall" );
+  discoBall->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( 0.0001f ) );
+
+  static auto magicSphere3 = _scene->getNode( "MagicSphere3" );
+  magicSphere3->rotate( glm::vec3( 0.f, 1.f, 0.f ), glm::degrees( -0.0001f ) );
+
   // 2D scene updates.
 
   static float blockOffset = 0.f;

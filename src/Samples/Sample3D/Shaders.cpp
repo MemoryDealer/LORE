@@ -452,6 +452,153 @@ void LoadCustomShaders()
   }
 
   program->allowMeshMaterialSettings = false;
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  name = "Water";
+
+  //
+  // Vertex shader.
+
+  src = header;
+
+  src.append( R"(
+    layout (location = 0) in vec3 vertex;
+    layout (location = 1) in vec2 texCoord;
+
+    uniform mat4 transform;
+
+    out vec4 FragPos;
+    out vec2 UV;
+
+    void main()
+    {
+      gl_Position = transform * vec4(vertex, 1.0);
+      FragPos = transform * vec4(vertex, 1.0);
+      UV = texCoord;
+    }
+
+  )" );
+
+  vsptr = Lore::Resource::CreateShader( name + "_VS", Lore::Shader::Type::Vertex );
+  if ( !vsptr->loadFromSource( src ) ) {
+    throw Lore::Exception( "Failed to compile vertex shader for " + name );
+  }
+
+  //
+  // Fragment shader.
+
+  src = header;
+
+  // Modified from source: http://glslsandbox.com/e#73280.0
+  src.append( R"(
+    layout (location = 0) out vec4 pixel;
+    layout (location = 1) out vec4 brightPixel;
+
+    in vec4 FragPos;
+    in vec2 UV;
+
+    uniform float time;
+    uniform mat4 view;
+    uniform vec2 resolution;
+
+    #define TAU 6.28318530718
+    #define MAX_ITER 4
+    //#define SHOW_TILING
+
+    void main( void ) {
+
+
+	    float t = time * .5+23.0;
+        // uv should be the 0-1 uv of texture...
+	    vec2 uv = UV * 1.5;
+
+
+    #ifdef SHOW_TILING
+	    vec2 p = mod(uv*TAU*2.0, TAU)-250.0;
+    #else
+        vec2 p = mod(uv*TAU, TAU)-250.0;
+    #endif
+	    vec2 i = vec2(p);
+	    float c = 1.0;
+	    float inten = .005;
+
+	    for (int n = 1; n < MAX_ITER; n++) 
+	    {
+		    float t = t * (1.0 - (3.5 / float(n+1)));
+		    i = p + vec2(cos(t - i.x) + sin(t + i.y), sin(t - i.y) + cos(t + i.x));
+		    c += 1.0/length(vec2(p.x / (sin(i.x+t)/inten),p.y / (cos(i.y+t)/inten)));
+	    }
+	    c /= float(MAX_ITER);
+	    c = 1.17-pow(c, 1.4);
+	    vec3 colour = vec3(pow(abs(c), 8.0));
+    	    colour = clamp(colour + vec3(0.0, 0.35, 0.6), 0.0, 1.0);
+    
+    #ifdef SHOW_TILING
+	    // Flash tile borders...
+	    vec2 pixel = 2.0 / resolution.xy;
+	    uv *= 2.0;
+
+	    float f = floor(mod(time*.5, 2.0)); 	// Flash value.
+	    vec2 first = step(pixel, uv) * f;		   	// Rule out first screen pixels and flash.
+	    uv  = step(fract(uv), pixel);				// Add one line of pixels per tile.
+	    colour = mix(colour, vec3(1.0, 1.0, 0.0), (uv.x + uv.y) * first.x * first.y); // Yellow line
+	
+    #endif
+
+	    pixel = vec4(colour, 1.0);
+      brightPixel = vec4(0.0, 0.0, 0.0, 1.0);
+    }
+
+  )" );
+
+  fsptr = Lore::Resource::CreateShader( name + "_FS", Lore::Shader::Type::Fragment );
+  if ( !fsptr->loadFromSource( src ) ) {
+    throw Lore::Exception( "Failed to compile fragment shader for " + name );
+  }
+
+  //
+  // Link and setup uniforms/updaters.
+
+  program = Lore::Resource::CreateGPUProgram( name );
+  program->attachShader( vsptr );
+  program->attachShader( fsptr );
+  if ( !program->link() ) {
+    throw Lore::Exception( "Failed to link program " + name );
+  }
+
+  program->addTransformVar( "transform" );
+  program->addUniformVar( "time" );
+  program->addUniformVar( "view" );
+  program->addUniformVar( "resolution" );
+
+  {
+    auto UniformUpdater = []( const Lore::RenderView& rv,
+      const Lore::GPUProgramPtr program,
+      const Lore::MaterialPtr material,
+      const Lore::RenderQueue::LightData& lights ) {
+        static float time = 0.0f;
+        time += 0.01f;
+        program->setUniformVar( "time", time );
+
+        program->setUniformVar( "view", rv.camera->getViewMatrix() );
+        program->setUniformVar( "resolution", glm::vec2( 1.f, 1.f ) );
+    };
+
+    auto UniformNodeUpdater = []( const Lore::GPUProgramPtr program,
+      const Lore::MaterialPtr material,
+      const Lore::NodePtr node,
+      const glm::mat4& viewProjection ) {
+        const glm::mat4 model = node->getFullTransform();
+        const glm::mat4 mvp = viewProjection * model;
+        program->setTransformVar( mvp );
+    };
+
+    program->setUniformUpdater( UniformUpdater );
+    program->setUniformNodeUpdater( UniformNodeUpdater );
+  }
+
+  program->allowMeshMaterialSettings = false;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

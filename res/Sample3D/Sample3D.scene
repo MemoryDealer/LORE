@@ -66,7 +66,7 @@
         "Ambient": [1.0, 1.0, 1.0],
         "Shininess": 32.0,
         "UVScale": [5.0, 5.0],
-        "ScrollSpeed": [0.001, 0.0]
+        "ScrollSpeed": [0.005, 0.0]
       },
       "CastShadows": false
     },
@@ -103,6 +103,28 @@
       "Model": "res/Sample3D/Models/sphere.fbx",
       "MaterialSettings": {
         "Program": "space1"
+      }
+    },
+    "WaterSphere": {
+      "Model": "res/Sample3D/Models/sphere.fbx",
+      "MaterialSettings": {
+        "Program": "Water"
+      }
+    },
+    "DiscoBall": {
+      "Model": "res/Sample3D/Models/discoball.fbx",
+      "StockMaterial": "Reflect3D",
+      "Sprite": "space",
+      "MaterialSettings": {
+        "Bloom": true
+      }
+    },
+    "MagicSphere3": {
+      "Model": "res/Sample3D/Models/sphere.fbx",
+      "StockMaterial": "Refract3D",
+      "Sprite": "space",
+      "MaterialSettings": {
+        "Bloom": true
       }
     }
   },
@@ -246,6 +268,24 @@
         "Position": [50.0, 10.0, 100.0],
         "Orientation": [0.0, 180.0, 90.0],
         "Scale": [20.0, 20.0, 20.0]
+      },
+      "WaterSphere": {
+        "Prefab": "WaterSphere",
+        "Position": [0.0, 90.0, 0.0],
+        "Orientation": [90.0, 0.0, 0.0],
+        "Scale": [40.0, 40.0, 40.0]
+      },
+      "DiscoBall": {
+        "Prefab": "DiscoBall",
+        "Position": [0.0, 20.0, 0.0],
+        "Orientation": [90.0, 0.0, 0.0],
+        "Scale": [2.0, 2.0, 2.0]
+      },
+      "MagicSphere3": {
+        "Prefab": "MagicSphere3",
+        "Position": [0.0, 42.0, 0.0],
+        "Orientation": [0.0, 0.0, 0.0],
+        "Scale": [3.0, 3.0, 3.0]
       }
     }
   }
