@@ -35,6 +35,13 @@ namespace Lore {
   class LORE_EXPORT Box final : public Alloc<Box>, public IResource
   {
 
+    bool _fill { true };
+
+    Color _borderColor { StockColor::White };
+    Color _fillColor { 1.f, 1.f, 1.f, 0.3f };
+    glm::vec2 _size { 1.f, 1.f };
+    real _borderWidth { 0.04f };
+
   public:
 
     Box() = default;
@@ -112,15 +119,6 @@ namespace Lore {
     {
       _borderWidth = width;
     }
-
-  private:
-
-    bool _fill { true };
-
-    Color _borderColor { StockColor::White };
-    Color _fillColor { 1.f, 1.f, 1.f, 0.3f };
-    glm::vec2 _size { 1.f, 1.f };
-    real _borderWidth { 0.04f };
 
   };
 

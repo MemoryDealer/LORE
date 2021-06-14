@@ -38,6 +38,16 @@ namespace Lore {
   class DebugUI_PerformanceStats final
   {
 
+    Timer _timer {};
+
+    // FPS.
+    int32_t _frameCount { 0 };
+    real _elapsed { 0 };
+    int32_t _FPS { 0 };
+    int32_t _MSPF { 0 };
+
+    Dimensions _windowDimensions {};
+
   public:
 
     DebugUI_PerformanceStats();
@@ -52,18 +62,6 @@ namespace Lore {
     {
       _windowDimensions = dimensions;
     }
-
-  private:
-
-    Timer _timer {};
-
-    // FPS.
-    int32_t _frameCount { 0 };
-    real _elapsed { 0 };
-    int32_t _FPS { 0 };
-    int32_t _MSPF { 0 };
-
-    Dimensions _windowDimensions {};
 
   };
 

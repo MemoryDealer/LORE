@@ -41,6 +41,8 @@ namespace Lore {
   class LORE_EXPORT Serializer final
   {
 
+    std::unique_ptr<SerializerComponent> _component { nullptr };
+
   public:
 
     enum class Mode
@@ -50,7 +52,7 @@ namespace Lore {
       Buffer
     };
 
-  public:
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     Serializer();
     Serializer( const Mode mode );
@@ -61,7 +63,6 @@ namespace Lore {
     void setMode( const Mode mode );
 
     void serialize( const string& file );
-
     bool deserialize( const string& file );
 
     //
@@ -70,16 +71,10 @@ namespace Lore {
     bool valueExists( const string& key ) const;
 
     SerializerValue& getValue( const string& key );
-
-    const SerializerValue::Values& getValues() const;
+    const Values& getValues() const;
 
     SerializerValue& addValue( const string& key );
-
     void addValue( const SerializerValue& value );
-
-  private:
-
-    std::unique_ptr<SerializerComponent> _component { nullptr };
 
   };
 

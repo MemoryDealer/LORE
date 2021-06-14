@@ -34,6 +34,9 @@ namespace Lore {
   class LORE_EXPORT CLI
   {
 
+    friend class Context;
+    static void AssignContext( ContextPtr context );
+
   public:
 
     struct Command
@@ -48,31 +51,24 @@ namespace Lore {
     };
     using CommandPtr = Command*;
 
-  public:
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    static ScenePtr ActiveScene;
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     static void Init();
-
     static ContextPtr GetContext();
 
     static string Execute( const string& command );
 
     static bool RegisterCommand( CommandPtr command, const uint32_t count, ... );
-
     static string GetPreviousCommand();
-
     static string GetNextCommand();
-
     static void ResetCommandHistoryIndex();
-
-    static ScenePtr GetActiveScene() { return ActiveScene; }
-
-    static void SetActiveScene( ScenePtr scene ) { ActiveScene = scene; }
-
-    // String processing.
 
     // Returns next isolated string, and removes it from str.
     static string ExtractNextArg( string& str );
-
     static uint32_t GetNumArgs( const string& str );
 
     // Conversion.
@@ -80,15 +76,6 @@ namespace Lore {
     static glm::vec2 ToVec2( const string& str );
     static glm::vec3 ToVec3( const string& str );
     static glm::vec4 ToVec4( const string& str );
-
-  private:
-
-    friend class Context;
-    static void AssignContext( ContextPtr context );
-
-  private:
-
-    static ScenePtr ActiveScene;
 
   };
 

@@ -42,28 +42,17 @@ namespace Lore {
   class Alloc
   {
 
+    friend class MemoryPool<T>;
+
   public:
 
+    std::atomic<bool> inUse { false };
+    T* next { nullptr };
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
     Alloc() = default;
-
     virtual ~Alloc() = default;
-
-    ///
-    /// \brief Returns true if object has been requested for use in memory pool.
-    /// After it is destroyed in the memory pool, it is no longer in use.
-    bool isInUse() const
-    {
-      return _inUse;
-    }
-
-  public: // HACK for posix.
-
-    std::atomic<bool> _inUse { false };
-    T* _next { nullptr };
-
-  private:
-
-    friend class MemoryPool<T>;
 
   };
 

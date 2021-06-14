@@ -35,6 +35,14 @@ namespace Lore {
   class LORE_EXPORT APIVersion
   {
 
+    // Provide Context access to internal method Set(), so render plugin
+    // Context objects can set the API version.
+    friend class Context;
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    static void Set( const int major, const int minor );
+
   public:
 
     ///
@@ -49,16 +57,6 @@ namespace Lore {
     /// \brief Returns major and minor version as string
     ///     (e.g., "4.3", for example).
     static string GetString();
-
-  private:
-
-    // Provide Context access to internal method Set(), so render plugin
-    // Context objects can set the API version.
-    friend class Context;
-
-  private:
-
-    static void Set( const int major, const int minor );
 
   };
 

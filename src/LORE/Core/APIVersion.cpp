@@ -34,8 +34,8 @@ using namespace Lore;
 
 namespace APIVersionNS {
 
-  static int Major=0;
-  static int Minor=0;
+  static int Major = 0;
+  static int Minor = 0;
 
 }
 using namespace APIVersionNS;
@@ -58,7 +58,7 @@ int APIVersion::GetMinor()
 
 string APIVersion::GetString()
 {
-  static string str=std::to_string( Major ) + std::to_string( Minor );
+  static string str = std::to_string( Major ) + std::to_string( Minor );
   return str;
 }
 
@@ -66,8 +66,8 @@ string APIVersion::GetString()
 
 void APIVersion::Set( const int major, const int minor )
 {
-  Major=major;
-  Minor=minor;
+  Major = major;
+  Minor = minor;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

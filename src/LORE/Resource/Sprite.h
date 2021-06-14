@@ -39,6 +39,21 @@ namespace Lore {
                                    public IResource
   {
 
+    using TextureList = std::vector<TexturePtr>;
+    using MixValues = std::vector<real>;
+
+    struct Frame
+    {
+      TextureList textures;
+      MixValues mixValues;
+    };
+
+    using FrameData = std::map<Texture::Type, Frame>;
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    std::vector<FrameData> _frames {};
+
   public:
 
     Sprite() = default;
@@ -57,23 +72,6 @@ namespace Lore {
     TexturePtr getTexture( const size_t frameIdx, const Texture::Type type, const size_t idx = 0 ) const;
     u8 getTextureCount( const size_t frameIdx, const Texture::Type type ) const;
     real getMixValue( const size_t frameIdx, const Texture::Type type, const size_t idx ) const;
-
-  private:
-
-    using TextureList = std::vector<TexturePtr>;
-    using MixValues = std::vector<real>;
-
-    struct Frame
-    {
-      TextureList textures;
-      MixValues mixValues;
-    };
-
-    using FrameData = std::map<Texture::Type, Frame>;
-
-  private:
-
-    std::vector<FrameData> _frames {};
 
   };
 

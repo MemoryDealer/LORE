@@ -49,7 +49,7 @@ using namespace Lore;
 namespace Local {
 
   static RenderPluginLoader __rpl;
-  static std::vector<Context::ErrorListener> __errorListeners;
+  static std::vector<ErrorListener> __errorListeners;
   static Context* _activeContextPtr = nullptr;
 
 }

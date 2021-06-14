@@ -41,17 +41,17 @@ namespace Lore {
   class Registry
   {
 
+    MapType<string, T*, MapParams ...> _container {};
+    MapType<string, u32> _count {};
+
   public:
 
     using Iterator = MapIterator<MapType<string, T*, MapParams ...>>;
     using ConstIterator = ConstMapIterator<MapType<string, T*, MapParams ...>>;
 
-  public:
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    constexpr
-    explicit Registry()
-    {
-    }
+    Registry() = default;
 
     void insert( const ID& id, T* resource, const bool autoDuplicate = false )
     {
@@ -140,11 +140,6 @@ namespace Lore {
 
     Registry& operator = ( const Registry& rhs ) = default;
     Registry( const Registry& rhs ) = default;
-
-  private:
-
-    MapType<string, T*, MapParams ...> _container {};
-    MapType<string, u32> _count {};
 
   };
 

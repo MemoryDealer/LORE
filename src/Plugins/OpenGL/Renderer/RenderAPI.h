@@ -81,7 +81,7 @@ namespace Lore { namespace OpenGL {
 
     void setBlendingEnabled( const bool enabled ) override;
 
-    void setBlendingFunc( const Material::BlendFactor& src, const Material::BlendFactor& dst ) override;
+    void setBlendingFunc( const BlendFactor& src, const BlendFactor& dst ) override;
 
     //
     // Debugging.

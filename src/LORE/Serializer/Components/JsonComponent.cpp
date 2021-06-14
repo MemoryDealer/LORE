@@ -224,7 +224,7 @@ bool JsonSerializerComponent::deserialize( const string& file )
     } break;
 
     case rapidjson::Type::kArrayType: {
-      SerializerValue::Array values;
+      Array values;
       // Add all array values.
       for ( auto arrayIt = value.Begin(); arrayIt != value.End(); ++arrayIt ) {
         SerializerValue v( key.GetString() );

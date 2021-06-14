@@ -33,10 +33,12 @@
 
 namespace Lore {
 
-  struct Light
+  class Light
   {
 
     LORE_OBJECT_BODY()
+
+    friend class Node;
 
     enum class Type
     {
@@ -45,9 +47,20 @@ namespace Lore {
       Spot
     };
 
-    RenderTargetPtr shadowMap {};
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    Color _ambient { StockColor::Black };
+    Color _diffuse { StockColor::White };
+    Color _specular { StockColor::White };
+
+    RenderTargetPtr shadowMap {};
+
+  protected:
+
+    Type _type { Type::Directional };
+
+  public:
 
     Light() = default;
     virtual ~Light();
@@ -97,28 +110,20 @@ namespace Lore {
 
     virtual void updateShadowTransforms( const glm::vec3& pos ) {}
 
-  protected:
-
-    Type _type { Type::Directional };
-
-  private:
-
-    friend class Node;
-
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-    Color _ambient { StockColor::Black };
-    Color _diffuse { StockColor::White };
-    Color _specular { StockColor::White };
-
   };
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-  struct DirectionalLight final : public Light, public Alloc<DirectionalLight>
+  class DirectionalLight final : public Light, public Alloc<DirectionalLight>
   {
 
+    glm::vec3 _direction;
+
+  public:
+
     glm::mat4 viewProj {};
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     DirectionalLight() = default;
     ~DirectionalLight() override = default;
@@ -140,10 +145,6 @@ namespace Lore {
       return _direction;
     }
 
-  private:
-
-    glm::vec3 _direction;
-
   };
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -151,8 +152,18 @@ namespace Lore {
   ///
   /// \class MovableLight
   /// \brief A light that can be attached to a scene node.
-  struct MovableLight : public Light
+  class MovableLight : public Light
   {
+
+    // Attenuation.
+    real _range { 1.f };
+    real _constant { 1.f };
+    real _linear { .7f };
+    real _quadratic { 1.8f };
+
+    real _intensity { 1.f };
+
+  public:
 
     MovableLight() = default;
     ~MovableLight() override = default;
@@ -198,41 +209,35 @@ namespace Lore {
       return _intensity;
     }
 
-  private:
-
-    // Attenuation.
-    real _range { 1.f };
-    real _constant { 1.f };
-    real _linear { .7f };
-    real _quadratic { 1.8f };
-
-    real _intensity { 1.f };
-
   };
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-  struct PointLight final : public MovableLight, public Alloc<PointLight>
+  class PointLight final : public MovableLight, public Alloc<PointLight>
   {
+
+  public:
+
+    std::vector<glm::mat4> shadowTransforms;
+    glm::mat4 _shadowProj;
+    real shadowFarPlane = 250.f;
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     PointLight() = default;
     ~PointLight() override = default;
 
     void init() override;
-
     void updateShadowTransforms( const glm::vec3& pos ) override;
 
-    // :::::::::::::::::::::::::::::::: //
-
-    std::vector<glm::mat4> shadowTransforms;
-    glm::mat4 _shadowProj;
-    real shadowFarPlane = 250.f;
   };
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-  struct SpotLight : public MovableLight, public Alloc<SpotLight>
+  class SpotLight : public MovableLight, public Alloc<SpotLight>
   {
+
+  public:
 
     SpotLight()
     {

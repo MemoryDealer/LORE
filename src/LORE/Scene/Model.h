@@ -34,12 +34,18 @@
 namespace Lore {
 
   using Vertices = std::vector<real>;
+  using MeshList = std::vector<MeshPtr>;
 
   class LORE_EXPORT Model : public IResource,
                             public Alloc<Model>
   {
 
   public:
+
+    Mesh::Type _type { Mesh::Type::Custom };
+    MeshList _meshes {};
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     Model() = default;
     ~Model() override;
@@ -57,15 +63,6 @@ namespace Lore {
     // Accessors.
 
     Mesh::Type getType() const;
-
-  private:
-
-    using MeshList = std::vector<MeshPtr>;
-
-  public:
-
-    Mesh::Type _type { Mesh::Type::Custom };
-    MeshList _meshes {};
 
   };
 

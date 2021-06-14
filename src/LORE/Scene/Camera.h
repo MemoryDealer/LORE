@@ -38,10 +38,17 @@ namespace Lore {
 
   public:
 
+    friend class Context;
+
     enum class Type
     {
       Type2D,
       Type3D
+    };
+
+    enum class TrackingStyle
+    {
+      Simple
     };
 
     struct PostProcessing
@@ -54,73 +61,6 @@ namespace Lore {
       float bloomThreshold { 10.0f };
       float gamma { 2.2f };
     };
-
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-    Camera() = default;
-    virtual ~Camera();
-
-    //
-    // Modifiers.
-
-    void setPosition( const glm::vec2& pos );
-
-    void setPosition( const real x, const real y );
-
-    void setPosition( const real x, const real y, const real z );
-
-    void translate( const glm::vec2& offset );
-
-    void translate( const real xOffset, const real yOffset );
-
-    void translate( const real xOffset, const real yOffset, const real zOffset );
-
-    void zoom( const real amount );
-
-    void setZoom( const real amount );
-
-    virtual void setPosition( const glm::vec3& pos ) = 0;
-
-    virtual void translate( const glm::vec3& offset ) = 0;
-
-    virtual void pitch( const real amount ) = 0;
-
-    virtual void yaw( const real amount ) = 0;
-
-    virtual void lookAt( const glm::vec3& pos, const glm::vec3& target, const glm::vec3& up ) = 0;
-
-    void initPostProcessing( const u32 width, const u32 height, const u32 sampleCount );
-
-    //
-    // Getters.
-
-    string getName() const;
-
-    glm::vec3 getPosition() const;
-
-    glm::vec3 getTarget() const;
-
-    glm::mat4 getViewMatrix();
-
-    // Tracking.
-
-    enum class TrackingStyle
-    {
-      Simple
-    };
-
-    void trackNode( NodePtr node, const TrackingStyle& mode = TrackingStyle::Simple );
-
-    void updateTracking();
-
-  ///
-
-    friend class Context;
-
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-    void _dirty();
-    virtual void _updateViewMatrix() = 0;
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -139,12 +79,58 @@ namespace Lore {
 
     std::unique_ptr<PostProcessing> postProcessing {};
 
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    Camera() = default;
+    virtual ~Camera();
+
+    //
+    // Modifiers.
+
+    void setPosition( const glm::vec2& pos );
+    void setPosition( const real x, const real y );
+    void setPosition( const real x, const real y, const real z );
+
+    void translate( const glm::vec2& offset );
+    void translate( const real xOffset, const real yOffset );
+    void translate( const real xOffset, const real yOffset, const real zOffset );
+
+    void zoom( const real amount );
+    void setZoom( const real amount );
+    virtual void setPosition( const glm::vec3& pos ) = 0;
+
+    virtual void translate( const glm::vec3& offset ) = 0;
+    virtual void pitch( const real amount ) = 0;
+    virtual void yaw( const real amount ) = 0;
+    virtual void lookAt( const glm::vec3& pos, const glm::vec3& target, const glm::vec3& up ) = 0;
+
+    void initPostProcessing( const u32 width, const u32 height, const u32 sampleCount );
+
+    //
+    // Getters.
+
+    string getName() const;
+    glm::vec3 getPosition() const;
+    glm::vec3 getTarget() const;
+    glm::mat4 getViewMatrix();
+
+
+    void trackNode( NodePtr node, const TrackingStyle& mode = TrackingStyle::Simple );
+    void updateTracking();
+
+    void _dirty();
+    virtual void _updateViewMatrix() = 0;
+
   };
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
   class LORE_EXPORT Camera2D final : public Camera
   {
+
+  protected:
+
+    void _updateViewMatrix() override;
 
   public:
 
@@ -155,18 +141,10 @@ namespace Lore {
     // Modifiers.
 
     void setPosition( const glm::vec3& pos ) override;
-
     void translate( const glm::vec3& offset ) override;
-
     void pitch( const real amount ) override { }
-
     void yaw( const real amount ) override { }
-
     void lookAt( const glm::vec3& pos, const glm::vec3& target, const glm::vec3& up ) override { }
-
-  protected:
-
-    void _updateViewMatrix() override;
 
   };
 
@@ -174,6 +152,14 @@ namespace Lore {
 
   class LORE_EXPORT Camera3D final : public Camera
   {
+
+    glm::vec3 _up {};
+    real _pitch { 0.f };
+    real _yaw { -90.f };
+
+  protected:
+
+    void _updateViewMatrix() override;
 
   public:
 
@@ -184,25 +170,10 @@ namespace Lore {
     // Modifiers.
 
     void setPosition( const glm::vec3& pos ) override;
-
     void translate( const glm::vec3& offset ) override;
-
     void pitch( const real amount ) override;
-
     void yaw( const real amount ) override;
-
     void lookAt( const glm::vec3& pos, const glm::vec3& target, const glm::vec3& up ) override;
-
-  protected:
-
-    void _updateViewMatrix() override;
-
-  private:
-
-    glm::vec3 _up {};
-
-    real _pitch { 0.f };
-    real _yaw { -90.f };
 
   };
 

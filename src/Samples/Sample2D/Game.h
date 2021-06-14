@@ -33,23 +33,6 @@
 class Game final
 {
 
-public:
-
-  Game();
-  ~Game();
-
-  void loadResources();
-
-  void loadScene();
-
-  void processInput();
-
-  void update();
-
-  void render();
-
-private:
-
   // This class is the owner of the Lore context, so it must use a unique_ptr.
   // Most other Lore objects are accessed via raw pointers, since they are owned
   // inside the Lore library.
@@ -65,6 +48,17 @@ private:
   // Game objects.
 
   std::vector<Lore::NodePtr> _floatingBlocks {};
+
+public:
+
+  Game();
+  ~Game();
+
+  void loadResources();
+  void loadScene();
+  void processInput();
+  void update();
+  void render();
 
 };
 

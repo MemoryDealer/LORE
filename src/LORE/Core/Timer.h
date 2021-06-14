@@ -33,10 +33,22 @@ namespace Lore {
   class LORE_EXPORT Timer final
   {
 
+    double mSecondsPerCount;
+    double mDeltaTime;
+
+#if LORE_PLATFORM == LORE_WINDOWS
+    __int64 mBaseTime;
+    __int64 mPausedTime;
+    __int64 mStopTime;
+    __int64 mPrevTime;
+    __int64 mCurrTime;
+#endif
+
+    bool mStopped;
+
   public:
 
     Timer();
-
     ~Timer() = default;
 
     ///
@@ -62,21 +74,6 @@ namespace Lore {
     ///
     /// \brief Moves delta time along based on elapsed time since last call to tick().
     void tick();
-
-  private:
-
-    double mSecondsPerCount;
-    double mDeltaTime;
-
-#if LORE_PLATFORM == LORE_WINDOWS
-    __int64 mBaseTime;
-    __int64 mPausedTime;
-    __int64 mStopTime;
-    __int64 mPrevTime;
-    __int64 mCurrTime;
-#endif
-
-    bool mStopped;
 
   };
 

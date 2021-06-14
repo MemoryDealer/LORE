@@ -27,215 +27,215 @@
 
 namespace Lore {
 
-    ///
-    /// \class IteratorWrapper
-    /// \brief Wrapper for iterators of containers, used to implement container iterators.
-    template<typename T, typename ItType, typename ValType>
-    class IteratorWrapper
-    {
+  ///
+  /// \class IteratorWrapper
+  /// \brief Wrapper for iterators of containers, used to implement container iterators.
+  template<typename T, typename ItType, typename ValType>
+  class IteratorWrapper
+  {
 
-    public:
+  protected:
 
-        using ValueType = ValType;
-        using PointerType = ValType*;
+    ItType _begin;
+    ItType _current;
+    ItType _end;
 
-    public:
+  public:
 
-        IteratorWrapper( ItType begin, ItType end )
-        : _begin( begin ), _current( begin ), _end( end )
-        { }
-
-        ///
-        /// \brief Returns true if the iterator has more values to iterate on.
-        bool hasMore() const
-        {
-            return ( _current != _end );
-        }
-
-        ///
-        /// \brief Advances iterator to next element.
-        void moveNext()
-        {
-            ++_current;
-        }
-
-        const ItType& begin()
-        {
-            return _begin;
-        }
-
-        ItType& current()
-        {
-            return _current;
-        }
-
-        const ItType& end()
-        {
-            return _end;
-        }
-
-        //
-        // Deleted functions/operators.
-
-        IteratorWrapper() = delete;
-
-    protected:
-
-        ItType _begin;
-        ItType _current;
-        ItType _end;
-
-    };
+    using ValueType = ValType;
+    using PointerType = ValType*;
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
+    IteratorWrapper( ItType begin, ItType end )
+    : _begin( begin ), _current( begin ), _end( end )
+    { }
+
     ///
-    /// \class MapIteratorWrapper
-    /// \brief Implements IteratorWrapper for map containers.
-    template<typename T, typename ItType>
-    class MapIteratorWrapper : public IteratorWrapper<T, ItType, typename T::mapped_type>
+    /// \brief Returns true if the iterator has more values to iterate on.
+    bool hasMore() const
     {
+      return ( _current != _end );
+    }
 
-    public:
+    ///
+    /// \brief Advances iterator to next element.
+    void moveNext()
+    {
+      ++_current;
+    }
 
-        using ValueType = typename IteratorWrapper<T, ItType, typename T::mapped_type>::ValueType;
-        using PointerType = typename IteratorWrapper<T, ItType, typename T::mapped_type>::PointerType;
+    const ItType& begin()
+    {
+      return _begin;
+    }
 
-        using KeyType = typename T::key_type;
+    ItType& current()
+    {
+      return _current;
+    }
 
-    public:
+    const ItType& end()
+    {
+      return _end;
+    }
 
-        MapIteratorWrapper( ItType begin, ItType end )
-        : IteratorWrapper<T, ItType, typename T::mapped_type>( begin, end )
-        { }
+    //
+    // Deleted functions/operators.
 
-        KeyType peekNextKey() const
-        {
-            return this->_current->first;
-        }
+    IteratorWrapper() = delete;
 
-        ValueType peekNextValue() const
-        {
-            return this->_current->second;
-        }
+  };
 
-        const PointerType peekNextValuePtr() const
-        {
-            return &( this->_current->second );
-        }
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        ValueType getNext()
-        {
-            return ( this->_current++ )->second;
-        }
+  ///
+  /// \class MapIteratorWrapper
+  /// \brief Implements IteratorWrapper for map containers.
+  template<typename T, typename ItType>
+  class MapIteratorWrapper : public IteratorWrapper<T, ItType, typename T::mapped_type>
+  {
 
-    };
+  public:
+
+    using ValueType = typename IteratorWrapper<T, ItType, typename T::mapped_type>::ValueType;
+    using PointerType = typename IteratorWrapper<T, ItType, typename T::mapped_type>::PointerType;
+
+    using KeyType = typename T::key_type;
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    ///
-    /// \class MapIterator
-    /// \brief An iterator for map containers.
-    template<typename T>
-    class MapIterator : public MapIteratorWrapper<T, typename T::iterator>
+    MapIteratorWrapper( ItType begin, ItType end )
+    : IteratorWrapper<T, ItType, typename T::mapped_type>( begin, end )
+    { }
+
+    KeyType peekNextKey() const
     {
+      return this->_current->first;
+    }
 
-    public:
-
-        MapIterator( typename T::iterator begin, typename T::iterator end )
-        : MapIteratorWrapper<T, typename T::iterator>( begin, end )
-        { }
-
-        explicit MapIterator( T& c )
-        : MapIteratorWrapper<T, typename T::iterator>( std::begin( c ), std::end( c ) )
-        { }
-
-    };
-
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-    ///
-    /// \class ConstMapIterator
-    /// \brief A constant iterator for map containers.
-    template<typename T>
-    class ConstMapIterator : public MapIteratorWrapper<T, typename T::const_iterator>
+    ValueType peekNextValue() const
     {
+      return this->_current->second;
+    }
 
-    public:
-
-        ConstMapIterator( typename T::const_iterator start, typename T::const_iterator last )
-        : MapIteratorWrapper<T, typename T::const_iterator>( start, last )
-        { }
-
-        explicit ConstMapIterator( const T& c )
-        : MapIteratorWrapper<T, typename T::const_iterator> ( std::begin( c ), std::end( c ) )
-        { }
-
-    };
-
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-    ///
-    /// \class UniqueMapIterator
-    /// \brief For iterating a map with value type of unique_ptr<T>.
-    /*template<typename T>
-    class UniqueMapIterator : public MapIteratorWrapper<T, typename T::iterator>
+    const PointerType peekNextValuePtr() const
     {
+      return &( this->_current->second );
+    }
 
-    public:
-
-        using UniqueType = typename ValueType::element_type*;
-
-    public:
-
-        UniqueMapIterator( typename T::iterator begin, typename T::iterator end )
-        : MapIteratorWrapper<T, typename T::iterator>( begin, end )
-        {
-        }
-
-        explicit UniqueMapIterator( T& c )
-        : MapIteratorWrapper<T, typename T::iterator>( std::begin( c ), std::end( c ) )
-        {
-        }
-
-        UniqueType getNext()
-        {
-            return ( _current++ )->second.get();
-        }
-
-    };*/
-
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-    ///
-    /// \class UniqueMapIterator
-    /// \brief For constant iterating a map with value type of unique_ptr<T>.
-    /*template<typename T>
-    class ConstUniqueMapIterator : public MapIteratorWrapper<T, typename T::const_iterator>
+    ValueType getNext()
     {
+      return ( this->_current++ )->second;
+    }
 
-    public:
+  };
 
-        using UniqueType = typename ValueType::element_type*;
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    public:
+  ///
+  /// \class MapIterator
+  /// \brief An iterator for map containers.
+  template<typename T>
+  class MapIterator : public MapIteratorWrapper<T, typename T::iterator>
+  {
 
-        ConstUniqueMapIterator( typename T::const_iterator begin, typename T::const_iterator end )
-        : MapIteratorWrapper<T, typename T::const_iterator>( begin, end )
-        {
-        }
+  public:
 
-        explicit ConstUniqueMapIterator( T& c )
-        : MapIteratorWrapper<T, typename T::const_iterator>( std::begin( c ), std::end( c ) )
-        {
-        }
+    MapIterator( typename T::iterator begin, typename T::iterator end )
+    : MapIteratorWrapper<T, typename T::iterator>( begin, end )
+    { }
 
-        UniqueType getNext()
-        {
-            return ( _current++ )->second.get();
-        }
+    explicit MapIterator( T& c )
+    : MapIteratorWrapper<T, typename T::iterator>( std::begin( c ), std::end( c ) )
+    { }
 
-    };*/
+  };
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  ///
+  /// \class ConstMapIterator
+  /// \brief A constant iterator for map containers.
+  template<typename T>
+  class ConstMapIterator : public MapIteratorWrapper<T, typename T::const_iterator>
+  {
+
+  public:
+
+    ConstMapIterator( typename T::const_iterator start, typename T::const_iterator last )
+    : MapIteratorWrapper<T, typename T::const_iterator>( start, last )
+    { }
+
+    explicit ConstMapIterator( const T& c )
+    : MapIteratorWrapper<T, typename T::const_iterator> ( std::begin( c ), std::end( c ) )
+    { }
+
+  };
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  ///
+  /// \class UniqueMapIterator
+  /// \brief For iterating a map with value type of unique_ptr<T>.
+  /*template<typename T>
+  class UniqueMapIterator : public MapIteratorWrapper<T, typename T::iterator>
+  {
+
+  public:
+
+      using UniqueType = typename ValueType::element_type*;
+
+  public:
+
+      UniqueMapIterator( typename T::iterator begin, typename T::iterator end )
+      : MapIteratorWrapper<T, typename T::iterator>( begin, end )
+      {
+      }
+
+      explicit UniqueMapIterator( T& c )
+      : MapIteratorWrapper<T, typename T::iterator>( std::begin( c ), std::end( c ) )
+      {
+      }
+
+      UniqueType getNext()
+      {
+          return ( _current++ )->second.get();
+      }
+
+  };*/
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  ///
+  /// \class UniqueMapIterator
+  /// \brief For constant iterating a map with value type of unique_ptr<T>.
+  /*template<typename T>
+  class ConstUniqueMapIterator : public MapIteratorWrapper<T, typename T::const_iterator>
+  {
+
+  public:
+
+      using UniqueType = typename ValueType::element_type*;
+
+  public:
+
+      ConstUniqueMapIterator( typename T::const_iterator begin, typename T::const_iterator end )
+      : MapIteratorWrapper<T, typename T::const_iterator>( begin, end )
+      {
+      }
+
+      explicit ConstUniqueMapIterator( T& c )
+      : MapIteratorWrapper<T, typename T::const_iterator>( std::begin( c ), std::end( c ) )
+      {
+      }
+
+      UniqueType getNext()
+      {
+          return ( _current++ )->second.get();
+      }
+
+  };*/
 
 }
 

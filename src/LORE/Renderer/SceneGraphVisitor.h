@@ -31,33 +31,30 @@
 
 namespace Lore {
 
+  ///
+  /// \class SceneGraphVisitor
+  /// \brief Traverses a scene graph (e.g., a Node and all of its children) and
+  ///     carries down transformation updates as needed.
+  class LORE_EXPORT SceneGraphVisitor
+  {
+
+    std::stack<glm::mat4> _stack;
+    NodePtr _node;
+
+  public:
+
     ///
-    /// \class SceneGraphVisitor
-    /// \brief Traverses a scene graph (e.g., a Node and all of its children) and
-    ///     carries down transformation updates as needed.
-    class LORE_EXPORT SceneGraphVisitor
-    {
+    /// \brief Constructor that takes root node as parameter, updates its
+    ///     world transform, and updates the scale of all children.
+    SceneGraphVisitor( NodePtr root );
+    ~SceneGraphVisitor() = default;
 
-    public:
+    ///
+    /// \brief Recursive function which updates the transformation matrix
+    ///     of all child nodes.
+    void visit( Renderer* renderer, bool parentDirty = false );
 
-        ///
-        /// \brief Constructor that takes root node as parameter, updates its
-        ///     world transform, and updates the scale of all children.
-        SceneGraphVisitor( NodePtr root );
-
-        ~SceneGraphVisitor();
-
-        ///
-        /// \brief Recursive function which updates the transformation matrix
-        ///     of all child nodes.
-        void visit( Renderer* renderer, bool parentDirty = false );
-
-    private:
-
-        std::stack<glm::mat4> _stack;
-        NodePtr _node;
-
-    };
+  };
 
 }
 

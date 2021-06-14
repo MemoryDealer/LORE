@@ -74,7 +74,7 @@ namespace Lore {
       Always
     };
 
-  public:
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     virtual ~IRenderAPI() = default;
 
@@ -82,7 +82,6 @@ namespace Lore {
     // General.
 
     virtual void setPolygonMode( const PolygonMode& mode ) = 0;
-
     virtual void setCullingMode( const CullingMode mode ) = 0;
 
     //
@@ -110,20 +109,15 @@ namespace Lore {
     //
     // Depth testing.
 
-    
-
     virtual void setDepthTestEnabled( const bool enabled ) = 0;
-
     virtual void setDepthMaskEnabled( const bool enabled ) = 0;
 
     //
     // Blending.
 
     virtual void setDepthFunc( const DepthFunc func ) = 0;
-
     virtual void setBlendingEnabled( const bool enabled ) = 0;
-
-    virtual void setBlendingFunc( const Material::BlendFactor& src, const Material::BlendFactor& dst ) = 0;
+    virtual void setBlendingFunc( const BlendFactor& src, const BlendFactor& dst ) = 0;
 
     //
     // Debugging.

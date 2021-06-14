@@ -104,6 +104,13 @@ namespace Lore {
   class LORE_EXPORT InputController
   {
 
+  protected:
+
+    InputHooks _hooks;
+    InputHooksPtr _activeHooks { &_hooks };
+
+    friend class Input;
+
   public:
 
     InputController() = default;
@@ -131,21 +138,15 @@ namespace Lore {
 
     virtual void setCursorEnabled( WindowPtr window, const bool enabled ) = 0;
 
-  protected:
-
-    InputHooks _hooks;
-    InputHooksPtr _activeHooks { &_hooks };
-
-  private:
-
-    friend class Input;
-
   };
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
   class LORE_EXPORT Input final
   {
+
+    friend class Context;
+    static void AssignContext( ContextPtr context );
 
   public:
 
@@ -170,14 +171,6 @@ namespace Lore {
 
     static void OverrideHooks( InputHooksPtr hooks );
     static void ResetHooks();
-
-  private:
-
-    friend class Context;
-
-  private:
-
-    static void AssignContext( ContextPtr context );
 
   };
 

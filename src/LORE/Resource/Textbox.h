@@ -35,6 +35,11 @@ namespace Lore {
   class LORE_EXPORT Textbox final : public Alloc<Textbox>, public IResource
   {
 
+    FontPtr _font { nullptr };
+    string _text {};
+    Color _textColor { StockColor::White };
+    uint32_t _renderQueue { RenderQueue::General };
+
   public:
 
     Textbox() = default;
@@ -86,13 +91,6 @@ namespace Lore {
     {
       return _renderQueue;
     }
-
-  private:
-
-    FontPtr _font { nullptr };
-    string _text {};
-    Color _textColor { StockColor::White };
-    uint32_t _renderQueue { RenderQueue::General };
 
   };
 

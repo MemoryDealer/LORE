@@ -25,7 +25,7 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-// 
+// Helper macro(s) to fill in common class data/functions.
 
 #define LORE_OBJECT_BODY()\
 protected:\

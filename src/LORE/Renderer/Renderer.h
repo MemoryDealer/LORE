@@ -33,6 +33,8 @@ namespace Lore {
 
   class IRenderAPI;
 
+  constexpr size_t DefaultRenderQueueCount = 100;
+
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
   ///
@@ -84,7 +86,7 @@ namespace Lore {
     using BoxList = std::vector<BoxData>;
     using TextboxList = std::vector<TextboxData>;
 
-    // Lore supports 100 render queues, rendered in order from 0-99.
+    // Lore supports 100 render queues (but not really used currently), rendered in order from 0-99.
     static const uint32_t Skybox = 0;
     static const uint32_t General = 50;
     static const uint32_t Foreground = 99;
@@ -109,6 +111,14 @@ namespace Lore {
   ///     window. Render plugins shall define these implementations.
   class LORE_EXPORT Renderer
   {
+
+  protected:
+
+    virtual void _clearRenderQueues() = 0;
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    IRenderAPI* _api { nullptr };
 
   public:
 
@@ -138,14 +148,6 @@ namespace Lore {
 
     void setRenderAPI( IRenderAPI* api );
 
-  protected:
-
-    virtual void _clearRenderQueues() = 0;
-
-  protected:
-
-    IRenderAPI* _api { nullptr };
-
   };
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -154,9 +156,8 @@ namespace Lore {
   // TODO: Convert to strongly typed enum and use type-safe bitmasks.
   enum RendererType
   {
-    Forward2D = 0x1,
-    Forward3D = 0x2,
-    All = Forward2D | Forward3D
+    Forward2D,
+    Forward3D
   };
 
 }

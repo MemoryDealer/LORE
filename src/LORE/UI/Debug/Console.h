@@ -38,6 +38,9 @@ namespace Lore {
   class DebugUI_Console final
   {
 
+    string _cliOutput {};
+    Dimensions _windowDimensions {};
+
   public:
 
     DebugUI_Console() = default;
@@ -52,11 +55,6 @@ namespace Lore {
     {
       _windowDimensions = dimensions;
     }
-
-  private:
-
-    string _cliOutput {};
-    Dimensions _windowDimensions {};
 
   };
 

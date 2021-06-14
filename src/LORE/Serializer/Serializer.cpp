@@ -105,7 +105,7 @@ SerializerValue& Serializer::getValue( const string& key )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-const SerializerValue::Values& Serializer::getValues() const
+const Values& Serializer::getValues() const
 {
   return _component->getValues();
 }

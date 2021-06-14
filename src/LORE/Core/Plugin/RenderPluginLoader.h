@@ -40,6 +40,10 @@ namespace Lore {
     class LORE_EXPORT RenderPluginLoader
     {
 
+#if LORE_PLATFORM == LORE_WINDOWS
+      HMODULE _hModule { nullptr };
+#endif
+
     public:
 
         RenderPluginLoader();
@@ -56,12 +60,6 @@ namespace Lore {
         ///
         /// \brief Instantiates the render plugin's implementation of the Lore Context.
         virtual std::unique_ptr<Context> createContext();
-
-    private:
-
-#if LORE_PLATFORM == LORE_WINDOWS
-        HMODULE _hModule { nullptr };
-#endif
 
     };
 

@@ -176,18 +176,18 @@ void Window::onKeyDown( const Keycode code )
       auto debugUI = std::static_pointer_cast<DebugUI>( _debugUI );
 
       if ( Input::GetKeyState( Keycode::LeftShift ) || Input::GetKeyState( Keycode::RightShift ) ) {
-        debugUI->setActivePanel( DebugUI::Panel::PerformanceStats );
+        debugUI->setActivePanel( Panel::PerformanceStats );
         debugUI->setEnabled( !debugUI->getEnabled() );
       }
       else {
-        if ( debugUI->getEnabled() && DebugUI::Panel::PerformanceStats == debugUI->getActivePanel() ) {
+        if ( debugUI->getEnabled() && Panel::PerformanceStats == debugUI->getActivePanel() ) {
           // Do nothing--keep debug UI open.
         }
         else {
           debugUI->setEnabled( true );
         }
 
-        debugUI->setActivePanel( DebugUI::Panel::Console );
+        debugUI->setActivePanel( Panel::Console );
         Input::OverrideHooks( debugUI->getInputHooks() );
         Input::SetCursorEnabled( true );
       }

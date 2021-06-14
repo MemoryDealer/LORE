@@ -27,32 +27,32 @@
 
 namespace Lore {
 
-    ///
-    /// \typedef Colori Represents color as 4D vector (r, g, b, a).
-    /// Uses ints with range of [0, 255].
-    using Color4i = glm::tvec4<uint32_t>;
+  ///
+  /// \typedef Colori Represents color as 4D vector (r, g, b, a).
+  /// Uses ints with range of [0, 255].
+  using Color4i = glm::tvec4<uint32_t>;
 
 
-    ///
-    /// \typedef Color4f Represents color as 4D vector (r, g, b, a).
-    /// Uses floats with range of [0.f, 1.f].
-    using Color4f = glm::vec4;
+  ///
+  /// \typedef Color4f Represents color as 4D vector (r, g, b, a).
+  /// Uses floats with range of [0.f, 1.f].
+  using Color4f = glm::vec4;
 
-    ///
-    /// \typedef Color Represents color as 4D vector (r, g, b, a).
-    /// Uses floats with range of [0.f, 1.f].
-    using Color = Color4f; // Default colors to floats.
+  ///
+  /// \typedef Color Represents color as 4D vector (r, g, b, a).
+  /// Uses floats with range of [0.f, 1.f].
+  using Color = Color4f; // Default colors to floats.
 
-    // Various common colors.
-    namespace StockColor {
+  // Various common colors.
+  namespace StockColor {
 
-        static const Color Black    = Color( 0.f, 0.f, 0.f, 1.f );
-        static const Color White    = Color( 1.f, 1.f, 1.f, 1.f );
-        static const Color Red      = Color( 1.f, 0.f, 0.f, 1.f );
-        static const Color Green    = Color( 0.f, 1.f, 0.f, 1.f );
-        static const Color Blue     = Color( 0.f, 0.f, 1.f, 1.f );
+    static const Color Black = Color( 0.f, 0.f, 0.f, 1.f );
+    static const Color White = Color( 1.f, 1.f, 1.f, 1.f );
+    static const Color Red = Color( 1.f, 0.f, 0.f, 1.f );
+    static const Color Green = Color( 0.f, 1.f, 0.f, 1.f );
+    static const Color Blue = Color( 0.f, 0.f, 1.f, 1.f );
 
-    }
+  }
 
 }
 

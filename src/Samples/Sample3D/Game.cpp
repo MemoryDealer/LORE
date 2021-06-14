@@ -101,7 +101,7 @@ void Game::loadScene()
   _camera->initPostProcessing( _window->getWidth(), _window->getHeight(), 8 );
 
   // TODO: This is a hack that should be taken care of internally.
-  Lore::CLI::SetActiveScene( _scene );
+  Lore::CLI::ActiveScene = _scene;
 
   // We must setup a RenderView to inform Lore how to render this scene in relation
   // to the window. We provide a viewport of [0, 0, 1, 1] to render the scene to the
@@ -232,7 +232,7 @@ void Game::loadScene2D()
   _camera2D->initPostProcessing( 1920, 1080, 8 );
 
   // TODO: This is a hack that should be taken care of internally.
-  Lore::CLI::SetActiveScene( _scene2D );
+  Lore::CLI::ActiveScene = _scene2D;
 
   Lore::RenderView rv( "2D", _scene2D, Lore::Rect( 0.f, 0.f, 1.f, 1.f ) );
   rv.camera = _camera2D;

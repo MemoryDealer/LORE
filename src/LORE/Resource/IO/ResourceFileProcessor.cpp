@@ -204,7 +204,7 @@ void ResourceFileProcessor::processAnimation( SpriteAnimationSetPtr animationSet
     const auto& deltaTimes = settings.getValue( "deltaTimes" ).toArray();
 
     // Create an animation to add to the animation set.
-    SpriteController::Animation animation;
+    Animation animation;
 
     // Process frames and delta times.
     for ( const auto& frame : frames ) {

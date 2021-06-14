@@ -42,7 +42,7 @@ void SpriteController::useAnimationSet( const SpriteAnimationSetPtr set )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-SpriteController::Animation& SpriteController::createAnimation( const string& name )
+Animation& SpriteController::createAnimation( const string& name )
 {
   auto lookup = _animations.find( name );
   if ( _animations.end() != lookup ) {
@@ -56,7 +56,7 @@ SpriteController::Animation& SpriteController::createAnimation( const string& na
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-SpriteController::Animation& SpriteController::getAnimation( const string& name )
+Animation& SpriteController::getAnimation( const string& name )
 {
   auto lookup = _animations.find( name );
   if ( _animations.end() == lookup ) {
@@ -75,7 +75,7 @@ bool SpriteController::hasActiveAnimation() const
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-SpriteController::Animation& SpriteController::getActiveAnimation() const
+Animation& SpriteController::getActiveAnimation() const
 {
   if ( !hasActiveAnimation() ) {
     throw Lore::Exception( "There is no active animation" );
@@ -113,7 +113,7 @@ void SpriteController::startAnimation( const string& name )
       _activeAnimation->second.lastTimePoint = std::chrono::high_resolution_clock::now();
 
       // Callback function to update animation.
-      _animationCallback = [this] ( const FrameListener::FrameEvent& ) {
+      _animationCallback = [this] ( const FrameEvent& ) {
         Animation& animation = _activeAnimation->second;
 
         // Calculate delta time since last animation tick.
@@ -165,7 +165,7 @@ void SpriteController::setYFlipped( const bool flipped )
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void SpriteAnimationSet::addAnimation( const string& name, const SpriteController::Animation& animation )
+void SpriteAnimationSet::addAnimation( const string& name, const Animation& animation )
 {
   auto lookup = _animations.find( name );
   if ( _animations.end() != lookup ) {
@@ -177,7 +177,7 @@ void SpriteAnimationSet::addAnimation( const string& name, const SpriteControlle
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-const SpriteController::AnimationMap& SpriteAnimationSet::getAnimations() const
+const AnimationMap& SpriteAnimationSet::getAnimations() const
 {
   return _animations;
 }

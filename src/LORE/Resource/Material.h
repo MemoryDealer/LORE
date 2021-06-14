@@ -34,6 +34,22 @@
 
 namespace Lore {
 
+  enum class BlendFactor
+  {
+    Zero,
+    One,
+    SrcColor,
+    OneMinusSrcColor,
+    DstColor,
+    OneMinusDstColor,
+    SrcAlpha,
+    OneMinusSrcAlpha,
+    ConstantColor,
+    OneMinusConstantColor,
+    ConstantAlpha,
+    OneMinusConstantAlpha
+  };
+
   ///
   /// \class Material
   /// \brief Contains data on how to render an object, including lighting, colors,
@@ -42,28 +58,35 @@ namespace Lore {
   class LORE_EXPORT Material final : public Alloc<Material>, public IResource
   {
 
+    glm::vec2 _texCoordScrollSpeed { };
+    glm::vec2 _texCoordOffset { };
+    Rect _texSampleRegion { 0.f, 0.f, 1.f, 1.f };
+    FrameListenerController::FrameStartedCallback _texCoordCallback { nullptr };
+
   public:
 
-    enum class BlendFactor
+    bool lighting { true };
+    Color ambient { StockColor::White };
+    Color diffuse { StockColor::White };
+    Color specular { StockColor::White };
+    real shininess { 32.f };
+    real opacity { 1.f };
+    bool bloom { false };
+    SpritePtr sprite { nullptr };
+    GPUProgramPtr program { nullptr };
+
+    glm::vec2 uvScale { 1.f, 1.f };
+
+    struct
     {
-      Zero,
-      One,
-      SrcColor,
-      OneMinusSrcColor,
-      DstColor,
-      OneMinusDstColor,
-      SrcAlpha,
-      OneMinusSrcAlpha,
-      ConstantColor,
-      OneMinusConstantColor,
-      ConstantAlpha,
-      OneMinusConstantAlpha
-    };
+      bool enabled { false };
+      BlendFactor srcFactor { BlendFactor::SrcAlpha };
+      BlendFactor dstFactor { BlendFactor::OneMinusSrcAlpha };
+    } blendingMode;
 
-  public:
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     Material();
-
     virtual ~Material() override;
 
     MaterialPtr clone( const string& newName );
@@ -72,9 +95,7 @@ namespace Lore {
     // Setters.
 
     void setTextureScrollSpeed( const glm::vec2& scroll );
-
     void setTextureSampleRegion( const Rect& region );
-
     void setTextureSampleRegion( const real x,
                                  const real y,
                                  const real w,
@@ -98,37 +119,6 @@ namespace Lore {
       
       return *this;
     }
-
-  public:
-
-    bool lighting { true };
-    Color ambient { StockColor::White };
-    Color diffuse { StockColor::White };
-    Color specular { StockColor::White };
-    real shininess { 32.f };
-    real opacity { 1.f };
-    bool bloom { false };
-    SpritePtr sprite { nullptr };
-    GPUProgramPtr program { nullptr };
-    
-    glm::vec2 uvScale { 1.f, 1.f };
-
-    struct
-    {
-      bool enabled { false };
-      BlendFactor srcFactor { BlendFactor::SrcAlpha };
-      BlendFactor dstFactor { BlendFactor::OneMinusSrcAlpha };
-    } blendingMode;
-
-  private:
-
-    // TODO: Use linked list of materials for multi-pass rendering. The renderer
-    // can pick these up and fill separate rendering queue groups for each pass.
-
-    glm::vec2 _texCoordScrollSpeed { };
-    glm::vec2 _texCoordOffset { };
-    Rect _texSampleRegion { 0.f, 0.f, 1.f, 1.f };
-    FrameListenerController::FrameStartedCallback _texCoordCallback { nullptr };
 
   };
 

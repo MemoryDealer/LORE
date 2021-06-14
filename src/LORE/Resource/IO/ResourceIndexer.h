@@ -30,17 +30,14 @@ namespace Lore {
   class ResourceIndexer
   {
 
+    string _resourceGroupName;
+
   public:
 
     ResourceIndexer( const string& resourceGroupName ) : _resourceGroupName( resourceGroupName ) {}
-
     virtual ~ResourceIndexer() = default;
 
     void traverseDirectory( const string& directory, ResourceControllerPtr resourceController, const bool recursive );
-
-  private:
-
-    string _resourceGroupName;
 
   };
 

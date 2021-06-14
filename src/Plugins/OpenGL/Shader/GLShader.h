@@ -31,34 +31,28 @@
 
 namespace Lore { namespace OpenGL {
 
-    class GLShader : public Lore::Shader,
-                     public Alloc<GLShader>
+  class GLShader : public Lore::Shader,
+    public Alloc<GLShader>
+  {
+
+    GLuint _shader;
+
+  public:
+
+    GLShader();
+    virtual ~GLShader() override;
+
+    void init( const Shader::Type& type ) override;
+    bool loadFromFile( const string& file ) override;
+    bool loadFromSource( const string& source ) override;
+    void unload() override;
+
+    uint getUintId() override
     {
+      return _shader;
+    }
 
-    public:
-
-        GLShader();
-
-        virtual ~GLShader() override;
-
-        void init( const Shader::Type& type ) override;
-
-        bool loadFromFile( const string& file ) override;
-
-        bool loadFromSource( const string& source ) override;
-
-        void unload() override;
-
-        uint getUintId() override
-        {
-            return _shader;
-        }
-
-    private:
-
-        GLuint _shader;
-
-    };
+  };
 
 }}
 

@@ -31,13 +31,27 @@
 
 namespace Lore {
 
+  using Array = std::vector<SerializerValue>;
+  using Values = std::unordered_map<string, SerializerValue>;
+
   class LORE_EXPORT SerializerValue final
   {
 
-  public:
+    friend class SerializerComponent;
+    friend class JsonSerializerComponent;
 
-    using Array = std::vector<SerializerValue>;
-    using Values = std::unordered_map<string, SerializerValue>;
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    struct NullType {};
+    using ValueHolder = LORE_VARIANT<MONOSTATE, NullType, bool, string, int, real, Array>;
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    string _key { };
+    ValueHolder _value {};
+    Values _values {};
+
+  public:
 
     enum class Type
     {
@@ -70,7 +84,7 @@ namespace Lore {
       return Type::Container;
     }
 
-  public:
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     SerializerValue() : _key() {}
     SerializerValue( const string& key ) : _key( key ) {}
@@ -225,22 +239,6 @@ namespace Lore {
     {
       _value = value;
     }
-
-  private:
-
-    friend class SerializerComponent;
-    friend class JsonSerializerComponent;
-
-  private:
-
-    struct NullType { };
-    using ValueHolder = LORE_VARIANT<MONOSTATE, NullType, bool, string, int, real, Array>;
-
-  private:
-
-    string _key { };
-    ValueHolder _value {};
-    Values _values {};
 
   };
 

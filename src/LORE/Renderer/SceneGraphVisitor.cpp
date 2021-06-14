@@ -52,12 +52,6 @@ SceneGraphVisitor::SceneGraphVisitor( NodePtr root )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-SceneGraphVisitor::~SceneGraphVisitor()
-{
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
 void SceneGraphVisitor::visit( Renderer* renderer, bool parentDirty )
 {
   const bool transformDirty = _node->_transformDirty();
@@ -78,7 +72,7 @@ void SceneGraphVisitor::visit( Renderer* renderer, bool parentDirty )
   while ( it.hasMore() ) {
     PrefabPtr prefab = it.getNext();
     // Ensure this prefab hasn't been reclaimed by the pool.
-    if ( prefab->isInUse() ) {
+    if ( prefab->inUse ) {
       renderer->addRenderData( prefab, _node );
 
       // Update instancing.
@@ -114,7 +108,7 @@ void SceneGraphVisitor::visit( Renderer* renderer, bool parentDirty )
     const auto newTransform = ( _stack.empty() ) ? transform : _stack.top() * transform;
     _stack.push( newTransform );
 
-    Node::ChildNodeIterator it = _node->getChildNodeIterator();
+    ChildNodeIterator it = _node->getChildNodeIterator();
     while ( it.hasMore() ) {
       _node = it.getNext();
       visit( renderer, parentDirty );

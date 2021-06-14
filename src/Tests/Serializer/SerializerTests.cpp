@@ -137,7 +137,7 @@ TEST_CASE( "Values correctly written in JSON format", "[serializer]" )
 
     // Add array.
     auto& array1 = object1["array1"];
-    Lore::SerializerValue::Array arrayValues;
+    Lore::Array arrayValues;
     for ( int i = 0; i < 5; ++i ) {
       Lore::SerializerValue v;
       v = i;
@@ -154,7 +154,7 @@ TEST_CASE( "Values correctly written in JSON format", "[serializer]" )
 
       if ( 4 == i ) {
         // Add array within object.
-        Lore::SerializerValue::Array arrayValues2;
+        Lore::Array arrayValues2;
         arrayValues2.resize( 3 );
         for ( int j = 0; j < 3; ++j ) {
           arrayValues2[j] = j;

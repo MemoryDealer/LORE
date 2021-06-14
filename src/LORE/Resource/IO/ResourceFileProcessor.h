@@ -35,12 +35,25 @@ namespace Lore {
   class ResourceFileProcessor final
   {
 
+    string _file {};
+    string _directory {};
+    SerializableResource _type {};
+    mutable Serializer _serializer {};
+    bool _hasData { false };
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    void processAnimation( SpriteAnimationSetPtr animationSet, const SerializerValue& animations, ResourceControllerPtr resourceController );
+    void processMaterial( MaterialPtr material, const SerializerValue& settings, ResourceControllerPtr resourceController );
+    void processSpriteList( const string& groupName, ResourceControllerPtr resourceController );
+    void processCubemap( TexturePtr cubemap );
+
   public:
 
     static void LoadConfiguration( const string& file, ResourceControllerPtr resourceController );
     static SerializableResource GetResourceFileType( const string& file );
 
-  public:
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     ResourceFileProcessor( const string& file, const SerializableResource type );
     ~ResourceFileProcessor() = default;
@@ -49,29 +62,10 @@ namespace Lore {
     /// \brief Loads any data needed from the resource file.
     /// \returns True if file has any relevant data.
     bool process();
-
     string getName() const;
-
     SerializableResource getType() const;
-
-	bool hasData() const;
-
+	  bool hasData() const;
     void load( const string& groupName, ResourceControllerPtr resourceController );
-
-  private:
-
-    void processAnimation( SpriteAnimationSetPtr animationSet, const SerializerValue& animations, ResourceControllerPtr resourceController );
-    void processMaterial( MaterialPtr material, const SerializerValue& settings, ResourceControllerPtr resourceController );
-    void processSpriteList( const string& groupName, ResourceControllerPtr resourceController );
-    void processCubemap( TexturePtr cubemap );
-
-  private:
-
-    string _file {};
-    string _directory {};
-    SerializableResource _type {};
-    mutable Serializer _serializer {};
-    bool _hasData { false };
 
   };
 

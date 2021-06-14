@@ -37,13 +37,6 @@ namespace Lore { namespace OpenGL {
   class GLResourceController final : public Lore::ResourceController
   {
 
-  public:
-
-    GLResourceController();
-    ~GLResourceController() override = default;
-
-  private:
-
     //
     // Creation functions.
 
@@ -63,6 +56,11 @@ namespace Lore { namespace OpenGL {
     void destroyRenderTarget( IResourcePtr resource );
     void destroyShader( IResourcePtr resource );
     void destroyTexture( IResourcePtr resource );
+
+  public:
+
+    GLResourceController();
+    ~GLResourceController() override = default;
 
   };
 

@@ -582,9 +582,9 @@ void Forward3DRenderer::_renderSkybox( const RenderView& rv,
 
   _api->setDepthMaskEnabled( false );
 
-  const Skybox::LayerMap& layers = skybox->getLayerMap();
+  const SkyboxLayerMap& layers = skybox->getLayerMap();
   for ( const auto& pair : layers ) {
-    const Skybox::Layer& layer = pair.second;
+    const SkyboxLayer& layer = pair.second;
     MaterialPtr material = layer.getMaterial();
 
     RenderQueue::LightData emptyLightData; // Not needed for skybox.
@@ -719,7 +719,7 @@ void Forward3DRenderer::_renderBoxes( const RenderQueue& queue,
                                       const glm::mat4& viewProjection ) const
 {
   _api->setBlendingEnabled( true );
-  _api->setBlendingFunc( Material::BlendFactor::SrcAlpha, Material::BlendFactor::OneMinusSrcAlpha );
+  _api->setBlendingFunc( BlendFactor::SrcAlpha, BlendFactor::OneMinusSrcAlpha );
 
   GPUProgramPtr program = StockResource::GetGPUProgram( "StandardBox2D" );
   ModelPtr model = StockResource::GetModel( "TexturedQuad" );

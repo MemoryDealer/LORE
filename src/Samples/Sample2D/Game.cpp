@@ -72,7 +72,7 @@ void Game::loadScene()
   _camera = _context->createCamera( "core", Lore::Camera::Type::Type2D );
 
   // TODO: This is a hack that should be taken care of internally.
-  Lore::CLI::SetActiveScene( _scene );
+  Lore::CLI::ActiveScene = _scene;
 
   // We must setup a RenderView to inform Lore how to render this scene in relation
   // to the window. We provide a viewport of [0, 0, 1, 1] to render the scene to the

@@ -36,6 +36,11 @@
 
 namespace Lore {
 
+  using NodeHashmap = Registry<std::unordered_map, Node>;
+  using DirectionalLightMap = Registry<std::map, DirectionalLight>;
+  using PointLightMap = Registry<std::unordered_map, PointLight>;
+  using SpotLightMap = Registry<std::unordered_map, SpotLight>;
+
   ///
   /// \class Scene
   /// \brief Contains all information to render a scene to an area in a window,
@@ -45,14 +50,37 @@ namespace Lore {
   class LORE_EXPORT Scene final : public Alloc<Scene>
   {
 
+    friend class Node;
+
     LORE_OBJECT_BODY()
 
-  public:
+    Color _bgColor { StockColor::Black };
 
-    using NodeMap = Registry<std::unordered_map, Node>;
-    using DirectionalLightMap = Registry<std::map, DirectionalLight>;
-    using PointLightMap = Registry<std::unordered_map, PointLight>;
-    using SpotLightMap = Registry<std::unordered_map, SpotLight>;
+    // The type of renderer this scene uses.
+    RendererPtr _renderer { nullptr };
+
+    // The scene's root node.
+    Node _root {};
+
+    // Convenient hash map of all nodes for quick lookup.
+    NodeHashmap _nodes {};
+
+    //
+    // Lighting.
+
+    Color _ambientLightColor { StockColor::Black };
+
+    DirectionalLightMap _directionalLights {};
+    PointLightMap _pointLights {};
+    SpotLightMap _spotLights {};
+
+    SkyboxPtr _skybox { nullptr };
+
+    string _sceneFile {};
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    void _addActiveLight( LightPtr light );
 
   public:
 
@@ -160,38 +188,6 @@ namespace Lore {
     {
       return _skybox;
     }
-
-  private:
-
-    void _addActiveLight( LightPtr light );
-
-    friend class Node;
-
-  private:
-
-    Color _bgColor { StockColor::Black };
-
-    // The type of renderer this scene uses.
-    RendererPtr _renderer { nullptr };
-
-    // The scene's root node.
-    Node _root {};
-
-    // Convenient hash map of all nodes for quick lookup.
-    NodeMap _nodes {};
-
-    //
-    // Lighting.
-
-    Color _ambientLightColor { StockColor::Black };
-
-    DirectionalLightMap _directionalLights {};
-    PointLightMap _pointLights {};
-    SpotLightMap _spotLights {};
-
-    SkyboxPtr _skybox { nullptr };
-
-    string _sceneFile {};
 
   };
 

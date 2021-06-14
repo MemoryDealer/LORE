@@ -37,11 +37,9 @@ namespace Lore {
   public:
 
     SerializerComponent();
-
     virtual ~SerializerComponent() = default;
 
     virtual void serialize( const string& file ) { }
-
     virtual bool deserialize( const string& file ) { return false; }
 
     //
@@ -50,17 +48,15 @@ namespace Lore {
     bool valueExists( const string& key );
 
     SerializerValue& getValue( const string& key );
-
-    const SerializerValue::Values& getValues() const;
+    const Values& getValues() const;
 
     SerializerValue& addValue( const string& key );
-
     void addValue( const SerializerValue& value );
 
   protected:
 
     SerializerValue _values;
-    SerializerValue::Values::iterator _lastLookup  { _values._values.end() };
+    Values::iterator _lastLookup  { _values._values.end() };
 
   };
 

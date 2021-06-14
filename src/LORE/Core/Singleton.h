@@ -41,43 +41,38 @@ namespace Lore {
     class LORE_EXPORT Singleton
     {
 
-    public:
-
-        Singleton()
-        {
-        }
-
-        virtual ~Singleton()
-        {
-        }
-
-        ///
-        /// \brief Allocates the singleton.
-        static void Initialize()
-        {
-            _instance = std::make_unique<T>();
-        }
-
-        ///
-        /// \brief Frees the singleton from memory.
-        static void Destroy()
-        {
-            _instance.reset();
-        }
-
-        static T& Get()
-        {
-            return *_instance;
-        }
-
-        static T* GetPtr()
-        {
-            return _instance;
-        }
-
     protected:
 
-        static std::unique_ptr<T> _instance;
+      static std::unique_ptr<T> _instance;
+
+    public:
+
+      Singleton() = default;
+      virtual ~Singleton() = default;
+
+      ///
+      /// \brief Allocates the singleton.
+      static void Initialize()
+      {
+          _instance = std::make_unique<T>();
+      }
+
+      ///
+      /// \brief Frees the singleton from memory.
+      static void Destroy()
+      {
+          _instance.reset();
+      }
+
+      static T& Get()
+      {
+          return *_instance;
+      }
+
+      static T* GetPtr()
+      {
+          return _instance;
+      }
 
     };
 

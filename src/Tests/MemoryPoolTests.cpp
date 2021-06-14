@@ -39,14 +39,14 @@ TEST_CASE( "Memory Pool", "[memory]" )
     std::vector<Lore::Node*> nodes;
     for ( int i = 0; i < size; ++i ) {
       nodes.push_back( pool.create() );
-      REQUIRE( true == nodes[i]->isInUse() );
+      REQUIRE( true == nodes[i]->inUse );
       nodes.back()->setPosition( 1.f, 1.f );
       nodes.back()->createSpriteController();
     }
 
     auto nodeToDestroy = nodes[50];
     pool.destroy( nodeToDestroy );
-    REQUIRE( false == nodeToDestroy->isInUse() );
+    REQUIRE( false == nodeToDestroy->inUse );
     REQUIRE( 0.f == nodeToDestroy->getPosition().x );
     REQUIRE( 0.f == nodeToDestroy->getPosition().y );
     REQUIRE_FALSE( nodeToDestroy->getSpriteController() );
@@ -54,7 +54,7 @@ TEST_CASE( "Memory Pool", "[memory]" )
     pool.destroyAll();
     for ( int i = 0; i < size; ++i ) {
       auto node = pool.getObjectAt( i );
-      REQUIRE( false == node->isInUse() );
+      REQUIRE( false == node->inUse );
       REQUIRE( 0.f == node->getPosition().x );
       REQUIRE( 0.f == node->getPosition().y );
       REQUIRE_FALSE( node->getSpriteController() );
@@ -107,14 +107,14 @@ TEST_CASE( "Pool Cluster", "[memory]" )
       nodes.push_back( cluster.create<Lore::Node>() );
       materials.push_back( cluster.create<Lore::Material>() );
 
-      REQUIRE( true == nodes[i]->isInUse() );
-      REQUIRE( true == materials[i]->isInUse() );
+      REQUIRE( true == nodes[i]->inUse );
+      REQUIRE( true == materials[i]->inUse );
     }
 
     cluster.destroy<Lore::Node>( nodes[100] );
     cluster.destroy<Lore::Material>( materials[100] );
-    REQUIRE( false == nodes[100]->isInUse() );
-    REQUIRE( false == materials[100]->isInUse() );
+    REQUIRE( false == nodes[100]->inUse );
+    REQUIRE( false == materials[100]->inUse );
   }
 
   cluster.unregisterPool<Lore::Node>();

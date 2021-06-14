@@ -36,7 +36,7 @@ using namespace Lore;
 
 void FrameListenerController::frameStarted()
 {
-  FrameListener::FrameEvent e;
+  FrameEvent e;
 
   // Update frame listeners.
   for ( const auto& frameListener : _frameListeners ) {
@@ -53,7 +53,7 @@ void FrameListenerController::frameStarted()
 
 void FrameListenerController::frameEnded()
 {
-  FrameListener::FrameEvent e;
+  FrameEvent e;
 
   // Update frame listeners.
   for ( const auto& frameListener : _frameListeners ) {

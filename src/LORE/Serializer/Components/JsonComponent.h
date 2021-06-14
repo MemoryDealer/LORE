@@ -39,7 +39,6 @@ namespace Lore {
     virtual ~JsonSerializerComponent() override;
 
     virtual void serialize( const string& file ) override;
-
     virtual bool deserialize( const string& file ) override;
 
   };

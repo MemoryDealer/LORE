@@ -27,22 +27,22 @@
 
 namespace Lore {
 
+  struct FrameEvent
+  {
+    uint32_t placeholder;
+  };
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
   class FrameListener
   {
 
   public:
 
-    struct FrameEvent
-    {
-      uint32_t placeholder;
-    };
-
-  public:
-
+    FrameListener() = default;
     virtual ~FrameListener() { }
 
     virtual void frameStarted( const FrameEvent& e ) { }
-
     virtual void frameEnded( const FrameEvent& e ) { }
 
   };

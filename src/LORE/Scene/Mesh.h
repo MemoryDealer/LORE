@@ -40,6 +40,8 @@ namespace Lore {
 
   public:
 
+    using TextureList = std::vector<TexturePtr>;
+
     enum class Type
     {
       Custom,
@@ -71,6 +73,12 @@ namespace Lore {
       Float
     };
 
+    struct Attribute
+    {
+      AttributeType type;
+      int size;
+    };
+
     struct Vertex
     {
       glm::vec3 position;
@@ -86,6 +94,17 @@ namespace Lore {
       std::vector<Vertex> verts;
       std::vector<uint32_t> indices;
     };
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    Type _type { Type::Custom };
+    std::vector<Attribute> _attributes {};
+
+    // A mesh can have its own sprite that overrides the material's sprite.
+    // Note it is not allocated via the ResourceController but is explicitly
+    // owned by the Mesh.
+    Sprite _sprite {};
+    MaterialPtr _material {};
 
   public:
 
@@ -110,29 +129,6 @@ namespace Lore {
     SpritePtr getSprite();
 
     Type getType() const;
-
-  private:
-
-    struct Attribute
-    {
-      AttributeType type;
-      int size;
-    };
-
-  protected:
-
-    using TextureList = std::vector<TexturePtr>;
-
-  public:
-
-    Type _type { Type::Custom };
-    std::vector<Attribute> _attributes {};
-
-    // A mesh can have its own sprite that overrides the material's sprite.
-    // Note it is not allocated via the ResourceController but is explicitly
-    // owned by the Mesh.
-    Sprite _sprite {};
-    MaterialPtr _material {};
 
   };
 

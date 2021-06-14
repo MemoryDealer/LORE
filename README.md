@@ -14,6 +14,8 @@
 ![Lore2](images/lore2.gif)
 ![Lore3](images/lore3.gif)
 ![Lore4](images/lore4.gif)
+![Lore5](images/lore5.gif)
+![Lore6](images/lore6.gif)
 
 LORE is a 2D and 3D rendering engine intended to provide an abstraction layer on graphics APIs, while also providing built-in shaders, rendering algorithms, and scene management, to name a few. I started this project to learn more about graphics, modern C++, and software architecture. It is also intended to be lightweight with minimal dependencies (hence the name).
 

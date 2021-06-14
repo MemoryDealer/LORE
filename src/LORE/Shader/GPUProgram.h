@@ -42,8 +42,24 @@ namespace Lore {
 
   public:
 
-    using UniformUpdater = void( *)( const RenderView&, const GPUProgramPtr, const MaterialPtr, const RenderQueue::LightData& );
-    using UniformNodeUpdater = void( *)( const GPUProgramPtr, const MaterialPtr, const NodePtr, const glm::mat4& );
+    using ShaderMap = std::unordered_map<Shader::Type, ShaderPtr>;
+
+    using UniformUpdater = void( * )( const RenderView&, const GPUProgramPtr, const MaterialPtr, const RenderQueue::LightData& );
+    using UniformNodeUpdater = void( * )( const GPUProgramPtr, const MaterialPtr, const NodePtr, const glm::mat4& );
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    ShaderMap _shaders;
+
+    UniformUpdater _uniformUpdater { nullptr };
+    UniformNodeUpdater _uniformNodeUpdater { nullptr };
+
+    uint32_t _diffuseSamplerCount { 0 };
+    uint32_t _specularSamplerCount { 0 };
+
+    u8 maxPointLights = 0;
+
+    bool allowMeshMaterialSettings { true };
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -53,11 +69,9 @@ namespace Lore {
     virtual void init() = 0;
 
     virtual void attachShader( ShaderPtr shader );
-
     virtual ShaderPtr getAttachedShader( const Shader::Type& type );
 
     virtual bool link() = 0;
-
     virtual void use() = 0;
 
     inline bool hasAttachedShader( const Shader::Type& type )
@@ -92,40 +106,17 @@ namespace Lore {
     // Uniform value updating.
 
     virtual void addTransformVar( const string& id ) = 0;
-
     virtual void setTransformVar( const glm::mat4& m ) = 0;
 
     virtual void addUniformVar( const string& id ) = 0;
-
     virtual void setUniformVar( const string& id, const glm::mat4& m ) = 0;
-
     virtual void setUniformVar( const string& id, const glm::vec2& v ) = 0;
-
     virtual void setUniformVar( const string& id, const glm::vec3& v ) = 0;
-
     virtual void setUniformVar( const string& id, const glm::vec4& v ) = 0;
-
     virtual void setUniformVar( const string& id, const real r ) = 0;
-
     virtual void setUniformVar( const string& id, const uint32_t i ) = 0;
-
     virtual void setUniformVar( const string& id, const int i ) = 0;
 
-
-    using ShaderMap = std::unordered_map<Shader::Type, ShaderPtr>;
-
-
-    ShaderMap _shaders;
-
-    UniformUpdater _uniformUpdater { nullptr };
-    UniformNodeUpdater _uniformNodeUpdater { nullptr };
-
-    uint32_t _diffuseSamplerCount { 0 };
-    uint32_t _specularSamplerCount { 0 };
-
-    u8 maxPointLights = 0;
-
-    bool allowMeshMaterialSettings { true };
   };
 
 }

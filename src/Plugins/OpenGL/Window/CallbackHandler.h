@@ -31,25 +31,25 @@
 
 namespace Lore { namespace OpenGL {
 
-    class WindowCallbackHandler final
+  class WindowCallbackHandler final
+  {
+
+  public:
+
+    inline static WindowPtr GetWindowPtr( GLFWwindow* window )
     {
+      return static_cast< WindowPtr >( glfwGetWindowUserPointer( window ) );
+    }
 
-    public:
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        inline static WindowPtr GetWindowPtr( GLFWwindow* window )
-        {
-            return static_cast< WindowPtr >( glfwGetWindowUserPointer( window ) );
-        }
+    inline static void Size( GLFWwindow* window, int width, int height )
+    {
+      auto p = GetWindowPtr( window );
+      p->setDimensions( width, height );
+    }
 
-        // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-        inline static void Size( GLFWwindow* window, int width, int height )
-        {
-            auto p = GetWindowPtr( window );
-            p->setDimensions( width, height );
-        }
-
-    };
+  };
 
 }}
 

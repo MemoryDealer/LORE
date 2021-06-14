@@ -148,14 +148,14 @@ NodePtr Node::getChild( const string& name )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Node::ChildNodeIterator Node::getChildNodeIterator()
+ChildNodeIterator Node::getChildNodeIterator()
 {
   return _childNodes.getIterator();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-Node::ConstChildNodeIterator Node::getConstChildNodeIterator()
+ConstChildNodeIterator Node::getConstChildNodeIterator()
 {
   return _childNodes.getConstIterator();
 }

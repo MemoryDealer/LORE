@@ -48,12 +48,12 @@ using namespace LocalNS;
 
 void Logger::__logger()
 {
-  const std::unordered_map<Level, string> logLevelStrings = {
-    { Level::Critical, "Critical" },
-    { Level::Error, "Error" },
-    { Level::Warning, "Warning" },
-    { Level::Info, "Info" },
-    { Level::Trace, "Trace" },
+  const std::unordered_map<LogLevel, string> logLevelStrings = {
+    { LogLevel::Critical, "Critical" },
+    { LogLevel::Error, "Error" },
+    { LogLevel::Warning, "Warning" },
+    { LogLevel::Info, "Info" },
+    { LogLevel::Trace, "Trace" },
   };
 
   while ( _active ) {
@@ -65,7 +65,7 @@ void Logger::__logger()
     auto timestamp = GenerateTimestamp();
 
     while ( !_messageQueue.empty() ) {
-      Message msg=_messageQueue.front();
+      LogMessage msg=_messageQueue.front();
 
       // Build the log string.
       string out;
@@ -96,13 +96,6 @@ void Logger::__logger()
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 Logger::Logger( const string& filename )
-  : _level( Level::Info )
-  , _stream()
-  , _messageQueue()
-  , _thread()
-  , _mutex()
-  , _cv()
-  , _active( true )
 {
   // Open log file.
   _stream.open( filename.c_str(), std::ofstream::out );
@@ -129,7 +122,7 @@ Logger::~Logger()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void Logger::log( const Message& msg )
+void Logger::log( const LogMessage& msg )
 {
   // Enqueue message and wake up logger thread.
   std::unique_lock<std::mutex> lock( _mutex );
@@ -150,23 +143,16 @@ void Logger::flush()
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-bool Logger::levelEnabled( const Level lvl )
+bool Logger::levelEnabled( const LogLevel lvl )
 {
-  return ( lvl <= _level );
-}
-
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-void Logger::setLevel( const Level lvl )
-{
-  _level = lvl;
+  return ( lvl <= level );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void Log::WriteLog( const bool internal,
-                    const Logger::Level lvl,
+                    const LogLevel lvl,
                     const char* file,
                     const int line,
                     const char* function,
@@ -177,7 +163,7 @@ void Log::WriteLog( const bool internal,
     return;
   }
 
-  Logger::Message msg;
+  LogMessage msg;
   msg.lvl = lvl;
 
   // Parse the message parameters.
@@ -213,7 +199,7 @@ void Log::WriteLog( const bool internal,
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-bool Log::LevelEnabled( const Logger::Level lvl )
+bool Log::LevelEnabled( const LogLevel lvl )
 {
   return __logger->levelEnabled( lvl );
 }

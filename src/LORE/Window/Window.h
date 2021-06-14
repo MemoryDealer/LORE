@@ -45,7 +45,7 @@ namespace Lore {
       FullscreenBorderless
     };
 
-  public:
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     Window();
 
@@ -69,11 +69,8 @@ namespace Lore {
     // Modifiers.
 
     virtual void setTitle( const string& title );
-
     virtual void setDimensions( const int width, const int height );
-
     virtual void setMode( const Mode& mode );
-
     virtual void setActive() = 0;
 
     //
@@ -120,9 +117,7 @@ namespace Lore {
     }
 
     const RenderView& getRenderView( const int32_t idx ) const;
-
     ResourceControllerPtr getResourceController() const;
-
     StockResourceControllerPtr getStockResourceController() const;
 
     void onKeyDown( const Keycode code ) override;
@@ -131,7 +126,7 @@ namespace Lore {
 
     using RenderViewList = std::vector<RenderView>;
 
-  protected:
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     string _title {};
     Dimensions _dimensions {};

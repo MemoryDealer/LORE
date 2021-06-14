@@ -37,17 +37,13 @@ namespace Lore {
     class LORE_EXPORT MemoryAccess final
     {
 
+      friend class Context;
+
+      static void _SetPrimaryPoolCluster( PoolCluster* pc );
+
     public:
 
         static PoolCluster* GetPrimaryPoolCluster();
-
-    private:
-
-        static void _SetPrimaryPoolCluster( PoolCluster* pc );
-
-    private:
-
-        friend class Context;
 
     };
 

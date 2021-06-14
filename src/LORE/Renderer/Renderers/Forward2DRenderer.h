@@ -33,20 +33,45 @@
 
 namespace Lore {
 
+  using RenderQueueList = std::vector<RenderQueue>;
+  using ActiveRenderQueueList = std::map<uint, RenderQueue&>;
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
   ///
   /// \class Forward2DRenderer
   /// \brief A basic 2D forward renderer.
   class Forward2DRenderer : public Lore::Renderer
   {
 
-  public:
-
-    const size_t DefaultRenderQueueCount = 100;
+    RenderQueueList _queues { };
+    ActiveRenderQueueList _activeQueues { };
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    Forward2DRenderer();
+    void _clearRenderQueues() override;
 
+    void activateQueue( const uint id,
+      RenderQueue& rq );
+
+    void renderSkybox( const RenderView& rv,
+      const real aspectRatio,
+      const glm::mat4& proj );
+
+    void renderSolids( const RenderView& rv,
+      const RenderQueue& queue,
+      const glm::mat4& viewProjection ) const;
+
+    void renderTransparents( const RenderView& rv,
+      const RenderQueue& queue,
+      const glm::mat4& viewProjection ) const;
+
+    void renderBoxes( const RenderQueue& queue,
+      const glm::mat4& viewProjection ) const;
+
+  public:
+
+    Forward2DRenderer();
     ~Forward2DRenderer() override = default;
 
     void addRenderData( PrefabPtr e,
@@ -63,38 +88,6 @@ namespace Lore {
 
     void present( const RenderView& rv,
                   const WindowPtr window ) override;
-
-  private:
-
-    void _clearRenderQueues() override;
-
-    void activateQueue( const uint id,
-                        RenderQueue& rq );
-
-    void renderSkybox( const RenderView& rv,
-                            const real aspectRatio,
-                            const glm::mat4& proj );
-
-    void renderSolids( const RenderView& rv,
-                       const RenderQueue& queue,
-                       const glm::mat4& viewProjection ) const;
-
-    void renderTransparents( const RenderView& rv,
-                             const RenderQueue& queue,
-                              const glm::mat4& viewProjection ) const;
-
-    void renderBoxes( const RenderQueue& queue,
-                      const glm::mat4& viewProjection ) const;
-
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-    using RenderQueueList = std::vector<RenderQueue>;
-    using ActiveRenderQueueList = std::map<uint, RenderQueue&>;
-
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-    RenderQueueList _queues { };
-    ActiveRenderQueueList _activeQueues { };
 
   };
 

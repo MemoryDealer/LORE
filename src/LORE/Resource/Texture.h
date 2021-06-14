@@ -54,21 +54,15 @@ namespace Lore {
     virtual ~Texture() = default;
 
     virtual void loadFromFile( const string& file, const bool srgb = true ) = 0;
-
     virtual void loadCubemap( const std::vector<string>& files ) = 0;
 
     virtual void create( const uint32_t width, const uint32_t height, const uint32_t sampleCount ) = 0;
-
     virtual void create( const int width, const int height, const Color& color ) = 0;
-
     virtual void createDepth( const uint32_t width, const uint32_t ) = 0;
-
     virtual void createCubemap( const uint32_t width, const uint32_t height ) = 0;
-
     virtual void createFloatingPoint( const u32 width, const u32 height, const u32 sampleCount, const u32 texCount ) = 0;
 
     virtual void bind( const u32 activeIdx = 0, const u32 texIdx = 0 ) = 0;
-
     virtual void setDefaultActiveTexture() = 0;
 
     virtual unsigned int getID( const u32 idx = 0 ) const = 0;

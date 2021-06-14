@@ -40,8 +40,8 @@ namespace Lore {
 
   public:
 
-    using FrameStartedCallback = std::function<void( const FrameListener::FrameEvent& e )>;
-    using FrameEndedCallback = std::function<void( const FrameListener::FrameEvent& e )>;
+    using FrameStartedCallback = std::function<void( const FrameEvent& e )>;
+    using FrameEndedCallback = std::function<void( const FrameEvent& e )>;
 
   private:
 

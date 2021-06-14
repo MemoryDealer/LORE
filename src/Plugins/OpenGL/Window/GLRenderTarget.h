@@ -36,6 +36,21 @@ namespace Lore { namespace OpenGL {
                          public Alloc<GLRenderTarget>
   {
 
+    static constexpr auto MaxFBO = 2;
+
+    GLuint _fbo[MaxFBO] { 0 };
+    u32 _fboCount = 1;
+    GLuint _intermediateFBO[MaxFBO] { 0 };
+    GLuint _rbo { 0 };
+
+    TexturePtr _intermediateTexture { nullptr };
+
+    bool _multiSampling { false };
+
+    static constexpr auto MaxColorAttachments = 8;
+    u32 _colorAttachmentCount { 1 };
+    u32 _colorAttachments[MaxColorAttachments] {};
+
   public:
 
     GLRenderTarget() = default;
@@ -53,22 +68,6 @@ namespace Lore { namespace OpenGL {
 
     void initColorAttachments();
 
-  private:
-
-    static constexpr auto MaxFBO = 2;
-
-    GLuint _fbo[MaxFBO] { 0 };
-    u32 _fboCount = 1;
-    GLuint _intermediateFBO[MaxFBO] { 0 };
-    GLuint _rbo { 0 };
-
-    TexturePtr _intermediateTexture { nullptr };
-
-    bool _multiSampling { false };
-
-    static constexpr auto MaxColorAttachments = 8;
-    u32 _colorAttachmentCount { 1 };
-    u32 _colorAttachments[MaxColorAttachments] {};
   };
 
 }}
