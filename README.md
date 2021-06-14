@@ -79,6 +79,8 @@ Open `LORE.sln` and build the solution (you probably want the release build for 
 
 You are done :)
 
+**If you are running into performance issues on the release build, please create an issue in the repo with your specs. I suspect there may be some caching issues in the scene graph, especially on certain hardware.**
+
 ### Running the samples
 
 By default the `Sample3D` project is selected. There is also the `Sample2D` project, and the unit tests.
