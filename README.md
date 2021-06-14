@@ -75,6 +75,8 @@ Navigate to `src` and run `generate_project.bat` to generate the Visual Studio p
 
 Open `LORE.sln` and build the solution (you probably want the release build for good performance).
 
+(Note I have provided the lib/dll files for the external libraries in the `lib` directory for convenience).
+
 You are done :)
 
 ### Running the samples
