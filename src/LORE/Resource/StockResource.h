@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -123,13 +123,12 @@ namespace Lore {
       BaseWhiteNoLighting
     };
 
-  public:
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     StockResourceController();
     virtual ~StockResourceController();
 
     void createStockResources();
-
     void createRendererStockResources( const RendererType type );
 
     //
@@ -150,7 +149,7 @@ namespace Lore {
 
     using StockResourceFactoryMap = std::map<RendererType, std::unique_ptr<StockResourceFactory>>;
 
-  protected:
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     std::unique_ptr<ResourceController> _controller { nullptr };
     StockResourceFactoryMap _factories {};
@@ -161,6 +160,10 @@ namespace Lore {
 
   class LORE_EXPORT StockResource final
   {
+
+    friend class Context;
+
+    static void AssignContext( ContextPtr context );
 
   public:
 
@@ -173,14 +176,6 @@ namespace Lore {
     static ModelPtr GetModel( const string& name );
     static ModelPtr GetModel( const Mesh::Type type );
     static FontPtr GetFont( const string& name );
-
-  private:
-
-    friend class Context;
-
-  private:
-
-    static void AssignContext( ContextPtr context );
 
   };
 

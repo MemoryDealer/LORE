@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -33,6 +33,23 @@
 class Game final
 {
 
+  // This class is the owner of the Lore context, so it must use a unique_ptr.
+  // Most other Lore objects are accessed via raw pointers, since they are owned
+  // inside the Lore library.
+  std::unique_ptr<Lore::Context> _context {};
+  Lore::WindowPtr _window {};
+
+  Lore::ScenePtr _scene {};
+  Lore::ScenePtr _scene2D {};
+  Lore::CameraPtr _camera {};
+  Lore::CameraPtr _camera2D {};
+
+  std::vector<Lore::NodePtr> _metalStars {};
+
+  Lore::NodePtr _playerNode2D {};
+  std::vector<Lore::NodePtr> _floatingBlocks {};
+  Lore::SpritePtr _rttSprite {};
+
 public:
 
   Game();
@@ -57,25 +74,6 @@ public:
   // Getters.
 
   Lore::CameraPtr getCamera() const;
-
-private:
-
-  // This class is the owner of the Lore context, so it must use a unique_ptr.
-  // Most other Lore objects are accessed via raw pointers, since they are owned
-  // inside the Lore library.
-  std::unique_ptr<Lore::Context> _context {};
-  Lore::WindowPtr _window {};
-
-  Lore::ScenePtr _scene {};
-  Lore::ScenePtr _scene2D {};
-  Lore::CameraPtr _camera {};
-  Lore::CameraPtr _camera2D {};
-
-  std::vector<Lore::NodePtr> _metalStars {};
-
-  Lore::NodePtr _playerNode2D {};
-  std::vector<Lore::NodePtr> _floatingBlocks {};
-  Lore::SpritePtr _rttSprite {};
 
 };
 

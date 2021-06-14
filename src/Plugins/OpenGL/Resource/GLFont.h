@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -33,44 +33,36 @@
 
 namespace Lore { namespace OpenGL {
 
+  struct Glyph
+  {
+    GLuint textureID;
+    GLuint advance;
+    glm::tvec2<uint32_t> size;
+    glm::tvec2<uint32_t> bearing;
+  };
+
   class GLFont : public Lore::Font,
                  public Alloc<GLFont>
   {
 
-  public:
+    using GlyphMap = std::map<GLchar, Glyph>;
 
-    struct Glyph
-    {
-      GLuint textureID;
-      GLuint advance;
-      glm::tvec2<uint32_t> size;
-      glm::tvec2<uint32_t> bearing;
-    };
+    GlyphMap _glyphs {};
 
   public:
 
     GLFont() = default;
-
     virtual ~GLFont() override = default;
 
     virtual void loadFromFile( const string& file, const uint32_t size ) override;
-
     virtual Vertices generateVertices( const char c,
                                                      const real x,
                                                      const real y,
                                                      const real scale ) override;
 
     virtual void bindTexture( const char c ) override;
-
     virtual real advanceGlyphX( const char c, const real x, const real scale ) override;
-
     virtual real getWidth( const char c ) override;
-
-  private:
-
-    using GlyphMap = std::map<GLchar, Glyph>;
-
-    GlyphMap _glyphs {};
 
   };
 

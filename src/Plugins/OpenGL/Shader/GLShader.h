@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -31,34 +31,28 @@
 
 namespace Lore { namespace OpenGL {
 
-    class GLShader : public Lore::Shader,
-                     public Alloc<GLShader>
+  class GLShader : public Lore::Shader,
+    public Alloc<GLShader>
+  {
+
+    GLuint _shader;
+
+  public:
+
+    GLShader();
+    virtual ~GLShader() override;
+
+    void init( const Shader::Type& type ) override;
+    bool loadFromFile( const string& file ) override;
+    bool loadFromSource( const string& source ) override;
+    void unload() override;
+
+    uint getUintId() override
     {
+      return _shader;
+    }
 
-    public:
-
-        GLShader();
-
-        virtual ~GLShader() override;
-
-        void init( const Shader::Type& type ) override;
-
-        bool loadFromFile( const string& file ) override;
-
-        bool loadFromSource( const string& source ) override;
-
-        void unload() override;
-
-        uint getUintId() override
-        {
-            return _shader;
-        }
-
-    private:
-
-        GLuint _shader;
-
-    };
+  };
 
 }}
 

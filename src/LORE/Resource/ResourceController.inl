@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -186,7 +186,7 @@ inline void ResourceController::addDestructionFunctor( PluginDestructionFunctor 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 template<typename T>
-inline ResourceController::PluginCreationFunctor ResourceController::getCreationFunctor()
+inline PluginCreationFunctor ResourceController::getCreationFunctor()
 {
   const auto t = std::type_index( typeid( T ) );
   auto lookup = _creationFunctors.find( t );
@@ -199,7 +199,7 @@ inline ResourceController::PluginCreationFunctor ResourceController::getCreation
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 template<typename T>
-inline ResourceController::PluginDestructionFunctor ResourceController::getDestructionFunctor()
+inline PluginDestructionFunctor ResourceController::getDestructionFunctor()
 {
   const auto t = std::type_index( typeid( T ) );
   auto lookup = _destructionFunctors.find( t );

@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -31,126 +31,121 @@
 
 namespace Lore {
 
-    ///
-    /// \class PoolCluster
-    /// \brief Owner of multiple MemoryPool instances for registered types.
-    class PoolCluster final
+  using PoolTable = std::unordered_map<std::type_index, std::unique_ptr<MemoryPoolBase>>;
+
+  ///
+  /// \class PoolCluster
+  /// \brief Owner of multiple MemoryPool instances for registered types.
+  class PoolCluster final
+  {
+
+    template<typename T>
+    MemoryPoolBase* _getPool()
     {
+      if ( _pools.empty() ) {
+        return nullptr;
+      }
 
-    public:
+      auto t = std::type_index( typeid( T ) );
+      auto lookup = _pools.find( t );
+      if ( _pools.end() != lookup ) {
+        return lookup->second.get();
+      }
 
-        PoolCluster( const string& name )
-        : _name( name )
-        , _pools()
-        { }
+      return nullptr;
+    }
 
-        ~PoolCluster()
-        { }
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        //
-        // Pool management.
+    string _name {};
+    PoolTable _pools {};
 
-        template<typename T, typename TDerived = T>
-        void registerPool( const size_t size )
-        {
-            auto t = std::type_index( typeid( T ) );
-            auto lookup = _pools.find( t );
-            if ( _pools.end() == lookup ) {
-                _pools[t] = std::make_unique<MemoryPool<TDerived>>( typeid( TDerived ).name(), size );
-            }
-        }
+  public:
 
-        template<typename T>
-        void resizePool( const size_t newSize )
-        {
-            auto pool = _getPool<T>();
-            if ( pool ) {
-                pool->resize( newSize );
-            }
-        }
+    PoolCluster( const string& name )
+    : _name( name )
+    { }
 
-        template<typename T>
-        void unregisterPool()
-        {
-            auto t = std::type_index( typeid( T ) );
-            auto lookup = _pools.find( t );
-            if ( _pools.end() != lookup ) {
-                _pools.erase( lookup );
-            }
-        }
+    ~PoolCluster()
+    { }
 
-        void resetAllPools()
-        {
-            for ( auto& pair : _pools ) {
-                pair.second->destroyAll();
-            }
-        }
+    //
+    // Pool management.
 
-        template<typename T>
-        bool poolExists()
-        {
-          return _getPool<T>();
-        }
+    template<typename T, typename TDerived = T>
+    void registerPool( const size_t size )
+    {
+      auto t = std::type_index( typeid( T ) );
+      auto lookup = _pools.find( t );
+      if ( _pools.end() == lookup ) {
+        _pools[t] = std::make_unique<MemoryPool<TDerived>>( typeid( TDerived ).name(), size );
+      }
+    }
 
-        //
-        // Object management.
+    template<typename T>
+    void resizePool( const size_t newSize )
+    {
+      auto pool = _getPool<T>();
+      if ( pool ) {
+        pool->resize( newSize );
+      }
+    }
 
-        template<typename T, typename TDerived = T>
-        TDerived* create()
-        {
-            auto pool = _getPool<T>();
-            if ( pool ) {
-                MemoryPool<TDerived>* TPool = static_cast< MemoryPool<TDerived>* >( pool );
-                return TPool->create();
-            }
+    template<typename T>
+    void unregisterPool()
+    {
+      auto t = std::type_index( typeid( T ) );
+      auto lookup = _pools.find( t );
+      if ( _pools.end() != lookup ) {
+        _pools.erase( lookup );
+      }
+    }
 
-            throw Lore::Exception( "PoolCluster::create<T>: Pool of type " +
-                                   string( typeid( TDerived ).name() ) + " does not exist" );
-        }
+    void resetAllPools()
+    {
+      for ( auto& pair : _pools ) {
+        pair.second->destroyAll();
+      }
+    }
 
-        template<typename T, typename TDerived = T>
-        void destroy( T* object )
-        {
-            auto pool = _getPool<T>();
-            if ( pool ) {
-                // TODO: Can this be done without casting?
-                MemoryPool<TDerived>* TPool = static_cast< MemoryPool<TDerived>* >( pool );
-                TPool->destroy( static_cast<TDerived*>( object ) );
-            }
-            else {
-              LogWrite( Info, "PoolCluster::create<T>: Pool of type %s does not exist",
-                        typeid( TDerived ).name() );
-            }
-        }
+    template<typename T>
+    bool poolExists()
+    {
+      return _getPool<T>();
+    }
 
-    private:
+    //
+    // Object management.
 
-        using PoolTable = std::unordered_map<std::type_index, std::unique_ptr<MemoryPoolBase>>;
+    template<typename T, typename TDerived = T>
+    TDerived* create()
+    {
+      auto pool = _getPool<T>();
+      if ( pool ) {
+          MemoryPool<TDerived>* TPool = static_cast< MemoryPool<TDerived>* >( pool );
+          return TPool->create();
+      }
 
-    private:
+      throw Lore::Exception( "PoolCluster::create<T>: Pool of type " +
+                              string( typeid( TDerived ).name() ) + " does not exist" );
+    }
 
-        template<typename T>
-        MemoryPoolBase* _getPool()
-        {
-          if ( _pools.empty() ) {
-            return nullptr;
-          }
+    template<typename T, typename TDerived = T>
+    void destroy( T* object )
+    {
+      auto pool = _getPool<T>();
+      if ( pool ) {
+          // TODO: Can this be done without casting?
+          MemoryPool<TDerived>* TPool = static_cast< MemoryPool<TDerived>* >( pool );
+          TPool->destroy( static_cast<TDerived*>( object ) );
+      }
+      else {
+        LogWrite( Info, "PoolCluster::create<T>: Pool of type %s does not exist",
+                  typeid( TDerived ).name() );
+      }
+    }
 
-          auto t = std::type_index( typeid( T ) );
-          auto lookup = _pools.find( t );
-          if ( _pools.end() != lookup ) {
-            return lookup->second.get();
-          }
-
-          return nullptr;
-        }
-
-    private:
-
-        string _name;
-        PoolTable _pools;
-
-    };
+  };
 
 }
 

@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -34,6 +34,11 @@ namespace Lore {
 
   class LORE_EXPORT Textbox final : public Alloc<Textbox>, public IResource
   {
+
+    FontPtr _font { nullptr };
+    string _text {};
+    Color _textColor { StockColor::White };
+    uint32_t _renderQueue { RenderQueue::General };
 
   public:
 
@@ -86,13 +91,6 @@ namespace Lore {
     {
       return _renderQueue;
     }
-
-  private:
-
-    FontPtr _font { nullptr };
-    string _text {};
-    Color _textColor { StockColor::White };
-    uint32_t _renderQueue { RenderQueue::General };
 
   };
 

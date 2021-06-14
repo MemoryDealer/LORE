@@ -3,7 +3,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -24,9 +24,8 @@
 // THE SOFTWARE.
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-#include <LORE/Core/Plugin/RenderPluginLoader.h>
-
 #include <LORE/Core/Context.h>
+#include <LORE/Core/Plugin/RenderPluginLoader.h>
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
@@ -46,56 +45,56 @@ RenderPluginLoader::RenderPluginLoader()
 
 RenderPluginLoader::~RenderPluginLoader()
 {
-    free();
+  free();
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 bool RenderPluginLoader::load( const string& file )
 {
-    free(); 
+  free();
 
-    _hModule = LoadLibrary( file.c_str() );
-    if ( nullptr == _hModule ) {
-        LogWrite( Critical, "Unable to load render plugin %s - error %d", file.c_str(), GetLastError() );
-        return false;
-    }
+  _hModule = LoadLibrary( file.c_str() );
+  if ( nullptr == _hModule ) {
+    LogWrite( Critical, "Unable to load render plugin %s - error %d", file.c_str(), GetLastError() );
+    return false;
+  }
 
-    LogWrite( Info, "Render plugin %s successfully loaded", file.c_str() );
+  LogWrite( Info, "Render plugin %s successfully loaded", file.c_str() );
 
-    return true;
+  return true;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 std::unique_ptr<Context> RenderPluginLoader::createContext()
 {
-    // Function pointer to create the context.
-    using CreateContextPtr = Context*( *)( );
+  // Function pointer to create the context.
+  using CreateContextPtr = Context*( *)( );
 
-    // Get address of CreateContext function inside DLL.
-    CreateContextPtr ccp = reinterpret_cast< CreateContextPtr >(
-        GetProcAddress( _hModule, "CreateContext" ) );
-    if ( nullptr == ccp ) {
-        LogWrite( Critical, "Unable to get CreateContext function pointer from render plugin" );
-        return nullptr;
-    }
+  // Get address of CreateContext function inside DLL.
+  CreateContextPtr ccp = reinterpret_cast< CreateContextPtr >(
+      GetProcAddress( _hModule, "CreateContext" ) );
+  if ( nullptr == ccp ) {
+      LogWrite( Critical, "Unable to get CreateContext function pointer from render plugin" );
+      return nullptr;
+  }
 
-    // Call the DLL's CreateContext() - allocate the render plugin's context.
-    Context* context = ccp();
+  // Call the DLL's CreateContext() - allocate the render plugin's context.
+  Context* context = ccp();
 
-    // Place Context object into unique_ptr to meet Lore's standard.
-    std::unique_ptr<Context> p( context );
-    return std::move( p );
+  // Place Context object into unique_ptr to meet Lore's standard.
+  std::unique_ptr<Context> p( context );
+  return std::move( p );
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
 void RenderPluginLoader::free()
 {
-    if ( _hModule ) {
-        FreeLibrary( _hModule );
-    }
+  if ( _hModule ) {
+    FreeLibrary( _hModule );
+  }
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

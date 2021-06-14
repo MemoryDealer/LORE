@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -40,6 +40,10 @@ namespace Lore {
     class LORE_EXPORT RenderPluginLoader
     {
 
+#if LORE_PLATFORM == LORE_WINDOWS
+      HMODULE _hModule { nullptr };
+#endif
+
     public:
 
         RenderPluginLoader();
@@ -56,12 +60,6 @@ namespace Lore {
         ///
         /// \brief Instantiates the render plugin's implementation of the Lore Context.
         virtual std::unique_ptr<Context> createContext();
-
-    private:
-
-#if LORE_PLATFORM == LORE_WINDOWS
-        HMODULE _hModule { nullptr };
-#endif
 
     };
 

@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -37,7 +37,25 @@ namespace Lore {
   class LORE_EXPORT Prefab final : public Alloc<Prefab>, public IResource
   {
 
+    friend class Node;
+
   public:
+
+    MaterialPtr _material { nullptr };
+    ModelPtr _model { nullptr };
+
+    bool castShadows { true };
+
+    // Only used if Prefab is instanced.
+    ModelPtr _instancedModel { nullptr };
+    size_t _instanceCount { 0 };
+    NodePtr _instanceControllerNode { nullptr };
+
+    uint _renderQueue { RenderQueue::General };
+
+    IRenderAPI::CullingMode cullingMode = IRenderAPI::CullingMode::Back;
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     Prefab() = default;
     ~Prefab() override;
@@ -93,29 +111,7 @@ namespace Lore {
     bool isInstanced() const;
     NodePtr getInstanceControllerNode() const;
 
-    //
-
-    friend class Node;
-
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
     void _notifyAttached( const NodePtr node );
-
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-    MaterialPtr _material { nullptr };
-    ModelPtr _model { nullptr };
-
-    bool castShadows { true };
-
-    // Only used if Prefab is instanced.
-    ModelPtr _instancedModel { nullptr };
-    size_t _instanceCount { 0 };
-    NodePtr _instanceControllerNode { nullptr };
-
-    uint _renderQueue { RenderQueue::General };
-
-    IRenderAPI::CullingMode cullingMode = IRenderAPI::CullingMode::Back;
 
   };
 

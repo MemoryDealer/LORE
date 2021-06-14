@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -32,58 +32,55 @@
 
 namespace Lore {
 
-    class LORE_EXPORT Shader : public IResource
-    {
+  class LORE_EXPORT Shader : public IResource
+  {
 
-    public:
+  public:
 
-        enum class Type {
-            Vertex,
-            Geometry,
-            Fragment
-        };
-
-    public:
-
-        Shader()
-        : _type()
-        , _loaded( false )
-        { }
-
-        virtual ~Shader() = default;
-
-        virtual void init( const Shader::Type& type ) = 0;
-
-        virtual bool loadFromFile( const string& file ) = 0;
-
-        virtual bool loadFromSource( const string& source ) = 0;
-
-        virtual void unload() = 0;
-
-        //
-        // Getters.
-
-        virtual Type getType() const
-        {
-            return _type;
-        }
-
-        bool isLoaded() const
-        {
-            return _loaded;
-        }
-
-        virtual uint getUintId()
-        {
-            return 0;
-        }
-
-    protected:
-
-        Type _type;
-        bool _loaded;
-
+    enum class Type {
+        Vertex,
+        Geometry,
+        Fragment
     };
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    Shader()
+    : _type()
+    , _loaded( false )
+    { }
+
+    virtual ~Shader() = default;
+
+    virtual void init( const Shader::Type& type ) = 0;
+    virtual bool loadFromFile( const string& file ) = 0;
+    virtual bool loadFromSource( const string& source ) = 0;
+    virtual void unload() = 0;
+
+    //
+    // Getters.
+
+    virtual Type getType() const
+    {
+      return _type;
+    }
+
+    bool isLoaded() const
+    {
+      return _loaded;
+    }
+
+    virtual uint getUintId()
+    {
+      return 0;
+    }
+
+  protected:
+
+    Type _type;
+    bool _loaded;
+
+  };
 
 }
 

@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -38,27 +38,25 @@ namespace Lore {
   class ModelLoader final
   {
 
-  public:
-
-    ModelLoader(const string& resourceGroupName);
-    ~ModelLoader() = default;
-
-    ModelPtr load( const string& path, const bool loadTextures = true );
-
-  private:
-
-    void _processNode( aiNode* node, const aiScene* scene );
-    void _processMesh( aiMesh* mesh, const aiScene* scene );
-    void _processTexture( aiMaterial* material, const aiTextureType type, MeshPtr mesh );
-
-  private:
-
     string _name {};
     string _directory {};
     string _resourceGroupName {};
     bool _loadTextures { true };
 
     ModelPtr _model { nullptr };
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    void _processNode( aiNode* node, const aiScene* scene );
+    void _processMesh( aiMesh* mesh, const aiScene* scene );
+    void _processTexture( aiMaterial* material, const aiTextureType type, MeshPtr mesh );
+
+  public:
+
+    ModelLoader(const string& resourceGroupName);
+    ~ModelLoader() = default;
+
+    ModelPtr load( const string& path, const bool loadTextures = true );
 
   };
 

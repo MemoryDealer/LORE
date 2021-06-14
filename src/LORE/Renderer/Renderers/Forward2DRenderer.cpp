@@ -3,7 +3,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -211,7 +211,7 @@ void Forward2DRenderer::present( const RenderView& rv, const WindowPtr window )
   }
 
   // AABBs.
-  auto renderAABBs = Config::GetValue( "RenderAABBs" );
+  /*auto renderAABBs = Config::GetValue( "RenderAABBs" );
   if ( GET_VARIANT<bool>( renderAABBs ) ) {
     RenderQueue tmpQueue;
 
@@ -238,7 +238,7 @@ void Forward2DRenderer::present( const RenderView& rv, const WindowPtr window )
       AddAABB( it.getNext() );
     }
     renderBoxes( tmpQueue, viewProjection );
-  }
+  }*/
 
   if ( rv.renderTarget ) {
     rv.renderTarget->flush();
@@ -280,14 +280,14 @@ void Forward2DRenderer::renderSkybox( const RenderView& rv,
                                         const glm::mat4& proj )
 {
   SkyboxPtr skybox = rv.scene->getSkybox();
-  const Skybox::LayerMap& layers = skybox->getLayerMap();
+  const SkyboxLayerMap& layers = skybox->getLayerMap();
 
   ModelPtr model = StockResource::GetModel( "Skybox2D" );
 
   const glm::vec3 camPos = rv.camera->getPosition();
 
   for ( const auto& pair : layers ) {
-    const Skybox::Layer& layer = pair.second;
+    const SkyboxLayer& layer = pair.second;
     MaterialPtr mat = layer.getMaterial();
 
     // TODO: Move this to uniform updaters in Skybox2D program.
@@ -443,7 +443,7 @@ void Forward2DRenderer::renderBoxes( const RenderQueue& queue,
                                      const glm::mat4& viewProjection ) const
 {
   _api->setBlendingEnabled( true );
-  _api->setBlendingFunc( Material::BlendFactor::SrcAlpha, Material::BlendFactor::OneMinusSrcAlpha );
+  _api->setBlendingFunc( BlendFactor::SrcAlpha, BlendFactor::OneMinusSrcAlpha );
 
   GPUProgramPtr program = StockResource::GetGPUProgram( "StandardBox2D" );
   ModelPtr model = StockResource::GetModel( "TexturedQuad" );

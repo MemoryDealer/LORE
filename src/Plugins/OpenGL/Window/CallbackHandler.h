@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -31,25 +31,25 @@
 
 namespace Lore { namespace OpenGL {
 
-    class WindowCallbackHandler final
+  class WindowCallbackHandler final
+  {
+
+  public:
+
+    inline static WindowPtr GetWindowPtr( GLFWwindow* window )
     {
+      return static_cast< WindowPtr >( glfwGetWindowUserPointer( window ) );
+    }
 
-    public:
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        inline static WindowPtr GetWindowPtr( GLFWwindow* window )
-        {
-            return static_cast< WindowPtr >( glfwGetWindowUserPointer( window ) );
-        }
+    inline static void Size( GLFWwindow* window, int width, int height )
+    {
+      auto p = GetWindowPtr( window );
+      p->setDimensions( width, height );
+    }
 
-        // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-        inline static void Size( GLFWwindow* window, int width, int height )
-        {
-            auto p = GetWindowPtr( window );
-            p->setDimensions( width, height );
-        }
-
-    };
+  };
 
 }}
 

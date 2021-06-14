@@ -3,7 +3,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -36,7 +36,7 @@ using namespace Lore;
 
 void FrameListenerController::frameStarted()
 {
-  FrameListener::FrameEvent e;
+  FrameEvent e;
 
   // Update frame listeners.
   for ( const auto& frameListener : _frameListeners ) {
@@ -53,7 +53,7 @@ void FrameListenerController::frameStarted()
 
 void FrameListenerController::frameEnded()
 {
-  FrameListener::FrameEvent e;
+  FrameEvent e;
 
   // Update frame listeners.
   for ( const auto& frameListener : _frameListeners ) {

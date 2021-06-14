@@ -3,7 +3,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -30,44 +30,44 @@
 
 namespace LocalNS {
 
-  static GLenum ConvertBlendFactor( const Lore::Material::BlendFactor& factor )
+  static GLenum ConvertBlendFactor( const Lore::BlendFactor& factor )
   {
     switch ( factor ) {
     default:
-    case Lore::Material::BlendFactor::Zero:
+    case Lore::BlendFactor::Zero:
       return GL_ZERO;
 
-    case Lore::Material::BlendFactor::One:
+    case Lore::BlendFactor::One:
       return GL_ONE;
 
-    case Lore::Material::BlendFactor::SrcColor:
+    case Lore::BlendFactor::SrcColor:
       return GL_SRC_COLOR;
 
-    case Lore::Material::BlendFactor::OneMinusSrcColor:
+    case Lore::BlendFactor::OneMinusSrcColor:
       return GL_ONE_MINUS_SRC_COLOR;
 
-    case Lore::Material::BlendFactor::DstColor:
+    case Lore::BlendFactor::DstColor:
       return GL_DST_COLOR;
 
-    case Lore::Material::BlendFactor::OneMinusDstColor:
+    case Lore::BlendFactor::OneMinusDstColor:
       return GL_ONE_MINUS_DST_COLOR;
 
-    case Lore::Material::BlendFactor::SrcAlpha:
+    case Lore::BlendFactor::SrcAlpha:
       return GL_SRC_ALPHA;
 
-    case Lore::Material::BlendFactor::OneMinusSrcAlpha:
+    case Lore::BlendFactor::OneMinusSrcAlpha:
       return GL_ONE_MINUS_SRC_ALPHA;
 
-    case Lore::Material::BlendFactor::ConstantColor:
+    case Lore::BlendFactor::ConstantColor:
       return GL_CONSTANT_COLOR;
 
-    case Lore::Material::BlendFactor::OneMinusConstantColor:
+    case Lore::BlendFactor::OneMinusConstantColor:
       return GL_ONE_MINUS_CONSTANT_COLOR;
 
-    case Lore::Material::BlendFactor::ConstantAlpha:
+    case Lore::BlendFactor::ConstantAlpha:
       return GL_CONSTANT_ALPHA;
 
-    case Lore::Material::BlendFactor::OneMinusConstantAlpha:
+    case Lore::BlendFactor::OneMinusConstantAlpha:
       return GL_ONE_MINUS_CONSTANT_ALPHA;
     }
   }
@@ -246,7 +246,7 @@ void RenderAPI::setBlendingEnabled( const bool enabled )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-void RenderAPI::setBlendingFunc( const Lore::Material::BlendFactor& src, const Lore::Material::BlendFactor& dst )
+void RenderAPI::setBlendingFunc( const Lore::BlendFactor& src, const Lore::BlendFactor& dst )
 {
   glBlendFuncSeparate( ConvertBlendFactor( src ), ConvertBlendFactor( dst ), GL_ONE, GL_ONE );
 }

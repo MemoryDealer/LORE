@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -37,13 +37,6 @@ namespace Lore { namespace OpenGL {
   class GLResourceController final : public Lore::ResourceController
   {
 
-  public:
-
-    GLResourceController();
-    ~GLResourceController() override = default;
-
-  private:
-
     //
     // Creation functions.
 
@@ -63,6 +56,11 @@ namespace Lore { namespace OpenGL {
     void destroyRenderTarget( IResourcePtr resource );
     void destroyShader( IResourcePtr resource );
     void destroyTexture( IResourcePtr resource );
+
+  public:
+
+    GLResourceController();
+    ~GLResourceController() override = default;
 
   };
 

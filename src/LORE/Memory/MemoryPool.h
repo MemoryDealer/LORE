@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -43,7 +43,6 @@ namespace Lore {
     virtual ~MemoryPoolBase() { }
 
     virtual void resize( const size_t newSize ) = 0;
-
     virtual void destroyAll() = 0;
 
   };
@@ -57,9 +56,16 @@ namespace Lore {
   class MemoryPool final : public MemoryPoolBase
   {
 
-  public:
-
     using List = T**;
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    string _name {};
+    size_t _size { 0 };
+    size_t _activeObjectCount { 0 };
+    List _objects {};
+
+    T* _next { nullptr };
 
   public:
 
@@ -75,12 +81,12 @@ namespace Lore {
 
       // Setup linked list.
       for ( int i = 0; i < _size - 1; ++i ) {
-        _objects[i]->_next = _objects[i + 1];
+        _objects[i]->next = _objects[i + 1];
       }
 
       // Setup head and tail.
       _next = _objects[0];
-      _objects[_size - 1]->_next = nullptr;
+      _objects[_size - 1]->next = nullptr;
     }
 
     inline virtual ~MemoryPool() override
@@ -102,9 +108,9 @@ namespace Lore {
       }
 
       T* p = _next;
-      assert( false == p->_inUse );
-      p->_inUse = true;
-      _next = p->_next;
+      assert( false == p->inUse );
+      p->inUse = true;
+      _next = p->next;
 
       ++_activeObjectCount;
 
@@ -113,7 +119,7 @@ namespace Lore {
 
     inline void destroy( T* object )
     {
-      if ( !object->_inUse ) {
+      if ( !object->inUse ) {
         //throw Exception( "Attempting to destroy object not in use" );
         LogWrite( Warning, "Attempted to destroy object not in use" );
         return;
@@ -125,10 +131,10 @@ namespace Lore {
       object->~T();
       new ( object ) T();
 
-      assert( false == alloc->_inUse );
+      assert( false == alloc->inUse );
 
       // Put this object at the front of the list.
-      alloc->_next = _next;
+      alloc->next = _next;
       _next = object;
 
       --_activeObjectCount;
@@ -144,7 +150,7 @@ namespace Lore {
     inline virtual void destroyAll() override
     {
       for ( int i = 0; i < _size; ++i ) {
-        if ( _objects[i]->_inUse ) {
+        if ( _objects[i]->inUse ) {
           destroy( _objects[i] );
         }
       }
@@ -181,18 +187,9 @@ namespace Lore {
     {
       printf( "Pool %s usage: \n\n", _name.c_str() );
       for ( int i = 0; i < _size; ++i ) {
-        printf( "Object %d \t[%s]\n", i, ( _objects[i]->_inUse ) ? "x" : " " );
+        printf( "Object %d \t[%s]\n", i, ( _objects[i]->inUse ) ? "x" : " " );
       }
     }
-
-  private:
-
-    string _name {};
-    size_t _size { 0 };
-    size_t _activeObjectCount { 0 };
-    List _objects {};
-
-    T* _next { nullptr };
 
   };
 

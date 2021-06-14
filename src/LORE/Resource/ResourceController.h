@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -44,6 +44,17 @@
 
 namespace Lore {
 
+  struct IndexedResource
+  {
+    SerializableResource type;
+    string file;
+    bool loaded;
+  };
+
+  using ResourceIndex = std::multimap<string, IndexedResource>;
+  using ResourceRegistry = Registry<std::unordered_map, IResource>;
+  using ResourceRegistryMap = std::unordered_map<std::type_index, ResourceRegistry>;
+
   ///
   /// \class ResourceGroup
   /// \brief A collection of resources used for rendering and various effects.
@@ -56,20 +67,21 @@ namespace Lore {
   class LORE_EXPORT ResourceGroup final
   {
 
-  public:
+    friend class ResourceController;
 
-    struct IndexedResource
-    {
-      SerializableResource type;
-      string file;
-      bool loaded;
-    };
-
-    using ResourceIndex = std::multimap<string, IndexedResource>;
-    using ResourceRegistry = Registry<std::unordered_map, IResource>;
-    using ResourceRegistryMap = std::unordered_map<std::type_index, ResourceRegistry>;
+    string _name {};
+    ResourceIndex _index {};
+    ResourceRegistryMap _resources {};
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    template<typename T>
+    void _addResourceType()
+    {
+      _resources[std::type_index( typeid( T ) )] = ResourceRegistry();
+    }
+
+  public:
 
     ResourceGroup( const string& name );
     ~ResourceGroup() = default;
@@ -96,27 +108,15 @@ namespace Lore {
 
     const string& getName() const;
 
-  private:
-
-    friend class ResourceController;
-
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-    template<typename T>
-    void _addResourceType()
-    {
-      _resources[std::type_index( typeid( T ) )] = ResourceRegistry();
-    }
-
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-    string _name {};
-    ResourceIndex _index {};
-    ResourceRegistryMap _resources {};
-
   };
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+  using ResourceGroupMap = std::unordered_map<string, std::shared_ptr<ResourceGroup>>; // TODO: Use unique_ptr (shared_ptr for now to avoid very difficult compilation error).
+  using PluginCreationFunctor = std::function<IResourcePtr()>;
+  using PluginDestructionFunctor = std::function<void( IResourcePtr )>;
+  using PluginCreationFunctorMap = std::unordered_map<std::type_index, PluginCreationFunctor>;
+  using PluginDestructionFunctorMap = std::unordered_map<std::type_index, PluginDestructionFunctor>;
 
   ///
   /// \class ResourceController
@@ -127,16 +127,19 @@ namespace Lore {
   class LORE_EXPORT ResourceController
   {
 
+    ResourceGroupMap _groups {};
+    ResourceGroupPtr _defaultGroup { nullptr };
+
+    PluginCreationFunctorMap _creationFunctors {};
+    PluginDestructionFunctorMap _destructionFunctors {};
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    ResourceGroupPtr _getGroup( const string& groupName );
+
   public:
 
-    using ResourceGroupMap = std::unordered_map<string, std::shared_ptr<ResourceGroup>>; // TODO: Use unique_ptr (shared_ptr for now to avoid very difficult compilation error).
-    using PluginCreationFunctor = std::function<IResourcePtr()>;
-    using PluginDestructionFunctor = std::function<void( IResourcePtr )>;
-    using PluginCreationFunctorMap = std::unordered_map<std::type_index, PluginCreationFunctor>;
-    using PluginDestructionFunctorMap = std::unordered_map<std::type_index, PluginDestructionFunctor>;
-
     static const string DefaultGroupName;
-
     string _workingDirectory {};
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -207,19 +210,7 @@ namespace Lore {
 
     template<typename T>
     PluginDestructionFunctor getDestructionFunctor();
-
-  private:
-
-    ResourceGroupPtr _getGroup( const string& groupName );
-
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-    ResourceGroupMap _groups {};
-    ResourceGroupPtr _defaultGroup { nullptr };
-
-    PluginCreationFunctorMap _creationFunctors {};
-    PluginDestructionFunctorMap _destructionFunctors {};
-
+    
   };
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

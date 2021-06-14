@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -31,52 +31,46 @@
 
 namespace Lore { namespace OpenGL {
 
-    class GLWindow final : public Lore::Window,
-                           public Alloc<GLWindow>
+  class GLWindow final : public Lore::Window,
+                          public Alloc<GLWindow>
+  {
+
+    GLFWwindow* _window;
+
+  public:
+
+    GLWindow();
+
+    virtual ~GLWindow() override;
+
+    void init( const string& title,
+                const int width,
+                const int height,
+                const RendererType rendererTypeMask );
+
+    //
+    // Rendering.
+
+    virtual void renderFrame() override;
+    virtual void addRenderView( const RenderView& renderView ) override;
+
+    //
+    // Modifiers.
+
+    virtual void setTitle( const string& title ) override;
+    virtual void setDimensions( const int width, const int height ) override;
+    virtual void setActive() override;
+    void updateRenderViews();
+
+    //
+    // Getters.
+
+    GLFWwindow* getInternalWindow() const
     {
+      return _window;
+    }
 
-    private:
-
-        GLFWwindow* _window;
-
-    public:
-
-        GLWindow();
-
-        virtual ~GLWindow() override;
-
-        void init( const string& title,
-                   const int width,
-                   const int height,
-                   const RendererType rendererTypeMask );
-
-        //
-        // Rendering.
-
-        virtual void renderFrame() override;
-
-        virtual void addRenderView( const RenderView& renderView ) override;
-
-        //
-        // Modifiers.
-
-        virtual void setTitle( const string& title ) override;
-
-        virtual void setDimensions( const int width, const int height ) override;
-
-        virtual void setActive() override;
-
-        void updateRenderViews();
-
-        //
-        // Getters.
-
-        GLFWwindow* getInternalWindow() const
-        {
-          return _window;
-        }
-
-    };
+  };
 
 }}
 

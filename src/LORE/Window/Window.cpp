@@ -3,7 +3,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -176,18 +176,18 @@ void Window::onKeyDown( const Keycode code )
       auto debugUI = std::static_pointer_cast<DebugUI>( _debugUI );
 
       if ( Input::GetKeyState( Keycode::LeftShift ) || Input::GetKeyState( Keycode::RightShift ) ) {
-        debugUI->setActivePanel( DebugUI::Panel::PerformanceStats );
+        debugUI->setActivePanel( Panel::PerformanceStats );
         debugUI->setEnabled( !debugUI->getEnabled() );
       }
       else {
-        if ( debugUI->getEnabled() && DebugUI::Panel::PerformanceStats == debugUI->getActivePanel() ) {
+        if ( debugUI->getEnabled() && Panel::PerformanceStats == debugUI->getActivePanel() ) {
           // Do nothing--keep debug UI open.
         }
         else {
           debugUI->setEnabled( true );
         }
 
-        debugUI->setActivePanel( DebugUI::Panel::Console );
+        debugUI->setActivePanel( Panel::Console );
         Input::OverrideHooks( debugUI->getInputHooks() );
         Input::SetCursorEnabled( true );
       }

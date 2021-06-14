@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -39,6 +39,21 @@ namespace Lore {
                                    public IResource
   {
 
+    using TextureList = std::vector<TexturePtr>;
+    using MixValues = std::vector<real>;
+
+    struct Frame
+    {
+      TextureList textures;
+      MixValues mixValues;
+    };
+
+    using FrameData = std::map<Texture::Type, Frame>;
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    std::vector<FrameData> _frames {};
+
   public:
 
     Sprite() = default;
@@ -57,23 +72,6 @@ namespace Lore {
     TexturePtr getTexture( const size_t frameIdx, const Texture::Type type, const size_t idx = 0 ) const;
     u8 getTextureCount( const size_t frameIdx, const Texture::Type type ) const;
     real getMixValue( const size_t frameIdx, const Texture::Type type, const size_t idx ) const;
-
-  private:
-
-    using TextureList = std::vector<TexturePtr>;
-    using MixValues = std::vector<real>;
-
-    struct Frame
-    {
-      TextureList textures;
-      MixValues mixValues;
-    };
-
-    using FrameData = std::map<Texture::Type, Frame>;
-
-  private:
-
-    std::vector<FrameData> _frames {};
 
   };
 

@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -42,28 +42,17 @@ namespace Lore {
   class Alloc
   {
 
+    friend class MemoryPool<T>;
+
   public:
 
+    std::atomic<bool> inUse { false };
+    T* next { nullptr };
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
     Alloc() = default;
-
     virtual ~Alloc() = default;
-
-    ///
-    /// \brief Returns true if object has been requested for use in memory pool.
-    /// After it is destroyed in the memory pool, it is no longer in use.
-    bool isInUse() const
-    {
-      return _inUse;
-    }
-
-  public: // HACK for posix.
-
-    std::atomic<bool> _inUse { false };
-    T* _next { nullptr };
-
-  private:
-
-    friend class MemoryPool<T>;
 
   };
 

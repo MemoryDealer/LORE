@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -34,6 +34,13 @@ namespace Lore {
 
   class LORE_EXPORT Box final : public Alloc<Box>, public IResource
   {
+
+    bool _fill { true };
+
+    Color _borderColor { StockColor::White };
+    Color _fillColor { 1.f, 1.f, 1.f, 0.3f };
+    glm::vec2 _size { 1.f, 1.f };
+    real _borderWidth { 0.04f };
 
   public:
 
@@ -112,15 +119,6 @@ namespace Lore {
     {
       _borderWidth = width;
     }
-
-  private:
-
-    bool _fill { true };
-
-    Color _borderColor { StockColor::White };
-    Color _fillColor { 1.f, 1.f, 1.f, 0.3f };
-    glm::vec2 _size { 1.f, 1.f };
-    real _borderWidth { 0.04f };
 
   };
 

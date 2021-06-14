@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -41,17 +41,17 @@ namespace Lore {
   class Registry
   {
 
+    MapType<string, T*, MapParams ...> _container {};
+    MapType<string, u32> _count {};
+
   public:
 
     using Iterator = MapIterator<MapType<string, T*, MapParams ...>>;
     using ConstIterator = ConstMapIterator<MapType<string, T*, MapParams ...>>;
 
-  public:
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-    constexpr
-    explicit Registry()
-    {
-    }
+    Registry() = default;
 
     void insert( const ID& id, T* resource, const bool autoDuplicate = false )
     {
@@ -76,7 +76,7 @@ namespace Lore {
       const auto transformedID = StringUtil::ToLower( id );
       auto lookup = _container.find( transformedID );
       if ( _container.end() == lookup ) {
-        LogWrite( Warning, "Tried to remove resource with id %s which does not exist", transformedID.c_str() );
+        //LogWrite( Warning, "Tried to remove resource with id %s which does not exist", transformedID.c_str() );
         return;
       }
 
@@ -140,11 +140,6 @@ namespace Lore {
 
     Registry& operator = ( const Registry& rhs ) = default;
     Registry( const Registry& rhs ) = default;
-
-  private:
-
-    MapType<string, T*, MapParams ...> _container {};
-    MapType<string, u32> _count {};
 
   };
 

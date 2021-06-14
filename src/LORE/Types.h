@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -42,26 +42,28 @@ namespace Lore {
   class Box;
   class Camera;
   class Context;
-  struct DirectionalLight;
+  class DirectionalLight;
   class Prefab;
   class Font;
   class GPUProgram;
   class InputController;
   class IResource;
-  struct Light;
+  class Light;
   class Material;
   class Mesh;
   class Model;
   class Node;
-  struct PointLight;
+  class PointLight;
   class PostProcessor;
   class Renderer;
   class RenderTarget;
   class ResourceController;
   class ResourceGroup;
   class Scene;
+  class Serializer;
+  class SerializerValue;
   class Shader;
-  struct SpotLight;
+  class SpotLight;
   class Sprite;
   class SpriteAnimationSet;
   class SpriteController;

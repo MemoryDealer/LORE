@@ -3,7 +3,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -204,7 +204,7 @@ void ResourceFileProcessor::processAnimation( SpriteAnimationSetPtr animationSet
     const auto& deltaTimes = settings.getValue( "deltaTimes" ).toArray();
 
     // Create an animation to add to the animation set.
-    SpriteController::Animation animation;
+    Animation animation;
 
     // Process frames and delta times.
     for ( const auto& frame : frames ) {

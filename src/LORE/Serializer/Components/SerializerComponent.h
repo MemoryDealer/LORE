@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -37,11 +37,9 @@ namespace Lore {
   public:
 
     SerializerComponent();
-
     virtual ~SerializerComponent() = default;
 
     virtual void serialize( const string& file ) { }
-
     virtual bool deserialize( const string& file ) { return false; }
 
     //
@@ -50,17 +48,15 @@ namespace Lore {
     bool valueExists( const string& key );
 
     SerializerValue& getValue( const string& key );
-
-    const SerializerValue::Values& getValues() const;
+    const Values& getValues() const;
 
     SerializerValue& addValue( const string& key );
-
     void addValue( const SerializerValue& value );
 
   protected:
 
     SerializerValue _values;
-    SerializerValue::Values::iterator _lastLookup  { _values._values.end() };
+    Values::iterator _lastLookup  { _values._values.end() };
 
   };
 

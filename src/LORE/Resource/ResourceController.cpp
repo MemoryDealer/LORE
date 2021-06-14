@@ -3,7 +3,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -133,7 +133,7 @@ void ResourceController::destroyGroup( const string& groupName )
 void ResourceController::loadGroup( const string& groupName )
 {
   // Place indexed resources into queue so they can be loaded in the correct order.
-  std::vector<ResourceGroup::IndexedResource*> loadQueues[static_cast< int >( SerializableResource::Count )];
+  std::vector<IndexedResource*> loadQueues[static_cast< int >( SerializableResource::Count )];
   auto group = _getGroup( groupName );
   auto& resourceIndex = group->_index;
   for ( auto& it : resourceIndex ) {
@@ -238,7 +238,7 @@ void ResourceController::indexResourceFile( const string& file, const string& gr
 
   if ( processor.hasData() ) {
     // Store location of this resource file and its type.
-    ResourceGroup::IndexedResource index;
+    IndexedResource index;
     index.file = file;
     index.type = resourceType;
     index.loaded = false;

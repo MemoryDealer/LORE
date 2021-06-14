@@ -3,7 +3,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -34,8 +34,8 @@ using namespace Lore;
 
 namespace APIVersionNS {
 
-  static int Major=0;
-  static int Minor=0;
+  static int Major = 0;
+  static int Minor = 0;
 
 }
 using namespace APIVersionNS;
@@ -58,7 +58,7 @@ int APIVersion::GetMinor()
 
 string APIVersion::GetString()
 {
-  static string str=std::to_string( Major ) + std::to_string( Minor );
+  static string str = std::to_string( Major ) + std::to_string( Minor );
   return str;
 }
 
@@ -66,8 +66,8 @@ string APIVersion::GetString()
 
 void APIVersion::Set( const int major, const int minor )
 {
-  Major=major;
-  Minor=minor;
+  Major = major;
+  Minor = minor;
 }
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //

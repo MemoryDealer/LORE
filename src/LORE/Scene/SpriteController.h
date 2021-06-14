@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -35,6 +35,19 @@ namespace Lore {
 
   class SpriteAnimationSet;
 
+  struct Animation
+  {
+    using FrameList = std::vector<size_t>;
+    using DeltaTimeList = std::vector<long>;
+
+    size_t activeFrameIndex { 0 };
+    FrameList frames {};
+    DeltaTimeList deltaTimes {};
+    std::chrono::high_resolution_clock::time_point lastTimePoint {};
+  };
+
+  using AnimationMap = std::map<string, Animation>;
+
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
   ///
@@ -43,22 +56,12 @@ namespace Lore {
   class LORE_EXPORT SpriteController final
   {
 
-  public:
-
-    struct Animation
-    {
-      using FrameList = std::vector<size_t>;
-      using DeltaTimeList = std::vector<long>;
-
-      size_t activeFrameIndex { 0 };
-      FrameList frames {};
-      DeltaTimeList deltaTimes {};
-      std::chrono::high_resolution_clock::time_point lastTimePoint {};
-    };
-
-    using AnimationMap = std::map<string, Animation>;
-
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+    size_t _activeFrame { 0 };
+    AnimationMap _animations {};
+    AnimationMap::iterator _activeAnimation { _animations.end() };
+    FrameListenerController::FrameStartedCallback _animationCallback { nullptr };
+    bool _xFlipped { false };
+    bool _yFlipped { false };
 
   public:
 
@@ -101,15 +104,6 @@ namespace Lore {
     bool getXFlipped() const;
     bool getYFlipped() const;
 
-  private:
-
-    size_t _activeFrame { 0 };
-    AnimationMap _animations {};
-    AnimationMap::iterator _activeAnimation { _animations.end() };
-    FrameListenerController::FrameStartedCallback _animationCallback { nullptr };
-    bool _xFlipped { false };
-    bool _yFlipped { false };
-
   };
 
   // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
@@ -117,18 +111,15 @@ namespace Lore {
   class LORE_EXPORT SpriteAnimationSet : public Alloc<SpriteAnimationSet>, public IResource
   {
 
+    AnimationMap _animations {};
+
   public:
 
     SpriteAnimationSet() = default;
     ~SpriteAnimationSet() override = default;
 
-    void addAnimation( const string& name, const SpriteController::Animation& animation );
-
-    const SpriteController::AnimationMap& getAnimations() const;
-
-  private:
-
-    SpriteController::AnimationMap _animations {};
+    void addAnimation( const string& name, const Animation& animation );
+    const AnimationMap& getAnimations() const;
 
   };
 

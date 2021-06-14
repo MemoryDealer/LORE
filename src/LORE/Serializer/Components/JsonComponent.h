@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -39,7 +39,6 @@ namespace Lore {
     virtual ~JsonSerializerComponent() override;
 
     virtual void serialize( const string& file ) override;
-
     virtual bool deserialize( const string& file ) override;
 
   };

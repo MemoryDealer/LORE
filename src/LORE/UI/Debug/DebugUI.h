@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -38,18 +38,22 @@
 
 namespace Lore {
 
+  enum class Panel
+  {
+    PerformanceStats,
+    GFX,
+    Console,
+    Memory
+  };
+
   class DebugUI : public UI
   {
 
-  public:
+    Panel _panel { Panel::Console };
 
-    enum class Panel
-    {
-      PerformanceStats,
-      GFX,
-      Console,
-      Memory
-    };
+    DebugUI_Console _console {};
+    DebugUI_PerformanceStats _perfStats {};
+    DebugUI_GFX _gfx {};
 
   public:
 
@@ -65,14 +69,6 @@ namespace Lore {
 
     void setEnabled( const bool enabled ) override;
     void setWindowDimensions( const Dimensions& dimensions ) override;
-
-  private:
-
-    Panel _panel { Panel::Console };
-
-    DebugUI_Console _console {};
-    DebugUI_PerformanceStats _perfStats {};
-    DebugUI_GFX _gfx {};
 
   };
 

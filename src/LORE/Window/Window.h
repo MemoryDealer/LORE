@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -45,7 +45,7 @@ namespace Lore {
       FullscreenBorderless
     };
 
-  public:
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     Window();
 
@@ -69,11 +69,8 @@ namespace Lore {
     // Modifiers.
 
     virtual void setTitle( const string& title );
-
     virtual void setDimensions( const int width, const int height );
-
     virtual void setMode( const Mode& mode );
-
     virtual void setActive() = 0;
 
     //
@@ -120,9 +117,7 @@ namespace Lore {
     }
 
     const RenderView& getRenderView( const int32_t idx ) const;
-
     ResourceControllerPtr getResourceController() const;
-
     StockResourceControllerPtr getStockResourceController() const;
 
     void onKeyDown( const Keycode code ) override;
@@ -131,7 +126,7 @@ namespace Lore {
 
     using RenderViewList = std::vector<RenderView>;
 
-  protected:
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
     string _title {};
     Dimensions _dimensions {};

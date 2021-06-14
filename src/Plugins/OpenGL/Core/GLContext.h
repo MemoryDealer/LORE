@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -36,25 +36,26 @@ namespace Lore { namespace OpenGL {
   class Context final : public Lore::Context
   {
 
+    GLFWwindow* _offscreenContextWindow { nullptr };
+
   public:
 
     explicit Context() noexcept;
+    ~Context() override;
 
-    virtual ~Context() override;
-
-    virtual void initConfiguration() override;
+    void initConfiguration() override;
 
     //
     // Rendering.
 
-    virtual void renderFrame( const float lagMultiplier = 1.f ) override;
+    void renderFrame( const float lagMultiplier = 1.f ) override;
 
     //
     // Factory/Destruction functions.
 
     ///
     /// \brief Creates a window and returns a handle to it.
-    virtual WindowPtr createWindow( const string& title,
+    WindowPtr createWindow( const string& title,
                                     const uint32_t width,
                                     const uint32_t height,
                                     const int sampleCount,
@@ -64,20 +65,16 @@ namespace Lore { namespace OpenGL {
     ///
     /// \brief Destroys specified window. If this is the last remaining window,
     ///     the context will no longer be active.
-    virtual void destroyWindow( WindowPtr window ) override;
+    void destroyWindow( WindowPtr window ) override;
 
     ///
     /// \brief Creates a scene, assigns, the specified renderer, and returns a handle to it.
-    virtual Lore::ScenePtr createScene( const string& name, const RendererType& rt ) override;
+    Lore::ScenePtr createScene( const string& name, const RendererType& rt ) override;
 
     //
     // Information.
 
-    virtual string getRenderPluginName() const override;
-
-  private:
-
-    GLFWwindow* _offscreenContextWindow { nullptr };
+    string getRenderPluginName() const override;
 
   };
 

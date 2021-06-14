@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -30,14 +30,18 @@ namespace Lore {
   class AABB final
   {
 
+    NodePtr _node { nullptr };
+    BoxPtr _box { nullptr };
+    glm::vec3 _min {};
+    glm::vec3 _max {};
+    glm::vec3 _dimensions {};
+
   public:
 
     explicit AABB( NodePtr node );
-
     ~AABB();
 
     void update();
-
     bool intersects( const AABB& rhs ) const;
 
     //
@@ -72,14 +76,6 @@ namespace Lore {
     {
       return _dimensions;
     }
-
-  private:
-
-    NodePtr _node { nullptr };
-    BoxPtr _box { nullptr };
-    glm::vec3 _min {};
-    glm::vec3 _max {};
-    glm::vec3 _dimensions {};
 
   };
 

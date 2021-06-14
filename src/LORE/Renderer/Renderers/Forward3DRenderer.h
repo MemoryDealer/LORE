@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -33,17 +33,50 @@
 
 namespace Lore {
 
+  using RenderQueueList = std::vector<RenderQueue>;
+  using ActiveRenderQueueList = std::map<uint, RenderQueue&>;
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
   ///
   /// \class Forward3DRenderer
   /// \brief A basic 3D forward renderer.
   class Forward3DRenderer : public Lore::Renderer
   {
 
-  public:
+    void _presentPostProcessing( const RenderView& rv,
+      const WindowPtr window );
 
-    const size_t DefaultRenderQueueCount = 100;
+    void _clearRenderQueues() override;
+
+    void _activateQueue( const uint id,
+      RenderQueue& rq );
+
+    void _renderShadowMaps( const RenderView& rv,
+      const RenderQueue& queue );
+
+    void _renderSkybox( const RenderView& rv,
+      const glm::mat4& viewProjection ) const;
+
+    void _renderSolids( const RenderView& rv,
+      const RenderQueue& queue,
+      const glm::mat4& viewProjection ) const;
+
+    void _renderTransparents( const RenderView& rv,
+      const RenderQueue& queue,
+      const glm::mat4& viewProjection ) const;
+
+    void _renderBoxes( const RenderQueue& queue,
+      const glm::mat4& viewProjection ) const;
 
     // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    RenderQueueList _queues { };
+    ActiveRenderQueueList _activeQueues { };
+
+    CameraPtr _camera { nullptr };
+
+  public:
 
     Forward3DRenderer();
     ~Forward3DRenderer() override = default;
@@ -62,45 +95,6 @@ namespace Lore {
 
     void present( const RenderView& rv,
                   const WindowPtr window ) override;
-
-  private:
-
-    void _presentPostProcessing( const RenderView& rv,
-                                 const WindowPtr window );
-
-    void _clearRenderQueues() override;
-
-    void _activateQueue( const uint id,
-                        RenderQueue& rq );
-
-    void _renderShadowMaps( const RenderView& rv,
-                            const RenderQueue& queue );
-
-    void _renderSkybox( const RenderView& rv,
-                        const glm::mat4& viewProjection ) const;
-
-    void _renderSolids( const RenderView& rv,
-                        const RenderQueue& queue,
-                        const glm::mat4& viewProjection ) const;
-
-    void _renderTransparents( const RenderView& rv,
-                              const RenderQueue& queue,
-                              const glm::mat4& viewProjection ) const;
-
-    void _renderBoxes( const RenderQueue& queue,
-                       const glm::mat4& viewProjection ) const;
-
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-    using RenderQueueList = std::vector<RenderQueue>;
-    using ActiveRenderQueueList = std::map<uint, RenderQueue&>;
-
-    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
-
-    RenderQueueList _queues { };
-    ActiveRenderQueueList _activeQueues { };
-
-    CameraPtr _camera { nullptr };
 
   };
 

@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -42,8 +42,15 @@ namespace Lore {
 
   public:
 
-    RenderTarget() = default;
+    TexturePtr _texture { nullptr };
+    uint32_t _width { 0 };
+    uint32_t _height { 0 };
+    real _aspectRatio { 0.f };
+    u32 _sampleCount { 0 };
 
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    RenderTarget() = default;
     virtual ~RenderTarget() = default;
 
     virtual void init( const uint32_t width, const uint32_t height, const uint32_t sampleCount ) = 0;
@@ -73,14 +80,6 @@ namespace Lore {
     {
       return _aspectRatio;
     }
-
-    ///
-
-    TexturePtr _texture { nullptr };
-    uint32_t _width { 0 };
-    uint32_t _height { 0 };
-    real _aspectRatio { 0.f };
-    u32 _sampleCount { 0 };
 
   };
 

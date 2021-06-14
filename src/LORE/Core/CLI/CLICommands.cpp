@@ -3,7 +3,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -50,7 +50,7 @@ namespace LocalNS {
         auto pos = CLI::ToVec3( posStr );
 
         try {
-          auto node = CLI::GetActiveScene()->getNode( nodeName );
+          auto node = CLI::ActiveScene->getNode( nodeName );
           node->setPosition( pos );
         }
         catch ( const Lore::Exception& e ) {
@@ -77,7 +77,7 @@ namespace LocalNS {
         auto offset = CLI::ToVec3( offsetStr );
 
         try {
-          auto node = CLI::GetActiveScene()->getNode( nodeName );
+          auto node = CLI::ActiveScene->getNode( nodeName );
           node->translate( offset );
         }
         catch ( const Lore::Exception& e ) {
@@ -104,7 +104,7 @@ namespace LocalNS {
         auto lightColor = CLI::ToVec4( lightColorStr );
 
         try {
-          auto light = CLI::GetActiveScene()->getLight( Lore::Light::Type::Point, lightName );
+          auto light = CLI::ActiveScene->getLight( Lore::Light::Type::Point, lightName );
           light->setDiffuse( lightColor );
           light->setSpecular( lightColor );
         }

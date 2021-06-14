@@ -3,7 +3,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -49,7 +49,7 @@ using namespace Lore;
 namespace Local {
 
   static RenderPluginLoader __rpl;
-  static std::vector<Context::ErrorListener> __errorListeners;
+  static std::vector<ErrorListener> __errorListeners;
   static Context* _activeContextPtr = nullptr;
 
 }
@@ -92,11 +92,11 @@ void Context::initConfiguration()
   _poolCluster.registerPool<PointLight>( 16 );
   _poolCluster.registerPool<SpotLight>( 4 );
 
-  _poolCluster.registerPool<Box>( 4096 );
+  _poolCluster.registerPool<Box>( 20000 );
   _poolCluster.registerPool<Prefab>( 128 );
   _poolCluster.registerPool<Material>( 128 );
   _poolCluster.registerPool<Model>( 64 );
-  _poolCluster.registerPool<Node>( 4096 );
+  _poolCluster.registerPool<Node>( 20000 );
   _poolCluster.registerPool<Scene>( 4 );
   _poolCluster.registerPool<Sprite>( 32 );
   _poolCluster.registerPool<SpriteAnimationSet>( 8 );

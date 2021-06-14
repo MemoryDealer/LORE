@@ -3,7 +3,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -79,7 +79,7 @@ void Material::setTextureScrollSpeed( const glm::vec2& scroll )
   // TODO: Put all texture scrolling in a single function (e.g., pass ref to offset).
   if ( !_texCoordCallback ) {
     // Register a callback to update the texture coordinates per frame.
-    _texCoordCallback = [this] ( const FrameListener::FrameEvent& e ) {
+    _texCoordCallback = [this] ( const FrameEvent& e ) {
       _texCoordOffset += ( _texCoordScrollSpeed );
     };
 

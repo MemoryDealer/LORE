@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -42,23 +42,59 @@
 
 namespace Lore {
 
+  using SceneRegistry = Registry<std::unordered_map, Scene>;
+  using WindowRegistry = Registry<std::map, Window>;
+  using CameraMap = std::unordered_map<string, std::unique_ptr<Camera>>;
+  using RendererMap = std::unordered_map <Lore::RendererType, std::unique_ptr<Lore::Renderer>>;
+
+  using ErrorListener = void( * )( int, const char* );
+
   ///
   /// \class Context
   /// \brief The single owner of all Lore functionality.
   class LORE_EXPORT Context : public KeyListener
   {
 
-  public:
+  protected:
+
+    PoolCluster _poolCluster { "Primary" };
+    std::unique_ptr<FrameListenerController> _frameListenerController { std::make_unique<FrameListenerController>() };
+
+    WindowRegistry _windowRegistry {};
+    SceneRegistry _sceneRegistry {};
+
+    CameraMap _cameras { };
+    RendererMap _renderers {};
+
+    WindowPtr _activeWindow { nullptr };
+
+    std::unique_ptr<InputController> _inputController { nullptr };
+    std::unique_ptr<IRenderAPI> _renderAPI { nullptr };
+
+    // True if one or more Windows exist in Context.
+    bool _active { false };
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    //
+    // Notification handlers.
 
     ///
-    /// \typedef ErrorListener
-    /// \brief Function pointer to an error listener callback.
-    using ErrorListener = void( *)( int, const char* );
+    /// \brief Handler for window event notifications.
+    void onWindowEvent( const Notification& n );
+
+    ///
+    /// \brief To be called by derived render plugin Context classes, so the
+    ///     Context object can know the rendering API version.
+    void setAPIVersion( const int major, const int minor );
+
+    ///
+    /// \brief Called on a render plugin error. Notifies all registered listeners.
+    static void ErrorCallback( int error, const char* desc );
 
   public:
 
     Context() noexcept;
-
     virtual ~Context() override;
 
     virtual void initConfiguration();
@@ -264,53 +300,6 @@ namespace Lore {
     ///
     /// \brief Used for processing default keyboard shortcuts (such as for the DebugUI).
     void onKeyDown( const Keycode code ) override;
-
-  protected:
-
-    //
-    // Notification handlers.
-
-    ///
-    /// \brief Handler for window event notifications.
-    void onWindowEvent( const Notification& n );
-
-    ///
-    /// \brief To be called by derived render plugin Context classes, so the
-    ///     Context object can know the rendering API version.
-    void setAPIVersion( const int major, const int minor );
-
-  protected:
-
-    ///
-    /// \brief Called on a render plugin error. Notifies all registered listeners.
-    static void ErrorCallback( int error, const char* desc );
-
-  protected:
-
-    using SceneRegistry = Registry<std::unordered_map, Scene>;
-    using WindowRegistry = Registry<std::map, Window>;
-
-    using CameraMap = std::unordered_map<string, std::unique_ptr<Camera>>;
-    using RendererMap = std::unordered_map <Lore::RendererType, std::unique_ptr<Lore::Renderer>>;
-
-  protected:
-
-    PoolCluster _poolCluster { "Primary" };
-    std::unique_ptr<FrameListenerController> _frameListenerController { std::make_unique<FrameListenerController>() };
-
-    WindowRegistry _windowRegistry {};
-    SceneRegistry _sceneRegistry {};
-
-    CameraMap _cameras { };
-    RendererMap _renderers {};
-
-    WindowPtr _activeWindow { nullptr };
-
-    std::unique_ptr<InputController> _inputController { nullptr };
-    std::unique_ptr<IRenderAPI> _renderAPI { nullptr };
-
-    // True if one or more Windows exist in Context.
-    bool _active { false };
 
   };
 

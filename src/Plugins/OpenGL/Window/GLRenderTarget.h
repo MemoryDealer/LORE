@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -36,6 +36,21 @@ namespace Lore { namespace OpenGL {
                          public Alloc<GLRenderTarget>
   {
 
+    static constexpr auto MaxFBO = 2;
+
+    GLuint _fbo[MaxFBO] { 0 };
+    u32 _fboCount = 1;
+    GLuint _intermediateFBO[MaxFBO] { 0 };
+    GLuint _rbo { 0 };
+
+    TexturePtr _intermediateTexture { nullptr };
+
+    bool _multiSampling { false };
+
+    static constexpr auto MaxColorAttachments = 8;
+    u32 _colorAttachmentCount { 1 };
+    u32 _colorAttachments[MaxColorAttachments] {};
+
   public:
 
     GLRenderTarget() = default;
@@ -53,22 +68,6 @@ namespace Lore { namespace OpenGL {
 
     void initColorAttachments();
 
-  private:
-
-    static constexpr auto MaxFBO = 2;
-
-    GLuint _fbo[MaxFBO] { 0 };
-    u32 _fboCount = 1;
-    GLuint _intermediateFBO[MaxFBO] { 0 };
-    GLuint _rbo { 0 };
-
-    TexturePtr _intermediateTexture { nullptr };
-
-    bool _multiSampling { false };
-
-    static constexpr auto MaxColorAttachments = 8;
-    u32 _colorAttachmentCount { 1 };
-    u32 _colorAttachments[MaxColorAttachments] {};
   };
 
 }}

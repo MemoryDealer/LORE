@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -41,43 +41,38 @@ namespace Lore {
     class LORE_EXPORT Singleton
     {
 
-    public:
-
-        Singleton()
-        {
-        }
-
-        virtual ~Singleton()
-        {
-        }
-
-        ///
-        /// \brief Allocates the singleton.
-        static void Initialize()
-        {
-            _instance = std::make_unique<T>();
-        }
-
-        ///
-        /// \brief Frees the singleton from memory.
-        static void Destroy()
-        {
-            _instance.reset();
-        }
-
-        static T& Get()
-        {
-            return *_instance;
-        }
-
-        static T* GetPtr()
-        {
-            return _instance;
-        }
-
     protected:
 
-        static std::unique_ptr<T> _instance;
+      static std::unique_ptr<T> _instance;
+
+    public:
+
+      Singleton() = default;
+      virtual ~Singleton() = default;
+
+      ///
+      /// \brief Allocates the singleton.
+      static void Initialize()
+      {
+          _instance = std::make_unique<T>();
+      }
+
+      ///
+      /// \brief Frees the singleton from memory.
+      static void Destroy()
+      {
+          _instance.reset();
+      }
+
+      static T& Get()
+      {
+          return *_instance;
+      }
+
+      static T* GetPtr()
+      {
+          return _instance;
+      }
 
     };
 

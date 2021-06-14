@@ -3,7 +3,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -224,7 +224,7 @@ bool JsonSerializerComponent::deserialize( const string& file )
     } break;
 
     case rapidjson::Type::kArrayType: {
-      SerializerValue::Array values;
+      Array values;
       // Add all array values.
       for ( auto arrayIt = value.Begin(); arrayIt != value.End(); ++arrayIt ) {
         SerializerValue v( key.GetString() );

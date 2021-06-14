@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -37,6 +37,21 @@ namespace Lore {
   class LORE_EXPORT SceneLoader final
   {
 
+    Serializer _serializer {};
+    ScenePtr _scene { nullptr };
+    string _resourceGroupName {};
+    bool _unloadPrefabs { false };
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    void _loadProperties();
+    void _loadPrefabs();
+    void _loadLighting();
+    void _loadLayout();
+
+    void _processMaterialSettings( const SerializerValue& value, PrefabPtr prefab );
+    void _processNode( const string& nodeName, const SerializerValue& nodeData, const NodePtr parent = nullptr );
+
   public:
 
     SceneLoader() = default;
@@ -46,23 +61,6 @@ namespace Lore {
 
     // If unload is true, all prefabs in scene's resource group will be unloaded first.
     void setUnloadPrefabs( const bool unload );
-
-  private:
-
-    void _loadProperties();
-    void _loadPrefabs();
-    void _loadLighting();
-    void _loadLayout();
-
-    void _processMaterialSettings( const SerializerValue& value, PrefabPtr prefab);
-    void _processNode( const string& nodeName, const SerializerValue& nodeData, const NodePtr parent = nullptr );
-
-  private:
-
-    Serializer _serializer {};
-    ScenePtr _scene { nullptr };
-    string _resourceGroupName {};
-    bool _unloadPrefabs { false };
 
   };
 

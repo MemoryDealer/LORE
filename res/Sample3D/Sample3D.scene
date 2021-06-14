@@ -23,7 +23,7 @@
     },
     "RTTCube": {
       "Model": "res/Sample3D/Models/quad.fbx",
-      "Instanced": 500,
+      "Instanced": 5000,
       "MaterialSettings": {
         "CastShadows": false
       }
@@ -134,14 +134,14 @@
       "Ambient": [0.05, 0.05, 0.05],
       "Diffuse": [0.3, 0.0, 0.0],
       "Specular": [0.3, 0.0, 0.0],
-      "Attenuation": [15.5, 0.5, 0.1, 0.1]
+      "Attenuation": [32.0, 1.0, 0.14, 0.07]
     },
     "LightGreen": {
       "Type": "Point",
       "Ambient": [0.05, 0.05, 0.05],
       "Diffuse": [0.0, 0.3, 0.0],
       "Specular": [0.0, 0.3, 0.0],
-      "Attenuation": [15.5, 0.5, 0.1, 0.1]
+      "Attenuation": [32.0, 1.0, 0.14, 0.07]
     },
     "LightBlue": {
       "Type": "Point",
@@ -149,6 +149,13 @@
       "Diffuse": [0.0, 0.0, 0.3],
       "Specular": [0.0, 0.0, 0.3],
       "Attenuation": [32.0, 1.0, 0.14, 0.07]
+    },
+    "StarLight": {
+      "Type": "Point",
+      "Ambient": [0.05, 0.05, 0.05],
+      "Diffuse": [0.8, 0.8, 0.1],
+      "Specular": [0.8, 0.8, 0.1],
+      "Attenuation": [500.0, 30.0, 15.0, 10.0]
     }
   },
   "Layout": {
@@ -249,7 +256,7 @@
         "Scale": [18.0, 10.0, 10.0]
       },
       "dorrieParent": {
-        "Position": [0.0, 3.0, 63.5],
+        "Position": [0.0, 9.0, 63.5],
         "ChildNodes": {
           "dorrie": {
             "Prefab": "dorrie",
@@ -259,6 +266,7 @@
           },
           "dorrieStar": {
             "Prefab": "star",
+            "Light": "StarLight",
             "Scale": [1.0, 1.0, 1.0]
           }
         }

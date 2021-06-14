@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -35,6 +35,19 @@ namespace Lore { namespace OpenGL {
                  public Alloc<GLMesh>
   {
 
+    GLuint _vbo { 0 }; // Vertex buffer object.
+    GLuint _vao { 0 }; // Vertex array object.
+    GLuint _ebo { 0 }; // Element buffer object.
+
+    GLuint _instancedVBO { 0 };
+    std::vector<glm::mat4> _instancedMatrices { };
+
+    std::vector<GLfloat> _vertices { };
+    std::vector<GLuint> _indices { };
+
+    GLenum _mode { GL_TRIANGLE_STRIP };
+    GLenum _glType { GL_UNSIGNED_INT };
+
   public:
 
     GLMesh() = default;
@@ -48,21 +61,6 @@ namespace Lore { namespace OpenGL {
 
     void draw( const GPUProgramPtr program, const size_t instanceCount, const bool bindTextures, const bool applyMaterial = true ) override;
     void draw( const Vertices& verts ) override;
-
-  private:
-
-    GLuint _vbo { 0 }; // Vertex buffer object.
-    GLuint _vao { 0 }; // Vertex array object.
-    GLuint _ebo { 0 }; // Element buffer object.
-
-    GLuint _instancedVBO { 0 };
-    std::vector<glm::mat4> _instancedMatrices { };
-
-    std::vector<GLfloat> _vertices { };
-    std::vector<GLuint> _indices { };
-
-    GLenum _mode { GL_TRIANGLE_STRIP };
-    GLenum _glType { GL_UNSIGNED_INT };
 
   };
 

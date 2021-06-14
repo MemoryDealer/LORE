@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -31,33 +31,30 @@
 
 namespace Lore {
 
+  ///
+  /// \class SceneGraphVisitor
+  /// \brief Traverses a scene graph (e.g., a Node and all of its children) and
+  ///     carries down transformation updates as needed.
+  class LORE_EXPORT SceneGraphVisitor
+  {
+
+    std::stack<glm::mat4> _stack;
+    NodePtr _node;
+
+  public:
+
     ///
-    /// \class SceneGraphVisitor
-    /// \brief Traverses a scene graph (e.g., a Node and all of its children) and
-    ///     carries down transformation updates as needed.
-    class LORE_EXPORT SceneGraphVisitor
-    {
+    /// \brief Constructor that takes root node as parameter, updates its
+    ///     world transform, and updates the scale of all children.
+    SceneGraphVisitor( NodePtr root );
+    ~SceneGraphVisitor() = default;
 
-    public:
+    ///
+    /// \brief Recursive function which updates the transformation matrix
+    ///     of all child nodes.
+    void visit( Renderer* renderer, bool parentDirty = false );
 
-        ///
-        /// \brief Constructor that takes root node as parameter, updates its
-        ///     world transform, and updates the scale of all children.
-        SceneGraphVisitor( NodePtr root );
-
-        ~SceneGraphVisitor();
-
-        ///
-        /// \brief Recursive function which updates the transformation matrix
-        ///     of all child nodes.
-        void visit( Renderer* renderer, bool parentDirty = false );
-
-    private:
-
-        std::stack<glm::mat4> _stack;
-        NodePtr _node;
-
-    };
+  };
 
 }
 

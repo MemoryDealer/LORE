@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -35,7 +35,23 @@
 
 namespace Lore {
 
+  enum class LogLevel
+  {
+    Critical,       // Program must terminate.
+    Error,          // Something failed, which may or may not be fatal.
+    Warning,        // A possible concern.
+    Info,           // Similar to warning, however this reports general information.
+    Trace           // For tracing entry/exit of routines or blocks.
+  };
 
+  struct LogMessage
+  {
+    LogLevel lvl;
+    string file;
+    string line;
+    string function;
+    string text;
+  };
 
   ///
   /// \class Logger
@@ -45,58 +61,8 @@ namespace Lore {
   class Logger final
   {
 
-  public:
-
-    enum class Level
-    {
-      Critical,       // Program must terminate.
-      Error,          // Something failed, which may or may not be fatal.
-      Warning,        // A possible concern.
-      Info,           // Similar to warning, however this reports general information.
-      Trace           // For tracing entry/exit of routines or blocks.
-    };
-
-    struct Message
-    {
-      Level lvl;
-      string file;
-      string line;
-      string function;
-      string text;
-    };
-
-  public:
-
-    explicit Logger( const string& filename );
-
-    ~Logger();
-
-    //
-    // Logging functions.
-
-    void log( const Message& msg );
-
-    ///
-    /// \brief Wakes up the logger thread and joins.
-    void flush();
-
-    bool levelEnabled( const Level lvl );
-
-    //
-    // Setters.
-
-    void setLevel( const Level lvl );
-
-  private:
-
-    void __logger();
-
-  private:
-
-    Level _level;
-
     std::ofstream _stream;
-    std::queue<Message> _messageQueue;
+    std::queue<LogMessage> _messageQueue;
 
     //
     // Provide thread materials, as the actual output to the log file is done
@@ -105,9 +71,31 @@ namespace Lore {
     std::thread _thread;
     std::mutex _mutex;
     std::condition_variable _cv;
-    std::atomic<bool> _active;
+    std::atomic<bool> _active { true };
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    void __logger();
+
+  public:
+
+    LogLevel level { LogLevel::Info };
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    explicit Logger( const string& filename );
+    ~Logger();
+
+    void log( const LogMessage& msg );
+
+    // Wakes up the logger thread and joins.
+    void flush();
+
+    bool levelEnabled( const LogLevel lvl );
 
   };
+
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
   class LORE_EXPORT Log final
   {
@@ -115,27 +103,29 @@ namespace Lore {
   public:
 
     static void WriteLog( const bool internal,
-                          const Logger::Level lvl,
+                          const LogLevel lvl,
                           const char* file,
                           const int line,
                           const char* function,
                           const char* format,
                           ... );
 
-    static bool LevelEnabled( const Logger::Level lvl );
+    static bool LevelEnabled( const LogLevel lvl );
 
     static void Alloc();
     static void Delete();
 
   };
 
+  // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
   //
   // Helper macros.
 
 #define LogWrite(lvl, format, ...)\
   do {\
-    if ( Log::LevelEnabled( Logger::Level::lvl ) ) {\
-      Log::WriteLog( true, Logger::Level::lvl, __FILE__, __LINE__, __FUNCTION__, format, ##__VA_ARGS__);\
+    if ( Log::LevelEnabled( LogLevel::lvl ) ) {\
+      Log::WriteLog( true, LogLevel::lvl, __FILE__, __LINE__, __FUNCTION__, format, ##__VA_ARGS__);\
     }\
   } while ( false )
 

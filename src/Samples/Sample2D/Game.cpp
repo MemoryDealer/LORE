@@ -3,7 +3,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -72,7 +72,7 @@ void Game::loadScene()
   _camera = _context->createCamera( "core", Lore::Camera::Type::Type2D );
 
   // TODO: This is a hack that should be taken care of internally.
-  Lore::CLI::SetActiveScene( _scene );
+  Lore::CLI::ActiveScene = _scene;
 
   // We must setup a RenderView to inform Lore how to render this scene in relation
   // to the window. We provide a viewport of [0, 0, 1, 1] to render the scene to the

@@ -3,7 +3,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -70,7 +70,7 @@ ConfigValue Config::GetValue( const string& key )
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-float DebugConfig::omniBias = 0.184f;
+float DebugConfig::omniBias = 0.275f;
 float DebugConfig::hdrExposure = 2.5f;
 bool DebugConfig::bloomEnabled = true;
 float DebugConfig::bloomThreshold = 10.0f;

@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -35,28 +35,31 @@ namespace Lore { namespace OpenGL {
                     public Alloc<GLTexture>
   {
 
+    static constexpr u32 MaxTextures = 2;
+
+    GLuint _id[MaxTextures] { 0 };
+    u32 _texCount = 1;
+    GLenum _target { GL_TEXTURE_2D };
+
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
+
+    void _createGLTexture( const unsigned char* pixels, const int width, const int height, const bool srgb = true, const bool genMipMaps = true );
+
   public:
 
     GLTexture() = default;
-
     ~GLTexture() override;
 
     void loadFromFile( const string& file, const bool srgb ) override;
-
     void loadCubemap( const std::vector<string>& files ) override;
 
     void create( const uint32_t width, const uint32_t height, const uint32_t sampleCount ) override;
-
     void create( const int width, const int height, const Color& color ) override;
-
     void createDepth( const uint32_t width, const uint32_t ) override;
-
     void createCubemap( const uint32_t width, const uint32_t height ) override;
-
     void createFloatingPoint( const u32 width, const u32 height, const u32 sampleCount, const u32 texCount ) override;
 
     void bind( const u32 activeIdx = 0, const u32 texIdx = 0 ) override;
-
     void setDefaultActiveTexture() override;
 
     //
@@ -64,20 +67,8 @@ namespace Lore { namespace OpenGL {
 
     unsigned int getID( const u32 idx = 0 ) const override
     {
-        return _id[idx];
+      return _id[idx];
     }
-
-  private:
-
-    void _createGLTexture( const unsigned char* pixels, const int width, const int height, const bool srgb = true, const bool genMipMaps = true );
-
-  private:
-
-    static constexpr u32 MaxTextures = 2;
-
-    GLuint _id[MaxTextures] { 0 };
-    u32 _texCount = 1;
-    GLenum _target { GL_TEXTURE_2D };
 
   };
 

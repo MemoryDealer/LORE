@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -31,59 +31,50 @@
 
 namespace Lore { namespace OpenGL {
 
-    class GLGPUProgram : public Lore::GPUProgram,
-                         public Alloc<GLGPUProgram>
-    {
+  class GLGPUProgram : public Lore::GPUProgram,
+                        public Alloc<GLGPUProgram>
+  {
 
-    public:
+    using UniformMap = std::unordered_map<string, GLint>;
 
-        GLGPUProgram();
-        ~GLGPUProgram() override;
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        void init() override;
+    GLuint _program;
+    UniformMap _uniforms;
+    GLint _transform;
 
-        void attachShader( ShaderPtr shader ) override;
+    // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: //
 
-        bool link() override;
+    GLuint _getUniform( const string& id );
+    void _updateUniform( const GLint id, const glm::mat4& m );
 
-        void use() override;
+  public:
 
-        //
-        // Uniform value updating.
+    GLGPUProgram();
+    ~GLGPUProgram() override;
 
-        void addTransformVar( const string& id ) override;
+    void init() override;
+    void attachShader( ShaderPtr shader ) override;
+    bool link() override;
+    void use() override;
 
-        void setTransformVar( const glm::mat4& m ) override;
+    //
+    // Uniform value updating.
 
-        void addUniformVar( const string& id ) override;
+    void addTransformVar( const string& id ) override;
+    void setTransformVar( const glm::mat4& m ) override;
 
-        void setUniformVar( const string& id, const glm::mat4& m ) override;
-        void setUniformVar( const string& id, const glm::vec2& v ) override;
-        void setUniformVar( const string& id, const glm::vec3& v ) override;
-        void setUniformVar( const string& id, const glm::vec4& v ) override;
-        void setUniformVar( const string& id, const real r ) override;
-        void setUniformVar( const string& id, const uint32_t i ) override;
-        void setUniformVar( const string& id, const int i ) override;
+    void addUniformVar( const string& id ) override;
 
-    private:
+    void setUniformVar( const string& id, const glm::mat4& m ) override;
+    void setUniformVar( const string& id, const glm::vec2& v ) override;
+    void setUniformVar( const string& id, const glm::vec3& v ) override;
+    void setUniformVar( const string& id, const glm::vec4& v ) override;
+    void setUniformVar( const string& id, const real r ) override;
+    void setUniformVar( const string& id, const uint32_t i ) override;
+    void setUniformVar( const string& id, const int i ) override;
 
-        using UniformMap = std::unordered_map<string, GLint>;
-
-    private:
-
-        GLuint _getUniform( const string& id );
-
-        void _updateUniform( const GLint id, const glm::mat4& m );
-
-    private:
-
-        GLuint _program;
-
-        UniformMap _uniforms;
-
-        GLint _transform;
-
-    };
+  };
 
 }}
 

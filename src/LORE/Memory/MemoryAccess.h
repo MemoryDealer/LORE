@@ -4,7 +4,7 @@
 // This source file is part of LORE
 // ( Lightweight Object-oriented Rendering Engine )
 //
-// Copyright (c) 2016-2017 Jordan Sparks
+// Copyright (c) 2017-2021 Jordan Sparks
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files ( the "Software" ), to deal
@@ -37,17 +37,13 @@ namespace Lore {
     class LORE_EXPORT MemoryAccess final
     {
 
+      friend class Context;
+
+      static void _SetPrimaryPoolCluster( PoolCluster* pc );
+
     public:
 
         static PoolCluster* GetPrimaryPoolCluster();
-
-    private:
-
-        static void _SetPrimaryPoolCluster( PoolCluster* pc );
-
-    private:
-
-        friend class Context;
 
     };
 
