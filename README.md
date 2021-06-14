@@ -1,6 +1,6 @@
 # LORE - Lightweight Object-oriented Rendering Engine
 
-### NOTE: **I do not condone object-oriented programming as _the way_ of developing software. This project was partially an experiment in OOP.**
+### NOTE: **I do not condone object-oriented programming as The Way™ of developing software. This project was partially an experiment in OOP.**
 
 ### I recommend [this video](https://www.youtube.com/watch?v=QM1iUe6IofM) on the topic of OOP.
 <br/>
@@ -130,4 +130,4 @@ E.g.,
 <br/>
 
 # Architecture
-**WIP**
+**WIP ... pretty charts and stuff coming soon**
