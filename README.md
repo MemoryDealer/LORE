@@ -1,8 +1,8 @@
 # LORE - Lightweight Object-oriented Rendering Engine
 
-### NOTE: **I do not condone object-oriented programming as The Way™ of developing software. This project was partially an experiment in OOP.**
+#### NOTE: **I do not condone object-oriented programming as The Way™ of developing software. This project was partially an experiment in OOP.**
 
-### I recommend [this video](https://www.youtube.com/watch?v=QM1iUe6IofM) on the topic of OOP.
+#### I recommend [this video](https://www.youtube.com/watch?v=QM1iUe6IofM) on the topic of OOP.
 <br/>
 
 ### **[Jump to Building](#building)**
@@ -17,51 +17,23 @@
 ![Lore5](images/lore5.gif)
 ![Lore6](images/lore6.gif)
 
-LORE is a 2D and 3D rendering engine intended to provide an abstraction layer on graphics APIs, while also providing built-in shaders, rendering algorithms, and scene management, to name a few. I started this project to learn more about graphics, modern C++, and software architecture. It is also intended to be lightweight with minimal dependencies (hence the name).
+LORE is a 2D and 3D rendering engine intended to provide an abstraction layer on graphics APIs, while also providing built-in shaders, rendering algorithms, and scene management, to name a few. I started this project to learn more about software architecture, graphics, and modern C++. My focus was more on engine architecture so the graphics techniques are a bit out of date. It is also intended to be lightweight with minimal dependencies (hence the name).
 
 ### Engine Features
-- Scene graph
-- Dynamically loaded render API plugins
-- Resource file management (parsing, indexing)
-- Robust material/shading pipeline (easy to create custom effects)
-- Custom memory management (memory pooling)
-- Uber shader generation at runtime
-- Data-driven configuration and scene loading
-- In-engine CLI
+Scene graph, multiple scene rendering, graphics resource management, resource file management (parsing, indexing), dynamically loaded render API plugins, robust material/shading pipeline (easy to create custom effects), custom memory management (memory pooling), uber shader generation at runtime, data-driven configuration and scene loading, in-engine CLI, serialization API (currently JSON support with rapidJSON).
 
 ### Graphics Features
-- Realtime lighting (Blinn-Phong)
-- Render to texture
-- Normal mapping
-- Shadows (directional and omnidirectional)
-- Post processing (HDR, bloom)
-- Instancing
-- Anti-aliasing
-- Transparency
-- UI (powered by ImGui)
-- Model loading (with help from Assimp)
-- Forward 2D/3D renderer
+Realtime lighting (Blinn-Phong), render to texture, tangent space normal mapping, dynamic omnidirectional/directional shadow mapping, post processing (HDR with exposure based tone mapping, bloom), skyboxes, instancing, anti-aliasing, transparency, UI (powered by ImGui), model loading (with help from Assimp), forward 2D/3D renderer.
 
 ### Feature Wishlist (Basic)
-- Deferred renderer
-- Reflection probes
-- Frustum culling
-- Scene editing in-engine
-- Gradient background/skybox
-- SSAO
-- Grid
+Deferred renderer, reflection probes, frustum culling, scene editing in-engine, gradient background/skybox, SSAO, grid.
 
 ### Feature Wishlist (Big Dreams)
-- Vulkan and D3D12 render plugins
-- PBR
-- Better shadows (fix peter-panning, flickering)
-
-## Using the Engine
-The main idea of setting up rendering in LORE is using a `RenderView`, which sets up a scene, camera, and viewport dimensions. By using two of these, it's very easy to setup an offscreen scene and sample it in the main scene (as seen in the 3D sample, where the 2D sample is rendered inside it).
-
-The provided samples showcase how to setup the main LORE objects (The `Context` - the object that manages everything, a `Scene`, and a `Camera`, etc.),  how to load resources, and render the scene.
+Real graphics API backends like Vulkan and D3D12 render plugins :), PBR, better shadows (fix peter-panning, flickering), hybrid renderer (clustered forward/deferred).
 
 ## Building
+
+I wanted an easy build process so there are just a few steps.
 
 ### Clone and initialize submodules
 `git clone https://github.com/MemoryDealer/LORE.git`
@@ -79,8 +51,6 @@ Open `LORE.sln` and build the solution (you probably want the release build for 
 
 You are done :)
 
-**If you are running into performance issues on the release build, please create an issue in the repo with your specs. I suspect there may be some caching issues in the scene graph, especially on certain hardware.**
-
 ### Running the samples
 
 By default the `Sample3D` project is selected. There is also the `Sample2D` project, and the unit tests.
@@ -88,7 +58,7 @@ By default the `Sample3D` project is selected. There is also the `Sample2D` proj
 ## Tips and Tricks
 
 ### Debug UI
-Press shift and `~` to bring up the debug UI and console. Alternatively you can only display the performance stats with `shift + ~`. There are just a few options in the debug UI currently.
+Press `~` to bring up the debug UI and console. Alternatively you can only display the performance stats with `shift + ~`. There are just a few options in the debug UI currently.
 
 ![Lore1](images/lore-ui.gif)
 
@@ -134,4 +104,9 @@ E.g.,
 <br/>
 
 # Architecture
+
+The main idea of setting up rendering in LORE is using a `RenderView`, which sets up a scene, camera, and viewport dimensions. By using two of these, it's very easy to setup an offscreen scene and sample it in the main scene (as seen in the 3D sample, where the 2D sample is rendered inside it).
+
+The provided samples showcase how to setup the main LORE objects (The `Context` - the object that manages everything, a `Scene`, and a `Camera`, etc.),  how to load resources, and render the scene.
+
 **WIP ... pretty charts and stuff coming soon**
