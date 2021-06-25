@@ -2,7 +2,7 @@
 
 ### **[Jump to Building](#building)**
 ### **[Jump to Architecture and Design](#architecture-and-design)**
-### **[About OOP](#about-oop)**
+### **[About OOP](#about-oop-1)**
 
 ## What is LORE?
 
