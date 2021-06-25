@@ -1,12 +1,8 @@
 # LORE - Lightweight Object-oriented Rendering Engine
 
-#### NOTE: **I do not condone object-oriented programming as The Way™ of developing software. This project was partially an experiment in OOP.**
-
-#### I recommend [this video](https://www.youtube.com/watch?v=QM1iUe6IofM) on the topic of OOP.
-<br/>
-
 ### **[Jump to Building](#building)**
 ### **[Jump to Architecture and Design](#architecture-and-design)**
+### **[About OOP](#about-oop)**
 
 ## What is LORE?
 
@@ -199,6 +195,12 @@ Allows you to setup input callbacks (keyboard/mouse). You can also temporarily o
 
 ---
 <br />
+
+### About OOP
+#### **I do not condone object-oriented programming as The Way™ of developing software. This project was partially an experiment in OOP.**
+
+#### I recommend [this video](https://www.youtube.com/watch?v=QM1iUe6IofM) on the topic of OOP.
+<br/>
 
 ### Feel free to submit pull requests or issues, however my time is mostly dedicated to other projects now, as this was a side project just for fun :)
 
